@@ -639,7 +639,6 @@ h1, h2, h3 { font-weight: normal; }
 .round-card { display: grid; gap: 0.5rem; padding: 0.85rem 1rem; }
 .round-card-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
 .round-card-head h2 { font: 11px var(--font-display); }
-.round-card-task { color: var(--muted); font-size: 14px; }
 
 
 /* Score tile: first in the left column, so the score is always in view. */
@@ -653,6 +652,16 @@ h1, h2, h3 { font-weight: normal; }
 .score-tile .journey-label { display: none; }
 .score-tile-round { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--glass-line-soft); color: var(--muted); font-size: 13px; }
 .score-tile-round strong { color: var(--text); font: 700 16px var(--font-mono); }
+
+/* Losing points this round: the card flashes red and the loss floats up and fades. */
+.score-tile.is-losing { animation: tile-losing 0.9s ease-out; }
+.score-tile.is-losing .score-tile-round strong { animation: worth-losing 0.9s ease-out; }
+@keyframes tile-losing { 0%, 40% { border-color: var(--danger) !important; box-shadow: 0 0 0 2px var(--danger), 0 0 28px rgba(255, 107, 125, 0.45), var(--glass-shadow); } 10%, 30% { transform: translateX(-3px); } 20% { transform: translateX(3px); } }
+@keyframes worth-losing { 0%, 50% { color: var(--danger); transform: scale(1.25); } }
+.score-tile-round,
+.score-tile-total { position: relative; }
+.worth-drop { position: absolute; right: 0; bottom: 100%; color: var(--danger); font: 700 18px var(--font-mono); text-shadow: 0 0 12px rgba(255, 107, 125, 0.6); pointer-events: none; animation: worth-drop 1.4s ease-out forwards; }
+@keyframes worth-drop { 0% { opacity: 0; transform: translateY(8px) scale(0.8); } 15% { opacity: 1; transform: translateY(0) scale(1.15); } 100% { opacity: 0; transform: translateY(-26px); } }
 
 /* Round result: takes the answer box's place in the right column. */
 .round-result { display: grid; gap: 0.7rem; animation: result-in 0.35s ease-out; }
@@ -790,7 +799,6 @@ h1, h2, h3 { font-weight: normal; }
 .target-country { display: flex; align-items: center; gap: 0.75rem; }
 .target-country strong { font: var(--question-font); font-size: 19px; }
 .target-flag img { display: block; width: 54px; height: 36px; border: 2px solid var(--line-strong); box-shadow: 3px 3px 0 #04060d; object-fit: cover; }
-.target-note { color: var(--muted); font-size: 13px; }
 .metric-name { color: var(--gold); font: var(--question-font); }
 
 .pinpoint-pick { display: grid; gap: 0.55rem; padding: 0.85rem 1rem; }
@@ -1209,6 +1217,13 @@ h1, h2, h3 { font-weight: normal; }
 .burst-list-flag { width: 24px; height: 16px; border-radius: 3px; object-fit: cover; }
 /* Rank 'Em's order reads top to bottom. */
 .burst-answer-list.is-order { flex-direction: column; align-items: flex-start; }
+/* Deep Cut's answers on the score card: one row per points tier, yours in green. */
+.burst-answer-list:has(.burst-tier) { flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 0.5rem; max-height: 24vh; overflow-y: auto; scrollbar-width: thin; }
+.burst-answer-list li.burst-tier { display: grid; gap: 0.3rem; padding: 0; border-radius: 0; background: none; text-align: center; }
+.burst-tier-label { color: var(--faint); font: 700 10px var(--font-mono); letter-spacing: 0.08em; }
+.burst-tier-answers { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; }
+.burst-tier-answers span { padding: 3px 9px; border-radius: 999px; background: var(--glass-fill); font-size: 13px; }
+.burst-tier-answers span.is-found { background: rgba(92, 242, 138, 0.14); color: var(--t-correct); box-shadow: inset 0 0 0 1px rgba(92, 242, 138, 0.6); }
 
 /* A missed round: the answer leads, the score steps back, and a button moves on. */
 .score-burst.is-missed { cursor: default; }
@@ -1297,8 +1312,10 @@ h1, h2, h3 { font-weight: normal; }
 .rank-reveal-hint { justify-self: center; font-size: 14px; }
 /* A Rank 'Em attempt is one slim row: its number and its lights. */
 :is(.game-view, .modal) .attempt.rank-attempt { gap: 0.7rem; padding: 0.4rem 0.8rem; }
-.rank-attempt .rank-pegs { gap: 6px; }
-.rank-attempt .rank-peg { width: 13px; height: 13px; }
+.rank-attempt-tally { padding: 1px 8px; border-radius: 999px; background: rgba(255, 107, 125, 0.14); color: var(--danger); font: 700 13px var(--font-mono); }
+.attempt.is-right .rank-attempt-tally { background: rgba(92, 242, 138, 0.14); color: var(--t-correct); }
+.rank-attempt-flags { display: flex; gap: 4px; margin-left: auto; }
+.rank-attempt-flag { display: block; width: 22px; height: 15px; border-radius: 3px; object-fit: cover; }
 
 /* Shown once every hint has turned over: the guess card waits for you. */
 .guess-reveal-next {
@@ -2047,7 +2064,6 @@ h1, h2, h3 { font-weight: normal; }
           <div class="round-card-head">
             <h2 id="roundCardName">MYSTERY COUNTRY</h2>
           </div>
-          <p class="round-card-task" id="roundCardTask"></p>
         </section>
 
         <div id="inputToast" class="input-toast hidden" role="status" aria-live="polite"></div>
@@ -2121,7 +2137,6 @@ h1, h2, h3 { font-weight: normal; }
           <section class="panel target-card">
             <span class="field-label">FIND THIS COUNTRY</span>
             <div class="target-country"><span class="target-flag" id="pinpointFlag"></span><strong id="pinpointName"></strong></div>
-            <p class="target-note">Click a country, then confirm.</p>
           </section>
           <section class="panel" aria-label="Clues">
             <div class="panel-head">
@@ -2149,7 +2164,6 @@ h1, h2, h3 { font-weight: normal; }
           <section class="panel target-card deepcut-card">
             <div class="target-country" id="deepcutSubject"><span class="target-flag" id="deepcutFlag"></span><strong id="deepcutCountry"></strong></div>
             <p class="round-question" id="deepcutQuestion"></p>
-            <p class="target-note">Any right answer ends the round. The more niche it is, the more it's worth, up to 1,000. Answers that aren't on the list cost nothing: just try again.</p>
           </section>
           <div class="guess-entry">
             <div class="input-group">
@@ -2170,7 +2184,6 @@ h1, h2, h3 { font-weight: normal; }
         <div class="round-view hidden" data-round="paint">
           <section class="panel target-card">
             <p class="round-question" id="paintQuestion"></p>
-            <p class="target-note" id="paintNote"></p>
           </section>
           <section class="pinpoint-pick" aria-live="polite">
             <span class="field-label">SELECTED</span>
@@ -10150,9 +10163,9 @@ const ROUND_TYPES = ["mystery", "pinpoint", "deepcut", "paint", "rank"];
 
 const ROUND_INFO = {
   mystery: { name: "Mystery Country", task: "Guess the country from its clues." },
-  pinpoint: { name: "Pinpoint", task: "Find the country on the globe from the clues." },
-  deepcut: { name: "Deep Cut", task: "Give one right answer: the more niche, the more points." },
-  paint: { name: "Paint the Map", task: "Click every country that fits." },
+  pinpoint: { name: "Pinpoint", task: "Find the country on the globe from the clues. Click a country, then confirm." },
+  deepcut: { name: "Deep Cut", task: "Give one right answer: the more niche, the more points. Wrong answers cost nothing." },
+  paint: { name: "Paint the Map", task: "Click every country that fits. Every wrong one costs 200; five wrong ends the round." },
   rank: { name: "Rank 'Em", task: "Put the five countries in order." }
 };
 
@@ -11905,16 +11918,26 @@ function renderBurstAnswer(round, result) {
   let note = "";
   let items = [];
   if (round.type === "deepcut") {
-    // Your answer and its worth, then the most niche answers you could have given.
+    // Your answer and its worth, then every answer that counted, grouped by its points
+    // (most niche first), yours picked out in green.
     const state = day.rounds[plan.indexOf(round)];
     const answers = getDeepCutAnswers(round);
     const mine = answers.find(answer => answer.text === state.answer);
-    kicker = mine ? `YOUR ANSWER · ${describeNiche(mine.points)}` : "SOME ANSWERS THAT WOULD HAVE COUNTED";
+    kicker = mine ? `YOUR ANSWER · ${describeNiche(mine.points)}` : "ANSWERS THAT WOULD HAVE COUNTED";
     name = mine?.text || "";
-    note = mine && mine.points < MAX_ROUND_SCORE ? "The most niche answers were worth 1,000:" : "";
-    const niche = answers.filter(answer => answer.points === MAX_ROUND_SCORE && answer.text !== mine?.text).slice(0, 4);
-    const obvious = mine ? [] : answers.filter(answer => answer.points === DEEP_CUT_TIERS.at(-1)).slice(0, 2);
-    items = [...niche, ...obvious].map(answer => listItem(null, `${answer.text} · ${answer.points.toLocaleString()}`, answer.points === MAX_ROUND_SCORE ? "is-found" : ""));
+    note = `All ${answers.length} answers`;
+    items = DEEP_CUT_TIERS.map(points => {
+      const tier = answers.filter(answer => answer.points === points);
+      if (!tier.length) return null;
+      const group = Object.assign(document.createElement("li"), { className: "burst-tier" });
+      const chips = Object.assign(document.createElement("div"), { className: "burst-tier-answers" });
+      tier.forEach(answer => chips.appendChild(Object.assign(document.createElement("span"), {
+        className: answer.text === mine?.text ? "is-found" : "",
+        textContent: answer.text === mine?.text ? `✓ ${answer.text}` : answer.text
+      })));
+      group.append(Object.assign(document.createElement("span"), { className: "burst-tier-label", textContent: `${points.toLocaleString()} · ${describeNiche(points)}` }), chips);
+      return group;
+    }).filter(Boolean);
   } else if (round.type === "paint") {
     kicker = round.question.toUpperCase();
     const found = new Set(day.rounds[plan.indexOf(round)].found);
@@ -12070,10 +12093,10 @@ function render({ animateGlobe = true } = {}) {
     return item;
   }));
 
-  // Round card: name, task and (once finished) the result. A round's difficulty is
-  // never shown: whether a question is easy or hard is for the player to find out.
+  // Round card: just the name (the task is on the round's title card, and once you're
+  // playing it's clear) and, once finished, the result. A round's difficulty is never
+  // shown: whether a question is easy or hard is for the player to find out.
   setText("roundCardName", ROUND_INFO[round.type].name.toUpperCase());
-  setText("roundCardTask", ROUND_INFO[round.type].task);
   renderRoundResult(round, dayScore.rounds[viewIndex], progress);
 
   document.querySelectorAll(".round-view").forEach(view => {
@@ -12131,8 +12154,30 @@ function renderScoreTile(dayScore) {
   }
   const progress = progressOf(viewIndex);
   const worth = Math.max(0, MAX_ROUND_SCORE - WRONG_PENALTY * (progress.wrong + (plan[viewIndex].rerolled ? 1 : 0)));
+  const shownWorth = Math.round(worth * (worth === MAX_ROUND_SCORE ? multiplier : 1));
   setText("scoreTileRoundLabel", `Round ${viewIndex + 1} is worth up to`);
-  setText("scoreTileWorth", Math.round(worth * (worth === MAX_ROUND_SCORE ? multiplier : 1)).toLocaleString());
+  setText("scoreTileWorth", shownWorth.toLocaleString());
+  // When the round's worth drops (a wrong guess, a re-roll), make the loss visible.
+  const worthKey = `${activeDate}:${viewIndex}`;
+  if (lastWorth.key === worthKey && shownWorth < lastWorth.value) showWorthDrop(lastWorth.value - shownWorth);
+  lastWorth = { key: worthKey, value: shownWorth };
+}
+
+// The round's worth as last shown, to spot a drop.
+let lastWorth = { key: null, value: 0 };
+
+// The score card flashes red and the points lost float up from the round's worth (or,
+// on a phone, where that line is hidden, from the day's total).
+function showWorthDrop(amount) {
+  const tile = document.querySelector(".score-tile");
+  const worth = document.getElementById("scoreTileWorth");
+  const anchor = worth.offsetParent ? worth : document.getElementById("dailyTotalScore");
+  tile.classList.remove("is-losing");
+  void tile.offsetWidth;
+  tile.classList.add("is-losing");
+  const badge = Object.assign(document.createElement("span"), { className: "worth-drop", textContent: `−${amount.toLocaleString()}` });
+  anchor.parentElement.appendChild(badge);
+  setTimeout(() => badge.remove(), 1400);
 }
 
 function renderRoundResult(round, result, progress) {
@@ -12367,7 +12412,6 @@ const ROUND_RENDERERS = {
   paint(round, state, progress) {
     const total = round.answers.length;
     setText("paintQuestion", round.question);
-    setText("paintNote", `${total} countries to find. Every wrong one costs 200; five wrong ends the round.`);
     setText("paintCount", `${state.found.length} / ${total}`);
     document.getElementById("paintDone").disabled = progress.done;
 
@@ -12466,14 +12510,20 @@ const ROUND_RENDERERS = {
       const right = submission.filter((iso, position) => round.answer[position] === iso).length;
       const item = document.createElement("li");
       item.className = right === submission.length ? "attempt is-right" : "attempt is-wrong";
-      // Just the lights, as on the try's card: green for each in place, then red. The
-      // order you tried shows on hover; hinted values stay on the board itself.
+      // How many were in the right place as "1/5" (the card's lights, green first, read
+      // as if the first country were right), and the order you tried as a row of flags
+      // (names on hover). Hinted values stay on the board.
       item.classList.add("rank-attempt");
       item.title = `Try ${index + 1}: ${submission.map(iso => getCountry(iso).name).join(", ")}`;
-      const pegs = Object.assign(document.createElement("span"), { className: "rank-pegs", role: "img" });
-      pegs.setAttribute("aria-label", `Try ${index + 1}: ${right} of ${submission.length} in the right place`);
-      submission.forEach((_, peg) => pegs.appendChild(Object.assign(document.createElement("i"), { className: `rank-peg is-turned ${peg < right ? "is-match" : "is-miss"}` })));
-      item.append(Object.assign(document.createElement("b"), { textContent: right === submission.length ? "✓" : "✕" }), Object.assign(document.createElement("span"), { className: "guess-number", textContent: String(index + 1) }), pegs);
+      const tally = Object.assign(document.createElement("span"), { className: "rank-attempt-tally", textContent: `${right}/${submission.length}` });
+      tally.setAttribute("aria-label", `${right} of ${submission.length} in the right place`);
+      const tried = Object.assign(document.createElement("span"), { className: "rank-attempt-flags" });
+      submission.forEach(iso => {
+        const flag = createFlagImage(getCountry(iso), "rank-attempt-flag");
+        flag.title = getCountry(iso).name;
+        tried.appendChild(flag);
+      });
+      item.append(Object.assign(document.createElement("b"), { textContent: right === submission.length ? "✓" : "✕" }), Object.assign(document.createElement("span"), { className: "guess-number", textContent: String(index + 1) }), tally, tried);
       return item;
     }));
     if (!state.submissions.length) attempts.appendChild(Object.assign(document.createElement("li"), { className: "attempt is-note", textContent: "A correct first try is worth 1,000." }));
