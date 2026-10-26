@@ -677,7 +677,11 @@ h1, h2, h3 { font-weight: normal; }
 .round-result-text { font-size: 14px; }
 
 /* The answer box, help choices and give-up links step aside once the round is over. */
-.game-view.is-round-done .side-right :is(.guess-entry, .pinpoint-pick, #pinpointGiveUp, #paintDone, #rankSubmit, #rankReroll) { display: none; }
+.game-view.is-round-done .side-right :is(.guess-entry, .pinpoint-pick, #pinpointGiveUp, #paintDone, .rank-actions) { display: none; }
+/* SUBMIT ORDER fills the row, sharing it with NEW TOPIC while that's still on offer. */
+.rank-actions { display: flex; gap: 0.5rem; }
+.rank-actions .btn { flex: 1; }
+.rank-actions .btn-secondary { flex: 0 0 auto; }
 /* With the answer box gone (and its suggestion list with it), a finished round's column
    can scroll, for the info card and long answer lists. */
 .game-view.is-round-done .side-right { overflow-y: auto; scrollbar-width: thin; }
@@ -783,7 +787,6 @@ h1, h2, h3 { font-weight: normal; }
 .next-round-kicker { font: 700 11px var(--font-mono); letter-spacing: 0.08em; opacity: 0.75; }
 .next-round-name { font: 12px/1.4 var(--font-display); }
 .next-round-go { display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem; font-size: 18px; }
-.next-round kbd { padding: 1px 6px; border-radius: 5px; background: rgba(4, 18, 26, 0.14); font: 700 11px var(--font-mono); }
 
 @keyframes next-glow {
   50% { box-shadow: 0 0 0 4px rgba(69, 227, 255, 0.18), 0 0 28px rgba(69, 227, 255, 0.45); }
@@ -1333,7 +1336,6 @@ h1, h2, h3 { font-weight: normal; }
   pointer-events: none;
   transition: opacity 0.25s ease;
 }
-.guess-reveal-next small { font: 11px var(--font-body); opacity: 0.7; }
 .is-complete .guess-reveal-next { opacity: 1; pointer-events: auto; }
 
 /* The row waits, hidden, while the card flies into its place. */
@@ -2088,7 +2090,7 @@ h1, h2, h3 { font-weight: normal; }
               <span class="next-round-kicker" id="nextRoundKicker">NEXT · ROUND 2 / 5</span>
               <strong class="next-round-name" id="nextRoundName">PINPOINT</strong>
             </span>
-            <span class="next-round-go"><kbd>Enter ↵</kbd><span aria-hidden="true">▶</span></span>
+            <span class="next-round-go"><span aria-hidden="true">▶</span></span>
           </button>
           <button class="give-up hidden" id="backToResultsButton" type="button">Back to today's results</button>
         </section>
@@ -2211,9 +2213,12 @@ h1, h2, h3 { font-weight: normal; }
             <ol class="rank-list" id="rankList"></ol>
             <span class="field-label rank-board-foot" id="rankBoardBottom">LOWEST</span>
           </div>
-          <button class="btn btn-primary btn-block" id="rankSubmit" type="button">SUBMIT ORDER</button>
-          <!-- Before the first try: swap the topic for the day's backup, for 200 points. -->
-          <button class="give-up hidden" id="rankReroll" type="button">🎲 New topic (costs 200)</button>
+          <!-- Before the first try, NEW TOPIC swaps the topic for the day's backup, for 200
+               points; it goes once used (or once you've tried an order). -->
+          <div class="rank-actions">
+            <button class="btn btn-primary" id="rankSubmit" type="button">SUBMIT ORDER</button>
+            <button class="btn btn-secondary hidden" id="rankReroll" type="button">NEW TOPIC −200</button>
+          </div>
           <section class="panel guesses-panel" aria-label="Attempts">
             <div class="panel-head">
               <h2>ATTEMPTS</h2>
@@ -2248,7 +2253,7 @@ h1, h2, h3 { font-weight: normal; }
             <span class="next-round-kicker" id="scoreBurstNextKicker">NEXT · ROUND 2 / 5</span>
             <strong class="next-round-name" id="scoreBurstNextName">PINPOINT</strong>
           </span>
-          <span class="next-round-go"><kbd>Enter ↵</kbd><span aria-hidden="true">▶</span></span>
+          <span class="next-round-go"><span aria-hidden="true">▶</span></span>
         </button>
       </div>
     </div>
@@ -2258,7 +2263,7 @@ h1, h2, h3 { font-weight: normal; }
         <span class="round-intro-count" id="roundIntroCount">ROUND 1 / 5</span>
         <h2 class="round-intro-name" id="roundIntroName">MYSTERY COUNTRY</h2>
         <p class="round-intro-task" id="roundIntroTask"></p>
-        <span class="round-intro-start">Click or press Enter to start</span>
+        <span class="round-intro-start">Click to start</span>
       </div>
     </div>
   </div>
@@ -7567,7 +7572,7 @@ function playRevealCard({ card, steps, nextLabel, land, sound = () => {}, onTurn
   card.classList.add("guess-reveal-card");
   steps.forEach(({ element }) => element.classList.add("reveal-slot"));
   const next = Object.assign(document.createElement("button"), { type: "button", className: "guess-reveal-next" });
-  next.append(`${nextLabel} ▶`, Object.assign(document.createElement("small"), { textContent: "or press Enter" }));
+  next.textContent = `${nextLabel} ▶`;
   card.appendChild(next);
   overlay.appendChild(card);
   host.appendChild(overlay);
@@ -11677,8 +11682,7 @@ function slideCardsOut() { document.getElementById("gameView").classList.add("is
 function slideCardsIn() { document.getElementById("gameView").classList.remove("is-switching"); }
 
 // Title shown over the globe when a round starts (once per round per visit), with the
-// cards slid out of the way; fades by itself or on a click / key press.
-let roundIntroTimer = null;
+// cards slid out of the way. It waits for a click or Enter, so there's time to read it.
 const shownIntros = new Set();
 function showRoundIntro(index) {
   const key = `${activeDate}:${index}`;
@@ -11693,14 +11697,11 @@ function showRoundIntro(index) {
   overlay.classList.remove("hidden", "is-leaving");
   void overlay.offsetWidth;
   overlay.classList.add("is-showing");
-  clearTimeout(roundIntroTimer);
-  roundIntroTimer = setTimeout(hideRoundIntro, 1700);
 }
 
 function hideRoundIntro() {
   const overlay = document.getElementById("roundIntro");
   if (overlay.classList.contains("hidden") || overlay.classList.contains("is-leaving")) return;
-  clearTimeout(roundIntroTimer);
   overlay.classList.add("is-leaving");
   slideCardsIn();
   setTimeout(() => {
