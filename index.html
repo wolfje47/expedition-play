@@ -641,10 +641,6 @@ h1, h2, h3 { font-weight: normal; }
 .round-card-head h2 { font: 11px var(--font-display); }
 .round-card-task { color: var(--muted); font-size: 14px; }
 
-.difficulty { display: inline-flex; align-items: center; gap: 3px; color: var(--muted); font: 700 10px var(--font-mono); letter-spacing: 0.08em; }
-.difficulty i { width: 8px; height: 8px; margin-right: 1px; background: var(--line); }
-.difficulty i.on { background: var(--gold); }
-.difficulty i:last-of-type { margin-right: 6px; }
 
 /* Score tile: first in the left column, so the score is always in view. */
 .score-tile { display: grid; gap: 0.35rem; padding: 0.9rem 1.1rem 1rem; border-color: rgba(255, 212, 92, 0.28) !important; }
@@ -781,9 +777,6 @@ h1, h2, h3 { font-weight: normal; }
 .next-round-text { display: grid; gap: 0.3rem; }
 .next-round-kicker { font: 700 11px var(--font-mono); letter-spacing: 0.08em; opacity: 0.75; }
 .next-round-name { font: 12px/1.4 var(--font-display); }
-.next-round .difficulty { color: rgba(4, 18, 26, 0.7); }
-.game-view .next-round .difficulty i { background: rgba(4, 18, 26, 0.2); }
-.game-view .next-round .difficulty i.on { background: #04121a; }
 .next-round-go { display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem; font-size: 18px; }
 .next-round kbd { padding: 1px 6px; border-radius: 5px; background: rgba(4, 18, 26, 0.14); font: 700 11px var(--font-mono); }
 
@@ -934,11 +927,9 @@ h1, h2, h3 { font-weight: normal; }
 .round-result { padding: 1rem 1.1rem; }
 .round-result.panel { border-color: rgba(255, 212, 92, 0.35); }
 
-.game-view .pips i,
-.game-view .difficulty i { border-radius: 2px; background: rgba(255, 255, 255, 0.16); }
+.game-view .pips i { border-radius: 2px; background: rgba(255, 255, 255, 0.16); }
 .game-view .pips i { height: 6px; border-radius: 3px; }
 .game-view .pips i.on { background: var(--accent); }
-.game-view .difficulty i.on { background: var(--gold); }
 
 .game-view .clue-tag { border-radius: 6px; }
 .game-view .clue-locked { border-top: 1px solid var(--glass-line-soft); }
@@ -1115,8 +1106,6 @@ h1, h2, h3 { font-weight: normal; }
 .round-intro-count { color: var(--muted); font: 700 12px var(--font-mono); letter-spacing: 0.25em; }
 .round-intro-name { color: var(--accent); font: clamp(1.1rem, 2.6vw, 1.5rem)/1.4 var(--font-display); letter-spacing: 0.1em; text-shadow: 0 0 22px rgba(69, 227, 255, 0.35); }
 .round-intro-task { color: var(--text); font-size: 16px; }
-.round-intro-difficulty { font-size: 11px; }
-.round-intro-difficulty i { border-radius: 2px; }
 .round-intro-start { margin-top: 0.2rem; color: var(--faint); font: 12px var(--font-mono); }
 
 .round-intro.is-showing .round-intro-card { animation: intro-in 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.1) both; }
@@ -2031,7 +2020,6 @@ h1, h2, h3 { font-weight: normal; }
         <section class="panel round-card" aria-live="polite">
           <div class="round-card-head">
             <h2 id="roundCardName">MYSTERY COUNTRY</h2>
-            <span class="difficulty" id="roundDifficulty"></span>
           </div>
           <p class="round-card-task" id="roundCardTask"></p>
         </section>
@@ -2057,7 +2045,6 @@ h1, h2, h3 { font-weight: normal; }
             <span class="next-round-text">
               <span class="next-round-kicker" id="nextRoundKicker">NEXT · ROUND 2 / 5</span>
               <strong class="next-round-name" id="nextRoundName">PINPOINT</strong>
-              <span class="difficulty" id="nextRoundDifficulty"></span>
             </span>
             <span class="next-round-go"><kbd>Enter ↵</kbd><span aria-hidden="true">▶</span></span>
           </button>
@@ -2230,7 +2217,6 @@ h1, h2, h3 { font-weight: normal; }
         <span class="round-intro-count" id="roundIntroCount">ROUND 1 / 5</span>
         <h2 class="round-intro-name" id="roundIntroName">MYSTERY COUNTRY</h2>
         <p class="round-intro-task" id="roundIntroTask"></p>
-        <span class="difficulty round-intro-difficulty" id="roundIntroDifficulty"></span>
         <span class="round-intro-start">Click or press Enter to start</span>
       </div>
     </div>
@@ -2250,7 +2236,7 @@ h1, h2, h3 { font-weight: normal; }
         <li><b>Paint the Map</b>: click every country that fits the question. Each wrong one costs 200; five wrong ends the round.</li>
         <li><b>Rank 'Em</b>: drag five countries into order by the day's topic. A wrong try with at least one in the right place reveals one country's real value.</li>
       </ol>
-      <p class="modal-note">Perfect rounds in a row build a streak: the second scores ×1.1, the third ×1.2, up to 6,000 for a flawless day. Each day has one easy, one hard and three in-between rounds, in a different order every day.</p>
+      <p class="modal-note">Perfect rounds in a row build a streak: the second scores ×1.1, the third ×1.2, up to 6,000 for a flawless day.</p>
       <label id="howToDontShow" class="dont-show hidden">
         <input type="checkbox" id="howToDontShowBox">
         <span>Don't show this again</span>
@@ -11209,7 +11195,6 @@ const LEGACY_SCORE_SCALE = MAX_DAILY_SCORE / 1000;
 // here, including upcoming ones, labelled "Day 1", "Day 2", ... instead of by date.
 const LAUNCH_DATE = "2026-10-01";
 const PRELOADED_DAYS = 30;
-const DIFFICULTY_LABELS = ["", "EASY", "FAIR", "MEDIUM", "TRICKY", "HARD"];
 // One colour per Rank 'Em country, on the board and on the globe.
 const RANK_COLORS = ["#45e3ff", "#ffd45c", "#ff8a3d", "#c58cff", "#5cf28a"];
 
@@ -11387,11 +11372,6 @@ function showRoundIntro(index) {
   setText("roundIntroCount", `ROUND ${index + 1} / ${plan.length}`);
   setText("roundIntroName", ROUND_INFO[round.type].name.toUpperCase());
   setText("roundIntroTask", ROUND_INFO[round.type].task);
-  document.getElementById("roundIntroDifficulty").replaceChildren(...[1, 2, 3, 4, 5].map(level => {
-    const pip = document.createElement("i");
-    if (level <= round.difficulty) pip.className = "on";
-    return pip;
-  }), DIFFICULTY_LABELS[round.difficulty]);
   overlay.classList.remove("hidden", "is-leaving");
   void overlay.offsetWidth;
   overlay.classList.add("is-showing");
@@ -11784,16 +11764,10 @@ function render({ animateGlobe = true } = {}) {
     return item;
   }));
 
-  // Round card: name, task, difficulty and (once finished) the result.
+  // Round card: name, task and (once finished) the result. A round's difficulty is
+  // never shown: whether a question is easy or hard is for the player to find out.
   setText("roundCardName", ROUND_INFO[round.type].name.toUpperCase());
   setText("roundCardTask", ROUND_INFO[round.type].task);
-  const difficulty = document.getElementById("roundDifficulty");
-  difficulty.replaceChildren(...[1, 2, 3, 4, 5].map(level => {
-    const pip = document.createElement("i");
-    if (level <= round.difficulty) pip.className = "on";
-    return pip;
-  }), DIFFICULTY_LABELS[round.difficulty]);
-  difficulty.title = `Difficulty ${round.difficulty} of 5`;
   renderRoundResult(round, dayScore.rounds[viewIndex], progress);
 
   document.querySelectorAll(".round-view").forEach(view => {
@@ -11883,20 +11857,13 @@ function renderRoundResult(round, result, progress) {
 
   const isLast = viewIndex === plan.length - 1;
   const complete = isDayComplete();
-  const difficulty = document.getElementById("nextRoundDifficulty");
   if (isLast) {
     setText("nextRoundKicker", "THAT'S THE DAY");
     setText("nextRoundName", "SEE TODAY'S RESULTS");
-    difficulty.replaceChildren();
   } else {
     const next = plan[viewIndex + 1];
     setText("nextRoundKicker", `NEXT · ROUND ${viewIndex + 2} / ${plan.length}`);
     setText("nextRoundName", ROUND_INFO[next.type].name.toUpperCase());
-    difficulty.replaceChildren(...[1, 2, 3, 4, 5].map(level => {
-      const pip = document.createElement("i");
-      if (level <= next.difficulty) pip.className = "on";
-      return pip;
-    }), DIFFICULTY_LABELS[next.difficulty]);
   }
   // While reviewing a finished day, the summary is always one click away.
   document.getElementById("backToResultsButton").classList.toggle("hidden", !complete || isLast);
