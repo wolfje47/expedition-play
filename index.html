@@ -44,7 +44,7 @@
   --glass-fill: rgba(0, 0, 0, 0.24);
   --glass-shine: inset 0 1px 0 rgba(255, 255, 255, 0.16);
   --glass-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
-  --glass-blur: blur(18px) saturate(150%);
+  --glass-blur: blur(12px) saturate(140%);
 
   /* Distance feedback; also used for the globe markers (see engine.js). */
   --t-correct: #5cf28a;
@@ -441,10 +441,8 @@ h1, h2, h3 { font-weight: normal; }
 .ad-slot { flex-shrink: 0; align-self: center; width: 300px; height: 250px; border-radius: 14px; overflow: hidden; }
 .side-right > *,
 .side-right .round-view > * { flex-shrink: 0; }
-/* Guesses and What we know share whatever height is left, each scrolling inside. */
+/* The guesses take whatever height is left, scrolling inside. */
 .side-right .round-view > .guesses-panel { flex: 1 1 auto; min-height: 150px; }
-.side-right .round-view > .known-panel { display: flex; flex-direction: column; flex: 0 1 auto; min-height: 110px; }
-.side-right .known-panel .known-list { min-height: 0; overflow-y: auto; }
 
 .game-view .panel { border-radius: 18px; }
 
@@ -493,11 +491,12 @@ h1, h2, h3 { font-weight: normal; }
 
 .clue-locked:empty { display: none; }
 
-/* Sits under the guesses, which shrink and scroll to leave it room. */
-.known-panel { flex: none; }
-.known-list { display: grid; gap: 0.3rem; padding: 0.7rem 1rem 0.8rem; list-style: none; font-size: 13px; line-height: 1.35; }
-.known-list li { position: relative; padding-left: 1rem; }
-.known-list li::before { position: absolute; left: 0; color: var(--accent); content: "›"; }
+/* Mystery's "What we know": chips above the guesses, in the hint chips' colours. */
+.known-strip { display: grid; flex: none; gap: 0.4rem; padding: 0.6rem 0.8rem 0.2rem; }
+.known-strip .field-label { font-size: 9px; }
+.known-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.known-chips .fact { border: 0; font: inherit; font-size: 12px; cursor: help; }
+.known-detail { color: var(--muted); font-size: 12px; }
 
 /* Guess input */
 
@@ -1237,72 +1236,53 @@ h1, h2, h3 { font-weight: normal; }
 
 @keyframes burst-in { from { opacity: 0; transform: scale(0.8); filter: blur(8px); } }
 
-/* ---------- Guess reveal overlay ---------- */
+/* ---------- Guess reveal ---------- */
 
-.jumbotron-overlay {
+/* Mystery and Pinpoint: a guess shows as a card in the middle (flag, name, hot/cold,
+   then its hints one by one) and then flies into its row in the list. A light dim, no
+   blur, so the globe behind it costs nothing extra to draw. */
+.guess-reveal {
   position: fixed;
   inset: 0;
   z-index: 250;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   padding: 5vh 5vw;
-  background: rgba(2, 3, 8, 0.6);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  pointer-events: none;
+  background: rgba(2, 3, 8, 0.45);
+  animation: intro-fade 0.2s ease both;
+  cursor: pointer;
 }
+.guess-reveal.is-leaving { background: transparent; transition: background 0.38s ease; }
 
-.jumbotron-board {
-  width: min(90vw, 600px);
-  padding: clamp(1rem, 3vw, 2rem);
-  border: 1px solid rgba(255, 212, 92, 0.4);
-  border-radius: 26px;
-  background: var(--glass);
-  box-shadow: var(--glass-shine), var(--glass-shadow), 0 0 60px rgba(255, 212, 92, 0.18);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  text-align: center;
-  opacity: 0;
+.guess-reveal-card {
+  display: grid;
+  gap: 0.9rem;
+  width: min(92vw, 440px);
+  padding: 1.1rem 1.2rem;
+  border-radius: 20px;
+  background: var(--glass-strong);
+  box-shadow: inset 4px 0 0 var(--temp), var(--glass-shine), var(--glass-shadow);
+  animation: reveal-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
 }
+.is-leaving .guess-reveal-card { transition: transform 0.38s cubic-bezier(0.6, 0, 0.3, 1), opacity 0.38s ease-in; opacity: 0; }
+@keyframes reveal-in { from { opacity: 0; transform: scale(0.88); } }
 
-.jumbotron-now-guessing { color: var(--gold); font: clamp(0.8rem, 2.5vw, 1.1rem) var(--font-display); }
+.guess-reveal-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.8rem; }
+.guess-reveal-flag { display: block; width: 54px; height: 36px; border-radius: 6px; object-fit: cover; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45); }
+.guess-reveal-name { overflow: hidden; font-size: 24px; text-overflow: ellipsis; white-space: nowrap; }
+.guess-reveal .temp-badge { font-size: 13px; }
+.guess-reveal-outline { position: relative; grid-column: 1 / -1; height: 96px; }
+.guess-reveal .guess-facts { grid-column: auto; gap: 0.4rem; }
+.guess-reveal .fact { padding: 0.25rem 0.55rem; font-size: 14px; animation: chip-in 0.22s ease-out both; animation-delay: calc(0.18s + var(--i) * 0.07s); }
+@keyframes chip-in { from { opacity: 0; transform: translateY(4px); } }
 
-.jumbotron-visuals {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(1rem, 4vw, 2rem);
-  margin: 1.25rem 0;
-}
+/* The row waits, hidden, while the card flies into its place. */
+.guess-row.is-landing { opacity: 0; }
 
-.jumbotron-flag { line-height: 0; }
-
-.jumbotron-flag-image {
-  display: block;
-  width: min(35vw, 240px, 28vh);
-  height: min(23vw, 160px, 19vh);
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  object-fit: cover;
-}
-
-/* The outline is pinned to this box: as a grid or flex item, an SVG's height: 100% is
-   ignored and it takes its height from the viewBox, so tall countries overflowed. */
-.jumbotron-silhouette { position: relative; flex: none; width: clamp(100px, 20vw, 170px); height: clamp(90px, 18vw, 150px); }
-.jumbotron-country-outline { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.jumbotron-country-outline path { fill: rgba(255, 212, 92, 0.16); stroke: var(--gold); stroke-width: 2; vector-effect: non-scaling-stroke; }
-
-.jumbotron-country { color: var(--text); font: 700 clamp(1.3rem, 4vw, 2rem) var(--font-body); }
-
-.jumbotron-active .jumbotron-board { animation: jumbotron-pop 1.8s ease both; }
-
-@keyframes jumbotron-pop {
-  0% { opacity: 0; transform: scale(0.85); }
-  12% { opacity: 1; transform: scale(1.02); }
-  20%, 82% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.02); }
-}
+/* A country's outline, scaled to fit its box (positioned, as a grid or flex item's
+   height: 100% would be ignored and the SVG would take its height from the viewBox). */
+.country-outline { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.country-outline path { fill: rgba(255, 212, 92, 0.16); stroke: var(--gold); stroke-width: 2; vector-effect: non-scaling-stroke; }
 
 /* ---------- Modals ---------- */
 
@@ -1804,10 +1784,8 @@ h1, h2, h3 { font-weight: normal; }
   .game-view .side-right .autocomplete-list { background: rgb(10, 16, 32); }
   .sheet-handle span { width: 42px; height: 5px; border-radius: 99px; background: rgba(255, 255, 255, 0.35); }
   .side-right .panel { border-radius: 16px; }
-  .side-right .round-view > .guesses-panel,
-  .side-right .round-view > .known-panel { flex: none; min-height: 0; }
-  .side-right .guess-list,
-  .side-right .known-panel .known-list { overflow: visible; }
+  .side-right .round-view > .guesses-panel { flex: none; min-height: 0; }
+  .side-right .guess-list { overflow: visible; }
   /* What you tapped on the globe, and its button, come first, where they can be seen. */
   .side-right .round-view > .pinpoint-pick { order: -1; }
   /* Big enough to tap. */
@@ -1844,7 +1822,22 @@ h1, h2, h3 { font-weight: normal; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .jumbotron-active .jumbotron-board { animation-duration: 1.8s; animation-timing-function: steps(1, end); }
+  .guess-reveal-card, .guess-reveal .fact { animation: none; }
+}
+
+/* ?fps in the address: a small frame counter for checking how smooth the game runs. */
+.frame-counter {
+  position: fixed;
+  bottom: 8px;
+  left: 50%;
+  z-index: 400;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--t-correct);
+  font: 12px var(--font-mono);
+  pointer-events: none;
+  transform: translateX(-50%);
 }
 
 </style>
@@ -2072,12 +2065,14 @@ h1, h2, h3 { font-weight: normal; }
               <h2>GUESSES</h2>
               <span class="panel-count" id="guessCount">0 / 5</span>
             </div>
+            <!-- What all the guesses below say about the answer, as chips: hover (or tap)
+                 one for the full sentence. -->
+            <div class="known-strip hidden" id="knownStrip" aria-label="What we know">
+              <span class="field-label">WHAT WE KNOW</span>
+              <div class="known-chips" id="knownChips"></div>
+              <p class="known-detail hidden" id="knownDetail"></p>
+            </div>
             <ol id="history" class="guess-list"></ol>
-          </section>
-          <!-- Everything the guesses above say about the answer, in one place. -->
-          <section class="panel known-panel hidden" id="knownPanel" aria-label="What we know">
-            <div class="panel-head"><h2>WHAT WE KNOW</h2></div>
-            <ul class="known-list" id="knownList"></ul>
           </section>
         </div>
 
@@ -2209,17 +2204,6 @@ h1, h2, h3 { font-weight: normal; }
         <p class="round-intro-task" id="roundIntroTask"></p>
         <span class="difficulty round-intro-difficulty" id="roundIntroDifficulty"></span>
         <span class="round-intro-start">Click or press Enter to start</span>
-      </div>
-    </div>
-
-    <div id="jumbotronOverlay" class="jumbotron-overlay hidden" role="status" aria-live="assertive">
-      <div class="jumbotron-board">
-        <div class="jumbotron-now-guessing">NOW GUESSING</div>
-        <div class="jumbotron-visuals" aria-hidden="true">
-          <div id="jumbotronFlag" class="jumbotron-flag"></div>
-          <div id="jumbotronSilhouette" class="jumbotron-silhouette"></div>
-        </div>
-        <div id="jumbotronCountry" class="jumbotron-country"></div>
       </div>
     </div>
   </div>
@@ -5106,13 +5090,17 @@ class DetailTiles {
   }
 
   // Fades tiles towards their target opacity; called every frame.
+  // Fades tiles towards their target; true while any tile is still fading.
   animate() {
+    let fading = false;
     this.tiles.forEach(tile => {
-      if (!tile.mesh) return;
+      if (!tile.mesh || tile.mesh.material.opacity === tile.target) return;
       const opacity = tile.mesh.material.opacity + (tile.target - tile.mesh.material.opacity) * 0.15;
       tile.mesh.material.opacity = Math.abs(opacity - tile.target) < 0.01 ? tile.target : opacity;
       tile.mesh.visible = tile.mesh.material.opacity > 0.01;
+      fading = true;
     });
+    return fading;
   }
 
   // Centre of the view (lat/lon) and how far the visible area reaches, or null when
@@ -5535,6 +5523,13 @@ const MENU_HORIZON = 0.42; // where the horizon sits: 0 = screen centre, 1 = bot
 const MENU_TILT = 0.15;
 const MENU_SPIN_SPEED = 0.018; // radians per second (one turn in about six minutes)
 const TRANSITION_MS = 1800; // menu horizon -> game globe
+// While playing, the globe is only redrawn when something on it changes; a pulsing
+// outline redraws at a gentler rate, and an idle globe still refreshes now and then.
+const PULSE_FRAME_MS = 33;
+const IDLE_FRAME_MS = 500;
+// Sharpness steps down (to no less than 1) while turning stays below about 45 fps.
+const SLOW_FRAME_MS = 22;
+const MIN_PIXEL_RATIO = 1;
 // Where every game starts: the flight from the menu always ends here.
 const START_VIEW = { lat: 15, lon: 10 };
 const MENU_SAMPLE_SPACING = 48; // screen pixels between the points that pick detail tiles
@@ -5600,6 +5595,12 @@ class PixelGlobe {
     this.viewShiftY = 0;
     this.borderLines = [];
     this.lastFrame = performance.now();
+    this.lastRender = 0;
+    this.needsRender = true;
+    this.viewSignature = "";
+    // Frame times while the globe moves, for stepping the sharpness down.
+    this.movingFrames = [];
+    this.stats = { renders: 0, pixelRatio: 1 };
     this.onGlobeClick = () => {};
     this.init();
   }
@@ -5615,6 +5616,7 @@ class PixelGlobe {
 
     this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    this.stats.pixelRatio = this.renderer.getPixelRatio();
     this.renderer.setSize(width, height);
     this.renderer.outputEncoding = THREE.sRGBEncoding;
     this.container.appendChild(this.renderer.domElement);
@@ -5723,16 +5725,18 @@ class PixelGlobe {
       material.map = texture;
       material.color.set(0xffffff);
       material.needsUpdate = true;
+      this.requestRender();
     }).catch(error => console.error("Unable to load the Earth satellite texture.", error));
 
     // City lights for the menu's night side; they stay dark during the game.
-    load("earth-night.jpg", false).then(texture => this.applyNightLights(material, texture))
+    load("earth-night.jpg", false).then(texture => { this.applyNightLights(material, texture); this.requestRender(); })
       .catch(error => console.error("Unable to load the night-lights texture.", error));
 
     // Relief shading is an extra; the globe works without it.
     load("earth-topology.png", false).then(texture => {
       material.bumpMap = texture;
       material.needsUpdate = true;
+      this.requestRender();
     }).catch(error => console.error("Unable to load the Earth relief texture.", error));
   }
 
@@ -5754,6 +5758,7 @@ class PixelGlobe {
         this.createSurfaceLines(coastlines.coordinates, BORDER_RADIUS, 0xffffff, 0.22)
       ];
       this.globeGroup.add(...this.borderLines);
+      this.requestRender();
       if (this.highlights.length) this.setHighlights(this.highlights);
     } catch (error) {
       console.error("Unable to load the country borders.", error);
@@ -5840,6 +5845,7 @@ class PixelGlobe {
       group.userData.edgeMaterial?.dispose();
     });
     this.highlightGroups = [];
+    this.requestRender();
     if (this.countryFeatures.length === 0) return;
 
     highlights.forEach(({ country, color = 0x45e3ff, pulse = false }) => {
@@ -5914,6 +5920,7 @@ class PixelGlobe {
     const width = this.container.clientWidth || 500;
     const height = this.container.clientHeight || 240;
     this.renderer.setSize(width, height);
+    this.requestRender();
     // The menu-to-game flight sets up the camera itself, frame by frame.
     if (this.mode === "transition") return;
     this.camera.aspect = width / height;
@@ -5942,6 +5949,7 @@ class PixelGlobe {
   setMode(mode) {
     if (this.mode === mode) return;
     this.mode = mode;
+    this.requestRender();
     this.transitionToken += 1; // cancels a flight still in progress
     const isMenu = mode === "menu";
     this.hemisphereLight.intensity = isMenu ? 0.1 : 0.75;
@@ -6275,6 +6283,7 @@ class PixelGlobe {
     const labelSize = (marker.isHighlighted ? 11 : 7) * zoom;
     marker.label.scale.set(labelSize, labelSize, 1);
     marker.label.position.copy(marker.mesh.position).multiplyScalar(1 + 0.03 * zoom);
+    this.requestRender();
   }
 
   setGuessPath(points) {
@@ -6286,6 +6295,7 @@ class PixelGlobe {
       this.guessPath.material.dispose();
       this.guessPath = null;
     }
+    this.requestRender();
     if (points.length < 2) return;
 
     const radius = PATH_RADIUS;
@@ -6376,7 +6386,37 @@ class PixelGlobe {
       marker.label.material.dispose();
     });
     this.markers = [];
+    this.requestRender();
     this.setGuessPath([]);
+  }
+
+  // Asks for the globe to be drawn on the next frame (after anything on it changed).
+  requestRender() {
+    this.needsRender = true;
+  }
+
+  // Everything that moves the picture without going through requestRender: turning,
+  // dragging, zooming and shifting the view.
+  getViewSignature() {
+    const { x, y, z, w } = this.globeGroup.quaternion;
+    const projection = this.camera.projectionMatrix.elements;
+    const { position } = this.camera;
+    return [x, y, z, w, position.x, position.y, position.z, projection[0], projection[5], projection[8], projection[9]]
+      .map(value => value.toFixed(5)).join();
+  }
+
+  // Lowers the sharpness one step when turning the globe runs below about 45 fps.
+  adaptPixelRatio(now) {
+    const frames = this.movingFrames;
+    frames.push(now);
+    if (frames.length < 40) return;
+    const average = (frames.at(-1) - frames[0]) / (frames.length - 1);
+    frames.length = 0;
+    const ratio = this.renderer.getPixelRatio();
+    if (average <= SLOW_FRAME_MS || ratio <= MIN_PIXEL_RATIO) return;
+    this.renderer.setPixelRatio(Math.max(MIN_PIXEL_RATIO, ratio - 0.25));
+    this.stats.pixelRatio = this.renderer.getPixelRatio();
+    this.resize();
   }
 
   animate() {
@@ -6393,7 +6433,7 @@ class PixelGlobe {
     if (this.guessPathPoints?.length > 1 && isStale(this.guessPathZoom)) this.setGuessPath(this.guessPathPoints);
     if (this.highlights.length && isStale(this.highlightZoom)) this.setHighlights(this.highlights);
     this.detailTiles.update(performance.now());
-    this.detailTiles.animate();
+    const tilesFading = this.detailTiles.animate();
     this.starField.update();
     // The menu globe turns slowly on its axis (time-based, so the speed doesn't depend on frame rate).
     const now = performance.now();
@@ -6401,9 +6441,29 @@ class PixelGlobe {
     this.lastFrame = now;
     this.daylight.update(now, this.camera);
     const pulse = 0.64 + (Math.sin(performance.now() * 0.006) + 1) * 0.15;
+    let pulsing = false;
     this.highlightGroups.forEach(group => {
-      if (group.userData.pulse) group.userData.material.opacity = pulse;
+      if (!group.userData.pulse) return;
+      group.userData.material.opacity = pulse;
+      pulsing = true;
     });
+
+    // The menu and the flight into the game move all the time; while playing, the globe
+    // is drawn only when it moved or changed.
+    const signature = this.getViewSignature();
+    const moved = signature !== this.viewSignature;
+    this.viewSignature = signature;
+    const isMoving = this.mode !== "game" || moved || tilesFading || this.isDragging;
+    const sinceRender = now - this.lastRender;
+    if (!isMoving && !this.needsRender && !(pulsing && sinceRender >= PULSE_FRAME_MS) && sinceRender < IDLE_FRAME_MS) {
+      this.movingFrames.length = 0;
+      return;
+    }
+    if (isMoving) this.adaptPixelRatio(now);
+    else this.movingFrames.length = 0;
+    this.needsRender = false;
+    this.lastRender = now;
+    this.stats.renders += 1;
     this.renderer.render(this.scene, this.camera);
   }
 }
@@ -7271,7 +7331,6 @@ const autocompleteList = document.getElementById("autocompleteList");
 const submitButton = document.getElementById("submitBtn");
 const toast = document.getElementById("inputToast");
 let toastTimer;
-let jumbotronTimer;
 let countryOutlineMapPromise;
 
 // Region phrases that legitimately contain a country name/alias
@@ -7381,15 +7440,14 @@ function loadCountryOutlineMap() {
   return countryOutlineMapPromise;
 }
 
-async function renderCountryOutline(country) {
+async function renderCountryOutline(country, container) {
   const { viewBox, outlines } = await loadCountryOutlineMap();
   const pathData = outlines.get(country.iso.toUpperCase());
   if (!pathData) throw new Error(`No country outline was found for ${country.iso}.`);
 
   const namespace = "http://www.w3.org/2000/svg";
-  const container = document.getElementById("jumbotronSilhouette");
   const svg = document.createElementNS(namespace, "svg");
-  svg.setAttribute("class", "jumbotron-country-outline");
+  svg.setAttribute("class", "country-outline");
   svg.setAttribute("viewBox", viewBox);
   svg.setAttribute("role", "img");
   svg.setAttribute("aria-label", `Outline of ${country.name}`);
@@ -7422,29 +7480,72 @@ async function renderCountryOutline(country) {
   container.replaceChildren(svg);
 }
 
-async function showJumbotronGuess(country) {
-  const overlay = document.getElementById("jumbotronOverlay");
-  const flag = document.getElementById("jumbotronFlag");
-  const name = document.getElementById("jumbotronCountry");
-  const silhouette = document.getElementById("jumbotronSilhouette");
-  flag.replaceChildren(createFlagImage(country, "jumbotron-flag-image"));
-  name.textContent = country.name;
-  silhouette.replaceChildren();
-  overlay.classList.remove("jumbotron-active");
-  overlay.classList.remove("hidden");
-  void overlay.offsetWidth;
-  overlay.classList.add("jumbotron-active");
-  clearTimeout(jumbotronTimer);
-  renderCountryOutline(country).catch(error => {
-    console.error("Unable to load the guessed country's outline.", error);
-    showToastNotice("Country outline could not be loaded.");
+// A guess as a card in the middle of the screen: flag, name and hot/cold first, then its
+// hints one by one. land() commits the guess and returns its new row; the card then flies
+// into that row. A click or Enter skips ahead. Resolves once the card is gone.
+const REVEAL_HOLD_MS = 1150;
+const REVEAL_FLY_MS = 380;
+function playGuessReveal(guess, { land }) {
+  const host = document.getElementById("gameView");
+  const overlay = Object.assign(document.createElement("div"), { className: "guess-reveal" });
+  const card = Object.assign(document.createElement("div"), { className: "guess-reveal-card" });
+  card.style.setProperty("--temp", guess.color);
+  const head = Object.assign(document.createElement("div"), { className: "guess-reveal-head" });
+  const outline = Object.assign(document.createElement("div"), { className: "guess-reveal-outline" });
+  head.append(
+    createFlagImage(guess.country, "guess-reveal-flag"),
+    Object.assign(document.createElement("strong"), { className: "guess-reveal-name", textContent: guess.country.name }),
+    Object.assign(document.createElement("span"), { className: "temp-badge", textContent: guess.temperature }),
+    outline
+  );
+  const facts = Object.assign(document.createElement("div"), { className: "guess-facts" });
+  getGuessFacts(guess).forEach(({ label, status, indicator }, index) => {
+    const fact = Object.assign(document.createElement("span"), { className: `fact fact-${status}` });
+    fact.style.setProperty("--i", index);
+    if (indicator) fact.appendChild(Object.assign(document.createElement("b"), { textContent: indicator }));
+    fact.append(label);
+    facts.appendChild(fact);
   });
-  await new Promise(resolve => {
-    jumbotronTimer = setTimeout(() => {
-      overlay.classList.remove("jumbotron-active");
-      overlay.classList.add("hidden");
-      resolve();
-    }, 1800);
+  card.append(head, facts);
+  overlay.appendChild(card);
+  host.appendChild(overlay);
+  renderCountryOutline(guess.country, outline).catch(() => outline.remove());
+
+  return new Promise(resolve => {
+    let landed = false;
+    const finish = () => {
+      if (landed) return;
+      landed = true;
+      clearTimeout(timer);
+      window.removeEventListener("keydown", onKey, true);
+      overlay.removeEventListener("pointerdown", finish);
+      const row = land();
+      const from = card.getBoundingClientRect();
+      const to = row?.getBoundingClientRect();
+      // Fly into the row when it's on screen; otherwise just fade out.
+      const visible = to && to.width && to.bottom > 0 && to.top < innerHeight;
+      if (visible) {
+        row.classList.add("is-landing");
+        card.style.transformOrigin = "0 0";
+        card.style.transform = `translate(${to.left - from.left}px, ${to.top - from.top}px) scale(${to.width / from.width}, ${to.height / from.height})`;
+      }
+      overlay.classList.add("is-leaving");
+      setTimeout(() => {
+        row?.classList.remove("is-landing");
+        overlay.remove();
+        resolve();
+      }, REVEAL_FLY_MS);
+    };
+    // Enter skips the rest of the reveal (and isn't also taken as a new guess).
+    const onKey = event => {
+      if (event.key !== "Enter" && event.key !== "Escape") return;
+      event.preventDefault();
+      event.stopPropagation();
+      finish();
+    };
+    const timer = setTimeout(finish, REVEAL_HOLD_MS);
+    window.addEventListener("keydown", onKey, true);
+    overlay.addEventListener("pointerdown", finish);
   });
 }
 
@@ -7922,7 +8023,7 @@ function initializeStatsModal(getStats) {
   });
 }
 
-return { showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, showJumbotronGuess, renderProgressiveHints, renderGlobeMarkerTooltip, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight, initializeStatsModal };
+return { showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, playGuessReveal, renderProgressiveHints, renderGlobeMarkerTooltip, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight, initializeStatsModal };
 })();
 
 // ---- shape-data.js
@@ -10037,24 +10138,26 @@ function describeNeighbours(country) {
 // which of the player's own guesses it is closest to.
 const joinNames = names => names.length > 1 ? `${names.slice(0, -1).join(", ")} or ${names.at(-1)}` : names[0];
 
-// The tightest "more than X, less than Y" a set of guesses gives for one measure.
-// ratioKey holds guess ÷ answer and valueKey the guessed country's own value.
+// The tightest "more than X, less than Y" a set of guesses gives for one measure, as
+// short chips. ratioKey holds guess ÷ answer and valueKey the guessed country's value.
 function describeBounds(guesses, ratioKey, valueKey, words) {
   const similar = guesses.filter(guess => Math.max(guess[ratioKey], 1 / guess[ratioKey]) <= 1.5);
   if (similar.length) {
     const closest = similar.reduce((best, guess) => Math.abs(Math.log(guess[ratioKey])) < Math.abs(Math.log(best[ratioKey])) ? guess : best);
-    return `${words.similar} ${closest.country.name}`;
+    return [{ status: "match", label: `${words.short} ≈ ${closest.country.name}`, title: `${words.similar} ${closest.country.name}` }];
   }
   const below = guesses.filter(guess => guess[ratioKey] < 1)
     .reduce((best, guess) => !best || guess.country[valueKey] > best.country[valueKey] ? guess : best, null);
   const above = guesses.filter(guess => guess[ratioKey] > 1)
     .reduce((best, guess) => !best || guess.country[valueKey] < best.country[valueKey] ? guess : best, null);
-  if (below && above) return `${words.more} ${below.country.name}, ${words.lessShort} ${above.country.name}`;
-  if (below) return `${words.more} ${below.country.name}`;
-  return `${words.less} ${above.country.name}`;
+  return [
+    ...(below ? [{ status: "hint", label: `${words.short} > ${below.country.name}`, title: `${words.more} ${below.country.name}` }] : []),
+    ...(above ? [{ status: "hint", label: `${words.short} < ${above.country.name}`, title: `${words.less} ${above.country.name}` }] : [])
+  ];
 }
 
-// What the wrong guesses so far tell you about the answer, as short sentences.
+// What the wrong guesses so far tell you about the answer: short chip labels (green for
+// what it is, blue for pointers, grey for what it isn't), each with a full sentence.
 function getGuessSummary(guesses) {
   const wrong = guesses.filter(guess => !guess.isCorrect);
   if (!wrong.length) return [];
@@ -10063,30 +10166,34 @@ function getGuessSummary(guesses) {
   const sameRegion = wrong.find(guess => guess.subregionMatch);
   const sameContinent = wrong.find(guess => guess.continentMatch);
   if (sameRegion) {
-    facts.push(`In ${sameRegion.country.subregion}`);
+    facts.push({ status: "match", label: sameRegion.country.subregion, title: `In ${sameRegion.country.subregion}` });
   } else if (sameContinent) {
     const otherRegions = [...new Set(wrong.filter(guess => guess.continentMatch).map(guess => guess.country.subregion))];
-    facts.push(`In ${sameContinent.country.continent}, but not in ${joinNames(otherRegions)}`);
+    facts.push(
+      { status: "match", label: sameContinent.country.continent, title: `In ${sameContinent.country.continent}` },
+      { status: "miss", label: otherRegions.length > 1 ? `not ${otherRegions.length} of its regions` : `not ${otherRegions[0]}`, title: `Not in ${joinNames(otherRegions)}` }
+    );
   } else {
-    facts.push(`Not in ${joinNames([...new Set(wrong.map(guess => guess.country.continent))])}`);
+    const continents = [...new Set(wrong.map(guess => guess.country.continent))];
+    facts.push({ status: "miss", label: continents.length > 2 ? `not ${continents.length} continents` : `not ${continents.join(" or ")}`, title: `Not in ${joinNames(continents)}` });
   }
 
   const closest = wrong.reduce((best, guess) => guess.distanceKm < best.distanceKm ? guess : best);
-  facts.push(`${closest.direction} of ${closest.country.name}, your closest guess`);
+  facts.push({ status: "hint", label: `${closest.direction} of ${closest.country.name}`, title: `${closest.direction} of ${closest.country.name}, your closest guess` });
 
   const neighbours = wrong.filter(guess => guess.borderMatch).map(guess => guess.country.name);
-  if (neighbours.length) facts.push(`Borders ${neighbours.join(" and ")}`);
+  neighbours.forEach(name => facts.push({ status: "match", label: `borders ${name}`, title: `Shares a border with ${name}` }));
 
-  facts.push(describeBounds(wrong, "populationRatio", "population", {
-    similar: "About as many people as", more: "More people than", less: "Fewer people than", lessShort: "fewer than"
+  facts.push(...describeBounds(wrong, "populationRatio", "population", {
+    short: "pop.", similar: "About as many people as", more: "More people than", less: "Fewer people than"
   }));
-  facts.push(describeBounds(wrong, "areaRatio", "area", {
-    similar: "About the size of", more: "Bigger than", less: "Smaller than", lessShort: "smaller than"
+  facts.push(...describeBounds(wrong, "areaRatio", "area", {
+    short: "size", similar: "About the size of", more: "Bigger than", less: "Smaller than"
   }));
 
   const first = wrong[0];
   const isLandlocked = first.landlockedMatch ? first.country.isLandlocked : !first.country.isLandlocked;
-  facts.push(isLandlocked ? "Landlocked" : "Has a coastline");
+  facts.push({ status: "match", label: isLandlocked ? "landlocked" : "coastal", title: isLandlocked ? "Landlocked" : "Has a coastline" });
   return facts;
 }
 
@@ -10997,7 +11104,7 @@ const { formatTopPercent, getDayStats, getTopPercent } = __modules["community.js
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
 const { MAX_DAILY_SCORE, MAX_GUESSES, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
-const { createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, initializeStatsModal, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, showJumbotronGuess, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
+const { createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, initializeStatsModal, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
 
 // v3: Deep Cut and Paint the Map replaced Capital Call and Border Patrol (October 2026).
 const DAY_STORAGE_PREFIX = "daily-geography:day:v3:";
@@ -11036,6 +11143,7 @@ let deepcutSuggestion = null;
 let hasFinishedDay = getDayScore(plan, day.rounds).completed;
 
 const globe = new PixelGlobe("globeCanvasContainer");
+if (new URLSearchParams(location.search).has("fps")) showFrameCounter();
 globe.onMarkerHover = (index, active) => {
   setGuessHighlight(index, active);
   if (active) queueMicrotask(() => renderGlobeMarkerTooltip(markerGuesses[index], index));
@@ -11047,6 +11155,28 @@ globe.renderer.domElement.addEventListener("mousemove", () => {
   });
 }, true);
 globe.onGlobeClick = handleGlobeClick;
+
+// Add ?fps to the address for a small counter: frames per second of the page, how often
+// the globe was actually drawn, and its sharpness (pixel ratio).
+function showFrameCounter() {
+  const counter = Object.assign(document.createElement("div"), { className: "frame-counter" });
+  document.body.appendChild(counter);
+  let frames = 0;
+  let renders = globe.stats.renders;
+  let since = performance.now();
+  const tick = now => {
+    frames += 1;
+    if (now - since >= 1000) {
+      const seconds = (now - since) / 1000;
+      counter.textContent = `${Math.round(frames / seconds)} fps · globe ${Math.round((globe.stats.renders - renders) / seconds)}/s · ${globe.stats.pixelRatio}×`;
+      frames = 0;
+      renders = globe.stats.renders;
+      since = now;
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
 
 // ---------------------------------------------------------------------------
 // Dates and storage
@@ -11722,6 +11852,23 @@ function showGuessMarkers(guesses, { animateGlobe }) {
   if (last && animateGlobe) globe.rotateTo(last.country.lat, last.country.lon, 700);
 }
 
+// Mystery's "What we know" chips, above the guesses. Hovering shows a chip's sentence as
+// a tooltip; tapping (on a phone) shows it in a line under the chips.
+function renderKnownStrip(facts) {
+  const detail = document.getElementById("knownDetail");
+  document.getElementById("knownStrip").classList.toggle("hidden", facts.length === 0);
+  detail.classList.add("hidden");
+  document.getElementById("knownChips").replaceChildren(...facts.map(({ status, label, title }) => {
+    const chip = Object.assign(document.createElement("button"), { type: "button", className: `fact fact-${status}`, textContent: label, title });
+    chip.addEventListener("click", () => {
+      const isOpen = !detail.classList.contains("hidden") && detail.textContent === title;
+      detail.textContent = title;
+      detail.classList.toggle("hidden", isOpen);
+    });
+    return chip;
+  }));
+}
+
 function setStageChip(label, country, text = null) {
   setText("stageChipLabel", label);
   setText("currentGuessLabel", text || country?.name || "NONE");
@@ -11735,9 +11882,7 @@ const ROUND_RENDERERS = {
     const guesses = state.guesses.map(iso => evaluateGuess(getCountry(iso), answer));
     renderProgressiveHints(answer, progress.wrong);
     renderGuessHistory(guesses, (index, active) => globe.setMarkerHighlight(index, active), MAX_GUESSES);
-    const known = progress.done ? [] : getGuessSummary(guesses);
-    document.getElementById("knownPanel").classList.toggle("hidden", known.length === 0);
-    document.getElementById("knownList").replaceChildren(...known.map(text => Object.assign(document.createElement("li"), { textContent: text })));
+    renderKnownStrip(progress.done ? [] : getGuessSummary(guesses));
     mysteryInput.setDisabled(progress.done || isAnimating);
     document.getElementById("giveUpBtn").disabled = progress.done;
     showGuessMarkers(guesses, options);
@@ -12053,6 +12198,24 @@ function showMiss(target, rowSelector) {
   if (row) row.classList.add("is-new");
 }
 
+// Mystery and Pinpoint: a guess first shows as a card with its hints (playGuessReveal),
+// then lands as its row. A miss flashes where you answered, as in every round. You can
+// type the next guess meanwhile; it can be sent once the card has landed.
+function revealGuess(guess, target, rowSelector, commitOptions = {}) {
+  isAnimating = true;
+  sounds.playFlyTo();
+  return playGuessReveal(guess, {
+    land: () => {
+      isAnimating = false;
+      commit(commitOptions);
+      if (guess.isCorrect) return null;
+      sounds.playError();
+      flashMiss(target);
+      return [...document.querySelectorAll(rowSelector)].at(-1) || null;
+    }
+  });
+}
+
 // Something that isn't an answer (an unknown name, a repeat): the same flash, and a note.
 function showProblem(message, target) {
   sounds.playError();
@@ -12079,15 +12242,8 @@ function submitMysteryGuess(value, selectedCountry) {
 
   state.guesses.push(country.iso);
   saveDay();
-  isAnimating = true;
-  mysteryInput.setDisabled(true);
-  showJumbotronGuess(country).then(() => {
-    isAnimating = false;
-    sounds.playFlyTo();
-    commit();
-    if (country.iso !== plan[viewIndex].answer) showMiss(answerBox("countryInput"), "#history .guess-row");
-    if (!progressOf(viewIndex).done) resetCountryInput();
-  });
+  const round = plan[viewIndex];
+  revealGuess(evaluateGuess(country, { ...getCountry(round.answer), ...round.clues }), answerBox("countryInput"), "#history .guess-row");
   return { status: "submitted" };
 }
 
@@ -12121,10 +12277,7 @@ function confirmPinpointGuess() {
   const country = getCountry(pinpointSelection);
   pinpointSelection = null;
   day.rounds[viewIndex].guesses.push(country.iso);
-  const isRight = country.iso === plan[viewIndex].answer;
-  if (isRight) sounds.playFlyTo();
-  commit({ animateGlobe: false });
-  if (!isRight) showMiss(pickCard("pinpoint"), "#pinpointGuesses .guess-row");
+  revealGuess(evaluateGuess(country, getCountry(plan[viewIndex].answer)), pickCard("pinpoint"), "#pinpointGuesses .guess-row", { animateGlobe: false });
 }
 
 // Deep Cut: the first answer on the list ends the round; anything else just says so,
