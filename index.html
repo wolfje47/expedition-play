@@ -668,7 +668,7 @@ h1, h2, h3 { font-weight: normal; }
 .round-result-text { font-size: 14px; }
 
 /* The answer box, help choices and give-up links step aside once the round is over. */
-.game-view.is-round-done .side-right :is(.guess-entry, .pinpoint-pick, #pinpointGiveUp, #paintDone, #rankSubmit) { display: none; }
+.game-view.is-round-done .side-right :is(.guess-entry, .pinpoint-pick, #pinpointGiveUp, #paintDone, #rankSubmit, #rankReroll) { display: none; }
 /* With the answer box gone (and its suggestion list with it), a finished round's column
    can scroll, for the info card and long answer lists. */
 .game-view.is-round-done .side-right { overflow-y: auto; scrollbar-width: thin; }
@@ -747,11 +747,7 @@ h1, h2, h3 { font-weight: normal; }
 .burst-info .info-text { padding: 0; }
 
 /* Rank 'Em tries: the order you submitted, under how many were in the right place. */
-.rank-try { display: grid; gap: 4px; min-width: 0; }
-.rank-try-order { display: flex; flex-wrap: wrap; gap: 3px 10px; color: var(--muted); font-size: 12px; list-style: decimal inside; }
-.rank-try-order li::marker { color: var(--faint); font-family: var(--font-mono); }
 .rank-try-flag { width: 16px; height: 11px; margin: 0 4px 0 2px; border-radius: 2px; object-fit: cover; vertical-align: -1px; }
-.game-view .attempt:has(.rank-try) { align-items: flex-start; }
 
 /* The day's name, under the game's name. */
 .day-name { display: block; margin-top: 0.15rem; color: var(--gold); font: 10px/1.5 var(--font-display); letter-spacing: 0.04em; }
@@ -1273,6 +1269,36 @@ h1, h2, h3 { font-weight: normal; }
 @keyframes slot-shimmer { to { background: rgba(255, 255, 255, 0.12); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35); } }
 @keyframes slot-turn { from { opacity: 0.4; transform: perspective(300px) rotateX(90deg) scale(0.9); } }
 @keyframes slot-glow { from { box-shadow: 0 0 0 2px var(--t-correct), 0 0 26px rgba(92, 242, 138, 0.7); transform: scale(1.12); } }
+
+.reveal-slot.is-turned.is-miss.rank-peg { animation: slot-turn 0.32s cubic-bezier(0.2, 0.9, 0.3, 1.3) both, peg-red 0.9s ease-out 0.1s; }
+@keyframes peg-red { from { box-shadow: 0 0 0 2px var(--danger), 0 0 22px rgba(255, 107, 125, 0.7); transform: scale(1.15); } }
+
+/* A newly unlocked clue: a wide tile that reads "NEW CLUE" until it turns over. */
+.reveal-clue { position: relative; display: grid; gap: 0.4rem; padding: 0.7rem 0.85rem; border-radius: 12px; background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+.reveal-clue p { font-size: 15px; font-weight: 500; line-height: 1.4; }
+.reveal-clue .clue-tag { justify-self: start; margin: 0; }
+.reveal-clue .slot-cover { position: absolute; inset: 0; display: grid; place-items: center; font: 11px var(--font-display); letter-spacing: 0.06em; }
+.reveal-slot:not(.is-turned) .slot-cover { color: var(--muted) !important; }
+.reveal-clue.reveal-slot:not(.is-turned) > :not(.slot-cover) { visibility: hidden; }
+.reveal-slot.is-turned .slot-cover { display: none; }
+
+/* Rank 'Em's lights: green for each country in the right place, then red for the rest. */
+.rank-pegs { display: flex; gap: 5px; }
+.rank-peg { width: 11px; height: 11px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); }
+.rank-peg.is-match { background: var(--t-correct); box-shadow: 0 0 8px rgba(92, 242, 138, 0.6); }
+.rank-peg.is-miss { background: var(--danger); }
+.rank-pegs.is-big { justify-content: center; gap: 12px; padding: 0.4rem 0; }
+.rank-pegs.is-big .rank-peg { width: 30px; height: 30px; }
+.rank-reveal-head { display: grid; gap: 0.6rem; }
+.rank-reveal-order { display: grid; gap: 4px; list-style: none; counter-reset: rank; }
+.rank-reveal-order li { display: flex; align-items: center; gap: 0.55rem; font-size: 14px; counter-increment: rank; }
+.rank-reveal-order li::before { width: 1.2rem; color: var(--faint); font: 700 12px var(--font-mono); content: counter(rank); }
+.rank-reveal-tally { text-align: center; font: 700 15px var(--font-mono); }
+.rank-reveal-hint { justify-self: center; font-size: 14px; }
+/* A Rank 'Em attempt is one slim row: its number and its lights. */
+:is(.game-view, .modal) .attempt.rank-attempt { gap: 0.7rem; padding: 0.4rem 0.8rem; }
+.rank-attempt .rank-pegs { gap: 6px; }
+.rank-attempt .rank-peg { width: 13px; height: 13px; }
 
 /* Shown once every hint has turned over: the guess card waits for you. */
 .guess-reveal-next {
@@ -2173,6 +2199,8 @@ h1, h2, h3 { font-weight: normal; }
             <span class="field-label rank-board-foot" id="rankBoardBottom">LOWEST</span>
           </div>
           <button class="btn btn-primary btn-block" id="rankSubmit" type="button">SUBMIT ORDER</button>
+          <!-- Before the first try: swap the topic for the day's backup, for 200 points. -->
+          <button class="give-up hidden" id="rankReroll" type="button">🎲 New topic (costs 200)</button>
           <section class="panel guesses-panel" aria-label="Attempts">
             <div class="panel-head">
               <h2>ATTEMPTS</h2>
@@ -5862,12 +5890,16 @@ class PixelGlobe {
     this.requestRender();
     if (this.countryFeatures.length === 0) return;
 
-    highlights.forEach(({ country, color = 0x45e3ff, pulse = false }) => {
+    // A focused outline (the country you selected) is thicker and drawn above all others,
+    // so it still shows where it shares every border with outlines already on the globe.
+    highlights.forEach(({ country, color = 0x45e3ff, pulse = false, focus = false }) => {
       const feature = this.findFeature(country);
       if (!feature) return;
+      const lineWidth = focus ? width * 1.8 : width;
+      const layer = focus ? 3 : 0;
       const material = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.95, side: THREE.DoubleSide, depthWrite: false });
       const group = new THREE.Group();
-      group.renderOrder = 3;
+      group.renderOrder = 3 + layer;
       group.userData = { material, pulse };
       // A wider dark band underneath keeps the colour readable on any terrain.
       const edgeMaterial = new THREE.MeshBasicMaterial({ color: 0x04060d, transparent: true, opacity: 0.6, side: THREE.DoubleSide, depthWrite: false });
@@ -5875,10 +5907,10 @@ class PixelGlobe {
       getPolygons(feature).forEach(polygon => polygon.forEach(ring => {
         const points = this.toSurfacePoints(ring, OUTLINE_RADIUS);
         if (points.length < 3) return;
-        const edge = this.createRibbon(points, width * 2.6, edgeMaterial);
-        edge.renderOrder = 2;
-        const line = this.createRibbon(points, width, material);
-        line.renderOrder = 3;
+        const edge = this.createRibbon(points, lineWidth * 2.6, edgeMaterial);
+        edge.renderOrder = 2 + layer;
+        const line = this.createRibbon(points, lineWidth, material);
+        line.renderOrder = 3 + layer;
         group.add(edge, line);
       }));
       this.highlightGroups.push(group);
@@ -5888,6 +5920,12 @@ class PixelGlobe {
 
   setCurrentGuess(country) {
     this.setHighlights(country ? [{ country, pulse: true }] : []);
+  }
+
+  // The country's polygons (GeoJSON order), for drawing its outline elsewhere.
+  outlineOf(country) {
+    const feature = this.findFeature(country);
+    return feature?.geometry ? getPolygons(feature) : null;
   }
 
   findFeature(country) {
@@ -7030,7 +7068,7 @@ const ROUND_PICTURES = {
     mystery: {"src":"pictures/2026-10-02-mystery.webp","width":640,"height":425,"credit":"Diliff","license":"CC BY 3.0","link":"https://commons.wikimedia.org/wiki/File:Trevi_Fountain,_Rome,_Italy_2_-_May_2007.jpg","article":"Rome","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Trevi_Fountain%2C_Rome%2C_Italy_2_-_May_2007.jpg/960px-Trevi_Fountain%2C_Rome%2C_Italy_2_-_May_2007.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     pinpoint: {"src":"pictures/2026-10-02-pinpoint.webp","width":640,"height":335,"credit":"Gobierno CDMX","license":"CC0","link":"https://commons.wikimedia.org/wiki/File:Sobrevuelos_CDMX_HJ2A4913_(25514321687)_(cropped).jpg","article":"Mexico City","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/Sobrevuelos_CDMX_HJ2A4913_%2825514321687%29_%28cropped%29.jpg/960px-Sobrevuelos_CDMX_HJ2A4913_%2825514321687%29_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     deepcut: {"src":"pictures/2026-10-02-deepcut.webp","width":640,"height":427,"credit":"Hagai Agmon-Snir حچاي اچمون-سنير חגי אגמון-שניר","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:CastelloDiF%C3%A9nisJuly292023_06.jpg","article":"Aosta Valley","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/CastelloDiF%C3%A9nisJuly292023_06.jpg/960px-CastelloDiF%C3%A9nisJuly292023_06.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    paint: {"src":"pictures/2026-10-02-paint.webp","width":640,"height":468,"credit":"of the modification : Eric Gaba (Sting)","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:Mediterranean_Sea_16.61811E_38.99124N.jpg","article":"Mediterranean Sea","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/Mediterranean_Sea_16.61811E_38.99124N.jpg/960px-Mediterranean_Sea_16.61811E_38.99124N.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    paint: {"src":"pictures/2026-10-02-paint.webp","width":640,"height":360,"credit":"China News Service","license":"CC BY 3.0","link":"https://commons.wikimedia.org/wiki/File:20201102.Hengnan.Hybrid_rice_Sanyou-1.6.jpg","article":"Rice","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0a/20201102.Hengnan.Hybrid_rice_Sanyou-1.6.jpg/960px-20201102.Hengnan.Hybrid_rice_Sanyou-1.6.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     rank: {"src":"pictures/2026-10-02-rank.webp","width":640,"height":640,"credit":"Takeaway","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Mama_instant_noodle_block.jpg","article":"Instant noodle","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/Mama_instant_noodle_block.jpg/960px-Mama_instant_noodle_block.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
   "2026-10-03": {
@@ -7064,7 +7102,7 @@ const ROUND_PICTURES = {
     mystery: {"src":"pictures/2026-10-07-mystery.webp","width":640,"height":369,"credit":"Holger Uwe Schmitt","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:%22Eine_beeindruckende_Festung%22._09.jpg","article":"Rabat","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/%22Eine_beeindruckende_Festung%22._09.jpg/960px-%22Eine_beeindruckende_Festung%22._09.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     pinpoint: {"src":"pictures/2026-10-07-pinpoint.webp","width":640,"height":341,"credit":"Morio","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Skyscrapers_of_Shinjuku_2009_January.jpg","article":"Tokyo","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/Skyscrapers_of_Shinjuku_2009_January.jpg/960px-Skyscrapers_of_Shinjuku_2009_January.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     deepcut: {"src":"pictures/2026-10-07-deepcut.webp","width":640,"height":1125,"credit":"Workshop of Hans Holbein the Younger","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:After_Hans_Holbein_the_Younger_-_Portrait_of_Henry_VIII_-_Google_Art_Project.jpg","article":"Henry VIII","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/After_Hans_Holbein_the_Younger_-_Portrait_of_Henry_VIII_-_Google_Art_Project.jpg/960px-After_Hans_Holbein_the_Younger_-_Portrait_of_Henry_VIII_-_Google_Art_Project.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    paint: {"src":"pictures/2026-10-07-paint.webp","width":640,"height":358,"credit":"Nepenthes","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Rub_al_Khali_002.JPG","article":"Rub' al Khali","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/34/Rub_al_Khali_002.JPG/960px-Rub_al_Khali_002.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    paint: {"src":"pictures/2026-10-07-paint.webp","width":640,"height":505,"credit":"Original: Peeperman New version: Carnby","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:European_monarchies.svg","article":"Monarchies in Europe","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c2/European_monarchies.svg/960px-European_monarchies.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     rank: {"src":"pictures/2026-10-07-rank.webp","width":640,"height":345,"credit":"Pangalau","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Aerial_view_of_Brunei_23_September_2024_11.jpg","article":"Istana Nurul Iman","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/Aerial_view_of_Brunei_23_September_2024_11.jpg/960px-Aerial_view_of_Brunei_23_September_2024_11.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
   "2026-10-08": {
@@ -7085,7 +7123,7 @@ const ROUND_PICTURES = {
     mystery: {"src":"pictures/2026-10-10-mystery.webp","width":640,"height":432,"credit":"David Felipe Ruiz Hoyos","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Bas%C3%ADlica_Catedral_Metropolitana_de_Lima_(cropped).jpg","article":"Lima","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/69/Bas%C3%ADlica_Catedral_Metropolitana_de_Lima_%28cropped%29.jpg/960px-Bas%C3%ADlica_Catedral_Metropolitana_de_Lima_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     pinpoint: {"src":"pictures/2026-10-10-pinpoint.webp","width":640,"height":420,"credit":"USACE HQ , JIM GORDAN, CIV, USACE","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:5628442718_b10fc2c47f_o.jpg","article":"Baghdad","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/5628442718_b10fc2c47f_o.jpg/960px-5628442718_b10fc2c47f_o.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     deepcut: {"src":"pictures/2026-10-10-deepcut.webp","width":640,"height":360,"credit":"Douwe C. van der Zee","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Great_Pyramid_of_Giza_-_Pyramid_of_Khufu.jpg","article":"Great Pyramid of Giza","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Great_Pyramid_of_Giza_-_Pyramid_of_Khufu.jpg/960px-Great_Pyramid_of_Giza_-_Pyramid_of_Khufu.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    paint: {"src":"pictures/2026-10-10-paint.webp","width":640,"height":815,"credit":"Jeff Schmaltz, MODIS Rapid Response Team, NASA/GSFC","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:Caspian_Sea_from_orbit.jpg","article":"Caspian Sea","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/98/Caspian_Sea_from_orbit.jpg/960px-Caspian_Sea_from_orbit.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    paint: {"src":"pictures/2026-10-10-paint.webp","width":640,"height":1056,"credit":"The original uploader was Mark22 at English Wikipedia.","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:SevenWondersOfTheWorld.png","article":"Seven Wonders of the Ancient World","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/SevenWondersOfTheWorld.png/960px-SevenWondersOfTheWorld.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     rank: {"src":"pictures/2026-10-10-rank.webp","width":640,"height":853,"credit":"Rantemario","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Kalender_Indonesia.jpg","article":"Calendar","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Kalender_Indonesia.jpg/960px-Kalender_Indonesia.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
   "2026-10-11": {
@@ -7133,7 +7171,7 @@ const ROUND_PICTURES = {
   "2026-10-17": {
     pinpoint: {"src":"pictures/2026-10-17-pinpoint.webp","width":640,"height":288,"credit":"Superbass","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Schoenbrunn_philharmoniker_2012.jpg","article":"Vienna","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Schoenbrunn_philharmoniker_2012.jpg/960px-Schoenbrunn_philharmoniker_2012.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     deepcut: {"src":"pictures/2026-10-17-deepcut.webp","width":640,"height":498,"credit":"Dezo Hoffmann, Distributed by Capitol Records","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:The_Beatles_1963_Dezo_Hoffman_Capitol_Records_press_photo_2.jpg","article":"The Beatles","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/The_Beatles_1963_Dezo_Hoffman_Capitol_Records_press_photo_2.jpg/960px-The_Beatles_1963_Dezo_Hoffman_Capitol_Records_press_photo_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    paint: {"src":"pictures/2026-10-17-paint.webp","width":640,"height":427,"credit":"Thomas Wolf, www.foto-tw.de","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Brandenburger_Tor_abends.jpg","article":"Brandenburg Gate","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Brandenburger_Tor_abends.jpg/960px-Brandenburger_Tor_abends.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    paint: {"src":"pictures/2026-10-17-paint.webp","width":640,"height":388,"credit":"MrSilesian","license":"CC0","link":"https://commons.wikimedia.org/wiki/File:Eurovision_Song_Contest_2025_ST_Jakobshalle.jpg","article":"St. Jakobshalle","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Eurovision_Song_Contest_2025_ST_Jakobshalle.jpg/960px-Eurovision_Song_Contest_2025_ST_Jakobshalle.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     rank: {"src":"pictures/2026-10-17-rank.webp","width":640,"height":853,"credit":"Johann Nepomuk della Croce","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:The_Mozart_Family_-_Wolfgang_Amadeus_Mozart_headshot.jpg","article":"Wolfgang Amadeus Mozart","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ad/The_Mozart_Family_-_Wolfgang_Amadeus_Mozart_headshot.jpg/960px-The_Mozart_Family_-_Wolfgang_Amadeus_Mozart_headshot.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     mystery: {"src":"pictures/2026-10-17-mystery.webp","width":442,"height":305,"credit":"The original uploader was Blofeld of SPECTRE at English Wikipedia. (Original text: W. Harris)","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:PortofKingston.jpg","article":"Kingston, Jamaica","remote":"https://upload.wikimedia.org/wikipedia/commons/9/99/PortofKingston.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"}
   },
@@ -7141,7 +7179,7 @@ const ROUND_PICTURES = {
     mystery: {"src":"pictures/2026-10-18-mystery.webp","width":640,"height":360,"credit":"Bahnfrend","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Cityscape_of_Manila,_2025_(01).jpg","article":"Manila","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Cityscape_of_Manila%2C_2025_%2801%29.jpg/960px-Cityscape_of_Manila%2C_2025_%2801%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     pinpoint: {"src":"pictures/2026-10-18-pinpoint.webp","width":640,"height":424,"credit":"Olga Ernst","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Reykjav%C3%ADk,_view_from_Hallgr%C3%ADmskirkja_(2).jpg","article":"Reykjavik","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Reykjav%C3%ADk%2C_view_from_Hallgr%C3%ADmskirkja_%282%29.jpg/960px-Reykjav%C3%ADk%2C_view_from_Hallgr%C3%ADmskirkja_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     deepcut: {"src":"pictures/2026-10-18-deepcut.webp","width":640,"height":496,"credit":"Jeff Schmaltz, MODIS Land Rapid Response Team, NASA GSFC","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:Satellite_image_of_Shikoku_in_April_2018.png","article":"Shikoku","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Satellite_image_of_Shikoku_in_April_2018.png/960px-Satellite_image_of_Shikoku_in_April_2018.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    paint: {"src":"pictures/2026-10-18-paint.webp","width":640,"height":249,"credit":"kallerna","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Kinabalu_Sabah_Borneo_Kampong_Kundasang_panorama_2.jpg","article":"Mount Kinabalu","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Kinabalu_Sabah_Borneo_Kampong_Kundasang_panorama_2.jpg/960px-Kinabalu_Sabah_Borneo_Kampong_Kundasang_panorama_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    paint: {"src":"pictures/2026-10-18-paint.webp","width":640,"height":329,"credit":"cmglee, Canuckguy and many others","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:Island_nations.svg","article":"Island country","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/Island_nations.svg/960px-Island_nations.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     rank: {"src":"pictures/2026-10-18-rank.webp","width":640,"height":699,"credit":"Hydrographica. Changed file format from GIF to PNG by Lidingo","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Stockholms_sk%C3%A4rg%C3%A5rd.png","article":"Stockholm archipelago","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/Stockholms_sk%C3%A4rg%C3%A5rd.png/960px-Stockholms_sk%C3%A4rg%C3%A5rd.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
   "2026-10-19": {
@@ -7155,7 +7193,7 @@ const ROUND_PICTURES = {
     mystery: {"src":"pictures/2026-10-20-mystery.webp","width":640,"height":360,"credit":"Ilya Grigorik","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:London_Skyline_(125508655).jpeg","article":"London","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/London_Skyline_%28125508655%29.jpeg/960px-London_Skyline_%28125508655%29.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     pinpoint: {"src":"pictures/2026-10-20-pinpoint.webp","width":640,"height":360,"credit":"U.S. Department of State","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:Saint_Basil%27s_Cathedral_and_the_Red_Square.jpg","article":"Moscow","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Saint_Basil%27s_Cathedral_and_the_Red_Square.jpg/960px-Saint_Basil%27s_Cathedral_and_the_Red_Square.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     deepcut: {"src":"pictures/2026-10-20-deepcut.webp","width":640,"height":406,"credit":"DeFacto","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Aston_Martin_DB5_(Skyfall).jpg","article":"Aston Martin DB5","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3d/Aston_Martin_DB5_%28Skyfall%29.jpg/960px-Aston_Martin_DB5_%28Skyfall%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    paint: {"src":"pictures/2026-10-20-paint.webp","width":640,"height":457,"credit":"Sorovas","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:VL_85-022_container_train.jpg","article":"Trans-Siberian Railway","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/VL_85-022_container_train.jpg/960px-VL_85-022_container_train.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    paint: {"src":"pictures/2026-10-20-paint.webp","width":640,"height":325,"credit":"Applysense","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:UKUSA_Map.svg","article":"Five Eyes","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/UKUSA_Map.svg/960px-UKUSA_Map.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     rank: {"src":"pictures/2026-10-20-rank.webp","width":640,"height":361,"credit":"Richard Cooke","license":"CC BY-SA 2.0","link":"https://commons.wikimedia.org/wiki/File:SIS_Building,_Vauxhall_Cross_-_geograph.org.uk_-_4541871.jpg","article":"SIS Building","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3d/SIS_Building%2C_Vauxhall_Cross_-_geograph.org.uk_-_4541871.jpg/960px-SIS_Building%2C_Vauxhall_Cross_-_geograph.org.uk_-_4541871.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
   "2026-10-21": {
@@ -7176,7 +7214,7 @@ const ROUND_PICTURES = {
     mystery: {"src":"pictures/2026-10-23-mystery.webp","width":640,"height":480,"credit":"Gihanud2001","license":"CC0","link":"https://commons.wikimedia.org/wiki/File:Colombo_city_skyline_at_night.png","article":"Colombo","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/Colombo_city_skyline_at_night.png/960px-Colombo_city_skyline_at_night.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     pinpoint: {"src":"pictures/2026-10-23-pinpoint.webp","width":640,"height":427,"credit":"Daniel Case","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Nairobi_skyline_from_Gem_Hotel.jpg","article":"Nairobi","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Nairobi_skyline_from_Gem_Hotel.jpg/960px-Nairobi_skyline_from_Gem_Hotel.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     deepcut: {"src":"pictures/2026-10-23-deepcut.webp","width":640,"height":467,"credit":"Unknown author","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Wakhan.png","article":"Wakhan Corridor","remote":"https://upload.wikimedia.org/wikipedia/commons/2/2f/Wakhan.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"},
-    paint: {"src":"pictures/2026-10-23-paint.webp","width":640,"height":960,"credit":"Gabriel Ziegler","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:The_Baltic_Sea.png","article":"Baltic Sea","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/The_Baltic_Sea.png/960px-The_Baltic_Sea.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    paint: {"src":"pictures/2026-10-23-paint.webp","width":640,"height":498,"credit":"Unknown author","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:DirkvdM_coffee-drying.jpg","article":"Coffee production","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/59/DirkvdM_coffee-drying.jpg/960px-DirkvdM_coffee-drying.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     rank: {"src":"pictures/2026-10-23-rank.webp","width":640,"height":427,"credit":"Coolcaesar","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Starbuckscenter.jpg","article":"Starbucks","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ad/Starbuckscenter.jpg/960px-Starbuckscenter.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
   "2026-10-24": {
@@ -7204,21 +7242,21 @@ const ROUND_PICTURES = {
     mystery: {"src":"pictures/2026-10-27-mystery.webp","width":640,"height":360,"credit":"CNJerem","license":"CC BY 4.0","link":"https://commons.wikimedia.org/wiki/File:View_from_I-Tower_SE_20200712.jpg","article":"Gaborone","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/View_from_I-Tower_SE_20200712.jpg/960px-View_from_I-Tower_SE_20200712.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     pinpoint: {"src":"pictures/2026-10-27-pinpoint.webp","width":640,"height":459,"credit":"Mangapwani","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Street_in_Viwandani_ward,_Dodoma_City.jpg","article":"Dodoma","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/Street_in_Viwandani_ward%2C_Dodoma_City.jpg/960px-Street_in_Viwandani_ward%2C_Dodoma_City.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     deepcut: {"src":"pictures/2026-10-27-deepcut.webp","width":640,"height":480,"credit":"Harsh.gavhane","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Waterhouse_Lake_Front.jpg","article":"Hobbiton Movie Set","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Waterhouse_Lake_Front.jpg/960px-Waterhouse_Lake_Front.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    paint: {"src":"pictures/2026-10-27-paint.webp","width":640,"height":394,"credit":"MONUSCO/Myriam Asmani","license":"CC BY-SA 2.0","link":"https://commons.wikimedia.org/wiki/File:Aerial_view_of_the_Congo_River_near_Kisangani.jpg","article":"Congo River","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/Aerial_view_of_the_Congo_River_near_Kisangani.jpg/960px-Aerial_view_of_the_Congo_River_near_Kisangani.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    paint: {"src":"pictures/2026-10-27-paint.webp","width":640,"height":427,"credit":"Charles J. Sharp","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Bengal_tiger_(Panthera_tigris_tigris)_female_3_crop.jpg","article":"Tiger","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg/960px-Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     rank: {"src":"pictures/2026-10-27-rank.webp","width":640,"height":425,"credit":"Nithin bolar k","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Kruger_Zebra.JPG","article":"Kruger National Park","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f0/Kruger_Zebra.JPG/960px-Kruger_Zebra.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
   "2026-10-28": {
     mystery: {"src":"pictures/2026-10-28-mystery.webp","width":640,"height":400,"credit":"Yann Caradec from Paris, France","license":"CC BY-SA 2.0","link":"https://commons.wikimedia.org/wiki/File:La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques,_Paris_ao%C3%BBt_2014_(2).jpg","article":"Paris","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg/960px-La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     pinpoint: {"src":"pictures/2026-10-28-pinpoint.webp","width":640,"height":410,"credit":"Vitor Oliveira from Torres Vedras, PORTUGAL","license":"CC BY-SA 2.0","link":"https://commons.wikimedia.org/wiki/File:Lisboa_-_Portugal_(52597836992).jpg","article":"Lisbon","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Lisboa_-_Portugal_%2852597836992%29.jpg/960px-Lisboa_-_Portugal_%2852597836992%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     deepcut: {"src":"pictures/2026-10-28-deepcut.webp","width":640,"height":360,"credit":"Amaustan","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Mont-Saint-Michel_vu_du_ciel.jpg","article":"Mont-Saint-Michel","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/Mont-Saint-Michel_vu_du_ciel.jpg/960px-Mont-Saint-Michel_vu_du_ciel.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    paint: {"src":"pictures/2026-10-28-paint.webp","width":640,"height":807,"credit":"Trougnouf (Benoit Brummer)","license":"CC BY 4.0","link":"https://commons.wikimedia.org/wiki/File:The_Atomium_during_civil_twilight_(DSCF1135).jpg","article":"Atomium","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/The_Atomium_during_civil_twilight_%28DSCF1135%29.jpg/960px-The_Atomium_during_civil_twilight_%28DSCF1135%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    paint: {"src":"pictures/2026-10-28-paint.webp","width":640,"height":427,"credit":"Terabass","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:New_york_times_square-terabass.jpg","article":"Tourism","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/New_york_times_square-terabass.jpg/960px-New_york_times_square-terabass.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     rank: {"src":"pictures/2026-10-28-rank.webp","width":640,"height":427,"credit":"muneaki","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Mont_Ventoux_090927.jpg","article":"Mont Ventoux","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Mont_Ventoux_090927.jpg/960px-Mont_Ventoux_090927.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
   "2026-10-29": {
     mystery: {"src":"pictures/2026-10-29-mystery.webp","width":640,"height":327,"credit":"Shahee Ilyas","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Mal%C3%A9.jpg","article":"Malé","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Mal%C3%A9.jpg/960px-Mal%C3%A9.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     pinpoint: {"src":"pictures/2026-10-29-pinpoint.webp","width":640,"height":365,"credit":"MSchlauch","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:Port_Moresby_Town2_Mschlauch.jpg","article":"Port Moresby","remote":"https://upload.wikimedia.org/wikipedia/commons/6/6a/Port_Moresby_Town2_Mschlauch.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"},
     deepcut: {"src":"pictures/2026-10-29-deepcut.webp","width":496,"height":676,"credit":"No machine-readable author provided. NormanEinstein assumed (based on copyright claims).","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Tyrrhenian_Sea_map.png","article":"Tyrrhenian Sea","remote":"https://upload.wikimedia.org/wikipedia/commons/f/f0/Tyrrhenian_Sea_map.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"},
-    paint: {"src":"pictures/2026-10-29-paint.webp","width":640,"height":574,"credit":"The SeaWiFS Project","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:The_Danube_Spills_into_the_Black_Sea.jpg","article":"Black Sea","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0d/The_Danube_Spills_into_the_Black_Sea.jpg/960px-The_Danube_Spills_into_the_Black_Sea.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    paint: {"src":"pictures/2026-10-29-paint.webp","width":640,"height":1159,"credit":"Unknown author","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:The_America%27s_Cup.jpg","article":"America's Cup","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/The_America%27s_Cup.jpg/960px-The_America%27s_Cup.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     rank: {"src":"pictures/2026-10-29-rank.webp","width":640,"height":433,"credit":"Nick Harris","license":"CC BY 2.5","link":"https://commons.wikimedia.org/wiki/File:Spring_Lake,_New_Jersey_Beach_at_Sunrise.jpg","article":"Coast","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/Spring_Lake%2C_New_Jersey_Beach_at_Sunrise.jpg/960px-Spring_Lake%2C_New_Jersey_Beach_at_Sunrise.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
   "2026-10-30": {
@@ -7368,7 +7406,6 @@ const autocompleteList = document.getElementById("autocompleteList");
 const submitButton = document.getElementById("submitBtn");
 const toast = document.getElementById("inputToast");
 let toastTimer;
-let countryOutlineMapPromise;
 
 // Region phrases that legitimately contain a country name/alias
 // (e.g. "Northern America" contains the US alias "America"). They are stashed
@@ -7450,132 +7487,100 @@ function createFlagImage(country, className) {
   return image;
 }
 
-function loadCountryOutlineMap() {
-  if (!countryOutlineMapPromise) {
-    countryOutlineMapPromise = fetch("https://cdn.jsdelivr.net/npm/@svg-maps/world@2.0.0/world.svg")
-      .then(response => {
-        if (!response.ok) throw new Error(`Country outline map request failed (${response.status}).`);
-        return response.text();
-      })
-      .then(svgText => {
-        const mapDocument = new DOMParser().parseFromString(svgText, "image/svg+xml");
-        const mapSvg = mapDocument.documentElement;
-        if (mapSvg.localName !== "svg" || mapDocument.querySelector("parsererror")) {
-          throw new Error("Country outline map response was not a valid SVG.");
-        }
-        const outlines = new Map();
-        mapSvg.querySelectorAll("path[id][d]").forEach(path => {
-          outlines.set(path.id.toUpperCase(), path.getAttribute("d"));
-        });
-        return { viewBox: mapSvg.getAttribute("viewBox"), outlines };
-      })
-      .catch(error => {
-        countryOutlineMapPromise = null;
-        throw error;
-      });
-  }
-  return countryOutlineMapPromise;
-}
+// A country's outline as an SVG, from the globe's own map polygons (GeoJSON order:
+// polygon -> rings -> [lon, lat]). It is drawn in a Lambert azimuthal equal-area
+// projection centred on the country, so the shape and proportions match the globe (a
+// flat world map stretches Canada and Russia). Far-off overseas parts, like French Guiana
+// for France or Hawaii for the United States, are left out so the country fills the box.
+const toVector = ([lon, lat]) => {
+  const phi = lat * Math.PI / 180;
+  const lambda = lon * Math.PI / 180;
+  return [Math.cos(phi) * Math.cos(lambda), Math.cos(phi) * Math.sin(lambda), Math.sin(phi)];
+};
+const angleBetween = (a, b) => Math.acos(Math.max(-1, Math.min(1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2])));
+const normalize = ([x, y, z]) => { const length = Math.hypot(x, y, z) || 1; return [x / length, y / length, z / length]; };
 
-async function renderCountryOutline(country, container) {
-  const { viewBox, outlines } = await loadCountryOutlineMap();
-  const pathData = outlines.get(country.iso.toUpperCase());
-  if (!pathData) throw new Error(`No country outline was found for ${country.iso}.`);
-
+function drawCountryOutline(polygons, label) {
+  if (!polygons?.length) return null;
+  const parts = polygons.map(rings => {
+    const points = rings[0].map(toVector);
+    const centre = normalize(points.reduce((sum, point) => sum.map((value, axis) => value + point[axis]), [0, 0, 0]));
+    return { rings, centre, reach: Math.max(...points.map(point => angleBetween(centre, point))) };
+  });
+  const main = parts.reduce((best, part) => part.reach > best.reach ? part : best);
+  const kept = parts.filter(part => angleBetween(part.centre, main.centre) <= main.reach + 15 * Math.PI / 180);
+  const [cx, cy, cz] = main.centre;
+  const lat0 = Math.asin(cz);
+  const lon0 = Math.atan2(cy, cx);
+  const project = ([lon, lat]) => {
+    const phi = lat * Math.PI / 180;
+    const dLambda = lon * Math.PI / 180 - lon0;
+    const cosC = Math.sin(lat0) * Math.sin(phi) + Math.cos(lat0) * Math.cos(phi) * Math.cos(dLambda);
+    const k = Math.sqrt(2 / Math.max(1e-6, 1 + cosC));
+    return [k * Math.cos(phi) * Math.sin(dLambda), -k * (Math.cos(lat0) * Math.sin(phi) - Math.sin(lat0) * Math.cos(phi) * Math.cos(dLambda))];
+  };
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  const d = kept.flatMap(part => part.rings).map(ring => ring.map((point, index) => {
+    const [x, y] = project(point);
+    minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+    minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+    return `${index ? "L" : "M"}${(x * 1000).toFixed(1)},${(y * 1000).toFixed(1)}`;
+  }).join("") + "Z").join("");
+  const padding = Math.max(maxX - minX, maxY - minY) * 0.06;
   const namespace = "http://www.w3.org/2000/svg";
   const svg = document.createElementNS(namespace, "svg");
   svg.setAttribute("class", "country-outline");
-  svg.setAttribute("viewBox", viewBox);
+  svg.setAttribute("viewBox", [minX - padding, minY - padding, maxX - minX + padding * 2, maxY - minY + padding * 2].map(value => (value * 1000).toFixed(1)).join(" "));
   svg.setAttribute("role", "img");
-  svg.setAttribute("aria-label", `Outline of ${country.name}`);
+  svg.setAttribute("aria-label", `Outline of ${label}`);
   const path = document.createElementNS(namespace, "path");
-  path.setAttribute("d", pathData);
+  path.setAttribute("d", d);
+  path.setAttribute("fill-rule", "evenodd");
   svg.appendChild(path);
-
-  const measurementSvg = document.createElementNS(namespace, "svg");
-  measurementSvg.setAttribute("viewBox", viewBox);
-  measurementSvg.style.cssText = "position:fixed;left:-10000px;top:0;width:1010px;height:666px;visibility:hidden;pointer-events:none";
-  const measurementPath = document.createElementNS(namespace, "path");
-  measurementPath.setAttribute("d", pathData);
-  measurementSvg.appendChild(measurementPath);
-  document.body.appendChild(measurementSvg);
-  try {
-    const bounds = measurementPath.getBBox();
-    if (!(bounds.width > 0 && bounds.height > 0)) {
-      throw new Error(`Country outline bounds are empty for ${country.iso}.`);
-    }
-    const padding = Math.max(bounds.width, bounds.height) * 0.06;
-    svg.setAttribute("viewBox", [
-      bounds.x - padding,
-      bounds.y - padding,
-      bounds.width + padding * 2,
-      bounds.height + padding * 2
-    ].join(" "));
-  } finally {
-    measurementSvg.remove();
-  }
-  container.replaceChildren(svg);
+  return svg;
 }
 
-// A guess as a card in the middle of the screen, opened like a pack: flag and name first,
-// then hot/cold, then each hint turns over one at a time (matches pop, with a chime). It
-// waits for "Next guess" (a click or Enter); a click while hints are still turning shows
-// them all at once. land() then commits the guess and returns its new row, and the card
-// flies into it. Resolves once the card is gone.
+// A card in the middle of the screen that opens like a pack: its steps (elements already
+// in the card, each with a status) start face down and turn over one at a time, matches
+// popping with a chime. It then waits for its button (a click or Enter); a click while
+// steps are still turning shows them all at once. land() commits the move and returns the
+// row the card should fly into. Resolves once the card is gone.
 const REVEAL_FIRST_MS = 650;
 const REVEAL_STEP_MS = 700;
 const REVEAL_FLY_MS = 380;
-function playGuessReveal(guess, { land, sound = () => {}, nextLabel = "NEXT GUESS" }) {
+function playRevealCard({ card, steps, nextLabel, land, sound = () => {}, onTurn = () => {} }) {
   const host = document.getElementById("gameView");
   const overlay = Object.assign(document.createElement("div"), { className: "guess-reveal" });
-  const card = Object.assign(document.createElement("div"), { className: "guess-reveal-card" });
-  // The card's edge takes the hot/cold colour only when that badge turns over.
-  card.style.setProperty("--temp", "var(--glass-line)");
-  const head = Object.assign(document.createElement("div"), { className: "guess-reveal-head" });
-  const outline = Object.assign(document.createElement("div"), { className: "guess-reveal-outline" });
-  const temperature = Object.assign(document.createElement("span"), { className: "temp-badge reveal-slot", textContent: guess.temperature });
-  head.append(
-    createFlagImage(guess.country, "guess-reveal-flag"),
-    Object.assign(document.createElement("strong"), { className: "guess-reveal-name", textContent: guess.country.name }),
-    temperature,
-    outline
-  );
-  const facts = Object.assign(document.createElement("div"), { className: "guess-facts" });
-  const slots = getGuessFacts(guess).map(({ label, status, indicator }) => {
-    const fact = Object.assign(document.createElement("span"), { className: `fact fact-${status} reveal-slot` });
-    if (indicator) fact.appendChild(Object.assign(document.createElement("b"), { textContent: indicator }));
-    fact.append(label);
-    facts.appendChild(fact);
-    return { element: fact, status };
-  });
+  card.classList.add("guess-reveal-card");
+  steps.forEach(({ element }) => element.classList.add("reveal-slot"));
   const next = Object.assign(document.createElement("button"), { type: "button", className: "guess-reveal-next" });
   next.append(`${nextLabel} ▶`, Object.assign(document.createElement("small"), { textContent: "or press Enter" }));
-  card.append(head, facts, next);
+  card.appendChild(next);
   overlay.appendChild(card);
   host.appendChild(overlay);
-  renderCountryOutline(guess.country, outline).catch(() => outline.remove());
 
-  // Hot/cold first, then the hints, each turning over on its own beat.
-  const steps = [{ element: temperature, status: guess.isCorrect ? "match" : "hint" }, ...slots];
   let shown = 0;
   let streak = 0;
   let timer = null;
-  const turnOver = ({ element, status }, quiet) => {
-    element.classList.add("is-turned", `is-${status}`);
-    if (element === temperature) card.style.setProperty("--temp", guess.color);
-    streak = status === "match" ? streak + 1 : 0;
-    if (!quiet) sound(status, streak - 1);
+  const turnOver = (step, quiet) => {
+    step.element.classList.add("is-turned", `is-${step.status}`);
+    streak = step.status === "match" ? streak + 1 : 0;
+    onTurn(step);
+    if (!quiet) sound(step.status === "clue" ? "hint" : step.status, streak - 1);
+  };
+  const complete = () => {
+    card.classList.add("is-complete");
+    next.focus({ preventScroll: true });
   };
   const showNext = () => {
-    // The slot about to turn shimmers for a moment first, for a little suspense.
     turnOver(steps[shown], false);
     shown += 1;
     if (shown < steps.length) {
+      // The step about to turn shimmers for a moment first, for a little suspense.
       steps[shown].element.classList.add("is-next");
       timer = setTimeout(showNext, REVEAL_STEP_MS);
     } else {
-      card.classList.add("is-complete");
-      next.focus({ preventScroll: true });
+      complete();
     }
   };
   steps[0].element.classList.add("is-next");
@@ -7604,14 +7609,13 @@ function playGuessReveal(guess, { land, sound = () => {}, nextLabel = "NEXT GUES
         resolve();
       }, REVEAL_FLY_MS);
     };
-    // A click or Enter: show the remaining hints at once, or, once all are shown, go on.
+    // A click or Enter: show the remaining steps at once, or, once all are shown, go on.
     const advance = () => {
       if (shown >= steps.length) { finish(); return; }
       clearTimeout(timer);
       steps.slice(shown).forEach(step => turnOver(step, true));
       shown = steps.length;
-      card.classList.add("is-complete");
-      next.focus({ preventScroll: true });
+      complete();
     };
     const onKey = event => {
       if (event.key !== "Enter" && event.key !== " " && event.key !== "Escape") return;
@@ -7626,7 +7630,97 @@ function playGuessReveal(guess, { land, sound = () => {}, nextLabel = "NEXT GUES
   });
 }
 
+// A face-down tile that turns over to show a newly unlocked clue (Mystery, Pinpoint).
+function createClueStep({ label, text }) {
+  const tile = Object.assign(document.createElement("div"), { className: "reveal-clue" });
+  tile.append(
+    Object.assign(document.createElement("span"), { className: "slot-cover", textContent: "🔓 NEW CLUE" }),
+    Object.assign(document.createElement("span"), { className: "clue-tag", textContent: label }),
+    Object.assign(document.createElement("p"), { textContent: text })
+  );
+  return { element: tile, status: "clue" };
+}
+
+// Mystery and Pinpoint: a guess as a pack-style card. Flag, name and outline show at once;
+// hot/cold, each hint and any newly unlocked clue turn over one by one.
+function playGuessReveal(guess, { land, sound, nextLabel = "NEXT GUESS", outline = null, newClue = null }) {
+  const card = document.createElement("div");
+  // The card's edge takes the hot/cold colour only when that badge turns over.
+  card.style.setProperty("--temp", "var(--glass-line)");
+  const head = Object.assign(document.createElement("div"), { className: "guess-reveal-head" });
+  const temperature = Object.assign(document.createElement("span"), { className: "temp-badge", textContent: guess.temperature });
+  head.append(
+    createFlagImage(guess.country, "guess-reveal-flag"),
+    Object.assign(document.createElement("strong"), { className: "guess-reveal-name", textContent: guess.country.name }),
+    temperature
+  );
+  const shape = drawCountryOutline(outline, guess.country.name);
+  if (shape) head.appendChild(Object.assign(document.createElement("div"), { className: "guess-reveal-outline" })).appendChild(shape);
+  const facts = Object.assign(document.createElement("div"), { className: "guess-facts" });
+  const steps = [{ element: temperature, status: guess.isCorrect ? "match" : "hint" }];
+  getGuessFacts(guess).forEach(({ label, status, indicator }) => {
+    const fact = Object.assign(document.createElement("span"), { className: `fact fact-${status}` });
+    if (indicator) fact.appendChild(Object.assign(document.createElement("b"), { textContent: indicator }));
+    fact.append(label);
+    facts.appendChild(fact);
+    steps.push({ element: fact, status });
+  });
+  card.append(head, facts);
+  if (newClue) {
+    const clue = createClueStep(newClue);
+    card.appendChild(clue.element);
+    steps.push(clue);
+  }
+  return playRevealCard({
+    card, steps, nextLabel, land, sound,
+    onTurn: step => { if (step.element === temperature) card.style.setProperty("--temp", guess.color); }
+  });
+}
+
+// Rank 'Em: a try as a pack-style card, Mastermind style. The order you tried is shown,
+// then five lights turn on one by one: green for each country in the right place, then
+// red for the rest (never which ones), and finally any hint the try unlocked.
+function playRankReveal({ tryNumber, order, right, hint = null, land, sound, nextLabel = "NEXT TRY" }) {
+  const card = document.createElement("div");
+  card.style.setProperty("--temp", "var(--glass-line)");
+  const head = Object.assign(document.createElement("div"), { className: "rank-reveal-head" });
+  head.append(
+    Object.assign(document.createElement("span"), { className: "field-label", textContent: `TRY ${tryNumber}` }),
+    Object.assign(document.createElement("ol"), { className: "rank-reveal-order" })
+  );
+  order.forEach(country => {
+    const item = document.createElement("li");
+    item.append(createFlagImage(country, "rank-try-flag"), country.name);
+    head.lastChild.appendChild(item);
+  });
+  const pegs = Object.assign(document.createElement("div"), { className: "rank-pegs is-big", role: "img" });
+  pegs.setAttribute("aria-label", `${right} of ${order.length} in the right place`);
+  const steps = order.map((_, index) => {
+    const peg = Object.assign(document.createElement("i"), { className: "rank-peg" });
+    pegs.appendChild(peg);
+    return { element: peg, status: index < right ? "match" : "miss" };
+  });
+  const tally = Object.assign(document.createElement("p"), { className: "rank-reveal-tally", textContent: `${right} of ${order.length} in the right place` });
+  card.append(head, pegs, tally);
+  steps.push({ element: tally, status: right === order.length ? "match" : "hint" });
+  if (hint) {
+    const chip = Object.assign(document.createElement("span"), { className: "fact fact-hint rank-reveal-hint", textContent: `Hint: ${hint}` });
+    card.appendChild(chip);
+    steps.push({ element: chip, status: "hint" });
+  }
+  return playRevealCard({
+    card, steps, nextLabel, land, sound,
+    onTurn: step => { if (step.element === tally) card.style.setProperty("--temp", right === order.length ? "var(--t-correct)" : "var(--danger)"); }
+  });
+}
+
 const CLUE_DIFFICULTIES = ["VERY DIFFICULT", "DIFFICULT", "MEDIUM", "EASY", "EASIEST"];
+
+// Mystery's clue number index (0-based), with the answer's name kept out of it.
+function getMysteryClue(targetCountry, index) {
+  const text = targetCountry[`clue${index + 1}`];
+  return text ? { label: `CLUE ${index + 1} · ${CLUE_DIFFICULTIES[index]}`, text: redactCountryName(text, targetCountry) } : null;
+}
 
 function renderProgressiveHints(targetCountry, wrongGuessCount) {
   const clues = [
@@ -8100,7 +8194,7 @@ function initializeStatsModal(getStats) {
   });
 }
 
-return { showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, playGuessReveal, renderProgressiveHints, renderGlobeMarkerTooltip, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight, initializeStatsModal };
+return { showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, playGuessReveal, playRankReveal, getMysteryClue, renderProgressiveHints, renderGlobeMarkerTooltip, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight, initializeStatsModal };
 })();
 
 // ---- shape-data.js
@@ -8332,9 +8426,11 @@ __modules["days.js"] = (() => {
 //           Wikipedia article whose lead picture to show (fetched by
 //           tools/fetch-pictures.mjs into round-pictures.js, with its credit).
 // paint:    a question whose answer is a set of countries, clicked on the globe. Avoid
-//           microstates and tiny islands: they're too small to click. `view` is where
-//           the globe turns to [lat, lon]. `picture` is the English Wikipedia article
-//           whose lead picture goes on the card after the round.
+//           microstates and tiny islands: they're too small to click. Ask for knowledge,
+//           not what the map shows ("borders X", "coast on Y" are read straight off the
+//           globe). `view` is no longer used: turning the globe there gave answers away.
+//           `picture` is the English Wikipedia article whose lead picture goes on the
+//           card after the round.
 // rank:     the day's own topic, anything that five countries can be ranked by (it needn't
 //           exist for every country). `values` gives each country's value, in the order
 //           they first appear on the board. Highest first, unless `order: "lowest"` or
@@ -8342,6 +8438,9 @@ __modules["days.js"] = (() => {
 //           the topic), `unit`, `prefix`, `decimals`, `approx` (shows ≈), `top` and
 //           `bottom` (the board's words, e.g. "MOST" / "FEWEST"), `note` (the info card's
 //           text, a good place for the source) and `picture` (a Wikipedia article).
+//           `reroll` is the backup topic a player can swap to before the first try, for
+//           200 points: the same fields, linked to the theme, a little easier (values
+//           further apart), but still a real question.
 //
 // Check the file with: node tools/check-days.mjs
 
@@ -8389,7 +8488,14 @@ const DAYS = {
       values: { FI: 484, US: 465, SG: 575, EE: 510, JP: 536 },
       unit: " points",
       note: "PISA tests 15-year-olds every few years. Singapore topped all three subjects in 2022.",
-      picture: "Programme for International Student Assessment"
+      picture: "Programme for International Student Assessment",
+      reroll: {
+        topic: "Year its oldest university opened",
+        detail: "The oldest university still running: Bologna, Salamanca, Prague, Harvard and Sydney.",
+        values: { US: 1636, IT: 1088, AU: 1850, CZ: 1348, ES: 1218 },
+        years: true,
+        note: "Bologna (1088), Salamanca (1218), Charles University in Prague (1348), Harvard (1636) and the University of Sydney (1850)."
+      }
     }
   },
 
@@ -8430,10 +8536,9 @@ const DAYS = {
       }
     },
     paint: {
-      question: "Click every country in Africa with a coast on the Mediterranean Sea.",
-      answers: ["MA", "DZ", "TN", "LY", "EG"],
-      view: [28, 12],
-      picture: "Mediterranean Sea"
+      question: "Click the five biggest rice producers.",
+      answers: ["CN", "IN", "BD", "ID", "VN"],
+      picture: "Rice"
     },
     rank: {
       topic: "Instant noodles eaten in 2023",
@@ -8441,7 +8546,14 @@ const DAYS = {
       decimals: 1,
       unit: " billion servings",
       note: "Figures from the World Instant Noodles Association; China's includes Hong Kong. The world ate about 120 billion servings.",
-      picture: "Instant noodle"
+      picture: "Instant noodle",
+      reroll: {
+        topic: "Life expectancy at birth",
+        values: { NG: 54.6, JP: 84, ET: 67.6, US: 78.9, ID: 71.3 },
+        decimals: 1,
+        unit: " years",
+        note: "A good diet is part of a long life. From the game's country data (World Bank and UN figures)."
+      }
     }
   },
 
@@ -8489,7 +8601,14 @@ const DAYS = {
       bottom: "FEWEST",
       unit: " titles",
       note: "South America's championship, played since 1916. Argentina's 2024 win was its 16th.",
-      picture: "Estadio Centenario"
+      picture: "Estadio Centenario",
+      reroll: {
+        topic: "Men's World Cup titles",
+        values: { FR: 2, BR: 5, ES: 1, AR: 3, IT: 4 },
+        top: "MOST",
+        bottom: "FEWEST",
+        note: "Up to and including 2022. Germany also has four."
+      }
     }
   },
 
@@ -8537,7 +8656,17 @@ const DAYS = {
       bottom: "FEWEST",
       unit: " golds",
       note: "Norway's 16 golds in Beijing were a record for a single Winter Games.",
-      picture: "Beijing National Stadium"
+      picture: "Beijing National Stadium",
+      reroll: {
+        topic: "Coldest temperature ever recorded",
+        values: { FI: -51.5, GB: -27.2, RU: -67.8, AU: -23, CA: -63 },
+        order: "lowest",
+        decimals: 1,
+        unit: " °C",
+        top: "COLDEST",
+        bottom: "MILDEST",
+        note: "Oymyakon and Verkhoyansk in Siberia, Snag in Yukon, Kittilä in Lapland, Braemar and Altnaharra in Scotland, and Charlotte Pass in New South Wales."
+      }
     }
   },
 
@@ -8586,7 +8715,14 @@ const DAYS = {
       top: "FURTHEST SOUTH",
       bottom: "CLOSEST TO THE EQUATOR",
       note: "Wellington is the southernmost capital of any country. South Africa's is Pretoria.",
-      picture: "Wellington"
+      picture: "Wellington",
+      reroll: {
+        topic: "Population of five southern countries",
+        values: { NZ: 5.3, BR: 212.8, UY: 3.4, ZA: 64.7, AU: 27.6 },
+        decimals: 1,
+        unit: " million",
+        note: "From the game's country data (World Bank and UN figures)."
+      }
     }
   },
 
@@ -8635,7 +8771,13 @@ const DAYS = {
       top: "FURTHEST",
       bottom: "CLOSEST",
       note: "Caravans set out from Xi'an, then called Chang'an, and travelled for months to reach the Mediterranean.",
-      picture: "Xi'an"
+      picture: "Xi'an",
+      reroll: {
+        topic: "GDP per person along the Silk Road",
+        values: { IR: 3924, TR: 18599, AF: 417, CN: 13862, TM: 6540 },
+        prefix: "$",
+        note: "In US dollars. From the game's country data (World Bank and UN figures)."
+      }
     }
   },
 
@@ -8671,17 +8813,22 @@ const DAYS = {
       }
     },
     paint: {
-      question: "Click every country that borders Saudi Arabia.",
-      answers: ["JO", "IQ", "KW", "QA", "AE", "OM", "YE"],
-      view: [24, 46],
-      picture: "Rub' al Khali"
+      question: "Click every kingdom in Europe.",
+      answers: ["GB", "NO", "SE", "DK", "NL", "BE", "ES"],
+      picture: "Monarchies in Europe"
     },
     rank: {
       topic: "Year the current monarch came to the throne",
       values: { JP: 2019, SE: 1973, MA: 1999, BN: 1967, NO: 1991 },
       years: true,
       note: "Brunei's Sultan Hassanal Bolkiah has reigned since 1967, longer than any other living monarch.",
-      picture: "Istana Nurul Iman"
+      picture: "Istana Nurul Iman",
+      reroll: {
+        topic: "Year the monarchy was abolished",
+        values: { IT: 1946, PT: 1910, NP: 2008, RU: 1917, EG: 1953 },
+        years: true,
+        note: "Portugal in 1910, Russia in 1917, Italy by referendum in 1946, Egypt in 1953 and Nepal in 2008."
+      }
     }
   },
 
@@ -8730,7 +8877,14 @@ const DAYS = {
       values: { IL: 1973, AU: 2015, GB: 1957, IE: 1965, SE: 1958 },
       years: true,
       note: "The contest began in 1956. Australia was invited in 2015, for its 60th edition, and has stayed.",
-      picture: "ABBA"
+      picture: "ABBA",
+      reroll: {
+        topic: "Eurovision wins",
+        values: { NO: 3, SE: 7, PT: 1, IL: 4, NL: 5 },
+        top: "MOST",
+        bottom: "FEWEST",
+        note: "Up to the 2025 contest. Ireland has seven too."
+      }
     }
   },
 
@@ -8781,7 +8935,15 @@ const DAYS = {
       top: "HIGHEST",
       bottom: "LOWEST",
       note: "Everest (Nepal), Jengish Chokusu (Kyrgyzstan), Aconcagua (Argentina), Kilimanjaro (Tanzania) and the Dufourspitze (Switzerland).",
-      picture: "Aconcagua"
+      picture: "Aconcagua",
+      reroll: {
+        topic: "Height of the capital",
+        detail: "Metres above sea level: Bern, Quito, Amsterdam, Addis Ababa and Kathmandu.",
+        values: { CH: 540, EC: 2850, NL: 0, ET: 2355, NP: 1400 },
+        approx: true,
+        unit: " m",
+        note: "Quito is the highest official capital on this list; Amsterdam lies around sea level."
+      }
     }
   },
 
@@ -8821,10 +8983,9 @@ const DAYS = {
       }
     },
     paint: {
-      question: "Click every country with a coast on the Caspian Sea.",
-      answers: ["RU", "KZ", "TM", "IR", "AZ"],
-      view: [42, 51],
-      picture: "Caspian Sea"
+      question: "Click every country that was home to one of the Seven Wonders of the Ancient World.",
+      answers: ["EG", "IQ", "GR", "TR"],
+      picture: "Seven Wonders of the Ancient World"
     },
     rank: {
       topic: "The year in the country's traditional calendar",
@@ -8834,7 +8995,15 @@ const DAYS = {
       bottom: "LOWEST",
       plain: true,
       note: "The Hebrew, Thai Buddhist, Nepali (Bikram Sambat), Ethiopian and Iranian solar calendars, each counting from a different start.",
-      picture: "Calendar"
+      picture: "Calendar",
+      reroll: {
+        topic: "Age of its most famous ancient monument",
+        detail: "The Great Pyramid, the Parthenon, the Colosseum, Angkor Wat and Machu Picchu.",
+        values: { KH: 876, EG: 4586, PE: 576, GR: 2458, IT: 1946 },
+        approx: true,
+        unit: " years",
+        note: "The Great Pyramid was finished around 2560 BC, the Parthenon in 432 BC, the Colosseum in AD 80, Angkor Wat around 1150 and Machu Picchu around 1450."
+      }
     }
   },
 
@@ -8884,7 +9053,13 @@ const DAYS = {
       values: { FR: 1944, NZ: 1893, CH: 1971, FI: 1906, NO: 1913 },
       years: true,
       note: "New Zealand was the first country where women could vote in national elections. Switzerland waited until 1971.",
-      picture: "Kate Sheppard"
+      picture: "Kate Sheppard",
+      reroll: {
+        topic: "Year it joined the EU",
+        values: { PL: 2004, FR: 1958, HR: 2013, DK: 1973, ES: 1986 },
+        years: true,
+        note: "France was a founding member of the European Economic Community in 1958."
+      }
     }
   },
 
@@ -8939,7 +9114,14 @@ const DAYS = {
       top: "MOST",
       bottom: "LEAST",
       note: "From the FAO's 2020 forest survey. Only Russia has more forest than Brazil.",
-      picture: "Amazon rainforest"
+      picture: "Amazon rainforest",
+      reroll: {
+        topic: "Share of land covered by forest",
+        values: { GB: 13.5, SR: 91.5, EG: 0, BR: 58.5, IN: 24.4 },
+        decimals: 1,
+        unit: "%",
+        note: "From the game's country data (World Bank and UN figures)."
+      }
     }
   },
 
@@ -8987,7 +9169,13 @@ const DAYS = {
       top: "HIGHEST",
       bottom: "LOWEST",
       note: "The first digit is the region: 3 and 4 are Europe, 8 is East Asia. The US and Canada share +1.",
-      picture: "Telephone"
+      picture: "Telephone",
+      reroll: {
+        topic: "People per square kilometre",
+        values: { MN: 2.3, NL: 537.2, AU: 3.6, BD: 1349.7, US: 37.4 },
+        decimals: 1,
+        note: "From the game's country data (World Bank and UN figures)."
+      }
     }
   },
 
@@ -9038,7 +9226,13 @@ const DAYS = {
       top: "LARGEST",
       bottom: "SMALLEST",
       note: "All five would fit inside Belgium, with room to spare.",
-      picture: "Luxembourg City"
+      picture: "Luxembourg City",
+      reroll: {
+        topic: "Population of five small countries",
+        values: { MT: 579704, VA: 882, SG: 6111175, SM: 34109, CY: 1370754 },
+        unit: " people",
+        note: "From the game's country data (World Bank and UN figures)."
+      }
     }
   },
 
@@ -9098,7 +9292,13 @@ const DAYS = {
       values: { EE: 2004, FI: 2023, TR: 1952, PL: 1999, DE: 1955 },
       years: true,
       note: "West Germany joined in 1955; reunited Germany stayed in. Finland joined in 2023, Sweden a year later.",
-      picture: "NATO"
+      picture: "NATO",
+      reroll: {
+        topic: "Nuclear warheads",
+        values: { FR: 290, RU: 5459, GB: 225, CN: 600, IL: 90 },
+        approx: true,
+        note: "SIPRI estimates for January 2025. Israel has never confirmed it has nuclear weapons."
+      }
     }
   },
 
@@ -9144,7 +9344,14 @@ const DAYS = {
       values: { IT: 1985, CA: 1967, IN: 1996, JP: 1971, CN: 1990 },
       years: true,
       note: "Canada had the first outside the US, in Richmond, British Columbia. India's menus have no beef.",
-      picture: "McDonald's"
+      picture: "McDonald's",
+      reroll: {
+        topic: "Share of people living in cities",
+        values: { NE: 18.4, BE: 87.7, IN: 35.7, PL: 60.1, BI: 25.7 },
+        decimals: 1,
+        unit: "%",
+        note: "Everyone else lives in the countryside, often from farming. From the game's country data (World Bank and UN figures)."
+      }
     }
   },
 
@@ -9182,10 +9389,9 @@ const DAYS = {
       }
     },
     paint: {
-      question: "Click every country that borders Germany.",
-      answers: ["DK", "PL", "CZ", "AT", "CH", "FR", "LU", "BE", "NL"],
-      view: [51, 10],
-      picture: "Brandenburg Gate"
+      question: "Click every country that has won Eurovision since 2014.",
+      answers: ["AT", "SE", "UA", "PT", "IL", "NL", "IT", "CH"],
+      picture: "St. Jakobshalle"
     },
     rank: {
       topic: "Birth year of the country's music legend",
@@ -9193,7 +9399,14 @@ const DAYS = {
       values: { FI: 1865, JM: 1945, PL: 1810, AT: 1756, NO: 1843 },
       years: true,
       note: "Mozart (Austria), Chopin (Poland), Grieg (Norway), Sibelius (Finland) and Bob Marley (Jamaica).",
-      picture: "Wolfgang Amadeus Mozart"
+      picture: "Wolfgang Amadeus Mozart",
+      reroll: {
+        topic: "Year its famous music festival began",
+        detail: "Tomorrowland, Glastonbury, Coachella, Rock in Rio and Sziget.",
+        values: { BE: 2005, GB: 1970, US: 1999, BR: 1985, HU: 1993 },
+        years: true,
+        note: "Glastonbury (1970), Rock in Rio (1985), Sziget (1993), Coachella (1999) and Tomorrowland (2005)."
+      }
     }
   },
 
@@ -9228,10 +9441,9 @@ const DAYS = {
       }
     },
     paint: {
-      question: "Click every country on the island of Borneo.",
-      answers: ["MY", "ID", "BN"],
-      view: [1, 114],
-      picture: "Mount Kinabalu"
+      question: "Click the five most populous island countries.",
+      answers: ["ID", "JP", "PH", "GB", "MG"],
+      picture: "Island country"
     },
     rank: {
       topic: "Number of islands",
@@ -9241,7 +9453,14 @@ const DAYS = {
       bottom: "FEWEST",
       unit: " islands",
       note: "Counts depend on how small an island may be; Sweden counts every islet in its lakes and seas.",
-      picture: "Stockholm archipelago"
+      picture: "Stockholm archipelago",
+      reroll: {
+        topic: "Population of five island countries",
+        values: { CU: 10.9, ID: 285.7, IS: 0.4, GB: 69.5, NZ: 5.3 },
+        decimals: 1,
+        unit: " million",
+        note: "From the game's country data (World Bank and UN figures)."
+      }
     }
   },
 
@@ -9294,7 +9513,13 @@ const DAYS = {
       top: "MOST",
       bottom: "LEAST",
       note: "OPEC figures. Only Venezuela has more oil under the ground than Saudi Arabia.",
-      picture: "Ghawar Field"
+      picture: "Ghawar Field",
+      reroll: {
+        topic: "People per square kilometre in desert lands",
+        values: { LY: 4.2, BH: 2000.5, MN: 2.3, EG: 118.9, DZ: 19.9 },
+        decimals: 1,
+        note: "From the game's country data (World Bank and UN figures)."
+      }
     }
   },
 
@@ -9333,10 +9558,9 @@ const DAYS = {
       }
     },
     paint: {
-      question: "Click every country that borders Russia.",
-      answers: ["NO", "FI", "EE", "LV", "LT", "PL", "BY", "UA", "GE", "AZ", "KZ", "MN", "CN", "KP"],
-      view: [55, 60],
-      picture: "Trans-Siberian Railway"
+      question: "Click every member of the Five Eyes intelligence alliance.",
+      answers: ["US", "GB", "CA", "AU", "NZ"],
+      picture: "Five Eyes"
     },
     rank: {
       topic: "Year the foreign intelligence service was founded",
@@ -9344,7 +9568,13 @@ const DAYS = {
       values: { DE: 1956, US: 1947, AU: 1952, GB: 1909, IL: 1949 },
       years: true,
       note: "Britain's MI6 (1909), the CIA (1947), Israel's Mossad (1949), Australia's ASIS (1952) and Germany's BND (1956).",
-      picture: "SIS Building"
+      picture: "SIS Building",
+      reroll: {
+        topic: "GDP per person",
+        values: { RU: 17547, CH: 114769, IN: 2702, GB: 57602, IR: 3924 },
+        prefix: "$",
+        note: "In US dollars. From the game's country data (World Bank and UN figures)."
+      }
     }
   },
 
@@ -9391,7 +9621,14 @@ const DAYS = {
       decimals: 1,
       unit: " °C",
       note: "Death Valley's 56.7 °C from 1913 is still the world record. Italy's came in Sicily in 2021, Britain's in 2022.",
-      picture: "Death Valley"
+      picture: "Death Valley",
+      reroll: {
+        topic: "Height of its highest volcano",
+        detail: "Ojos del Salado, Kilimanjaro, Mount Fuji, Ruapehu and Öræfajökull.",
+        values: { JP: 3776, CL: 6893, IS: 2110, TZ: 5895, NZ: 2797 },
+        unit: " m",
+        note: "Ojos del Salado, on the border with Argentina, is the highest volcano on Earth."
+      }
     }
   },
 
@@ -9443,7 +9680,13 @@ const DAYS = {
       bottom: "FEWEST",
       unit: " stripes",
       note: "Malaysia's 14 stripes stand for its 13 states and the federal government.",
-      picture: "Flag of Malaysia"
+      picture: "Flag of Malaysia",
+      reroll: {
+        topic: "Year its current flag was adopted",
+        values: { CA: 1965, FR: 1794, RW: 2001, NO: 1821, ZA: 1994 },
+        years: true,
+        note: "France's tricolour (1794), Norway's cross (1821), Canada's maple leaf (1965), South Africa (1994) and Rwanda (2001)."
+      }
     }
   },
 
@@ -9479,17 +9722,23 @@ const DAYS = {
       }
     },
     paint: {
-      question: "Click every country with a coast on the Baltic Sea.",
-      answers: ["SE", "FI", "RU", "EE", "LV", "LT", "PL", "DE", "DK"],
-      view: [58, 20],
-      picture: "Baltic Sea"
+      question: "Click the five biggest coffee producers.",
+      answers: ["BR", "VN", "CO", "ID", "ET"],
+      picture: "Coffee production"
     },
     rank: {
       topic: "Year the first Starbucks opened",
       values: { IN: 2012, US: 1971, IT: 2018, JP: 1996, CN: 1999 },
       years: true,
       note: "Seattle had the first in 1971. Tokyo got the first one outside North America; Milan, home of the espresso bar, waited until 2018.",
-      picture: "Starbucks"
+      picture: "Starbucks",
+      reroll: {
+        topic: "Year its best-known brewery was founded",
+        detail: "Heineken, Weihenstephan, Grupo Modelo (Corona), Guinness and Asahi.",
+        values: { NL: 1864, DE: 1040, MX: 1925, IE: 1759, JP: 1889 },
+        years: true,
+        note: "Weihenstephan in Bavaria says it is the oldest working brewery in the world."
+      }
     }
   },
 
@@ -9539,7 +9788,13 @@ const DAYS = {
       values: { JP: 1956, SS: 2011, CA: 1945, CH: 2002, IE: 1955 },
       years: true,
       note: "Canada was a founding member in 1945. South Sudan, the newest country, joined in 2011.",
-      picture: "Headquarters of the United Nations"
+      picture: "Headquarters of the United Nations",
+      reroll: {
+        topic: "Year of independence",
+        values: { NG: 1960, US: 1776, TL: 2002, MX: 1821, IN: 1947 },
+        years: true,
+        note: "Timor-Leste's independence was restored in 2002, after Indonesian rule."
+      }
     }
   },
 
@@ -9586,7 +9841,14 @@ const DAYS = {
       decimals: 1,
       unit: " million",
       note: "Cars, vans, trucks and buses, from OICA. China builds about a third of the world's vehicles.",
-      picture: "Traffic congestion"
+      picture: "Traffic congestion",
+      reroll: {
+        topic: "Year its best-known car maker was founded",
+        detail: "Toyota, Ford, Hyundai, Citroën and Volvo.",
+        values: { JP: 1937, US: 1903, KR: 1967, FR: 1919, SE: 1927 },
+        years: true,
+        note: "Ford (1903), Citroën (1919), Volvo (1927), Toyota (1937) and Hyundai Motor (1967)."
+      }
     }
   },
 
@@ -9636,7 +9898,13 @@ const DAYS = {
       values: { CN: 2003, US: 1961, KR: 2008, FR: 1982, JP: 1990 },
       years: true,
       note: "Alan Shepard (US), Jean-Loup Chrétien (France), Toyohiro Akiyama (Japan), Yang Liwei (China) and Yi So-yeon (South Korea).",
-      picture: "Yang Liwei"
+      picture: "Yang Liwei",
+      reroll: {
+        topic: "Year it first launched a satellite itself",
+        values: { IN: 1980, RU: 1957, IR: 2009, FR: 1965, IL: 1988 },
+        years: true,
+        note: "On its own rocket. The Soviet Union's Sputnik 1 counts for Russia."
+      }
     }
   },
 
@@ -9676,17 +9944,23 @@ const DAYS = {
       }
     },
     paint: {
-      question: "Click every country that borders the Democratic Republic of the Congo.",
-      answers: ["CG", "CF", "SS", "UG", "RW", "BI", "TZ", "ZM", "AO"],
-      view: [-3, 23],
-      picture: "Congo River"
+      question: "Click the 13 countries where wild tigers live, or lived until recently.",
+      answers: ["BD", "BT", "KH", "CN", "IN", "ID", "LA", "MY", "MM", "NP", "RU", "TH", "VN"],
+      picture: "Tiger"
     },
     rank: {
       topic: "Year the first national park was founded",
       values: { ZA: 1926, US: 1872, KE: 1946, AU: 1879, CA: 1885 },
       years: true,
       note: "Yellowstone (1872), the Royal National Park near Sydney (1879), Banff (1885), Kruger (1926) and Nairobi National Park (1946).",
-      picture: "Kruger National Park"
+      picture: "Kruger National Park",
+      reroll: {
+        topic: "Year its oldest zoo opened",
+        detail: "Vienna, London, Philadelphia, Pretoria and Singapore.",
+        values: { SG: 1973, AT: 1752, ZA: 1899, GB: 1828, US: 1874 },
+        years: true,
+        note: "Vienna's Tiergarten Schönbrunn (1752) is the oldest zoo still open."
+      }
     }
   },
 
@@ -9726,10 +10000,9 @@ const DAYS = {
       }
     },
     paint: {
-      question: "Click every country that borders Belgium.",
-      answers: ["FR", "LU", "DE", "NL"],
-      view: [50, 5],
-      picture: "Atomium"
+      question: "Click the five most visited countries in 2023.",
+      answers: ["FR", "ES", "US", "IT", "TR"],
+      picture: "Tourism"
     },
     rank: {
       topic: "Tour de France wins",
@@ -9738,7 +10011,13 @@ const DAYS = {
       bottom: "FEWEST",
       unit: " wins",
       note: "Counted by the winner's nationality. No Frenchman has won since Bernard Hinault in 1985.",
-      picture: "Mont Ventoux"
+      picture: "Mont Ventoux",
+      reroll: {
+        topic: "Year the capital got a metro",
+        values: { RU: 1935, GB: 1863, CN: 1969, FR: 1900, HU: 1896 },
+        years: true,
+        note: "London (1863), Budapest (1896), Paris (1900), Moscow (1935) and Beijing (1969)."
+      }
     }
   },
 
@@ -9778,10 +10057,9 @@ const DAYS = {
       }
     },
     paint: {
-      question: "Click every country with a coast on the Black Sea.",
-      answers: ["TR", "BG", "RO", "UA", "RU", "GE"],
-      view: [43, 34],
-      picture: "Black Sea"
+      question: "Click every country that has won the America's Cup.",
+      answers: ["US", "AU", "NZ", "CH"],
+      picture: "America's Cup"
     },
     rank: {
       topic: "Length of coastline",
@@ -9790,7 +10068,13 @@ const DAYS = {
       top: "LONGEST",
       bottom: "SHORTEST",
       note: "From the CIA World Factbook. Canada's coast, with all its islands, is the longest on Earth.",
-      picture: "Coast"
+      picture: "Coast",
+      reroll: {
+        topic: "GDP per person in ocean nations",
+        values: { FJ: 6642, SG: 98814, TL: 1341, MV: 14615, PG: 3020 },
+        prefix: "$",
+        note: "In US dollars. From the game's country data (World Bank and UN figures)."
+      }
     }
   },
 
@@ -9825,9 +10109,8 @@ const DAYS = {
       }
     },
     paint: {
-      question: "Click every country that borders Hungary.",
-      answers: ["AT", "SK", "UA", "RO", "RS", "HR", "SI"],
-      view: [47, 19],
+      question: "Click every country the Danube flows through.",
+      answers: ["DE", "AT", "SK", "HU", "HR", "RS", "RO", "BG", "MD", "UA"],
       picture: "Danube"
     },
     rank: {
@@ -9839,7 +10122,14 @@ const DAYS = {
       top: "MOST",
       bottom: "FEWEST",
       note: "In Reykjavík the sun is up for less than eight hours on 31 October; in Wellington it's spring.",
-      picture: "Jack-o'-lantern"
+      picture: "Jack-o'-lantern",
+      reroll: {
+        topic: "Life expectancy",
+        values: { HT: 65.1, IE: 83, TD: 55.2, RO: 76.5, PH: 69.9 },
+        decimals: 1,
+        unit: " years",
+        note: "From the game's country data (World Bank and UN figures)."
+      }
     }
   }
 };
@@ -10119,14 +10409,28 @@ const AUTHORED = {
     info: entry.info || null
   }),
   paint: entry => ({ question: entry.question, answers: entry.answers, view: entry.view || null, highlight: entry.highlight || null }),
-  rank: entry => {
-    // The five countries are listed in days.js in the order they first appear on the board.
-    const countries = Object.keys(entry.values);
-    const direction = entry.order === "lowest" || entry.years ? 1 : -1;
-    const answer = [...countries].sort((left, right) => direction * (entry.values[left] - entry.values[right]));
-    return { topic: entry, countries, answer };
-  }
+  rank: entry => ({ ...buildRankTopic(entry), reroll: entry.reroll ? buildRankTopic(entry.reroll) : null })
 };
+
+// A Rank 'Em topic from days.js as a round's countries and right order. The five
+// countries are listed in the order they first appear on the board.
+function buildRankTopic(entry) {
+  const countries = Object.keys(entry.values);
+  const direction = entry.order === "lowest" || entry.years ? 1 : -1;
+  const answer = [...countries].sort((left, right) => direction * (entry.values[left] - entry.values[right]));
+  return { topic: entry, countries, answer };
+}
+
+// The round as it is being played: in Rank 'Em, a player can swap the day's topic for its
+// backup (re-roll) before the first try, which costs 200. Every other round is as planned.
+function resolveRound(round, state) {
+  if (round.type !== "rank" || !state?.rerolled || !round.reroll) return round;
+  return { ...round, ...round.reroll, reroll: null, rerolled: true };
+}
+
+function resolvePlan(plan, states) {
+  return plan.map((round, index) => resolveRound(round, states?.[index]));
+}
 
 // The day's name (shown to players) and theme (a note for us), if it was hand-made.
 function getDayInfo(dateKey) {
@@ -10302,7 +10606,7 @@ function createRoundState(type) {
     case "pinpoint": return { guesses: [], gaveUp: false };
     case "deepcut": return { tries: [], answer: null, gaveUp: false };
     case "paint": return { found: [], wrong: [], finished: false };
-    case "rank": return { submissions: [], order: null };
+    case "rank": return { submissions: [], order: null, rerolled: false };
     default: throw new Error(`Unknown round type ${type}`);
   }
 }
@@ -10349,7 +10653,9 @@ function getRoundProgress(round, state) {
       const solved = state.submissions.some(order => order.join() === round.answer.join());
       const wrong = state.submissions.length - (solved ? 1 : 0);
       const done = solved || state.submissions.length >= MAX_GUESSES;
-      return { done, solved, wrong, score: solved ? MAX_ROUND_SCORE - WRONG_PENALTY * wrong : 0 };
+      // A re-rolled topic costs as much as a wrong try.
+      const cost = WRONG_PENALTY * (wrong + (round.rerolled ? 1 : 0));
+      return { done, solved, wrong, score: solved ? Math.max(0, MAX_ROUND_SCORE - cost) : 0 };
     }
     default: throw new Error(`Unknown round type ${round.type}`);
   }
@@ -10374,7 +10680,7 @@ function getDayScore(plan, states) {
   };
 }
 
-return { ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, getDayInfo, getDailyPlan, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
+return { ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, resolveRound, resolvePlan, getDayInfo, getDailyPlan, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
 })();
 
 // ---- community.js
@@ -11180,8 +11486,8 @@ const { createDistributionChart, initializeHistoryScreens } = __modules["screens
 const { formatTopPercent, getDayStats, getTopPercent } = __modules["community.js"];
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
-const { MAX_DAILY_SCORE, MAX_GUESSES, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
-const { createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, initializeStatsModal, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
+const { MAX_DAILY_SCORE, MAX_GUESSES, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
+const { createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, initializeStatsModal, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playRankReveal, getMysteryClue, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
 
 // v3: Deep Cut and Paint the Map replaced Capital Call and Border Patrol (October 2026).
 const DAY_STORAGE_PREFIX = "daily-geography:day:v3:";
@@ -11201,8 +11507,9 @@ const RANK_COLORS = ["#45e3ff", "#ffd45c", "#ff8a3d", "#c58cff", "#5cf28a"];
 const today = toUtcDateKey(new Date());
 // The day being played: today, or an unplayed past day opened from the archive.
 let activeDate = today;
-let plan = getDailyPlan(activeDate);
 let day = loadDay(activeDate);
+// The day's rounds as played (with a re-rolled Rank 'Em topic, if any).
+let plan = resolvePlan(getDailyPlan(activeDate), day.rounds);
 let viewIndex = getActiveRoundIndex();
 let isGameViewVisible = false;
 let isAnimating = false;
@@ -11211,8 +11518,6 @@ let markerGuesses = [];
 let pinpointSelection = null;
 // The country clicked in Paint the Map, waiting to be painted.
 let paintSelection = null;
-// The Paint the Map view the globe last turned to, so it only turns once per round.
-let paintViewShown = null;
 // Deep Cut's near miss: the wrong try it belongs to and the answer it was probably meant to be.
 let deepcutSuggestion = null;
 // Set once today's last round is finished, so stats are saved only once.
@@ -11452,7 +11757,8 @@ function applyJourneyWords() {
 // real values as bars for Rank 'Em.
 function getRoundInfo(round) {
   // Each round's photo on the hand-made days (see tools/fetch-pictures.mjs).
-  const photo = ROUND_PICTURES[activeDate]?.[round.type];
+  // A re-rolled Rank 'Em topic has no photo of its own.
+  const photo = round.rerolled ? null : ROUND_PICTURES[activeDate]?.[round.type];
   switch (round.type) {
     case "deepcut":
       return round.info ? { ...round.info, picture: photo } : null;
@@ -11824,7 +12130,7 @@ function renderScoreTile(dayScore) {
     return;
   }
   const progress = progressOf(viewIndex);
-  const worth = Math.max(0, MAX_ROUND_SCORE - WRONG_PENALTY * progress.wrong);
+  const worth = Math.max(0, MAX_ROUND_SCORE - WRONG_PENALTY * (progress.wrong + (plan[viewIndex].rerolled ? 1 : 0)));
   setText("scoreTileRoundLabel", `Round ${viewIndex + 1} is worth up to`);
   setText("scoreTileWorth", Math.round(worth * (worth === MAX_ROUND_SCORE ? multiplier : 1)).toLocaleString());
 }
@@ -12009,7 +12315,7 @@ const ROUND_RENDERERS = {
       globe.setHighlights([...outlines, { country: target, color: 0x5cf28a, pulse: true }]);
       if (options.animateGlobe) globe.rotateTo(target.lat, target.lon, 900);
     } else {
-      globe.setHighlights([...outlines, ...(selected ? [{ country: selected, color: 0xffd45c, pulse: true }] : [])]);
+      globe.setHighlights([...outlines, ...(selected ? [{ country: selected, color: 0xffd45c, pulse: true, focus: true }] : [])]);
     }
   },
 
@@ -12093,14 +12399,9 @@ const ROUND_RENDERERS = {
       ...state.wrong.map(iso => ({ country: getCountry(iso), color: 0xff6b7d })),
       ...(progress.done ? missing.map(iso => ({ country: getCountry(iso), color: 0xff8a3d })) : []),
       // Gold, so a selection between painted (green) neighbours doesn't look painted already.
-      ...(selected ? [{ country: selected, color: 0xffd45c, pulse: true }] : [])
+      ...(selected ? [{ country: selected, color: 0xffd45c, pulse: true, focus: true }] : [])
     ]);
-    // Turn to the part of the world the question is about, once per round.
-    const viewKey = `${activeDate}:${viewIndex}`;
-    if (round.view && paintViewShown !== viewKey) {
-      paintViewShown = viewKey;
-      globe.rotateTo(round.view[0], round.view[1], 900);
-    }
+    // The globe stays where it is: turning it to the right region gave the answer away.
     const last = state.found.length || state.wrong.length ? getCountry([...state.found, ...state.wrong].at(-1)) : null;
     setStageChip("LAST PAINTED", last);
   },
@@ -12122,6 +12423,7 @@ const ROUND_RENDERERS = {
     setText("rankBoardBottom", metric.bottom);
     setText("rankCount", `${state.submissions.length} / ${MAX_GUESSES}`);
     document.getElementById("rankSubmit").disabled = progress.done;
+    document.getElementById("rankReroll").classList.toggle("hidden", progress.done || state.submissions.length > 0 || !round.reroll);
 
     const order = progress.done ? round.answer : state.order;
     const list = document.getElementById("rankList");
@@ -12164,19 +12466,14 @@ const ROUND_RENDERERS = {
       const right = submission.filter((iso, position) => round.answer[position] === iso).length;
       const item = document.createElement("li");
       item.className = right === submission.length ? "attempt is-right" : "attempt is-wrong";
-      const hint = hints.find(candidate => candidate.afterTry === index + 1);
-      const hintText = hint ? ` · Hint: ${getCountry(hint.iso).name}, ${metric.format(metric.value(getCountry(hint.iso)))}` : "";
-      const summary = Object.assign(document.createElement("span"), { className: "rank-try-summary", textContent: `Try ${index + 1}: ${right} of 5 in the right place${hintText}` });
-      // The order you tried, so you don't have to remember it.
-      const tried = Object.assign(document.createElement("ol"), { className: "rank-try-order" });
-      submission.forEach(iso => {
-        const entry = document.createElement("li");
-        entry.append(createFlagImage(getCountry(iso), "rank-try-flag"), getCountry(iso).name);
-        tried.appendChild(entry);
-      });
-      const body = Object.assign(document.createElement("div"), { className: "rank-try" });
-      body.append(summary, tried);
-      item.append(Object.assign(document.createElement("b"), { textContent: right === submission.length ? "✓" : "✕" }), body);
+      // Just the lights, as on the try's card: green for each in place, then red. The
+      // order you tried shows on hover; hinted values stay on the board itself.
+      item.classList.add("rank-attempt");
+      item.title = `Try ${index + 1}: ${submission.map(iso => getCountry(iso).name).join(", ")}`;
+      const pegs = Object.assign(document.createElement("span"), { className: "rank-pegs", role: "img" });
+      pegs.setAttribute("aria-label", `Try ${index + 1}: ${right} of ${submission.length} in the right place`);
+      submission.forEach((_, peg) => pegs.appendChild(Object.assign(document.createElement("i"), { className: `rank-peg is-turned ${peg < right ? "is-match" : "is-miss"}` })));
+      item.append(Object.assign(document.createElement("b"), { textContent: right === submission.length ? "✓" : "✕" }), Object.assign(document.createElement("span"), { className: "guess-number", textContent: String(index + 1) }), pegs);
       return item;
     }));
     if (!state.submissions.length) attempts.appendChild(Object.assign(document.createElement("li"), { className: "attempt is-note", textContent: "A correct first try is worth 1,000." }));
@@ -12259,12 +12556,14 @@ function showMiss(target, rowSelector) {
 // Mystery and Pinpoint: a guess first shows as a card with its hints (playGuessReveal),
 // then lands as its row once you go on. A miss flashes where you answered, as in every
 // round. You can type the next guess meanwhile; it can be sent once the card has landed.
-function revealGuess(guess, target, rowSelector, commitOptions = {}) {
+function revealGuess(guess, target, rowSelector, { commitOptions = {}, newClue = null } = {}) {
   isAnimating = true;
   sounds.playFlyTo();
   return playGuessReveal(guess, {
     sound: (status, streak) => sounds.playReveal(status, streak),
     nextLabel: guess.isCorrect ? "CONTINUE" : "NEXT GUESS",
+    outline: globe.outlineOf(guess.country),
+    newClue,
     land: () => {
       isAnimating = false;
       commit(commitOptions);
@@ -12303,7 +12602,11 @@ function submitMysteryGuess(value, selectedCountry) {
   state.guesses.push(country.iso);
   saveDay();
   const round = plan[viewIndex];
-  revealGuess(evaluateGuess(country, { ...getCountry(round.answer), ...round.clues }), answerBox("countryInput"), "#history .guess-row");
+  const answer = { ...getCountry(round.answer), ...round.clues };
+  // A wrong guess unlocks the next clue, shown last on the guess card.
+  const progress = progressOf(viewIndex);
+  const newClue = progress.done ? null : getMysteryClue(answer, progress.wrong);
+  revealGuess(evaluateGuess(country, answer), answerBox("countryInput"), "#history .guess-row", { newClue });
   return { status: "submitted" };
 }
 
@@ -12337,7 +12640,16 @@ function confirmPinpointGuess() {
   const country = getCountry(pinpointSelection);
   pinpointSelection = null;
   day.rounds[viewIndex].guesses.push(country.iso);
-  revealGuess(evaluateGuess(country, getCountry(plan[viewIndex].answer)), pickCard("pinpoint"), "#pinpointGuesses .guess-row", { animateGlobe: false });
+  const round = plan[viewIndex];
+  const target = getCountry(round.answer);
+  // A wrong guess unlocks the next clue (as the renderer counts them), shown last on the card.
+  const state = day.rounds[viewIndex];
+  const progress = progressOf(viewIndex);
+  const funClues = round.funClues || [];
+  const clues = getPinpointClues(target, state.guesses, funClues);
+  const index = progress.wrong + (funClues.length ? 1 : 0) - 1;
+  const newClue = progress.done || index < 0 || index >= clues.length ? null : { label: `CLUE ${index + 1}`, text: clues[index] };
+  revealGuess(evaluateGuess(country, target), pickCard("pinpoint"), "#pinpointGuesses .guess-row", { commitOptions: { animateGlobe: false }, newClue });
 }
 
 // Deep Cut: the first answer on the list ends the round; anything else just says so,
@@ -12471,10 +12783,49 @@ function submitRankOrder() {
     return;
   }
   state.submissions.push([...state.order]);
-  const isRight = state.order.join() === plan[viewIndex].answer.join();
-  commit();
-  // The new row under Attempts says how many are in place, and any hint it unlocked.
-  if (!isRight) showMiss(document.getElementById("rankBoard"), "#rankAttempts .attempt.is-wrong");
+  const round = plan[viewIndex];
+  const right = state.order.filter((iso, position) => round.answer[position] === iso).length;
+  const isRight = right === round.answer.length;
+  const metric = getRankMetric(round);
+  const hint = getRankHints(round, state).find(candidate => candidate.afterTry === state.submissions.length);
+  // Mastermind style: the try opens as a card whose lights turn green for each country in
+  // the right place, then red for the rest; then it lands as its row under Attempts.
+  isAnimating = true;
+  playRankReveal({
+    tryNumber: state.submissions.length,
+    order: state.order.map(getCountry),
+    right,
+    hint: hint ? `${getCountry(hint.iso).name}, ${metric.format(metric.value(getCountry(hint.iso)))}` : null,
+    nextLabel: isRight ? "CONTINUE" : "NEXT TRY",
+    sound: (status, streak) => sounds.playReveal(status, streak),
+    land: () => {
+      isAnimating = false;
+      commit();
+      if (isRight) return null;
+      sounds.playError();
+      flashMiss(document.getElementById("rankBoard"));
+      return [...document.querySelectorAll("#rankAttempts .attempt.is-wrong")].at(-1) || null;
+    }
+  });
+}
+
+// Rank 'Em: swaps the day's topic for its backup (a little easier, with values further
+// apart) before the first try. It costs 200, like a wrong try, and can't be undone.
+function rerollRank() {
+  if (!isPlaying("rank")) return;
+  const state = day.rounds[viewIndex];
+  if (state.submissions.length || state.rerolled || !plan[viewIndex].reroll) return;
+  state.rerolled = true;
+  state.order = null;
+  plan[viewIndex] = resolveRound(getDailyPlan(activeDate)[viewIndex], state);
+  sounds.playFlyTo();
+  saveDay();
+  render();
+  const board = document.getElementById("rankBoard");
+  board.classList.remove("is-new");
+  void board.offsetWidth;
+  board.classList.add("is-new");
+  showToastNotice("New topic. This round is now worth up to 800.", { near: board });
 }
 
 function giveUpRound() {
@@ -12665,8 +13016,8 @@ function getDayRecord(dateKey) {
     const legacy = getLegacyRecord(dateKey);
     if (legacy) return { ...base, ...legacy };
   }
-  const dayPlan = dateKey === activeDate ? plan : getDailyPlan(dateKey);
   const states = saved?.rounds || ROUND_TYPES.map(createRoundState);
+  const dayPlan = dateKey === activeDate ? plan : resolvePlan(getDailyPlan(dateKey), states);
   const dayScore = getDayScore(dayPlan, states);
   const mystery = dayPlan[0];
   const answer = getCountry(mystery.answer);
@@ -12769,8 +13120,8 @@ function closeGameIntro() {
 function enterGameView(dateKey = today) {
   if (dateKey !== activeDate) {
     activeDate = dateKey;
-    plan = getDailyPlan(activeDate);
     day = loadDay(activeDate);
+    plan = resolvePlan(getDailyPlan(activeDate), day.rounds);
     hasFinishedDay = getDayScore(plan, day.rounds).completed;
     pinpointSelection = null;
     paintSelection = null;
@@ -12822,6 +13173,7 @@ document.addEventListener("keydown", event => {
 });
 ["pinpointGiveUp", "deepcutGiveUp", "paintDone"].forEach(id => document.getElementById(id).addEventListener("click", giveUpRound));
 document.getElementById("rankSubmit").addEventListener("click", () => { sounds.playClick(); submitRankOrder(); });
+document.getElementById("rankReroll").addEventListener("click", rerollRank);
 document.getElementById("continueButton").addEventListener("click", continueFromResult);
 // Enter moves on from a finished round (unless typing, or something is open on top).
 document.addEventListener("keydown", event => {
@@ -12899,7 +13251,7 @@ function syncDayToAccount(dateKey) {
   if (!getUser()) return;
   const state = readDayState(dateKey);
   if (!state) return;
-  const dayScore = getDayScore(getDailyPlan(dateKey), state.rounds);
+  const dayScore = getDayScore(resolvePlan(getDailyPlan(dateKey), state.rounds), state.rounds);
   pushDay(dateKey, state, { score: dayScore.completed ? dayScore.total : null, completed: dayScore.completed });
 }
 
@@ -12921,6 +13273,7 @@ async function mergeAccountDays() {
     });
     // The day on screen may have moved on in the account.
     day = loadDay(activeDate);
+    plan = resolvePlan(getDailyPlan(activeDate), day.rounds);
     hasFinishedDay = getDayScore(plan, day.rounds).completed;
     if (isGameViewVisible) render({ animateGlobe: false });
   } catch (error) {
