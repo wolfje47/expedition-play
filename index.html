@@ -1572,9 +1572,13 @@ h1, h2, h3 { font-weight: normal; }
 .community-group-head > div { display: grid; flex: 1; gap: 0.15rem; }
 .community-group-head strong { font: 12px var(--font-display); }
 .community-group-head small { color: var(--muted); font-size: 12px; }
-.community-crowned { padding: 0.5rem 0.7rem; border: 1px solid rgba(255, 212, 92, 0.45); border-radius: 10px; background: rgba(255, 212, 92, 0.08); color: var(--gold); font-size: 13px; }
-.community-views { align-items: center; }
-.community-views .board-day { margin-left: auto; }
+.community-views { flex-wrap: wrap; }
+.community-day-picker { justify-self: start; }
+.community-range { color: var(--muted); font-size: 13px; }
+.board-days { flex: none; color: var(--faint); font: 400 11px var(--font-mono); }
+.community-history { display: grid; gap: 0.9rem; }
+.community-podium { display: grid; gap: 0.4rem; }
+.community-podium h3 { color: var(--gold); font: 10px var(--font-display); letter-spacing: 0.05em; }
 .community-board .board-row { grid-template-columns: 44px minmax(0, 1fr) 90px 64px; }
 .community-board .board-rank .medal-svg { display: block; }
 .community-board .board-row.is-waiting { opacity: 0.55; }
@@ -11446,8 +11450,8 @@ return { showToastNotice, resetCountryInput, normalizeCountryName, updateDailySc
 // ---- social.js
 __modules["social.js"] = (() => {
 // The Community screen: your profile and invite code, your friends, and groups of friends.
-// In a group each day has a gold, silver and bronze medal for its top three, and each week
-// (Monday to Sunday) a winner is crowned: the highest total of daily scores. The data
+// In a group the top three of each day, week (Monday to Sunday) and month get gold, silver
+// and bronze; weeks and months rank average daily scores. Each ended month's podium stays. The data
 // lives in Supabase (supabase/social.sql); without an account the screen asks you to sign in.
 const { sounds } = __modules["audio.js"];
 const { addFriend, addToGroup, createGroup, getFriends, getGroupBoard, getGroups, getMyProfile, getUser, isConfigured, leaveGroup, removeFriend, setDisplayName } = __modules["auth.js"];
@@ -11686,17 +11690,15 @@ function initializeCommunity({ getDays, today, dayLabel }) {
     return card;
   }
 
-  // A group: who's in it, then a day's ranking (medals for the top three) or this week's
-  // (a crown for the leader), and last week's winner.
+  // A group: who's in it, then one of four tables. DAY ranks a day's scores; THIS WEEK and
+  // THIS MONTH rank average daily scores; each gives gold, silver and bronze to the top
+  // three. HISTORY shows the podium of every month that has ended.
   async function createGroupCard(group) {
     const card = element("div", "community-card community-group");
-    const monthStart = `${today.slice(0, 7)}-01`;
-    const weekStart = mondayOf(today);
-    const lastWeekStart = addDays(weekStart, -7);
-    const from = [monthStart, lastWeekStart, state.dateKey].sort()[0];
+    const firstDay = getDays()[0]?.dateKey || today;
     let rows;
     try {
-      rows = await getGroupBoard(group.id, from, today);
+      rows = await getGroupBoard(group.id, firstDay, today);
     } catch (error) {
       card.appendChild(element("p", "community-empty", error.message));
       return card;
@@ -11734,19 +11736,15 @@ function initializeCommunity({ getDays, today, dayLabel }) {
     });
     head.append(title, addSelect, leave);
 
-    // Last week's winner, crowned.
-    const lastWeek = weekTotals(people, lastWeekStart, addDays(lastWeekStart, 6));
-    const crowned = element("p", "community-crowned");
-    crowned.textContent = lastWeek[0]?.total ? `👑 Last week's winner: ${lastWeek[0].person.name} · ${lastWeek[0].total.toLocaleString()}` : "👑 Last week nobody in this group played yet.";
-
     const views = element("div", "board-tabs community-views");
-    [["day", "DAY"], ["week", "THIS WEEK"]].forEach(([key, label]) => views.appendChild(button(`board-tab${state.view === key ? " is-active" : ""}`, label, () => {
+    [["day", "DAY"], ["week", "THIS WEEK"], ["month", "THIS MONTH"], ["history", "HISTORY"]].forEach(([key, label]) => views.appendChild(button(`board-tab${state.view === key ? " is-active" : ""}`, label, () => {
       state.view = key;
       render();
     })));
-    const list = element("ol", "board-list community-board");
+    card.append(head, views);
+
     if (state.view === "day") {
-      const picker = element("select", "board-day");
+      const picker = element("select", "board-day community-day-picker");
       picker.setAttribute("aria-label", "Day");
       getDays().map(day => day.dateKey).filter(dateKey => dateKey <= today).reverse().forEach(dateKey => {
         picker.appendChild(Object.assign(element("option", "", `${dayLabel(dateKey)}${dateKey === today ? " (today)" : ""}`), { value: dateKey, selected: dateKey === state.dateKey }));
@@ -11755,24 +11753,24 @@ function initializeCommunity({ getDays, today, dayLabel }) {
         state.dateKey = picker.value;
         render();
       });
-      views.appendChild(picker);
-      dayRanking(people, state.dateKey, me).forEach(row => list.appendChild(row));
+      card.append(picker, createRanking(standings(people, state.dateKey, state.dateKey), people, me, { perDay: false }));
+    } else if (state.view === "week") {
+      const weekStart = mondayOf(today);
+      card.append(element("p", "community-range", `${formatRange(weekStart, addDays(weekStart, 6))} · average score per day played`),
+        createRanking(standings(people, weekStart, addDays(weekStart, 6)), people, me, { perDay: true }));
+    } else if (state.view === "month") {
+      const month = today.slice(0, 7);
+      card.append(element("p", "community-range", `${monthName(month)} · average score per day played`),
+        createRanking(standings(people, `${month}-01`, `${month}-31`), people, me, { perDay: true }));
     } else {
-      const totals = weekTotals(people, weekStart, addDays(weekStart, 6));
-      totals.forEach((entry, index) => {
-        const row = element("li", "board-row");
-        row.classList.toggle("is-you", entry.person.id === me);
-        const rank = element("span", "board-rank", index === 0 && entry.total ? "👑" : `#${index + 1}`);
-        row.append(rank, memberName(entry.person), element("span", "board-extra", `${entry.played} ${entry.played === 1 ? "day" : "days"}`), element("strong", "board-score", entry.total.toLocaleString()));
-        list.appendChild(row);
-      });
+      card.appendChild(createHistory(people, firstDay, me));
     }
-    card.append(head, crowned, views, list, element("p", "sample-note", "Top % against the world is still sample data until the game has real players."));
+    card.appendChild(element("p", "sample-note", "Top % against the world is still sample data until the game has real players."));
     return card;
   }
 
   // A member's name with the badge they've earned this month.
-  function memberName(person) {
+  function memberName(person, played = null) {
     const name = element("span", "board-name");
     const playedDays = [...person.days.entries()].filter(([dateKey]) => dateKey.startsWith(today.slice(0, 7)))
       .map(([dateKey, score]) => ({ dateKey, completed: true, topPercent: topPercentOf(dateKey, score) }));
@@ -11781,46 +11779,94 @@ function initializeCommunity({ getDays, today, dayLabel }) {
     icon.classList.toggle("is-locked", !badge.tier);
     if (badge.tier) icon.setAttribute("aria-label", `${badge.tier.name} this month`);
     name.append(icon, element("span", "", person.name));
+    if (played !== null) name.appendChild(element("small", "board-days", `${played} ${played === 1 ? "day" : "days"}`));
     return name;
   }
 
-  // A day's ranking: highest score first, gold, silver and bronze for the top three, and
-  // everyone who hasn't played it yet at the bottom.
-  function dayRanking(people, dateKey, me) {
-    const played = people.filter(person => person.days.has(dateKey)).sort((left, right) => right.days.get(dateKey) - left.days.get(dateKey));
-    const waiting = people.filter(person => !person.days.has(dateKey));
+  // Everyone who played between two dates: their average daily score and average top %,
+  // best first. More days played breaks a tie.
+  function standings(people, from, to) {
+    return people.map(person => {
+      const days = [...person.days.entries()].filter(([dateKey]) => dateKey >= from && dateKey <= to);
+      if (!days.length) return null;
+      return {
+        person,
+        played: days.length,
+        score: Math.round(days.reduce((sum, [, score]) => sum + score, 0) / days.length),
+        topPercent: days.reduce((sum, [dateKey, score]) => sum + topPercentOf(dateKey, score), 0) / days.length
+      };
+    }).filter(Boolean).sort((left, right) => right.score - left.score || right.played - left.played);
+  }
+
+  // Places with equal scores (and days) shared, so a tie shares its medal too.
+  function withPlaces(entries) {
     let place = 0;
-    let lastScore = null;
-    const rows = played.map((person, index) => {
-      const score = person.days.get(dateKey);
-      // Equal scores share a place (and a medal).
-      if (score !== lastScore) place = index + 1;
-      lastScore = score;
+    return entries.map((entry, index) => {
+      const previous = entries[index - 1];
+      if (!previous || previous.score !== entry.score || previous.played !== entry.played) place = index + 1;
+      return { ...entry, place };
+    });
+  }
+
+  // A ranking: gold, silver and bronze for the top three, then everyone who hasn't played
+  // in this stretch at the bottom.
+  function createRanking(entries, people, me, { perDay }) {
+    const list = element("ol", "board-list community-board");
+    withPlaces(entries).forEach(entry => {
       const row = element("li", "board-row");
-      row.classList.toggle("is-you", person.id === me);
-      const medal = getGroupMedal(place);
+      row.classList.toggle("is-you", entry.person.id === me);
+      const medal = getGroupMedal(entry.place);
       const rank = element("span", "board-rank");
       if (medal) rank.appendChild(createMedal(medal, 26));
-      else rank.textContent = `#${place}`;
-      row.append(rank, memberName(person), element("span", "board-extra", formatTopPercent(topPercentOf(dateKey, score))), element("strong", "board-score", score.toLocaleString()));
-      return row;
+      else rank.textContent = `#${entry.place}`;
+      row.append(rank, memberName(entry.person, perDay ? entry.played : null), element("span", "board-extra", formatTopPercent(entry.topPercent)), element("strong", "board-score", entry.score.toLocaleString()));
+      list.appendChild(row);
     });
-    waiting.forEach(person => {
+    people.filter(person => !entries.some(entry => entry.person === person)).forEach(person => {
       const row = element("li", "board-row is-waiting");
       row.classList.toggle("is-you", person.id === me);
       row.append(element("span", "board-rank", "—"), memberName(person), element("span", "board-extra", "not played"), element("strong", "board-score", "—"));
-      rows.push(row);
+      list.appendChild(row);
     });
-    if (!people.length) rows.push(element("li", "community-empty", "Nobody here yet."));
-    return rows;
+    if (!people.length) list.appendChild(element("li", "community-empty", "Nobody here yet."));
+    return list;
   }
 
-  // Each member's total of daily scores over a week (Monday to Sunday), highest first.
-  function weekTotals(people, from, to) {
-    return people.map(person => {
-      const scores = [...person.days.entries()].filter(([dateKey]) => dateKey >= from && dateKey <= to).map(([, score]) => score);
-      return { person, total: scores.reduce((sum, score) => sum + score, 0), played: scores.length };
-    }).sort((left, right) => right.total - left.total);
+  // Every month that has ended, newest first, with its winner and podium.
+  function createHistory(people, firstDay, me) {
+    const history = element("div", "community-history");
+    const months = [];
+    for (let month = firstDay.slice(0, 7); month < today.slice(0, 7); month = addDays(`${month}-28`, 7).slice(0, 7)) months.unshift(month);
+    months.forEach(month => {
+      const podium = withPlaces(standings(people, `${month}-01`, `${month}-31`)).filter(entry => entry.place <= 3);
+      if (!podium.length) return;
+      const block = element("section", "community-podium");
+      block.appendChild(element("h3", "", `${monthName(month)} · 👑 ${podium[0].person.name}`));
+      const list = element("ol", "board-list community-board");
+      podium.forEach(entry => {
+        const row = element("li", "board-row");
+        row.classList.toggle("is-you", entry.person.id === me);
+        const rank = element("span", "board-rank");
+        rank.appendChild(createMedal(getGroupMedal(entry.place), 26));
+        const name = element("span", "board-name");
+        name.append(element("span", "", entry.person.name), element("small", "board-days", `${entry.played} ${entry.played === 1 ? "day" : "days"}`));
+        row.append(rank, name, element("span", "board-extra", formatTopPercent(entry.topPercent)), element("strong", "board-score", entry.score.toLocaleString()));
+        list.appendChild(row);
+      });
+      block.appendChild(list);
+      history.appendChild(block);
+    });
+    if (!history.children.length) history.appendChild(element("p", "community-empty", `The podium of ${monthName(today.slice(0, 7))} shows up here once the month is over.`));
+    return history;
+  }
+
+  function monthName(month) {
+    return new Date(`${month}-01T00:00:00Z`).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" });
+  }
+
+  function formatRange(from, to) {
+    const format = dateKey => new Date(`${dateKey}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+    return `${format(from)} – ${format(to)}`;
   }
 
   document.querySelectorAll(".community-open-button").forEach(openButton => openButton.addEventListener("click", () => {
