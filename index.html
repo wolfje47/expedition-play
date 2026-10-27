@@ -230,6 +230,42 @@ h1, h2, h3 { font-weight: normal; }
 
 .menu-pixel-icon { width: 22px; height: 22px; flex: 0 0 22px; }
 
+/* PLAY's games as tiles: 8-bit art on a little screen in the game's colour (--tile), the
+   name, what it is, and how today's game stands. */
+.play-tile {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--tile) 45%, transparent);
+  border-radius: 16px;
+  background: linear-gradient(110deg, color-mix(in srgb, var(--tile) 16%, transparent), rgba(255, 255, 255, 0.03) 70%);
+  text-align: left;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.play-tile:hover:not(:disabled),
+.play-tile:focus-visible { border-color: var(--tile); box-shadow: 0 0 24px color-mix(in srgb, var(--tile) 30%, transparent); outline: none; transform: translateY(-2px); }
+.play-tile-art {
+  display: grid;
+  place-items: center;
+  height: 84px;
+  border-radius: 12px;
+  /* A dark screen with faint scanlines behind the sprite. */
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0 2px, transparent 2px 4px), radial-gradient(circle, color-mix(in srgb, var(--tile) 30%, #04121a), #04121a 75%);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tile) 55%, transparent);
+}
+.play-tile-art svg { width: 60px; height: 60px; image-rendering: pixelated; }
+.play-tile:hover:not(:disabled) .play-tile-art svg { animation: tile-bob 0.6s steps(2) infinite alternate; }
+@keyframes tile-bob { to { transform: translateY(-3px); } }
+.play-tile-text { display: grid; gap: 0.3rem; }
+.play-tile-text strong { color: var(--tile); font: 13px var(--font-display); }
+.play-tile-text span { color: var(--text); font-size: 13px; }
+.play-tile-text small { color: var(--muted); font: 12px var(--font-mono); }
+.play-tile:disabled { cursor: not-allowed; filter: grayscale(0.6); opacity: 0.55; }
+.menu-back { min-height: 44px; background: transparent; }
+.menu-play-options:not(.hidden) { animation: ui-arrive 0.25s ease-out both; }
+
 
 /* ---------- Game view ---------- */
 
@@ -303,7 +339,7 @@ h1, h2, h3 { font-weight: normal; }
 .round-row:disabled { opacity: 0.4; cursor: default; }
 .round-row.is-viewing { background: rgba(69, 227, 255, 0.1); box-shadow: inset 0 0 0 1px rgba(69, 227, 255, 0.45); color: var(--text); }
 /* The round's number in its mountain colour. */
-.round-row-number { color: var(--round-color, var(--faint)); font: 700 12px var(--font-mono); }
+.round-row-number { color: var(--text); font: 700 12px var(--font-mono); }
 .round-row-name { overflow: hidden; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .round-row-status { color: var(--faint); font: 700 12px var(--font-mono); }
 .round-row.is-perfect .round-row-status { color: var(--t-correct); }
@@ -654,6 +690,27 @@ h1, h2, h3 { font-weight: normal; }
 .round-card { display: grid; gap: 0.5rem; padding: 0.85rem 1rem; }
 .round-card-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
 .round-card-head h2 { font: 11px var(--font-display); }
+
+/* Competitive: the round's 30-second bar (engine.js renderSpeedBar). Green while there's
+   plenty of time, then gold, then red; dimmed while the clock is stopped. */
+.speed-bar { display: grid; grid-template-columns: auto 1fr 2.6em; align-items: center; gap: 0.6rem; }
+.speed-bar-label { min-width: 5.2em; color: var(--t-correct); font: 700 13px var(--font-mono); }
+.speed-bar-track { height: 8px; overflow: hidden; border-radius: 999px; background: rgba(255, 255, 255, 0.08); }
+.speed-bar-fill { display: block; height: 100%; border-radius: inherit; background: var(--t-correct); transform-origin: left; box-shadow: 0 0 10px currentColor; color: var(--t-correct); }
+.speed-bar-time { color: var(--muted); font: 12px var(--font-mono); text-align: right; }
+.speed-bar.is-mid .speed-bar-label { color: var(--gold); }
+.speed-bar.is-mid .speed-bar-fill { background: var(--gold); color: var(--gold); }
+.speed-bar.is-low .speed-bar-label { color: var(--danger); }
+.speed-bar.is-low .speed-bar-fill { background: var(--danger); color: var(--danger); }
+.speed-bar.is-paused { opacity: 0.55; }
+.speed-bar.is-done .speed-bar-time { color: var(--text); font-size: 10px; }
+
+/* The game's mode next to the day, in the left column. */
+.mode-chip { color: var(--accent); }
+[data-mode="casual"] .mode-chip { color: var(--gold); }
+
+/* Casual Paint the Map: the clues unlocked by wrong clicks, under the question. */
+.paint-clues { padding: 0.6rem 0 0; }
 
 
 /* Score tile: first in the left column, so the score is always in view. */
@@ -1365,6 +1422,21 @@ h1, h2, h3 { font-weight: normal; }
   transition: opacity 0.25s ease;
 }
 .is-complete .guess-reveal-next { opacity: 1; pointer-events: auto; }
+/* Competitive: the card goes on by itself; a darker bar sweeps across the button meanwhile. */
+.guess-reveal-next.is-auto {
+  position: relative;
+  overflow: hidden;
+}
+.guess-reveal-next.is-auto::after {
+  position: absolute;
+  inset: auto 0 0;
+  height: 4px;
+  background: rgba(4, 18, 26, 0.45);
+  transform-origin: left;
+  animation: auto-continue var(--auto-ms, 1300ms) linear forwards;
+  content: "";
+}
+@keyframes auto-continue { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
 /* The row waits, hidden, while the card flies into its place. */
 .guess-row.is-landing { opacity: 0; }
@@ -1455,24 +1527,44 @@ h1, h2, h3 { font-weight: normal; }
 
 .how-to-play-modal { width: min(100%, 520px); }
 .how-to-rounds { display: grid; gap: 0.3rem; list-style: none; counter-reset: round; }
-.how-to-rounds li { display: grid; grid-template-columns: 28px auto 1fr; align-items: center; gap: 0.6rem; padding: 0.4rem 0.6rem; border-left: 3px solid var(--round-color); border-radius: 10px; background: var(--glass-fill); counter-increment: round; font-size: 14px; }
-.how-to-rounds li::before { content: counter(round); display: grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; background: var(--round-color); color: #04121a; font: 700 12px var(--font-mono); }
-.how-to-rounds b { color: var(--round-color); white-space: nowrap; }
+.how-to-rounds li { display: grid; grid-template-columns: 28px auto 1fr; align-items: center; gap: 0.6rem; padding: 0.4rem 0.6rem; border-radius: 10px; background: var(--glass-fill); counter-increment: round; font-size: 14px; }
+.how-to-rounds li::before { content: counter(round); display: grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; background: rgba(255, 255, 255, 0.1); color: var(--text); font: 700 12px var(--font-mono); }
+.how-to-rounds b { color: var(--text); white-space: nowrap; }
 .how-to-rounds span { color: var(--muted); font-size: 13px; text-align: right; }
 .how-to-warmth { display: grid; gap: 0.35rem; }
 .how-to-temps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; list-style: none; }
 .how-to-temps li { display: grid; justify-items: center; gap: 2px; padding: 0.35rem 0.2rem; border-radius: 9px; background: color-mix(in srgb, var(--temp) 16%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--temp) 45%, transparent); text-align: center; }
 .how-to-temps b { color: var(--temp); font: 700 10px var(--font-mono); letter-spacing: 0.04em; white-space: nowrap; }
 .how-to-temps span { color: var(--muted); font: 10px var(--font-mono); white-space: nowrap; }
-.how-to-streak { color: var(--muted); font-size: 13px; }
-.how-to-streak b { color: var(--gold); }
-.how-to-awards { display: grid; grid-template-columns: 1.6fr 1fr; gap: 0.5rem; }
+.how-to-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.how-to-modes > div { display: grid; align-content: start; gap: 0.25rem; padding: 0.6rem 0.7rem; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: rgba(255, 255, 255, 0.03); }
+.how-to-modes b { color: var(--accent); font: 700 12px var(--font-mono); letter-spacing: 0.06em; }
+.how-to-modes > div + div b { color: var(--gold); }
+.how-to-modes span { color: var(--muted); font-size: 12px; }
+/* Points: the 1,000 per round, and the two multipliers stacking on top. */
+.how-to-scoring { display: grid; gap: 0.45rem; padding: 0.7rem 0.8rem; border: 1px solid rgba(255, 212, 92, 0.3); border-radius: 12px; background: rgba(255, 212, 92, 0.05); color: var(--muted); font-size: 13px; }
+.how-to-scoring p b { color: var(--gold); }
+.how-to-multipliers { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; list-style: none; }
+.how-to-multipliers li { display: grid; gap: 0.15rem; padding: 0.45rem 0.6rem; border-radius: 9px; background: var(--glass-fill); }
+.how-to-multipliers b { color: var(--text); font: 700 13px var(--font-mono); }
+.how-to-multipliers span { font-size: 12px; }
+.how-to-max { font-size: 12px; }
+/* A sample of the top % shown after a game. */
+.how-to-top { justify-self: start; margin-top: 0.2rem; padding: 0.3rem 0.6rem; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font: 700 13px var(--font-mono); }
+.how-to-awards { display: grid; grid-template-columns: 1fr 1.4fr; gap: 0.5rem; }
 .how-to-awards > div { display: grid; align-content: start; gap: 0.3rem; padding: 0.6rem 0.7rem; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: rgba(255, 255, 255, 0.03); }
 .how-to-awards p { color: var(--muted); font-size: 12px; }
-.how-to-badges,
-.how-to-medals { display: flex; gap: 0.3rem; margin-top: 0.2rem; }
+/* The badges as a stack of stones seen at an angle, Mr. Worldwide in front; hover fans
+   them out. Each has the top % it asks for. */
+.how-to-badges { display: flex; margin-top: 0.3rem; padding: 0.2rem 0 0.5rem 0.4rem; perspective: 500px; }
+.how-to-badge { position: relative; z-index: var(--stack); display: grid; justify-items: center; margin-left: -20px; transform: rotateY(40deg) translateY(calc(var(--stack) * -2px)) translateZ(calc(var(--stack) * 8px)); transform-origin: left center; transition: margin 0.25s ease, transform 0.25s ease; filter: drop-shadow(-5px 4px 3px rgba(0, 0, 0, 0.6)); }
+.how-to-badge:first-child { margin-left: 0; }
+.how-to-badges:hover .how-to-badge { margin-left: 2px; transform: none; }
+.how-to-badge small { margin-top: -6px; padding: 1px 4px; border-radius: 5px; background: var(--glass-strong); color: var(--text); font: 700 9px var(--font-mono); white-space: nowrap; box-shadow: inset 0 0 0 1px var(--glass-line); }
 @media (max-width: 760px) {
-  .how-to-awards { grid-template-columns: 1fr; }
+  .how-to-awards,
+  .how-to-modes,
+  .how-to-multipliers { grid-template-columns: 1fr; }
   .how-to-rounds li { grid-template-columns: 28px 1fr; row-gap: 0; }
   .how-to-rounds li::before { grid-row: span 2; }
   .how-to-rounds span { text-align: left; }
@@ -1984,6 +2076,27 @@ h1, h2, h3 { font-weight: normal; }
   transform: translateX(-50%);
 }
 
+/* Casual: country names written on the globe (globe.js setLabels). */
+.globe-labels { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+.globe-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: rgba(255, 255, 255, 0.94);
+  font: 600 11px var(--font-body);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px #000, 0 0 6px rgba(0, 0, 0, 0.85);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.globe-label.is-shown { opacity: 1; }
+
+/* The archive's two calendars, one per mode. */
+.archive-mode-tabs { max-width: 360px; margin-top: 0.7rem; }
+.archive-mode-tabs .overview-tab[data-mode="casual"][aria-selected="true"] { background: var(--gold); }
+.calendar-mode-note { padding: 0.7rem 0.9rem; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: rgba(255, 212, 92, 0.06); color: var(--muted); font-size: 13px; }
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -1998,11 +2111,11 @@ h1, h2, h3 { font-weight: normal; }
         <p class="menu-tagline">The daily geography challenge</p>
       </div>
       <nav class="menu-options" aria-label="Main menu">
-        <button class="menu-option menu-option-primary" id="menuDailyButton" type="button">
+        <button class="menu-option menu-option-primary" id="menuPlayButton" type="button" aria-expanded="false" aria-controls="menuPlayOptions">
           <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
             <path d="M10 6h4v20h-4zm4 2h4v2h4v2h4v2h2v4h-2v2h-4v2h-4v2h-4z" fill="currentColor"/>
           </svg>
-          <span>DAILY CHALLENGE</span>
+          <span>PLAY</span>
         </button>
         <button class="menu-option" id="menuArchiveButton" type="button">
           <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
@@ -2028,7 +2141,40 @@ h1, h2, h3 { font-weight: normal; }
               <path d="M12 3h8v2h2v2h2v8h-2v2h-2v2h-8v-2h-2v-2H8V7h2V5h2zM8 21h16v2h3v3h2v4H3v-4h2v-3h3z" fill="currentColor"/>
             </svg>
           </span>
-          <span id="menuAccountLabel">SIGN IN</span>
+          <span id="menuAccountLabel">MY ACCOUNT</span>
+        </button>
+      </nav>
+      <!-- PLAY opens the day's games in place of the main options. -->
+      <nav class="menu-options menu-play-options hidden" id="menuPlayOptions" aria-label="Play">
+        <button class="play-tile menu-mode" id="menuCompetitiveButton" type="button" data-mode="competitive" style="--tile: var(--accent)">
+          <span class="play-tile-art" data-art="competitive" aria-hidden="true"></span>
+          <span class="play-tile-text">
+            <strong>COMPETITIVE</strong>
+            <span>30 seconds a round. Answer fast for up to ×1.5.</span>
+            <small id="menuCompetitiveStatus"></small>
+          </span>
+        </button>
+        <button class="play-tile menu-mode" id="menuCasualButton" type="button" data-mode="casual" style="--tile: var(--gold)">
+          <span class="play-tile-art" data-art="casual" aria-hidden="true"></span>
+          <span class="play-tile-text">
+            <strong>CASUAL</strong>
+            <span>No clock, names on the globe, extra clues.</span>
+            <small id="menuCasualStatus"></small>
+          </span>
+        </button>
+        <button class="play-tile menu-mode" id="menuPuzzlesButton" type="button" disabled style="--tile: #c58cff">
+          <span class="play-tile-art" data-art="puzzles" aria-hidden="true"></span>
+          <span class="play-tile-text">
+            <strong>PUZZLES</strong>
+            <span>Brain teasers about the world.</span>
+            <small>Coming soon</small>
+          </span>
+        </button>
+        <button class="menu-option menu-back" id="menuPlayBack" type="button">
+          <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
+            <path d="M12 6h4v4h-4v4h14v4H12v4h4v4h-4v-4H8v-4H4v-4h4v-4h4z" fill="currentColor"/>
+          </svg>
+          <span>BACK</span>
         </button>
       </nav>
     </div>
@@ -2059,7 +2205,7 @@ h1, h2, h3 { font-weight: normal; }
               <span class="brand-mark" aria-hidden="true"></span>
               <span class="brand-name">EXPEDITION</span>
             </button>
-            <small class="brand-meta"><span id="dailyBadge">DAILY</span> · <span id="puzzleDate"></span></small>
+            <small class="brand-meta"><span id="dailyBadge">DAILY</span> · <span class="mode-chip" id="modeChip">COMPETITIVE</span> · <span id="puzzleDate"></span></small>
             <strong class="day-name hidden" id="dayName"></strong>
           </div>
         </section>
@@ -2139,6 +2285,13 @@ h1, h2, h3 { font-weight: normal; }
         <section class="panel round-card" aria-live="polite">
           <div class="round-card-head">
             <h2 id="roundCardName">MYSTERY COUNTRY</h2>
+          </div>
+          <!-- Competitive: the round's 30-second clock. Answering while it runs scores up to
+               ×1.5; it stops while a guess is revealed. -->
+          <div class="speed-bar hidden" id="speedBar" aria-hidden="true">
+            <span class="speed-bar-label" id="speedBarLabel">⚡ ×1.50</span>
+            <span class="speed-bar-track"><span class="speed-bar-fill" id="speedBarFill"></span></span>
+            <span class="speed-bar-time" id="speedBarTime">30s</span>
           </div>
         </section>
 
@@ -2260,6 +2413,8 @@ h1, h2, h3 { font-weight: normal; }
         <div class="round-view hidden" data-round="paint">
           <section class="panel target-card">
             <p class="round-question" id="paintQuestion"></p>
+            <!-- Casual: a clue about a country still to find after every wrong one. -->
+            <ol class="clue-list paint-clues hidden" id="paintClues" aria-label="Clues"></ol>
           </section>
           <section class="pinpoint-pick" aria-live="polite">
             <span class="field-label">SELECTED</span>
@@ -2348,7 +2503,26 @@ h1, h2, h3 { font-weight: normal; }
         <h2 id="howToPlayTitle">HOW TO PLAY</h2>
         <button class="modal-close" id="closeHowToButton" type="button" aria-label="Close instructions">×</button>
       </div>
-      <p class="modal-note">Five rounds a day, one theme. Each round is worth up to 1,000; every mistake costs 200.</p>
+      <p class="modal-note">Two games a day, each with its own theme and five rounds. The goal: score as many points as you can.</p>
+      <div class="how-to-modes">
+        <div>
+          <b>⚡ COMPETITIVE</b>
+          <span>A 30-second bar every round. Counts for your badge and your groups.</span>
+        </div>
+        <div>
+          <b>☕ CASUAL</b>
+          <span>No clock, country names on the globe and extra clues. Just for fun.</span>
+        </div>
+      </div>
+      <div class="how-to-scoring">
+        <span class="field-label">POINTS</span>
+        <p>Every round starts at <b>1,000</b>; every mistake costs 200. Then the multipliers stack on top of each other:</p>
+        <ul class="how-to-multipliers">
+          <li><b>🔥 ×1.1, ×1.2 …</b><span>for perfect rounds in a row</span></li>
+          <li><b>⚡ up to ×1.5</b><span>for a fast right answer (competitive)</span></li>
+        </ul>
+        <p class="how-to-max">A day goes up to <b>9,000</b> in competitive and <b>6,000</b> in casual.</p>
+      </div>
       <ol class="how-to-rounds">
         <li><b>Mystery Country</b><span>Guess it from clues</span></li>
         <li><b>Pinpoint</b><span>Find it on the globe</span></li>
@@ -2366,17 +2540,16 @@ h1, h2, h3 { font-weight: normal; }
           <li style="--temp: var(--t-very-cold)"><b>VERY COLD</b><span>further</span></li>
         </ol>
       </div>
-      <p class="how-to-streak">🔥 Perfect rounds in a row multiply: ×1.1, ×1.2 … up to <b>6,000</b>.</p>
       <div class="how-to-awards">
         <div>
-          <span class="field-label">A BADGE EACH MONTH</span>
-          <p>Play more days and rank higher in the world.</p>
-          <div class="how-to-badges" id="howToBadges"></div>
+          <span class="field-label">YOUR TOP %</span>
+          <p>After every game you see where you rank in the world, so you can compare yourself with everyone else.</p>
+          <span class="how-to-top">TOP 12%</span>
         </div>
         <div>
-          <span class="field-label">MEDALS WITH FRIENDS</span>
-          <p>Top 3 of your group, every day, week and month.</p>
-          <div class="how-to-medals" id="howToMedals"></div>
+          <span class="field-label">BADGES</span>
+          <p>Earn badges every month.</p>
+          <div class="how-to-badges" id="howToBadges"></div>
         </div>
       </div>
       <label id="howToDontShow" class="dont-show hidden">
@@ -2498,6 +2671,10 @@ h1, h2, h3 { font-weight: normal; }
         <div>
           <h2 id="archiveTitle">ARCHIVE</h2>
           <p class="modal-note">Your top % of the world for every day you play, and a badge each month for how often and how well you played. Pick a day to see its rounds and how everyone did.</p>
+          <div class="overview-tabs archive-mode-tabs" id="archiveModeTabs" role="tablist" aria-label="Mode">
+            <button class="overview-tab" type="button" role="tab" data-mode="competitive" aria-selected="true">COMPETITIVE</button>
+            <button class="overview-tab" type="button" role="tab" data-mode="casual" aria-selected="false">CASUAL</button>
+          </div>
         </div>
         <button class="modal-close" id="closeArchiveButton" type="button" aria-label="Close archive">×</button>
       </div>
@@ -5716,6 +5893,8 @@ class PixelGlobe {
     this.viewShift = 0;
     this.viewShiftY = 0;
     this.borderLines = [];
+    this.labels = [];
+    this.labelLayer = null;
     this.lastFrame = performance.now();
     this.lastRender = 0;
     this.needsRender = true;
@@ -5827,7 +6006,7 @@ class PixelGlobe {
     this.container.classList.remove("is-clickable");
     this.container = nextContainer;
     this.container.classList.toggle("is-clickable", this.isClickable);
-    this.container.append(this.renderer.domElement, this.tooltip);
+    this.container.append(this.renderer.domElement, this.tooltip, ...(this.labelLayer ? [this.labelLayer] : []));
     this.resizeObserver.observe(this.container);
     this.resize();
   }
@@ -6106,6 +6285,67 @@ class PixelGlobe {
     let lon = Math.atan2(local.z, -local.x) * 180 / Math.PI - 180;
     if (lon < -180) lon += 360;
     return { lat, lon };
+  }
+
+  // Country names written on the globe while playing (casual): [{ name, lat, lon, area }],
+  // or null for none. Where names would overlap the bigger country wins, and smaller
+  // countries get their name as you zoom in.
+  setLabels(places) {
+    this.labelLayer?.remove();
+    this.labelLayer = null;
+    this.labels = [];
+    if (places?.length) {
+      this.labelLayer = Object.assign(document.createElement("div"), { className: "globe-labels" });
+      this.labelLayer.setAttribute("aria-hidden", "true");
+      this.labels = [...places].sort((left, right) => right.area - left.area).map(place => {
+        const element = Object.assign(document.createElement("span"), { className: "globe-label", textContent: place.name });
+        this.labelLayer.appendChild(element);
+        return { element, area: place.area, position: this.latLonToVector3(place.lat, place.lon, GLOBE_RADIUS), shown: false, width: 0 };
+      });
+      this.container.appendChild(this.labelLayer);
+    }
+    this.requestRender();
+  }
+
+  // Places the names over the globe after it was drawn: only on the side facing you, and
+  // only for countries big enough on screen to carry one.
+  updateLabels() {
+    if (!this.labelLayer) return;
+    const inGame = this.mode === "game";
+    this.labelLayer.classList.toggle("hidden", !inGame);
+    if (!inGame) return;
+    const width = this.renderer.domElement.clientWidth;
+    const height = this.renderer.domElement.clientHeight;
+    // Screen pixels per km of the globe's surface, near the middle of the view.
+    const focal = height / 2 / Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
+    const pixelsPerKm = focal / (this.camera.position.z - GLOBE_RADIUS) * GLOBE_RADIUS / 6371;
+    const world = new THREE.Vector3();
+    const toCamera = new THREE.Vector3();
+    const placed = [];
+    this.globeGroup.updateMatrixWorld();
+    this.labels.forEach(label => {
+      world.copy(label.position).applyMatrix4(this.globeGroup.matrixWorld);
+      toCamera.copy(this.camera.position).sub(world).normalize();
+      const facing = toCamera.dot(world.clone().normalize());
+      let show = facing > 0.25 && Math.sqrt(label.area) * pixelsPerKm > 26;
+      if (show) {
+        world.project(this.camera);
+        const x = (world.x + 1) / 2 * width;
+        const y = (1 - world.y) / 2 * height;
+        if (!label.width) label.width = label.element.offsetWidth || label.element.textContent.length * 7;
+        const box = { left: x - label.width / 2 - 4, right: x + label.width / 2 + 4, top: y - 9, bottom: y + 9 };
+        show = x > 0 && x < width && y > 0 && y < height
+          && !placed.some(other => box.left < other.right && box.right > other.left && box.top < other.bottom && box.bottom > other.top);
+        if (show) {
+          placed.push(box);
+          label.element.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -50%)`;
+        }
+      }
+      if (show !== label.shown) {
+        label.element.classList.toggle("is-shown", show);
+        label.shown = show;
+      }
+    });
   }
 
   setClickable(isClickable) {
@@ -6676,6 +6916,7 @@ class PixelGlobe {
     this.lastRender = now;
     this.stats.renders += 1;
     this.renderer.render(this.scene, this.camera);
+    this.updateLabels();
   }
 }
 
@@ -9526,14 +9767,1356 @@ const DAYS = {
 return { DAYS };
 })();
 
+// ---- casual-days.js
+__modules["casual-days.js"] = (() => {
+// The casual calendar: a second, easier puzzle for every day, with its own theme. Same
+// fields as days.js (see there), with a few differences:
+//   - casual answers are well-known countries, questions and topics;
+//   - Deep Cut may leave out `countries` (no country lit up), for questions about the
+//     whole world;
+//   - Rank 'Em has no `reroll`, and its values are far apart.
+// The game makes casual easier by itself too: country names on the globe, no timer, an
+// extra clue up front in Mystery Country, a clue after every wrong Paint the Map click,
+// and a Rank 'Em hint after every wrong try.
+//
+// Check the file with: node tools/check-days.mjs
+
+const CASUAL_DAYS = {
+  "2026-10-01": {
+    name: "Hello, World",
+    theme: "The world's most famous landmarks.",
+    journey: "balloon",
+    mystery: "IN",
+    pinpoint: {
+      answer: "EG",
+      clues: [
+        "Tutankhamun's golden mask is one of its most famous treasures.",
+        "The Nile, one of the longest rivers on Earth, flows through it to the Mediterranean.",
+        "The Great Pyramid of Giza, the last of the Seven Wonders of the Ancient World still standing, is here."
+      ]
+    },
+    deepcut: {
+      countries: ["CN", "IN", "JO", "BR", "PE", "MX", "IT"],
+      question: "Name one of the New Seven Wonders of the World.",
+      answers: {
+        1000: ["Petra", "Chichén Itzá"],
+        800: ["Christ the Redeemer"],
+        600: ["Machu Picchu"],
+        400: ["Colosseum"],
+        200: ["Great Wall of China", "Taj Mahal"]
+      },
+      aliases: {
+        "Chichén Itzá": ["Chichen Itza"], "Christ the Redeemer": ["Cristo Redentor"],
+        "Colosseum": ["Coliseum", "Colosseo"], "Great Wall of China": ["Great Wall", "The Great Wall"]
+      },
+      info: {
+        title: "The New Seven Wonders",
+        text: "In 2007 a worldwide public vote chose seven new wonders of the world. The Great Pyramid of Giza, the only ancient wonder still standing, was given an honorary place.",
+        facts: [["Announced", "2007"], ["Wonders", "7"], ["In the Americas", "3"]]
+      }
+    },
+    paint: {
+      question: "Click the countries where these stand: the Eiffel Tower, the Statue of Liberty, the Sydney Opera House, the Colosseum and the Great Wall.",
+      answers: ["FR", "US", "AU", "IT", "CN"]
+    },
+    rank: {
+      topic: "Height of a famous landmark",
+      detail: "The Burj Khalifa, the Eiffel Tower, the London Eye, the Statue of Liberty and Christ the Redeemer (both with their pedestals).",
+      values: { FR: 330, US: 93, AE: 828, BR: 38, GB: 135 },
+      unit: " m",
+      top: "TALLEST",
+      bottom: "SHORTEST",
+      note: "The Burj Khalifa in Dubai has been the world's tallest building since 2010."
+    }
+  },
+
+  "2026-10-02": {
+    name: "Snack Attack",
+    theme: "Food from around the world.",
+    journey: "climb",
+    mystery: "TH",
+    pinpoint: {
+      answer: "US",
+      clues: [
+        "Peanut butter and jelly sandwiches are a lunchbox classic here.",
+        "Every November, families gather for Thanksgiving with roast turkey and pumpkin pie.",
+        "McDonald's, Burger King and KFC all started here."
+      ]
+    },
+    deepcut: {
+      countries: ["US"],
+      question: "Name a colour of M&M's.",
+      answers: {
+        1000: ["Orange"],
+        800: ["Brown"],
+        600: ["Yellow"],
+        400: ["Green", "Blue"],
+        200: ["Red"]
+      },
+      aliases: {},
+      info: {
+        title: "M&M's",
+        text: "M&M's were first sold in 1941. The two Ms stand for Forrest Mars and Bruce Murrie, the men behind them. Blue replaced tan in 1995, after a public vote.",
+        facts: [["First sold", "1941"], ["Colours today", "6"], ["Newest colour", "Blue, 1995"]]
+      }
+    },
+    paint: {
+      question: "Click the countries these dishes come from: pizza, tacos, paella, kimchi and crêpes.",
+      answers: ["IT", "MX", "ES", "KR", "FR"]
+    },
+    rank: {
+      topic: "Population",
+      detail: "How many mouths there are to feed.",
+      values: { DE: 83, CN: 1407, AU: 28, BR: 213, US: 342 },
+      unit: " million",
+      top: "MOST",
+      bottom: "FEWEST",
+      note: "Figures for 2025. China was the most populous country until India passed it in 2023."
+    }
+  },
+
+  "2026-10-03": {
+    name: "Game On",
+    theme: "Sport.",
+    journey: "rocket",
+    mystery: "ES",
+    pinpoint: {
+      answer: "BR",
+      clues: [
+        "Its carnival in Rio is one of the biggest parties in the world.",
+        "Pelé, one of the greatest footballers of all time, played for its national team.",
+        "It won the men's football World Cup in 1958, 1962, 1970, 1994 and 2002."
+      ]
+    },
+    deepcut: {
+      countries: ["AU", "FR", "GB", "US"],
+      question: "Name one of tennis's four Grand Slam tournaments.",
+      answers: {
+        1000: ["Australian Open"],
+        800: ["French Open"],
+        600: ["US Open"],
+        200: ["Wimbledon"]
+      },
+      aliases: { "French Open": ["Roland Garros", "Roland-Garros"], "US Open": ["U.S. Open"] },
+      info: {
+        title: "The Grand Slams",
+        text: "Tennis's four biggest tournaments are played every year in Melbourne, Paris, London and New York. Wimbledon, first held in 1877, is the oldest, and the only one still played on grass.",
+        facts: [["Tournaments", "4"], ["Oldest", "Wimbledon, 1877"], ["On clay", "French Open"]]
+      }
+    },
+    paint: {
+      question: "Click every country that has hosted the Summer Olympics since 2000.",
+      answers: ["AU", "GR", "CN", "GB", "BR", "JP", "FR"]
+    },
+    rank: {
+      topic: "Medals won at the Paris 2024 Olympics",
+      values: { JP: 45, US: 126, KE: 11, CN: 91, AU: 53 },
+      top: "MOST",
+      bottom: "FEWEST",
+      note: "Gold, silver and bronze together. The United States topped the table, level with China on 40 golds."
+    }
+  },
+
+  "2026-10-04": {
+    name: "Snow Day",
+    theme: "Winter and snow.",
+    journey: "climb",
+    mystery: "RU",
+    pinpoint: {
+      answer: "FI",
+      clues: [
+        "The video game Angry Birds and Nokia phones both come from here.",
+        "Saunas are so popular here that there are about three million of them.",
+        "Santa Claus Village, where you can meet Santa all year round, sits on the Arctic Circle here."
+      ]
+    },
+    deepcut: {
+      countries: ["US"],
+      question: "Name one of Santa's reindeer.",
+      answers: {
+        1000: ["Donner", "Blitzen"],
+        800: ["Vixen"],
+        600: ["Comet", "Cupid"],
+        400: ["Dasher", "Dancer", "Prancer"],
+        200: ["Rudolph"]
+      },
+      aliases: { Donner: ["Donder", "Dunder"], Blitzen: ["Blixem", "Blixen"] },
+      info: {
+        title: "Santa's reindeer",
+        text: "Eight reindeer were named in the 1823 American poem A Visit from St. Nicholas. Rudolph joined them in 1939, in a story written for the department store Montgomery Ward.",
+        facts: [["In the poem", "8"], ["Poem", "1823"], ["Rudolph", "1939"]]
+      }
+    },
+    paint: {
+      question: "Click every country that has hosted the Winter Olympics since 1990.",
+      answers: ["FR", "NO", "JP", "US", "IT", "CA", "RU", "KR", "CN"]
+    },
+    rank: {
+      topic: "Size",
+      detail: "Land and water, in km².",
+      values: { SE: 450295, RU: 17098242, IS: 103000, CA: 9984670, AR: 2780400 },
+      unit: " km²",
+      top: "BIGGEST",
+      bottom: "SMALLEST",
+      note: "Russia is the biggest country in the world, almost twice the size of Canada."
+    }
+  },
+
+  "2026-10-05": {
+    name: "Wild Things",
+    theme: "Animals.",
+    journey: "trek",
+    mystery: "KE",
+    pinpoint: {
+      answer: "CN",
+      clues: [
+        "It sometimes lends its giant pandas to zoos around the world as a sign of friendship.",
+        "It is the only country where giant pandas live in the wild.",
+        "The Great Wall stretches for thousands of kilometres across its north."
+      ]
+    },
+    deepcut: {
+      countries: ["TZ", "ZA", "BW"],
+      question: "Name one of Africa's Big Five animals.",
+      answers: {
+        1000: ["Buffalo"],
+        800: ["Leopard"],
+        600: ["Rhinoceros"],
+        400: ["Elephant"],
+        200: ["Lion"]
+      },
+      aliases: {
+        Buffalo: ["Cape buffalo", "African buffalo"], Rhinoceros: ["Rhino", "Black rhino", "White rhino"],
+        Elephant: ["African elephant"]
+      },
+      info: {
+        title: "The Big Five",
+        text: "Big-game hunters named them the five animals hardest to hunt on foot. Today safari-goers hope to see all five, in parks such as the Serengeti and Kruger.",
+        facts: [["Animals", "5"], ["Most endangered", "Black rhino"], ["On", "South African banknotes"]]
+      }
+    },
+    paint: {
+      question: "Click the countries where these animals live in the wild: the kiwi, the koala, the ring-tailed lemur and the Komodo dragon.",
+      answers: ["NZ", "AU", "MG", "ID"]
+    },
+    rank: {
+      topic: "Share of the land covered by forest",
+      values: { AU: 17.4, FI: 74.2, IS: 0.6, BR: 58.5, US: 33.8 },
+      decimals: 1,
+      unit: "%",
+      note: "World Bank figures for 2024. Finland is the most forested country in Europe."
+    }
+  },
+
+  "2026-10-06": {
+    name: "Rock and Roll",
+    theme: "Music.",
+    journey: "balloon",
+    mystery: "GB",
+    pinpoint: {
+      answer: "SE",
+      clues: [
+        "Spotify was founded here in 2006.",
+        "The DJ Avicii, who made Wake Me Up and Levels, came from here.",
+        "ABBA, the band behind Dancing Queen and Mamma Mia, comes from here."
+      ]
+    },
+    deepcut: {
+      countries: ["GB"],
+      question: "Name a member of the Beatles, past or present.",
+      answers: {
+        1000: ["Pete Best", "Stuart Sutcliffe"],
+        800: ["George Harrison"],
+        600: ["Ringo Starr"],
+        400: ["Paul McCartney"],
+        200: ["John Lennon"]
+      },
+      aliases: {
+        "Pete Best": ["Best"], "Stuart Sutcliffe": ["Sutcliffe", "Stuart"], "George Harrison": ["George", "Harrison"],
+        "Ringo Starr": ["Ringo", "Starr"], "Paul McCartney": ["Paul", "McCartney"], "John Lennon": ["John", "Lennon"]
+      },
+      info: {
+        title: "The Beatles",
+        text: "The band from Liverpool is the best-selling music act of all time. Stuart Sutcliffe and Pete Best played with them before they were famous; Ringo Starr joined in 1962.",
+        facts: [["From", "Liverpool"], ["Number-one singles (UK)", "17"], ["Ringo joined", "1962"]]
+      }
+    },
+    paint: {
+      question: "Click the home countries of these stars: Shakira, Taylor Swift, Ed Sheeran, BTS and Céline Dion.",
+      answers: ["CO", "US", "GB", "KR", "CA"]
+    },
+    rank: {
+      topic: "Year the band's first album came out",
+      detail: "The Beatles, ABBA, U2, Nirvana and BTS.",
+      values: { US: 1989, GB: 1963, KR: 2013, SE: 1973, IE: 1980 },
+      years: true,
+      note: "Please Please Me (1963), Ring Ring (1973), Boy (1980), Bleach (1989) and 2 Cool 4 Skool (2013)."
+    }
+  },
+
+  "2026-10-07": {
+    name: "Movie Night",
+    theme: "Films and television.",
+    journey: "rocket",
+    mystery: "NZ",
+    pinpoint: {
+      answer: "KR",
+      clues: [
+        "Parasite, made here, was the first film not in English to win the Oscar for Best Picture.",
+        "Squid Game, made here, became Netflix's most-watched series.",
+        "Samsung and Hyundai are based here, and its capital is Seoul."
+      ]
+    },
+    deepcut: {
+      countries: ["DE"],
+      question: "Name one of Disney's Seven Dwarfs.",
+      answers: {
+        1000: ["Bashful"],
+        800: ["Sneezy"],
+        600: ["Doc"],
+        400: ["Happy", "Sleepy"],
+        200: ["Grumpy", "Dopey"]
+      },
+      aliases: {},
+      info: {
+        title: "Snow White",
+        text: "The Brothers Grimm published the fairy tale in Germany in 1812. Disney's Snow White and the Seven Dwarfs (1937), its first full-length animated film, gave the dwarfs their names.",
+        facts: [["Fairy tale", "1812"], ["Disney film", "1937"], ["Dwarfs", "7"]]
+      }
+    },
+    paint: {
+      question: "Click the countries where these Disney films are set: Mulan, Coco, Ratatouille, Brave and Encanto.",
+      answers: ["CN", "MX", "FR", "GB", "CO"]
+    },
+    rank: {
+      topic: "Year the film festival was first held",
+      detail: "Venice, Cannes, Berlin, Sundance and Busan.",
+      values: { FR: 1946, KR: 1996, IT: 1932, US: 1978, DE: 1951 },
+      years: true,
+      note: "Venice is the oldest film festival in the world. Sundance began in 1978 as the Utah/US Film Festival."
+    }
+  },
+
+  "2026-10-08": {
+    name: "Big Splash",
+    theme: "Oceans and seas.",
+    journey: "dive",
+    mystery: "PT",
+    pinpoint: {
+      answer: "AU",
+      clues: [
+        "Bondi is one of its most famous surf beaches.",
+        "The Great Barrier Reef, the world's largest coral reef system, lies off its coast.",
+        "Kangaroos and koalas live in the wild here."
+      ]
+    },
+    deepcut: {
+      question: "Name one of the world's five oceans.",
+      answers: {
+        1000: ["Southern Ocean"],
+        800: ["Arctic Ocean"],
+        600: ["Indian Ocean"],
+        400: ["Atlantic Ocean"],
+        200: ["Pacific Ocean"]
+      },
+      aliases: {
+        "Southern Ocean": ["Southern", "Antarctic", "Antarctic Ocean"], "Arctic Ocean": ["Arctic"],
+        "Indian Ocean": ["Indian"], "Atlantic Ocean": ["Atlantic"], "Pacific Ocean": ["Pacific"]
+      },
+      info: {
+        title: "The five oceans",
+        text: "The Pacific is the biggest and deepest: it covers about a third of the Earth's surface. The Southern Ocean around Antarctica was only widely counted as the fifth ocean from the 2000s.",
+        facts: [["Biggest", "Pacific"], ["Smallest", "Arctic"], ["Deepest point", "Challenger Deep, ~11 km"]]
+      }
+    },
+    paint: {
+      question: "Click every country with a coast on the Caspian Sea.",
+      answers: ["RU", "KZ", "TM", "IR", "AZ"]
+    },
+    rank: {
+      topic: "Population density",
+      detail: "People per km².",
+      values: { IT: 196, AU: 4, BD: 1190, US: 36, NL: 432 },
+      unit: " people per km²",
+      top: "MOST CROWDED",
+      bottom: "EMPTIEST",
+      note: "Bangladesh is the most crowded large country in the world."
+    }
+  },
+
+  "2026-10-09": {
+    name: "Fly the Flag",
+    theme: "Flags.",
+    journey: "balloon",
+    mystery: "CA",
+    pinpoint: {
+      answer: "JP",
+      clues: [
+        "Its bullet trains, the Shinkansen, have run since 1964.",
+        "Pokémon, Super Mario and Hello Kitty were all created here.",
+        "Its white flag has a red circle in the middle, standing for the sun."
+      ]
+    },
+    deepcut: {
+      countries: ["ZA"],
+      question: "Name a colour on the flag of South Africa.",
+      answers: {
+        1000: ["Yellow"],
+        800: ["White"],
+        600: ["Black"],
+        400: ["Blue", "Red"],
+        200: ["Green"]
+      },
+      aliases: { Yellow: ["Gold"] },
+      info: {
+        title: "South Africa's flag",
+        text: "It was adopted in 1994, for the country's first democratic elections. It has six colours, more than almost any other national flag, and its Y shape stands for different paths coming together.",
+        facts: [["Adopted", "1994"], ["Colours", "6"], ["Shape", "A sideways Y"]]
+      }
+    },
+    paint: {
+      question: "Click every country with a Nordic cross on its flag.",
+      answers: ["DK", "SE", "NO", "FI", "IS"]
+    },
+    rank: {
+      topic: "Year the flag was officially adopted",
+      detail: "The flag as it is today.",
+      values: { CA: 1965, JP: 1999, GB: 1801, ZA: 1994, US: 1960 },
+      years: true,
+      note: "The Union Flag got its St Patrick's cross in 1801; the US flag got its 50th star in 1960; Canada's Maple Leaf flew from 1965; Japan's flag was made official by law in 1999."
+    }
+  },
+
+  "2026-10-10": {
+    name: "Capital Idea",
+    theme: "Capital cities.",
+    journey: "trek",
+    mystery: "FR",
+    pinpoint: {
+      answer: "TR",
+      clues: [
+        "Its biggest city, which lies on two continents, is not its capital.",
+        "Hot-air balloons float over the fairy chimneys of Cappadocia here every morning.",
+        "Its capital is Ankara, and its red flag has a white crescent and star."
+      ]
+    },
+    deepcut: {
+      countries: ["GB"],
+      question: "Name the capital of one of the four nations of the United Kingdom.",
+      answers: {
+        1000: ["Belfast"],
+        800: ["Cardiff"],
+        600: ["Edinburgh"],
+        200: ["London"]
+      },
+      aliases: {},
+      info: {
+        title: "Four capitals",
+        text: "The United Kingdom is made up of England, Scotland, Wales and Northern Ireland, and each has its own capital. Scotland, Wales and Northern Ireland also have their own parliaments.",
+        facts: [["Nations", "4"], ["Cardiff a capital since", "1955"], ["Scottish Parliament", "Edinburgh, 1999"]]
+      }
+    },
+    paint: {
+      question: "Click the countries with these capitals: Ottawa, Canberra, Brasília, Pretoria and Wellington.",
+      answers: ["CA", "AU", "BR", "ZA", "NZ"]
+    },
+    rank: {
+      topic: "Height of the capital above sea level",
+      detail: "Quito, Mexico City, Nairobi, Kathmandu and London.",
+      values: { NP: 1400, GB: 11, EC: 2850, KE: 1795, MX: 2240 },
+      approx: true,
+      unit: " m",
+      top: "HIGHEST",
+      bottom: "LOWEST",
+      note: "Quito is the highest official capital in the world."
+    }
+  },
+
+  "2026-10-11": {
+    name: "Sky High",
+    theme: "Mountains and tall things.",
+    journey: "climb",
+    mystery: "NP",
+    pinpoint: {
+      answer: "AE",
+      clues: [
+        "One of its cities built islands in the shape of a palm tree.",
+        "It is made up of seven emirates.",
+        "The Burj Khalifa, the tallest building in the world, stands in Dubai, here."
+      ]
+    },
+    deepcut: {
+      countries: ["NP", "AR", "US", "TZ", "RU", "AU", "ID"],
+      question: "Name one of the Seven Summits, the highest mountain on each continent.",
+      answers: {
+        1000: ["Vinson", "Kosciuszko", "Carstensz Pyramid"],
+        800: ["Elbrus", "Aconcagua"],
+        600: ["Denali"],
+        400: ["Kilimanjaro"],
+        200: ["Everest"]
+      },
+      aliases: {
+        Vinson: ["Mount Vinson", "Vinson Massif"], Kosciuszko: ["Mount Kosciuszko", "Kosciusko"],
+        "Carstensz Pyramid": ["Puncak Jaya", "Carstensz"], Elbrus: ["Mount Elbrus"],
+        Denali: ["Mount McKinley", "McKinley"], Kilimanjaro: ["Mount Kilimanjaro"], Everest: ["Mount Everest"]
+      },
+      info: {
+        title: "The Seven Summits",
+        text: "In 1985 Dick Bass became the first person to climb the highest mountain on every continent. Climbers still argue whether Australia's is Kosciuszko or Carstensz Pyramid in New Guinea, so both count here.",
+        facts: [["Highest", "Everest, 8,849 m"], ["Lowest", "Kosciuszko, 2,228 m"], ["First to climb all", "1985"]]
+      }
+    },
+    paint: {
+      question: "Click every country with a mountain higher than 8,000 metres.",
+      answers: ["NP", "CN", "PK", "IN"]
+    },
+    rank: {
+      topic: "Height of the country's tallest building",
+      detail: "The Burj Khalifa, the Shanghai Tower, One World Trade Center, the Shard and Zalmhaven.",
+      values: { GB: 310, AE: 828, NL: 215, CN: 632, US: 541 },
+      unit: " m",
+      top: "TALLEST",
+      bottom: "SHORTEST"
+    }
+  },
+
+  "2026-10-12": {
+    name: "Sweet Tooth",
+    theme: "Chocolate and sweets.",
+    journey: "balloon",
+    mystery: "BE",
+    pinpoint: {
+      answer: "CH",
+      clues: [
+        "Toblerone, the triangle-shaped chocolate bar, was invented in its capital, Bern.",
+        "Milk chocolate was first made here, in 1875.",
+        "Its flag is a white cross on a square red background."
+      ]
+    },
+    deepcut: {
+      countries: ["GB"],
+      question: "Name one of the five children who find a golden ticket in Charlie and the Chocolate Factory.",
+      answers: {
+        1000: ["Mike Teavee"],
+        800: ["Violet Beauregarde"],
+        600: ["Veruca Salt"],
+        400: ["Augustus Gloop"],
+        200: ["Charlie Bucket"]
+      },
+      aliases: {
+        "Mike Teavee": ["Mike", "Teavee", "Mike TV"], "Violet Beauregarde": ["Violet"], "Veruca Salt": ["Veruca"],
+        "Augustus Gloop": ["Augustus", "Gloop"], "Charlie Bucket": ["Charlie"]
+      },
+      info: {
+        title: "Charlie and the Chocolate Factory",
+        text: "Roald Dahl's book came out in 1964. Five golden tickets bring five children into Willy Wonka's factory, and only Charlie Bucket makes it to the end.",
+        facts: [["Published", "1964"], ["Golden tickets", "5"], ["Author", "Roald Dahl"]]
+      }
+    },
+    paint: {
+      question: "Click the countries these sweet things come from: churros, mochi, gulab jamun, pastéis de nata and maple syrup.",
+      answers: ["ES", "JP", "IN", "PT", "CA"]
+    },
+    rank: {
+      topic: "Year the famous chocolate first went on sale",
+      detail: "Côte d'Or, the Hershey bar, Toblerone, the Mars bar and Nutella.",
+      values: { CH: 1908, IT: 1964, BE: 1883, GB: 1932, US: 1900 },
+      years: true
+    }
+  },
+
+  "2026-10-13": {
+    name: "On the Road",
+    theme: "Cars and driving.",
+    journey: "trek",
+    mystery: "DE",
+    pinpoint: {
+      answer: "IT",
+      clues: [
+        "Ferrari, Lamborghini and Maserati are all made here.",
+        "The Vespa scooter was first built here in 1946.",
+        "On the map, it is shaped like a boot."
+      ]
+    },
+    deepcut: {
+      countries: ["GB", "IE", "MT", "CY"],
+      question: "Name a country in Europe where people drive on the left.",
+      answers: {
+        1000: ["Malta"],
+        800: ["Cyprus"],
+        400: ["Ireland"],
+        200: ["United Kingdom"]
+      },
+      aliases: { "United Kingdom": ["UK", "Britain", "Great Britain", "England"], Ireland: ["Republic of Ireland"] },
+      info: {
+        title: "Driving on the left",
+        text: "About a third of the world's people drive on the left, mostly in places once tied to Britain. In Europe only four countries still do; Sweden switched to the right overnight in 1967.",
+        facts: [["Countries in Europe", "4"], ["Sweden switched", "1967"], ["Most people", "India"]]
+      }
+    },
+    paint: {
+      question: "Click the home countries of these car brands: Toyota, Volvo, Hyundai, Ford and Renault.",
+      answers: ["JP", "SE", "KR", "US", "FR"]
+    },
+    rank: {
+      topic: "Year the car company was founded",
+      detail: "Ford, BMW, Volvo, Toyota and Hyundai.",
+      values: { SE: 1927, KR: 1967, US: 1903, JP: 1937, DE: 1916 },
+      years: true
+    }
+  },
+
+  "2026-10-14": {
+    name: "Island Life",
+    theme: "Islands.",
+    journey: "dive",
+    mystery: "GR",
+    pinpoint: {
+      answer: "IS",
+      clues: [
+        "Its parliament, the Althing, first met in the year 930.",
+        "Geysers, glaciers and volcanoes sit side by side here, and you can see the northern lights.",
+        "It is an island in the North Atlantic, and its capital is Reykjavík."
+      ]
+    },
+    deepcut: {
+      countries: ["US"],
+      question: "Name one of the eight main Hawaiian islands.",
+      answers: {
+        1000: ["Niihau", "Kahoolawe"],
+        800: ["Lanai", "Molokai"],
+        600: ["Kauai"],
+        400: ["Oahu", "Maui"],
+        200: ["Hawaii"]
+      },
+      aliases: {
+        Niihau: ["Ni'ihau"], Kahoolawe: ["Kaho'olawe"], Lanai: ["Lana'i"], Molokai: ["Moloka'i"],
+        Kauai: ["Kaua'i"], Oahu: ["O'ahu"], Hawaii: ["Big Island", "Hawaii Island", "Hawai'i"]
+      },
+      info: {
+        title: "Hawaii",
+        text: "The islands were made by volcanoes rising from the floor of the Pacific, and Kīlauea on the Big Island is one of the most active on Earth. Hawaii became the 50th US state in 1959.",
+        facts: [["Main islands", "8"], ["Became a state", "1959"], ["Capital", "Honolulu, on Oahu"]]
+      }
+    },
+    paint: {
+      question: "Click every country on the islands of Borneo and Hispaniola.",
+      answers: ["ID", "MY", "BN", "HT", "DO"]
+    },
+    rank: {
+      topic: "Size of the island country",
+      detail: "Land and water, in km².",
+      values: { JP: 377930, JM: 10991, ID: 1904569, IS: 103000, NZ: 270467 },
+      unit: " km²",
+      top: "BIGGEST",
+      bottom: "SMALLEST"
+    }
+  },
+
+  "2026-10-15": {
+    name: "Once Upon a Time",
+    theme: "Fairy tales and legends.",
+    journey: "balloon",
+    mystery: "DK",
+    pinpoint: {
+      answer: "NO",
+      clues: [
+        "In its folk tales, trolls live in the mountains and turn to stone in sunlight.",
+        "Disney's Frozen was inspired by its fjords and wooden stave churches.",
+        "Its long coast is cut by deep fjords, and its capital is Oslo."
+      ]
+    },
+    deepcut: {
+      countries: ["GB"],
+      question: "Name one of the things the Three Little Pigs built their houses from.",
+      answers: {
+        1000: ["Sticks"],
+        600: ["Straw"],
+        200: ["Bricks"]
+      },
+      aliases: { Sticks: ["Stick", "Wood", "Twigs"], Straw: ["Hay"], Bricks: ["Brick"] },
+      info: {
+        title: "The Three Little Pigs",
+        text: "The English fairy tale was written down in the 1840s and became famous with Disney's 1933 cartoon, whose song Who's Afraid of the Big Bad Wolf? was a hit.",
+        facts: [["Pigs", "3"], ["Houses blown down", "2"], ["Disney cartoon", "1933"]]
+      }
+    },
+    paint: {
+      question: "Click the home countries of these storytellers: the Brothers Grimm, Charles Perrault, Aesop, Lewis Carroll and Astrid Lindgren.",
+      answers: ["DE", "FR", "GR", "GB", "SE"]
+    },
+    rank: {
+      topic: "Year the story was first published",
+      detail: "Cinderella (Perrault), Snow White (the Grimms), The Little Mermaid (Andersen), Alice in Wonderland (Carroll) and Pippi Longstocking (Lindgren).",
+      values: { DK: 1837, SE: 1945, FR: 1697, GB: 1865, DE: 1812 },
+      years: true
+    }
+  },
+
+  "2026-10-16": {
+    name: "Party Time",
+    theme: "Festivals and celebrations.",
+    journey: "rocket",
+    mystery: "BR",
+    pinpoint: {
+      answer: "IE",
+      clues: [
+        "Halloween grew out of Samhain, an old festival celebrated here.",
+        "On St Patrick's Day, people around the world wear green for it.",
+        "Its symbol is the shamrock, and its capital is Dublin."
+      ]
+    },
+    deepcut: {
+      countries: ["CN"],
+      question: "Name an animal of the Chinese zodiac.",
+      answers: {
+        1000: ["Ox", "Goat", "Rooster"],
+        800: ["Rat", "Pig"],
+        600: ["Snake", "Horse"],
+        400: ["Rabbit", "Monkey", "Dog"],
+        200: ["Dragon", "Tiger"]
+      },
+      aliases: { Ox: ["Cow", "Bull"], Goat: ["Sheep", "Ram"], Rooster: ["Chicken", "Cock"], Pig: ["Boar"], Rabbit: ["Hare"] },
+      info: {
+        title: "The Chinese zodiac",
+        text: "Every Lunar New Year starts the year of a new animal, in a cycle of twelve. Legend says their order was decided by a great race. 2026 is the Year of the Horse.",
+        facts: [["Animals", "12"], ["2026", "Horse"], ["First in the cycle", "Rat"]]
+      }
+    },
+    paint: {
+      question: "Click the countries famous for these festivals: Oktoberfest, La Tomatina, Holi, the Day of the Dead and Songkran.",
+      answers: ["DE", "ES", "IN", "MX", "TH"]
+    },
+    rank: {
+      topic: "Year the festival was first held",
+      detail: "Oktoberfest, La Tomatina, Glastonbury, Burning Man and Tomorrowland.",
+      values: { GB: 1970, BE: 2005, DE: 1810, US: 1986, ES: 1945 },
+      years: true
+    }
+  },
+
+  "2026-10-17": {
+    name: "In Full Bloom",
+    theme: "Flowers and gardens.",
+    journey: "trek",
+    mystery: "NL",
+    pinpoint: {
+      answer: "KE",
+      clues: [
+        "Many of the roses sold in Europe are grown here, around Lake Naivasha.",
+        "Its long-distance runners, like Eliud Kipchoge, are among the best in the world.",
+        "Wildebeest cross into it every year on the Great Migration, and its capital is Nairobi."
+      ]
+    },
+    deepcut: {
+      countries: ["NL"],
+      question: "Name one of the twelve provinces of the Netherlands.",
+      answers: {
+        1000: ["Drenthe", "Flevoland", "Overijssel"],
+        800: ["Groningen", "Friesland", "Zeeland"],
+        600: ["Gelderland", "Limburg", "North Brabant"],
+        400: ["Utrecht"],
+        200: ["North Holland", "South Holland"]
+      },
+      aliases: {
+        "North Holland": ["Noord-Holland"], "South Holland": ["Zuid-Holland"],
+        "North Brabant": ["Noord-Brabant", "Brabant"], Friesland: ["Fryslan"]
+      },
+      info: {
+        title: "The Dutch provinces",
+        text: "The Netherlands has twelve provinces. The newest, Flevoland, is almost all land won back from the sea, and only became a province in 1986.",
+        facts: [["Provinces", "12"], ["Newest", "Flevoland, 1986"], ["Most people", "South Holland"]]
+      }
+    },
+    paint: {
+      question: "Click the three Benelux countries.",
+      answers: ["BE", "NL", "LU"]
+    },
+    rank: {
+      topic: "Share of people living in cities",
+      values: { CN: 66.3, ET: 24.1, NL: 95.9, KE: 32.2, US: 80.2 },
+      decimals: 1,
+      unit: "%",
+      note: "World Bank figures for 2025."
+    }
+  },
+
+  "2026-10-18": {
+    name: "Bright Ideas",
+    theme: "Inventions.",
+    journey: "rocket",
+    mystery: "US",
+    pinpoint: {
+      answer: "GB",
+      clues: [
+        "Tim Berners-Lee, who invented the World Wide Web, was born here.",
+        "The first steam railway carrying passengers opened here in 1825.",
+        "Its capital is London, and its flag is the Union Jack."
+      ]
+    },
+    deepcut: {
+      countries: ["IN"],
+      question: "Name a chess piece.",
+      answers: {
+        1000: ["Rook"],
+        800: ["Bishop"],
+        600: ["Knight"],
+        400: ["Pawn"],
+        200: ["King", "Queen"]
+      },
+      aliases: { Rook: ["Castle"], Knight: ["Horse"] },
+      info: {
+        title: "Chess",
+        text: "Chess grew out of chaturanga, a game played in India about 1,500 years ago, and reached Europe through Persia. Each player starts with 16 pieces on a board of 64 squares.",
+        facts: [["Pieces per player", "16"], ["Squares", "64"], ["Born in", "India"]]
+      }
+    },
+    paint: {
+      question: "Click the home countries of these companies: LEGO, Samsung, Nokia, Sony and IKEA.",
+      answers: ["DK", "KR", "FI", "JP", "SE"]
+    },
+    rank: {
+      topic: "Year of the invention",
+      detail: "Paper (China), the printing press (Germany), the telephone (United States), television (United Kingdom) and the World Wide Web (Switzerland, at CERN).",
+      values: { DE: 1440, CH: 1989, CN: 105, GB: 1926, US: 1876 },
+      years: true,
+      approx: true
+    }
+  },
+
+  "2026-10-19": {
+    name: "Out of This World",
+    theme: "Space.",
+    journey: "rocket",
+    mystery: "CN",
+    pinpoint: {
+      answer: "RU",
+      clues: [
+        "Sputnik 1, the first satellite, was launched from here in 1957, when it was part of the Soviet Union.",
+        "Yuri Gagarin, the first person in space, was born here.",
+        "It is the biggest country in the world, and its capital is Moscow."
+      ]
+    },
+    deepcut: {
+      question: "Name a planet in our solar system.",
+      answers: {
+        1000: ["Mercury", "Uranus"],
+        800: ["Neptune", "Venus"],
+        600: ["Saturn", "Jupiter"],
+        400: ["Earth"],
+        200: ["Mars"]
+      },
+      aliases: {},
+      info: {
+        title: "The planets",
+        text: "Eight planets circle the Sun. Pluto counted as the ninth until 2006, when astronomers called it a dwarf planet. Jupiter is so big that all the other planets would fit inside it.",
+        facts: [["Planets", "8"], ["Biggest", "Jupiter"], ["Pluto dropped", "2006"]]
+      }
+    },
+    paint: {
+      question: "Click the home countries of these astronauts: Neil Armstrong, Yang Liwei, Tim Peake, Chris Hadfield and Thomas Pesquet.",
+      answers: ["US", "CN", "GB", "CA", "FR"]
+    },
+    rank: {
+      topic: "Year the space agency was founded",
+      detail: "NASA, ISRO (India), the CNSA (China), JAXA (Japan) and the UAE Space Agency.",
+      values: { JP: 2003, US: 1958, AE: 2014, IN: 1969, CN: 1993 },
+      years: true
+    }
+  },
+
+  "2026-10-20": {
+    name: "Desert Heat",
+    theme: "Deserts.",
+    journey: "trek",
+    mystery: "EG",
+    pinpoint: {
+      answer: "SA",
+      clues: [
+        "The Rub' al Khali, or Empty Quarter, the biggest sand desert in the world, covers much of it.",
+        "Mecca, the holiest city in Islam, is here.",
+        "It covers most of the Arabian Peninsula, and its capital is Riyadh."
+      ]
+    },
+    deepcut: {
+      question: "Name a country the Sahara Desert reaches into.",
+      answers: {
+        1000: ["Tunisia"],
+        800: ["Chad", "Mauritania"],
+        600: ["Sudan", "Mali", "Niger"],
+        400: ["Libya", "Algeria", "Morocco"],
+        200: ["Egypt"]
+      },
+      aliases: {},
+      info: {
+        title: "The Sahara",
+        text: "The world's biggest hot desert covers about 9 million km², nearly the size of the United States. Only about a quarter of it is sand dunes; the rest is mostly rock and gravel.",
+        facts: [["Area", "~9 million km²"], ["Countries", "10, and Western Sahara"], ["Biggest share", "Algeria"]]
+      }
+    },
+    paint: {
+      question: "Click the countries of these deserts: the Atacama, the Mojave, the Taklamakan and the Simpson Desert.",
+      answers: ["CL", "US", "CN", "AU"]
+    },
+    rank: {
+      topic: "Life expectancy",
+      values: { EG: 71.8, NG: 54.6, JP: 84.0, PK: 67.8, SA: 79.0 },
+      decimals: 1,
+      unit: " years",
+      note: "How long a baby born in 2024 can expect to live (World Bank)."
+    }
+  },
+
+  "2026-10-21": {
+    name: "Big and Small",
+    theme: "The biggest and smallest.",
+    journey: "climb",
+    mystery: "AU",
+    pinpoint: {
+      answer: "CA",
+      clues: [
+        "It has more lakes than any other country.",
+        "It is the second-biggest country in the world by area.",
+        "There is a red maple leaf on its flag, and its capital is Ottawa."
+      ]
+    },
+    deepcut: {
+      question: "Name one of the five biggest countries in the world by area.",
+      answers: {
+        1000: ["Brazil"],
+        800: ["China"],
+        600: ["United States"],
+        400: ["Canada"],
+        200: ["Russia"]
+      },
+      aliases: { "United States": ["USA", "US", "America", "United States of America"] },
+      info: {
+        title: "The giants",
+        text: "Russia alone covers more than a tenth of the world's land. The United States and China are so close in size that which is bigger depends on how lakes and coastal waters are counted.",
+        facts: [["Biggest", "Russia, 17.1 million km²"], ["Sixth", "Australia"], ["Smallest country", "Vatican City"]]
+      }
+    },
+    paint: {
+      question: "Click the five countries with the most people.",
+      answers: ["IN", "CN", "US", "ID", "PK"]
+    },
+    rank: {
+      topic: "Money made per person (GDP per head)",
+      values: { BR: 10713, US: 90027, IN: 2702, AU: 65130, JP: 35951 },
+      prefix: "$",
+      note: "World Bank figures for 2025, in US dollars."
+    }
+  },
+
+  "2026-10-22": {
+    name: "All Aboard",
+    theme: "Trains and railways.",
+    journey: "trek",
+    mystery: "JP",
+    pinpoint: {
+      answer: "FR",
+      clues: [
+        "Its TGV high-speed trains set a world record of 574.8 km/h in 2007.",
+        "The Channel Tunnel links it to Britain under the sea.",
+        "The Eiffel Tower stands in its capital, Paris."
+      ]
+    },
+    deepcut: {
+      countries: ["GB"],
+      question: "Name one of the four railway stations on the London Monopoly board.",
+      answers: {
+        1000: ["Fenchurch Street"],
+        800: ["Marylebone"],
+        600: ["Liverpool Street"],
+        200: ["King's Cross"]
+      },
+      aliases: { "Fenchurch Street": ["Fenchurch St"], "Liverpool Street": ["Liverpool St"], "King's Cross": ["Kings Cross"] },
+      info: {
+        title: "Monopoly's stations",
+        text: "The London edition of Monopoly came out in 1936. It has four railway stations, one in the middle of each side of the board, and each costs £200.",
+        facts: [["Stations", "4"], ["Price each", "£200"], ["Rent with all four", "£200"]]
+      }
+    },
+    paint: {
+      question: "Click the countries of these famous train journeys: the Trans-Siberian, the Ghan, the Glacier Express, the Rocky Mountaineer and the Blue Train.",
+      answers: ["RU", "AU", "CH", "CA", "ZA"]
+    },
+    rank: {
+      topic: "Year the first railway opened",
+      values: { JP: 1872, GB: 1825, TH: 1893, DE: 1835, IN: 1853 },
+      years: true,
+      note: "Stockton and Darlington (1825), Nuremberg to Fürth (1835), Bombay to Thane (1853), Tokyo to Yokohama (1872) and Bangkok to Paknam (1893)."
+    }
+  },
+
+  "2026-10-23": {
+    name: "Coffee Break",
+    theme: "Drinks.",
+    journey: "balloon",
+    mystery: "ET",
+    pinpoint: {
+      answer: "VN",
+      clues: [
+        "Its coffee is often served with sweet condensed milk, or even with egg.",
+        "It grows more coffee than any country except Brazil.",
+        "Its long S-shaped coast runs along the South China Sea, and its capital is Hanoi."
+      ]
+    },
+    deepcut: {
+      countries: ["US"],
+      question: "Name a cup size at Starbucks.",
+      answers: {
+        1000: ["Trenta"],
+        800: ["Short"],
+        600: ["Venti"],
+        400: ["Grande"],
+        200: ["Tall"]
+      },
+      aliases: {},
+      info: {
+        title: "Starbucks sizes",
+        text: "Starbucks opened in Seattle in 1971. Its Italian-sounding sizes came after Howard Schultz visited espresso bars in Milan: venti is Italian for twenty, the hot cup's size in ounces.",
+        facts: [["Founded", "1971, Seattle"], ["Venti (hot)", "20 oz"], ["Biggest", "Trenta, ~31 oz"]]
+      }
+    },
+    paint: {
+      question: "Click the homes of these drinks: espresso, sake, tequila, the caipirinha and rooibos tea.",
+      answers: ["IT", "JP", "MX", "BR", "ZA"]
+    },
+    rank: {
+      topic: "Height of the highest peak",
+      detail: "Five coffee-growing countries.",
+      values: { ET: 4550, JM: 2256, CO: 5730, VN: 3147, ID: 4884 },
+      approx: true,
+      unit: " m",
+      top: "HIGHEST",
+      bottom: "LOWEST"
+    }
+  },
+
+  "2026-10-24": {
+    name: "Happy Birthday",
+    theme: "Famous people.",
+    journey: "climb",
+    mystery: "AR",
+    pinpoint: {
+      answer: "PT",
+      clues: [
+        "The explorer Vasco da Gama sailed from here to India in 1497.",
+        "Cristiano Ronaldo was born on its island of Madeira.",
+        "Its capital is Lisbon, and it lies west of Spain."
+      ]
+    },
+    deepcut: {
+      question: "Name a month with 31 days.",
+      answers: {
+        1000: ["August"],
+        800: ["July"],
+        600: ["October", "May"],
+        400: ["March"],
+        200: ["January", "December"]
+      },
+      aliases: {},
+      info: {
+        title: "Months with 31 days",
+        text: "Seven months have 31 days. To remember which, count the months over your knuckles and the dips between them: every knuckle is a 31-day month.",
+        facts: [["31-day months", "7"], ["30-day months", "4"], ["February", "28 or 29"]]
+      }
+    },
+    paint: {
+      question: "Click the home countries of these footballers: Mohamed Salah, Kylian Mbappé, Neymar, Erling Haaland and Son Heung-min.",
+      answers: ["EG", "FR", "BR", "NO", "KR"]
+    },
+    rank: {
+      topic: "Year the famous person was born",
+      detail: "William Shakespeare, Mahatma Gandhi, Bob Marley, Diego Maradona and Cristiano Ronaldo.",
+      values: { IN: 1869, PT: 1985, GB: 1564, AR: 1960, JM: 1945 },
+      years: true
+    }
+  },
+
+  "2026-10-25": {
+    name: "Into the Jungle",
+    theme: "Rainforests.",
+    journey: "trek",
+    mystery: "ID",
+    pinpoint: {
+      answer: "PE",
+      clues: [
+        "The Amazon River begins high in its mountains.",
+        "Its Lake Titicaca, shared with Bolivia, is one of the highest big lakes in the world.",
+        "The Inca city of Machu Picchu is here, and its capital is Lima."
+      ]
+    },
+    deepcut: {
+      question: "Name a country the Amazon rainforest covers.",
+      answers: {
+        1000: ["Suriname", "Guyana", "French Guiana"],
+        800: ["Venezuela", "Ecuador"],
+        600: ["Bolivia"],
+        400: ["Colombia", "Peru"],
+        200: ["Brazil"]
+      },
+      aliases: { "French Guiana": ["France"] },
+      info: {
+        title: "The Amazon rainforest",
+        text: "The biggest rainforest on Earth covers about 5.5 million km², and about 60% of it is in Brazil. Around one in ten of all known species live there.",
+        facts: [["Area", "~5.5 million km²"], ["In Brazil", "~60%"], ["Countries", "8, and French Guiana"]]
+      }
+    },
+    paint: {
+      question: "Click every country in South America that the Equator crosses.",
+      answers: ["EC", "CO", "BR"]
+    },
+    rank: {
+      topic: "Distance from the capital to the Equator",
+      detail: "Quito, Jakarta, Lima, Brasília and Mexico City.",
+      values: { PE: 1340, MX: 2161, EC: 20, BR: 1756, ID: 690 },
+      order: "lowest",
+      approx: true,
+      unit: " km",
+      top: "CLOSEST",
+      bottom: "FARTHEST"
+    }
+  },
+
+  "2026-10-26": {
+    name: "Pirates Ahoy",
+    theme: "Pirates and the Caribbean.",
+    journey: "dive",
+    mystery: "JM",
+    pinpoint: {
+      answer: "CU",
+      clues: [
+        "Old American cars from the 1950s still drive its streets.",
+        "It is famous for its cigars and its salsa music.",
+        "It is the biggest island in the Caribbean, and its capital is Havana."
+      ]
+    },
+    deepcut: {
+      question: "Name a Pirates of the Caribbean film.",
+      answers: {
+        1000: ["On Stranger Tides"],
+        800: ["Dead Men Tell No Tales"],
+        600: ["At World's End"],
+        400: ["Dead Man's Chest"],
+        200: ["The Curse of the Black Pearl"]
+      },
+      aliases: {
+        "The Curse of the Black Pearl": ["Curse of the Black Pearl", "Black Pearl"],
+        "Dead Men Tell No Tales": ["Salazar's Revenge"]
+      },
+      info: {
+        title: "Pirates of the Caribbean",
+        text: "The films began as a Disneyland ride from 1967. Johnny Depp played Captain Jack Sparrow in all five, which together earned about $4.5 billion.",
+        facts: [["Films", "5"], ["First film", "2003"], ["Based on", "A Disneyland ride"]]
+      }
+    },
+    paint: {
+      question: "Click every country in Central America with a coast on the Caribbean Sea.",
+      answers: ["BZ", "GT", "HN", "NI", "CR", "PA"]
+    },
+    rank: {
+      topic: "Year it became independent",
+      values: { CU: 1902, BS: 1973, HT: 1804, JM: 1962, DO: 1844 },
+      years: true,
+      note: "Haiti from France (1804), the Dominican Republic from Haiti (1844), Cuba as a republic after Spanish rule (1902), Jamaica and the Bahamas from Britain."
+    }
+  },
+
+  "2026-10-27": {
+    name: "Digging Deep",
+    theme: "Dinosaurs, fossils and things underground.",
+    journey: "dive",
+    mystery: "MN",
+    pinpoint: {
+      answer: "ZA",
+      clues: [
+        "Its Cradle of Humankind holds some of the oldest fossils of our human ancestors.",
+        "Nelson Mandela became its first president elected by all its people, in 1994.",
+        "It sits at the southern tip of Africa, and Table Mountain rises above Cape Town."
+      ]
+    },
+    deepcut: {
+      countries: ["US"],
+      question: "Name a kind of dinosaur seen in the film Jurassic Park (1993).",
+      answers: {
+        1000: ["Gallimimus", "Parasaurolophus"],
+        800: ["Dilophosaurus"],
+        600: ["Brachiosaurus"],
+        400: ["Triceratops"],
+        200: ["Tyrannosaurus rex", "Velociraptor"]
+      },
+      aliases: { "Tyrannosaurus rex": ["T. rex", "T rex", "T-rex", "Tyrannosaurus"], Velociraptor: ["Raptor"] },
+      info: {
+        title: "Jurassic Park",
+        text: "Steven Spielberg's film mixed life-size robots with computer-made dinosaurs, which were new at the time. It was based on Michael Crichton's 1990 novel.",
+        facts: [["Released", "1993"], ["Director", "Steven Spielberg"], ["Novel", "1990"]]
+      }
+    },
+    paint: {
+      question: "Click the countries where these famous fossils were found: Lucy, Archaeopteryx, Sue the T. rex, Spinosaurus and Argentinosaurus.",
+      answers: ["ET", "DE", "US", "EG", "AR"]
+    },
+    rank: {
+      topic: "Year the capital's metro opened",
+      detail: "London, Paris, Tokyo, Moscow and Seoul.",
+      values: { RU: 1935, GB: 1863, KR: 1974, FR: 1900, JP: 1927 },
+      years: true
+    }
+  },
+
+  "2026-10-28": {
+    name: "Pole Position",
+    theme: "Motor racing.",
+    journey: "rocket",
+    mystery: "AT",
+    pinpoint: {
+      answer: "NL",
+      clues: [
+        "Max Verstappen, who won four Formula One titles in a row, races for it.",
+        "About a quarter of it lies below sea level, kept dry by dikes.",
+        "It is famous for windmills, tulips and bikes, and its capital is Amsterdam."
+      ]
+    },
+    deepcut: {
+      question: "Name a Formula One driver who won at least four world titles.",
+      answers: {
+        1000: ["Juan Manuel Fangio", "Alain Prost"],
+        800: ["Sebastian Vettel"],
+        600: ["Max Verstappen"],
+        400: ["Michael Schumacher"],
+        200: ["Lewis Hamilton"]
+      },
+      aliases: {
+        "Juan Manuel Fangio": ["Fangio"], "Alain Prost": ["Prost"], "Sebastian Vettel": ["Vettel"],
+        "Max Verstappen": ["Verstappen"], "Michael Schumacher": ["Schumacher"], "Lewis Hamilton": ["Hamilton"]
+      },
+      info: {
+        title: "F1's greatest",
+        text: "Lewis Hamilton and Michael Schumacher share the record of seven world titles. Juan Manuel Fangio won five in the 1950s, a record that stood for 46 years.",
+        facts: [["Most titles", "7"], ["Fangio's titles", "5"], ["First championship", "1950"]]
+      }
+    },
+    paint: {
+      question: "Click the home countries of these racing legends: Ayrton Senna, Michael Schumacher, Fernando Alonso, Kimi Räikkönen and Lewis Hamilton.",
+      answers: ["BR", "DE", "ES", "FI", "GB"]
+    },
+    rank: {
+      topic: "Year the first motorway opened",
+      values: { GB: 1958, IT: 1924, JP: 1963, DE: 1932, US: 1940 },
+      years: true,
+      note: "Italy's Autostrada dei Laghi (1924), Cologne to Bonn (1932), the Pennsylvania Turnpike (1940), the Preston bypass (1958) and the Meishin Expressway (1963)."
+    }
+  },
+
+  "2026-10-29": {
+    name: "Holiday Snaps",
+    theme: "Holidays.",
+    journey: "balloon",
+    mystery: "MA",
+    pinpoint: {
+      answer: "GR",
+      clues: [
+        "The Olympic Games began here, at Olympia, almost 2,800 years ago.",
+        "Santorini, with its white houses and blue domes, is one of its islands.",
+        "The Parthenon stands on the Acropolis in its capital, Athens."
+      ]
+    },
+    deepcut: {
+      countries: ["ES"],
+      question: "Name one of the eight main Canary Islands.",
+      answers: {
+        1000: ["La Graciosa", "El Hierro"],
+        800: ["La Gomera", "La Palma"],
+        600: ["Fuerteventura"],
+        400: ["Lanzarote", "Gran Canaria"],
+        200: ["Tenerife"]
+      },
+      aliases: {},
+      info: {
+        title: "The Canary Islands",
+        text: "Spain's islands off north-west Africa are a holiday spot all year round thanks to their mild weather. Mount Teide on Tenerife, a volcano, is Spain's highest mountain.",
+        facts: [["Main islands", "8"], ["Highest point", "Teide, 3,715 m"], ["Biggest island", "Tenerife"]]
+      }
+    },
+    paint: {
+      question: "Click the countries of these holiday islands: Bali, Phuket, Sicily, Mallorca and Zanzibar.",
+      answers: ["ID", "TH", "IT", "ES", "TZ"]
+    },
+    rank: {
+      topic: "Year it joined the European Union",
+      detail: "Or the European Economic Community before it.",
+      values: { AT: 1995, IT: 1958, HR: 2013, ES: 1986, GR: 1981 },
+      years: true
+    }
+  },
+
+  "2026-10-30": {
+    name: "Trick or Treat",
+    theme: "Halloween.",
+    journey: "climb",
+    mystery: "IE",
+    pinpoint: {
+      answer: "MX",
+      clues: [
+        "On the Day of the Dead, families here build altars with marigolds and sugar skulls.",
+        "Chocolate, chilli peppers and avocados were first grown here.",
+        "The Maya pyramid of Chichén Itzá is here, and its capital has the same name as the country."
+      ]
+    },
+    deepcut: {
+      countries: ["US"],
+      question: "Name one of the four Ghostbusters in the 1984 film.",
+      answers: {
+        1000: ["Winston Zeddemore"],
+        800: ["Egon Spengler"],
+        600: ["Ray Stantz"],
+        200: ["Peter Venkman"]
+      },
+      aliases: {
+        "Winston Zeddemore": ["Winston", "Zeddemore"], "Egon Spengler": ["Egon", "Spengler"],
+        "Ray Stantz": ["Ray", "Stantz"], "Peter Venkman": ["Peter", "Venkman"]
+      },
+      info: {
+        title: "Ghostbusters",
+        text: "The 1984 comedy follows four ghost-catchers in New York. Its theme song, by Ray Parker Jr., went to number one in the United States.",
+        facts: [["Released", "1984"], ["Ghostbusters", "4"], ["Base", "A New York firehouse"]]
+      }
+    },
+    paint: {
+      question: "Click the countries these legends come from: Dracula, the Loch Ness Monster, the Yeti, Bigfoot and the Golem of Prague.",
+      answers: ["RO", "GB", "NP", "US", "CZ"]
+    },
+    rank: {
+      topic: "Year the horror classic came out",
+      detail: "Frankenstein (novel), Dracula (novel, by the Irish writer Bram Stoker), Nosferatu (film), The Exorcist (film) and Ringu (film).",
+      values: { DE: 1922, JP: 1998, GB: 1818, US: 1973, IE: 1897 },
+      years: true
+    }
+  }
+};
+
+return { CASUAL_DAYS };
+})();
+
 // ---- daily.js
 __modules["daily.js"] = (() => {
 // The daily puzzle: which five rounds a day has, what's in them, and how they score.
-// Days come from the hand-made calendar in days.js; a day without one is generated,
+// Every day has two puzzles, one per mode: competitive (days.js, timed) and casual
+// (casual-days.js, easier and untimed). A day without a hand-made entry is generated,
 // seeded by the date. Everything here is pure, so every player gets the same day.
 const { COUNTRIES, buildRoundClues, createSeededRandom, getClueSeed, hashStringToSeed } = __modules["countries.js"];
 const { SHAPES } = __modules["shape-data.js"];
 const { DAYS } = __modules["days.js"];
+const { CASUAL_DAYS } = __modules["casual-days.js"];
+
+const MODES = ["competitive", "casual"];
+const MODE_INFO = {
+  competitive: { name: "Competitive", short: "COMPETITIVE" },
+  casual: { name: "Casual", short: "CASUAL" }
+};
+const calendarOf = mode => mode === "casual" ? CASUAL_DAYS : DAYS;
 
 const ROUND_TYPES = ["mystery", "pinpoint", "deepcut", "paint", "rank"];
 
@@ -9551,6 +11134,20 @@ const MAX_GUESSES = 5;
 const STREAK_STEP = 0.1;
 // A perfect day: 1000 × (1.0 + 1.1 + 1.2 + 1.3 + 1.4).
 const MAX_DAILY_SCORE = ROUND_TYPES.reduce((sum, _, index) => sum + MAX_ROUND_SCORE * (1 + STREAK_STEP * index), 0);
+
+// Competitive rounds are timed: a round solved straight away scores ×1.5, falling evenly
+// to ×1.0 when the 30-second bar runs out. After that you can still answer, without the
+// bonus. The clock stops while a guess is being revealed. A round that isn't solved
+// gets no speed bonus.
+const SPEED_WINDOW_MS = 30000;
+const MAX_SPEED_BONUS = 0.5;
+function getSpeedMultiplier(elapsedMs) {
+  const left = Math.max(0, 1 - (elapsedMs || 0) / SPEED_WINDOW_MS);
+  return Math.round((1 + MAX_SPEED_BONUS * left) * 100) / 100;
+}
+// The highest score a day can reach: 9,000 in competitive (a perfect day, every round
+// solved at once), 6,000 in casual.
+const getMaxScore = mode => mode === "casual" ? MAX_DAILY_SCORE : Math.round(MAX_DAILY_SCORE * (1 + MAX_SPEED_BONUS));
 
 // Note: the day plan picks a metric by position in this list, so adding or removing one
 // changes the Rank 'Em round of every day (saved past games would no longer match).
@@ -9597,9 +11194,10 @@ const RANK_METRICS = {
 // How the day's score is shown (journeys.js): a climb, a dive, a launch, a balloon ride or
 // a trek. A hand-made day picks one to fit its theme; other days take turns.
 const JOURNEY_TYPES = ["climb", "dive", "rocket", "balloon", "trek"];
-function getJourney(dateKey) {
-  const chosen = DAYS[dateKey]?.journey;
-  return JOURNEY_TYPES.includes(chosen) ? chosen : JOURNEY_TYPES[hashStringToSeed(`journey:${dateKey}`) % JOURNEY_TYPES.length];
+function getJourney(dateKey, mode = "competitive") {
+  const chosen = calendarOf(mode)[dateKey]?.journey;
+  const seed = mode === "casual" ? `journey:casual:${dateKey}` : `journey:${dateKey}`;
+  return JOURNEY_TYPES.includes(chosen) ? chosen : JOURNEY_TYPES[hashStringToSeed(seed) % JOURNEY_TYPES.length];
 }
 
 // What a Rank 'Em round ranks by: one of RANK_METRICS (generated days), or the day's own
@@ -9822,8 +11420,8 @@ function resolvePlan(plan, states) {
 }
 
 // The day's name (shown to players) and theme (a note for us), if it was hand-made.
-function getDayInfo(dateKey) {
-  const entry = DAYS[dateKey];
+function getDayInfo(dateKey, mode = "competitive") {
+  const entry = calendarOf(mode)[dateKey];
   return entry ? { name: entry.name, theme: entry.theme } : null;
 }
 
@@ -9831,20 +11429,22 @@ function pickFrom(items, random) {
   return items[Math.floor(random() * items.length)];
 }
 
-// Each day spreads difficulty levels 1–5 across its five rounds in a different order,
-// so every day is equally hard overall but the tough round moves around.
-function getDailyPlan(dateKey) {
-  const difficulties = shuffle([1, 2, 3, 4, 5], seededRandom(`plan:${dateKey}`));
-  const authored = DAYS[dateKey];
+// Each competitive day spreads difficulty levels 1–5 across its five rounds in a
+// different order, so every day is equally hard overall but the tough round moves
+// around. Casual days stay at the easy end. Every round knows its mode.
+function getDailyPlan(dateKey, mode = "competitive") {
+  const prefix = mode === "casual" ? "casual:" : "";
+  const difficulties = shuffle(mode === "casual" ? [1, 1, 1, 2, 2] : [1, 2, 3, 4, 5], seededRandom(`plan:${prefix}${dateKey}`));
+  const authored = calendarOf(mode)[dateKey];
   const used = new Set();
   return ROUND_TYPES.map((type, index) => {
-    const random = seededRandom(`round:${dateKey}:${type}`);
+    const random = seededRandom(`round:${prefix}${dateKey}:${type}`);
     const content = authored?.[type]
       ? AUTHORED[type](authored[type], dateKey, index)
       : BUILDERS[type](difficulties[index], random, used, dateKey, index);
     // A hand-made round can set its own difficulty (1-5).
     const difficulty = authored?.[type]?.difficulty || difficulties[index];
-    const round = { type, index, difficulty, ...content };
+    const round = { type, index, difficulty, mode, ...content };
     [...(round.countries || []), round.answer].filter(iso => typeof iso === "string").forEach(iso => used.add(iso));
     return round;
   });
@@ -9989,26 +11589,30 @@ function getPinpointClues(country, guessedIsos = [], funClues = []) {
 // Round state and scoring (state is what gets saved; everything else is derived)
 // ---------------------------------------------------------------------------
 
+// Every round also keeps its clock (competitive): `elapsed` is the playing time so far
+// in ms, and `speed` the multiplier locked in when the round ended.
 function createRoundState(type) {
+  const clock = { elapsed: 0, speed: null };
   switch (type) {
     case "mystery":
-    case "pinpoint": return { guesses: [], gaveUp: false };
-    case "deepcut": return { tries: [], answer: null, gaveUp: false };
-    case "paint": return { found: [], wrong: [], finished: false };
-    case "rank": return { submissions: [], order: null, rerolled: false };
+    case "pinpoint": return { guesses: [], gaveUp: false, ...clock };
+    case "deepcut": return { tries: [], answer: null, gaveUp: false, ...clock };
+    case "paint": return { found: [], wrong: [], finished: false, ...clock };
+    case "rank": return { submissions: [], order: null, rerolled: false, ...clock };
     default: throw new Error(`Unknown round type ${type}`);
   }
 }
 
 // Rank 'Em hints: every wrong try that gets at least one country in the right place
-// reveals the real value of one more country (a fixed random pick per try).
+// reveals the real value of one more country (a fixed random pick per try). In casual,
+// every wrong try does.
 function getRankHints(round, state) {
   const hints = [];
   state.submissions.forEach((submission, index) => {
     if (submission.join() === round.answer.join()) return;
     const right = submission.filter((iso, position) => round.answer[position] === iso).length;
     const remaining = round.countries.filter(iso => !hints.some(hint => hint.iso === iso));
-    if (right === 0 || remaining.length === 0) return;
+    if ((right === 0 && round.mode !== "casual") || remaining.length === 0) return;
     const random = seededRandom(`rank-hint:${round.answer.join()}:${index}`);
     hints.push({ iso: remaining[Math.floor(random() * remaining.length)], afterTry: index + 1 });
   });
@@ -10051,16 +11655,18 @@ function getRoundProgress(round, state) {
 }
 
 // Perfect rounds in a row build a streak: the 2nd scores ×1.1, the 3rd ×1.2 and so on.
-// Any non-perfect round scores ×1.0 and resets the streak.
+// Any non-perfect round scores ×1.0 and resets the streak. A solved competitive round
+// also scores its speed (locked in `speed` when it ended).
 function getDayScore(plan, states) {
   let streak = 0;
   const rounds = plan.map((round, index) => {
     const progress = getRoundProgress(round, states[index]);
-    if (!progress.done) return { ...progress, multiplier: 1, points: 0 };
+    if (!progress.done) return { ...progress, multiplier: 1, speed: 1, points: 0 };
     const isPerfect = progress.score === MAX_ROUND_SCORE;
     const multiplier = isPerfect ? 1 + STREAK_STEP * streak : 1;
+    const speed = progress.solved && states[index].speed > 1 ? states[index].speed : 1;
     streak = isPerfect ? streak + 1 : 0;
-    return { ...progress, isPerfect, multiplier, points: Math.round(progress.score * multiplier) };
+    return { ...progress, isPerfect, multiplier, speed, points: Math.round(progress.score * multiplier * speed) };
   });
   return {
     rounds,
@@ -10069,7 +11675,7 @@ function getDayScore(plan, states) {
   };
 }
 
-return { ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, resolveRound, resolvePlan, getDayInfo, getDailyPlan, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
+return { MODES, MODE_INFO, ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, SPEED_WINDOW_MS, MAX_SPEED_BONUS, getSpeedMultiplier, getMaxScore, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, resolveRound, resolvePlan, getDayInfo, getDailyPlan, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
 })();
 
 // ---- community.js
@@ -10080,10 +11686,9 @@ __modules["community.js"] = (() => {
 // getDayStats with real figures later; the rest can stay as is.
 
 const { COUNTRIES } = __modules["countries.js"];
-const { MAX_DAILY_SCORE, getCountry } = __modules["daily.js"];
+const { MAX_DAILY_SCORE, getCountry, getMaxScore } = __modules["daily.js"];
 
 const SCORE_BUCKET_COUNT = 10;
-const SCORE_BUCKET_SIZE = MAX_DAILY_SCORE / SCORE_BUCKET_COUNT;
 
 // Explorer ranks, highest first; maxPercent is the "top X%" a player must be within. Each
 // has a pixel badge (badges.js) in its colour.
@@ -10113,16 +11718,21 @@ function createSeededRandom(seedText) {
   };
 }
 
-function getDayStats(dateKey) {
-  const random = createSeededRandom(`community:${dateKey}`);
+// A day's scores in one mode, in ten buckets from 0 to that mode's maximum (9,000 in
+// competitive, 6,000 in casual).
+function getDayStats(dateKey, mode = "competitive") {
+  const random = createSeededRandom(mode === "casual" ? `community:casual:${dateKey}` : `community:${dateKey}`);
+  const maxScore = getMaxScore(mode);
+  const bucketSize = maxScore / SCORE_BUCKET_COUNT;
   const targetPlayers = Math.round(1800 + random() * 2600);
-  // Positions are expressed as a share of the maximum, then scaled to the day's points.
-  const center = (0.5 + random() * 0.12) * MAX_DAILY_SCORE;
+  // Positions are a share of a 6,000-point day: competitive players earn a little extra
+  // for speed, and casual days are easier.
+  const center = (0.5 + random() * 0.12) * MAX_DAILY_SCORE * (mode === "casual" ? 1.2 : 1.12);
   const spread = (0.15 + random() * 0.05) * MAX_DAILY_SCORE;
 
   // Bell curve of daily totals, plus a small bump for near-flawless days.
   const weights = Array.from({ length: SCORE_BUCKET_COUNT }, (_, bucket) => {
-    const middle = (bucket + 0.5) * SCORE_BUCKET_SIZE;
+    const middle = (bucket + 0.5) * bucketSize;
     return Math.exp(-((middle - center) ** 2) / (2 * spread ** 2)) * (0.85 + random() * 0.3);
   });
   weights[0] += 0.04 + random() * 0.03;
@@ -10131,11 +11741,13 @@ function getDayStats(dateKey) {
   const distribution = weights.map(weight => Math.round(weight / weightTotal * targetPlayers));
   const players = distribution.reduce((sum, count) => sum + count, 0);
   const averageScore = Math.round(
-    distribution.reduce((sum, count, bucket) => sum + count * (bucket + 0.5) * SCORE_BUCKET_SIZE, 0) / players
+    distribution.reduce((sum, count, bucket) => sum + count * (bucket + 0.5) * bucketSize, 0) / players
   );
 
   return {
     isSample: true,
+    maxScore,
+    bucketSize,
     players,
     averageScore,
     perfectRoundRate: Math.round((0.25 + random() * 0.2) * 100),
@@ -10143,16 +11755,16 @@ function getDayStats(dateKey) {
   };
 }
 
-function getScoreBucket(score) {
-  return Math.min(SCORE_BUCKET_COUNT - 1, Math.floor(score / SCORE_BUCKET_SIZE));
+function getScoreBucket(stats, score) {
+  return Math.min(SCORE_BUCKET_COUNT - 1, Math.floor(score / stats.bucketSize));
 }
 
 // Share of players (0–100) who scored better than `score`.
 function getTopPercent(stats, score) {
-  const bucket = getScoreBucket(score);
-  const bucketTop = (bucket + 1) * SCORE_BUCKET_SIZE;
+  const bucket = getScoreBucket(stats, score);
+  const bucketTop = (bucket + 1) * stats.bucketSize;
   const playersAbove = stats.distribution.slice(bucket + 1).reduce((sum, count) => sum + count, 0);
-  const better = playersAbove + stats.distribution[bucket] * ((bucketTop - score) / SCORE_BUCKET_SIZE);
+  const better = playersAbove + stats.distribution[bucket] * ((bucketTop - score) / stats.bucketSize);
   return Math.min(100, Math.max(0.1, better / stats.players * 100));
 }
 
@@ -10208,7 +11820,7 @@ function getRoundStats(dateKey, index, round) {
   }
 }
 
-return { SCORE_BUCKET_COUNT, SCORE_BUCKET_SIZE, RANK_TIERS, getDayStats, getScoreBucket, getTopPercent, formatTopPercent, getMonthBadge, getRoundStats };
+return { SCORE_BUCKET_COUNT, RANK_TIERS, getDayStats, getScoreBucket, getTopPercent, formatTopPercent, getMonthBadge, getRoundStats };
 })();
 
 // ---- badges.js
@@ -10348,8 +11960,8 @@ return { createBadge, MEDALS, getGroupMedal, createMedal };
 // ---- screens.js
 __modules["screens.js"] = (() => {
 const { sounds } = __modules["audio.js"];
-const { RANK_TIERS, SCORE_BUCKET_SIZE, formatTopPercent, getDayStats, getMonthBadge, getRoundStats, getScoreBucket, getTopPercent } = __modules["community.js"];
-const { MAX_DAILY_SCORE } = __modules["daily.js"];
+const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getRoundStats, getScoreBucket, getTopPercent } = __modules["community.js"];
+const { MAX_DAILY_SCORE, MODE_INFO } = __modules["daily.js"];
 const { createBadge } = __modules["badges.js"];
 
 const SAMPLE_NOTE = "Player numbers and ranks are sample data until the game has real players.";
@@ -10363,7 +11975,7 @@ function element(tag, className, text) {
 
 // Adds sample community stats and the player's rank to a day record from engine.js.
 function withCommunity(record) {
-  const stats = getDayStats(record.dateKey);
+  const stats = getDayStats(record.dateKey, record.mode);
   const topPercent = record.completed ? getTopPercent(stats, record.score) : null;
   return { ...record, stats, topPercent };
 }
@@ -10427,8 +12039,8 @@ function createDayCell(day, { isSelected, onSelect }) {
 }
 
 // A month's header: days played, your average top % that month, and "FULL MONTH" once
-// every day of the month in the archive is played.
-function createMonthHead(month, weeks) {
+// every day of the month in the archive is played. Badges are for competitive days only.
+function createMonthHead(month, weeks, mode) {
   const days = weeks.flatMap(week => week.cells).filter(day => day && day.dateKey.startsWith(month));
   const played = days.filter(day => day.completed);
   const head = element("div", "calendar-month");
@@ -10440,10 +12052,12 @@ function createMonthHead(month, weeks) {
     const average = played.reduce((sum, day) => sum + day.topPercent, 0) / played.length;
     summary.appendChild(element("span", "calendar-month-top", `avg. ${formatTopPercent(average).toLowerCase()}`));
     // The badge earned that month.
-    const badge = getMonthBadge(days, month);
-    const earned = element("span", "calendar-month-badge");
-    earned.append(createBadge(badge.tier, 20), badge.tier.name);
-    summary.appendChild(earned);
+    if (mode === "competitive") {
+      const badge = getMonthBadge(days, month);
+      const earned = element("span", "calendar-month-badge");
+      earned.append(createBadge(badge.tier, 20), badge.tier.name);
+      summary.appendChild(earned);
+    }
   }
   head.append(element("span", "calendar-month-name", name), summary);
   if (played.length === days.length) head.appendChild(element("span", "calendar-full", "FULL MONTH"));
@@ -10486,16 +12100,21 @@ function createBadgeLadder(current) {
   return ladder;
 }
 
-function createCalendar(days, { selected, onSelect }) {
+function createCalendar(days, { selected, onSelect, mode }) {
   const weeks = groupByWeek(days);
   const calendar = element("div", "calendar");
   const todayKey = days.find(day => day.isToday)?.dateKey || days.at(-1).dateKey;
-  const thisMonth = getMonthBadge(days, todayKey.slice(0, 7));
-  calendar.append(createMonthBadgeCard(thisMonth, todayKey.slice(0, 7)), createBadgeLadder(thisMonth.tier));
+  // Your badge comes from competitive days; casual has just the calendar.
+  if (mode === "competitive") {
+    const thisMonth = getMonthBadge(days, todayKey.slice(0, 7));
+    calendar.append(createMonthBadgeCard(thisMonth, todayKey.slice(0, 7)), createBadgeLadder(thisMonth.tier));
+  } else {
+    calendar.appendChild(element("p", "calendar-mode-note", "Casual days: no clock, country names on the globe and extra clues. They don't count towards your badge."));
+  }
   [...new Set(weeks.map(week => week.month))].forEach(month => {
     const monthWeeks = weeks.filter(week => week.month === month);
     // The month's header with its medals, then the weekday letters, then its weeks.
-    calendar.appendChild(createMonthHead(month, monthWeeks));
+    calendar.appendChild(createMonthHead(month, monthWeeks, mode));
     const weekdays = element("div", "calendar-week calendar-weekdays");
     WEEKDAYS.forEach(letter => weekdays.appendChild(element("span", "", letter)));
     calendar.appendChild(weekdays);
@@ -10523,16 +12142,16 @@ function createStatCard(label, value, note) {
 }
 
 function createDistributionChart(day) {
-  const { distribution } = day.stats;
+  const { distribution, bucketSize, maxScore } = day.stats;
   const highest = Math.max(...distribution);
-  const playerBucket = day.completed ? getScoreBucket(day.score) : -1;
+  const playerBucket = day.completed ? getScoreBucket(day.stats, day.score) : -1;
   const chart = element("div", "distribution");
   const bars = element("div", "distribution-bars");
   distribution.forEach((count, bucket) => {
     const bar = element("div", "distribution-bar");
     bar.style.height = `${Math.max(3, count / highest * 100)}%`;
     bar.classList.toggle("is-player", bucket === playerBucket);
-    const range = `${(bucket * SCORE_BUCKET_SIZE).toLocaleString()}–${((bucket + 1) * SCORE_BUCKET_SIZE).toLocaleString()}`;
+    const range = `${(bucket * bucketSize).toLocaleString()}–${((bucket + 1) * bucketSize).toLocaleString()}`;
     bar.title = `${range}: ${count.toLocaleString()} players`;
     if (bucket === playerBucket) bar.appendChild(element("span", "distribution-you", "YOU"));
     bars.appendChild(bar);
@@ -10540,8 +12159,8 @@ function createDistributionChart(day) {
   const axis = element("div", "distribution-axis");
   axis.append(
     element("span", "", "0"),
-    element("span", "", (MAX_DAILY_SCORE / 2).toLocaleString()),
-    element("span", "", MAX_DAILY_SCORE.toLocaleString())
+    element("span", "", (maxScore / 2).toLocaleString()),
+    element("span", "", maxScore.toLocaleString())
   );
   chart.append(bars, axis);
   return chart;
@@ -10561,7 +12180,7 @@ function createPlayPanel(day, onPlay) {
   button.type = "button";
   button.addEventListener("click", () => {
     sounds.playClick();
-    onPlay(day.dateKey);
+    onPlay(day.dateKey, day.mode);
   });
   panel.append(
     element("p", "", day.started ? "You started this day but haven't finished it yet." : "You haven't played this day yet. You can play it once."),
@@ -10584,7 +12203,7 @@ function renderDayOverview(container, day, onPlay) {
   const head = element("div", "overview-head");
   const titles = element("div");
   titles.append(
-    element("span", "field-label", day.isToday ? "TODAY'S PUZZLE" : "DAILY PUZZLE"),
+    element("span", "field-label", `${day.isToday ? "TODAY'S" : "DAILY"} ${MODE_INFO[day.mode].short} PUZZLE`),
     element("h3", "overview-date", `Day ${day.puzzleNumber}${day.dayName ? `: ${day.dayName}` : ""}`)
   );
   // Played: the medal and score, and, big, where that puts you in the world. Otherwise
@@ -10686,6 +12305,7 @@ function createRoundsSection(day) {
     }
     const points = element("span", "overview-round-points", round.done ? round.points.toLocaleString() : "—");
     if (round.multiplier > 1) points.appendChild(element("small", "", ` ×${round.multiplier.toFixed(1)}`));
+    if (round.speed > 1) points.appendChild(element("small", "", ` ⚡${round.speed.toFixed(2)}`));
     item.append(text, points);
     list.appendChild(item);
   });
@@ -10735,28 +12355,44 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay }) {
   const archiveGrid = document.getElementById("archiveListContainer");
   const overview = document.getElementById("dayOverview");
 
-  function loadDays() {
-    return getDays().map(dateKey => withCommunity(getDayRecord(dateKey)));
+  // Competitive days by default (badges, the leaderboard and groups use those).
+  function loadDays(mode = "competitive") {
+    return getDays().map(dateKey => withCommunity(getDayRecord(dateKey, mode)));
   }
 
-  function playDay(dateKey) {
+  function playDay(dateKey, mode) {
     archiveModal.classList.add("hidden");
     document.getElementById("communityModal")?.classList.add("hidden");
     document.getElementById("victoryModal").classList.add("hidden");
     document.getElementById("gameView").classList.remove("hidden");
-    onPlayDay(dateKey);
+    onPlayDay(dateKey, mode);
   }
 
-  function openArchive(selectedDateKey = null) {
-    const days = loadDays();
+  // The archive has a tab per mode, each with its own calendar; the selected day stays
+  // selected when switching.
+  let archiveMode = "competitive";
+  let currentSelection = null;
+  const modeTabs = [...document.querySelectorAll("#archiveModeTabs button")];
+  modeTabs.forEach(tab => tab.addEventListener("click", () => {
+    sounds.playClick();
+    openArchive(currentSelection, tab.dataset.mode);
+  }));
+
+  function openArchive(selectedDateKey = null, mode = archiveMode) {
+    archiveMode = mode;
+    modeTabs.forEach(tab => tab.setAttribute("aria-selected", String(tab.dataset.mode === mode)));
+    const days = loadDays(mode);
     // Selecting a day shows its overview; unfinished days start from a button there.
     let selected = days.find(day => day.dateKey === selectedDateKey) || days.find(day => day.isToday) || days[0] || null;
+    currentSelection = selected?.dateKey || null;
 
     const renderGrid = () => {
       archiveGrid.replaceChildren(createCalendar(days, {
         selected,
+        mode,
         onSelect: picked => {
           selected = picked;
+          currentSelection = picked.dateKey;
           renderGrid();
           renderDayOverview(overview, selected, playDay);
         }
@@ -10772,7 +12408,9 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay }) {
   document.querySelectorAll(".archive-open-button, #menuArchiveButton").forEach(button => {
     button.addEventListener("click", () => {
       sounds.playClick();
-      openArchive();
+      // From a game, the archive opens on that game's mode.
+      const mode = document.getElementById("gameView").dataset.mode;
+      openArchive(null, button.id === "menuArchiveButton" ? archiveMode : mode || archiveMode);
     });
   });
   document.getElementById("closeArchiveButton").addEventListener("click", () => {
@@ -10937,7 +12575,9 @@ function drawCountryOutline(polygons, label) {
 const REVEAL_FIRST_MS = 650;
 const REVEAL_STEP_MS = 700;
 const REVEAL_FLY_MS = 380;
-function playRevealCard({ card, steps, nextLabel, land, sound = () => {}, onTurn = () => {} }) {
+// With autoContinue (ms, competitive), the card goes on by itself that long after its
+// last step; the button fills up meanwhile. Otherwise it waits for a click or Enter.
+function playRevealCard({ card, steps, nextLabel, land, sound = () => {}, onTurn = () => {}, autoContinue = 0 }) {
   const host = document.getElementById("gameView");
   const overlay = Object.assign(document.createElement("div"), { className: "guess-reveal" });
   card.classList.add("guess-reveal-card");
@@ -10951,6 +12591,7 @@ function playRevealCard({ card, steps, nextLabel, land, sound = () => {}, onTurn
   let shown = 0;
   let streak = 0;
   let timer = null;
+  let goOn = () => {};
   const turnOver = (step, quiet) => {
     step.element.classList.add("is-turned", `is-${step.status}`);
     streak = step.status === "match" ? streak + 1 : 0;
@@ -10960,6 +12601,11 @@ function playRevealCard({ card, steps, nextLabel, land, sound = () => {}, onTurn
   const complete = () => {
     card.classList.add("is-complete");
     next.focus({ preventScroll: true });
+    if (autoContinue) {
+      next.style.setProperty("--auto-ms", `${autoContinue}ms`);
+      next.classList.add("is-auto");
+      timer = setTimeout(() => goOn(), autoContinue);
+    }
   };
   const showNext = () => {
     turnOver(steps[shown], false);
@@ -10980,6 +12626,7 @@ function playRevealCard({ card, steps, nextLabel, land, sound = () => {}, onTurn
     const finish = () => {
       if (landed) return;
       landed = true;
+      clearTimeout(timer);
       window.removeEventListener("keydown", onKey, true);
       const row = land();
       const from = card.getBoundingClientRect();
@@ -11014,6 +12661,7 @@ function playRevealCard({ card, steps, nextLabel, land, sound = () => {}, onTurn
       event.stopPropagation();
       advance();
     };
+    goOn = finish;
     window.addEventListener("keydown", onKey, true);
     overlay.addEventListener("click", advance);
   });
@@ -11032,7 +12680,7 @@ function createClueStep({ label, text }) {
 
 // Mystery and Pinpoint: a guess as a pack-style card. Flag, name and outline show at once;
 // hot/cold, each hint and any newly unlocked clue turn over one by one.
-function playGuessReveal(guess, { land, sound, nextLabel = "NEXT GUESS", outline = null, newClue = null }) {
+function playGuessReveal(guess, { land, sound, nextLabel = "NEXT GUESS", outline = null, newClue = null, autoContinue = 0 }) {
   const card = document.createElement("div");
   // The card's edge takes the hot/cold colour only when that badge turns over.
   card.style.setProperty("--temp", "var(--glass-line)");
@@ -11061,7 +12709,7 @@ function playGuessReveal(guess, { land, sound, nextLabel = "NEXT GUESS", outline
     steps.push(clue);
   }
   return playRevealCard({
-    card, steps, nextLabel, land, sound,
+    card, steps, nextLabel, land, sound, autoContinue,
     onTurn: step => { if (step.element === temperature) card.style.setProperty("--temp", guess.color); }
   });
 }
@@ -11069,7 +12717,7 @@ function playGuessReveal(guess, { land, sound, nextLabel = "NEXT GUESS", outline
 // Rank 'Em: a try as a pack-style card, Mastermind style. The order you tried is shown,
 // then a counter ticks up to how many are in the right place (never which ones), and
 // finally any hint the try unlocked.
-function playRankReveal({ tryNumber, order, right, hint = null, land, sound, nextLabel = "NEXT TRY" }) {
+function playRankReveal({ tryNumber, order, right, hint = null, land, sound, nextLabel = "NEXT TRY", autoContinue = 0 }) {
   const card = document.createElement("div");
   card.style.setProperty("--temp", "var(--glass-line)");
   const head = Object.assign(document.createElement("div"), { className: "rank-reveal-head" });
@@ -11101,7 +12749,7 @@ function playRankReveal({ tryNumber, order, right, hint = null, land, sound, nex
     steps.push({ element: chip, status: "hint" });
   }
   return playRevealCard({
-    card, steps, nextLabel, land, sound,
+    card, steps, nextLabel, land, sound, autoContinue,
     onTurn: step => {
       if (step.value === undefined) return;
       number.textContent = String(step.value);
@@ -11195,7 +12843,94 @@ function renderGlobeMarkerTooltip(guess, index) {
   tooltip.append(heading, details);
 }
 
-function initializeMainMenu({ onDailyChallenge, onHome }) {
+// 16×16 pixel art for the PLAY tiles: a stopwatch with a lightning bolt, a cup of
+// coffee and a puzzle piece.
+const PLAY_ART = {
+  competitive: [
+    ".....KKKKKK.....",
+    ".....KCCCCK.....",
+    "......KKKK......",
+    "....KKKKKKKK..KK",
+    "...KWWWWWWWWKKCK",
+    "..KWWWWWWWYYWKK.",
+    ".KWWWWWWWYYWWWK.",
+    ".KWWWWWWYYWWWWK.",
+    ".KWWWWWYYYYYYWK.",
+    ".KWWWWWWWWYYWWK.",
+    ".KWWWWWWWYYWWWK.",
+    ".KWWWWWWYYWWWWK.",
+    "..KWWWWWYWWWWK..",
+    "...KWWWWWWWWK...",
+    "....KKKKKKKK....",
+    "................"
+  ],
+  casual: [
+    "................",
+    "....S..S..S.....",
+    "...S..S..S......",
+    "....S..S..S.....",
+    "...S..S..S......",
+    "................",
+    "..KKKKKKKKKK....",
+    "..KDDDDDDDDKKK..",
+    "..KGGGGGGGGKGGK.",
+    "..KGHGGGGGGK.GK.",
+    "..KGHGGGGGGKKGK.",
+    "..KGGGGGGGGGKK..",
+    "...KGGGGGGGK....",
+    "....KKKKKKK.....",
+    ".KKKKKKKKKKKKK..",
+    "................"
+  ],
+  puzzles: [
+    "................",
+    "......KKKK......",
+    ".....KLLPPK.....",
+    ".....KLPPPK.....",
+    ".KKKKKKPPKKKKK..",
+    ".KLLLPPPPPPPPK..",
+    ".KLPPPPPPPPPPKKK",
+    ".KLPPPPPPPPPPPPK",
+    ".KPPPPPPPPPPPPPK",
+    ".KPPPPPPPPPPPKKK",
+    ".KPPPPPPPPPPPK..",
+    ".KPPPPPPPPPPPK..",
+    ".KPPPPPPPPPPPK..",
+    ".KQQQQQQQQQQQK..",
+    ".KKKKKKKKKKKKK..",
+    "................"
+  ]
+};
+const PLAY_ART_COLORS = {
+  K: "#04121a", C: "#45e3ff", W: "#e9f6ff", Y: "#ffd45c",
+  S: "rgba(233, 238, 251, 0.55)", D: "#5a3b22", G: "#ffd45c", H: "#fff1c2",
+  P: "#c58cff", L: "#e6ccff", Q: "#8a5cc4"
+};
+
+function createPixelArt(rows, colors) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 16 16");
+  svg.setAttribute("shape-rendering", "crispEdges");
+  rows.forEach((row, y) => {
+    let x = 0;
+    while (x < row.length) {
+      const key = row[x];
+      let end = x;
+      while (end < row.length && row[end] === key) end += 1;
+      if (colors[key]) {
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        Object.entries({ x, y, width: end - x, height: 1, fill: colors[key] }).forEach(([name, value]) => rect.setAttribute(name, value));
+        svg.appendChild(rect);
+      }
+      x = end;
+    }
+  });
+  return svg;
+}
+
+// onPlay(mode) starts today's game in a mode; describeMode(mode) says how it stands
+// ("Played · 4,210", "Round 3 of 5", ...), shown under each game in PLAY.
+function initializeMainMenu({ onPlay, onHome, describeMode = () => "" }) {
   const menu = document.getElementById("mainMenu");
   const menuOptions = menu.querySelector(".menu-options");
   const menuButtons = [...menuOptions.querySelectorAll(".menu-option")];
@@ -11244,9 +12979,41 @@ function initializeMainMenu({ onDailyChallenge, onHome }) {
   updateMenuButtonActivity();
   menuOptions.classList.add("is-boot-complete");
 
+  document.querySelectorAll(".play-tile-art").forEach(slot => slot.appendChild(createPixelArt(PLAY_ART[slot.dataset.art], PLAY_ART_COLORS)));
+
+  // PLAY swaps the main options for the day's games; BACK (or Escape) swaps them back.
+  const mainOptions = document.querySelector(".menu-options:not(.menu-play-options)");
+  const playOptions = document.getElementById("menuPlayOptions");
+  const playButton = document.getElementById("menuPlayButton");
+  function showPlayOptions(open) {
+    mainOptions.classList.toggle("hidden", open);
+    playOptions.classList.toggle("hidden", !open);
+    playButton.setAttribute("aria-expanded", String(open));
+    if (open) {
+      document.getElementById("menuCompetitiveStatus").textContent = describeMode("competitive");
+      document.getElementById("menuCasualStatus").textContent = describeMode("casual");
+      document.getElementById("menuCompetitiveButton").focus();
+    } else {
+      playButton.focus();
+    }
+  }
+  playButton.addEventListener("click", () => {
+    sounds.playClick();
+    showPlayOptions(true);
+  });
+  document.getElementById("menuPlayBack").addEventListener("click", () => {
+    sounds.playClick();
+    showPlayOptions(false);
+  });
+  menu.addEventListener("keydown", event => {
+    if (event.key === "Escape" && !playOptions.classList.contains("hidden")) showPlayOptions(false);
+  });
+
   function showMenu() {
     gameView.classList.add("hidden");
     menu.classList.remove("hidden");
+    mainOptions.classList.remove("hidden");
+    playOptions.classList.add("hidden");
     howToModal.classList.add("hidden");
     document.getElementById("victoryModal").classList.add("hidden");
     document.getElementById("statsModal").classList.add("hidden");
@@ -11256,16 +13023,16 @@ function initializeMainMenu({ onDailyChallenge, onHome }) {
   }
 
   // The game hides the menu itself, so it can play the menu's exit animation.
-  function showGame() {
+  function showGame(mode) {
     howToModal.classList.add("hidden");
     gameView.classList.remove("hidden");
-    onDailyChallenge();
+    onPlay(mode);
   }
 
-  document.getElementById("menuDailyButton").addEventListener("click", () => {
+  document.querySelectorAll(".menu-mode[data-mode]").forEach(button => button.addEventListener("click", () => {
     sounds.playClick();
-    showGame();
-  });
+    showGame(button.dataset.mode);
+  }));
   document.querySelectorAll("#menuHowToButton, .how-to-open-button").forEach(button => {
     button.addEventListener("click", () => {
       sounds.playClick();
@@ -11642,7 +13409,7 @@ function initializeStatsModal(getStats) {
   });
 }
 
-return { showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, playGuessReveal, playRankReveal, getMysteryClue, renderProgressiveHints, renderGlobeMarkerTooltip, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight, initializeStatsModal };
+return { redactCountryName, showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, playGuessReveal, playRankReveal, getMysteryClue, renderProgressiveHints, renderGlobeMarkerTooltip, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight, initializeStatsModal };
 })();
 
 // ---- social.js
@@ -12102,14 +13869,17 @@ const { sounds } = __modules["audio.js"];
 const { createDistributionChart, initializeHistoryScreens } = __modules["screens.js"];
 const { RANK_TIERS, formatTopPercent, getDayStats, getTopPercent } = __modules["community.js"];
 const { initializeCommunity } = __modules["social.js"];
-const { createBadge, createMedal, getGroupMedal } = __modules["badges.js"];
+const { createBadge } = __modules["badges.js"];
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
-const { MAX_DAILY_SCORE, MAX_GUESSES, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
-const { createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, initializeStatsModal, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playRankReveal, getMysteryClue, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
+const { MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MODES, MODE_INFO, SPEED_WINDOW_MS, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
+const { createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, initializeStatsModal, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playRankReveal, getMysteryClue, redactCountryName, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
 
 // v3: Deep Cut and Paint the Map replaced Capital Call and Border Patrol (October 2026).
 const DAY_STORAGE_PREFIX = "daily-geography:day:v3:";
+// Casual days are kept apart from competitive ones.
+const CASUAL_STORAGE_PREFIX = "daily-geography:casual:v1:";
+const storagePrefix = mode => mode === "casual" ? CASUAL_STORAGE_PREFIX : DAY_STORAGE_PREFIX;
 const LEGACY_SESSION_PREFIX = "daily-geography:session:v1:";
 const LEGACY_SCORES_KEY = "daily-geography:scores:v1";
 const STATS_STORAGE_KEY = "daily-geography:stats:v1";
@@ -12125,19 +13895,26 @@ const LAUNCH_DATE = "2026-10-01";
 const PRELOADED_DAYS = 30;
 // One colour per Rank 'Em country, on the board and on the globe.
 const RANK_COLORS = ["#45e3ff", "#ffd45c", "#ff8a3d", "#c58cff", "#5cf28a"];
+// Competitive: how long a guess's card stays once it has turned over, before it goes on
+// by itself (casual waits for a click).
+const AUTO_CONTINUE_MS = 1300;
 
 const today = toUtcDateKey(new Date());
-// The day being played: today, or an unplayed past day opened from the archive.
+// The day being played: today, or an unplayed past day opened from the archive, in one
+// of the two modes (each day has a competitive and a casual puzzle).
 let activeDate = today;
-let day = loadDay(activeDate);
+let activeMode = "competitive";
+let day = loadDay(activeDate, activeMode);
 // The day's rounds as played (with a re-rolled Rank 'Em topic, if any).
-let plan = resolvePlan(getDailyPlan(activeDate), day.rounds);
+let plan = resolvePlan(getDailyPlan(activeDate, activeMode), day.rounds);
 let viewIndex = getActiveRoundIndex();
 let isGameViewVisible = false;
 let isAnimating = false;
 let markerGuesses = [];
 // Country clicked in Pinpoint but not yet confirmed as a guess.
 let pinpointSelection = null;
+// Casual Mystery Country: the country clicked on the globe, put in the answer box.
+let mysterySelection = null;
 // The country clicked in Paint the Map, waiting to be painted.
 let paintSelection = null;
 // Deep Cut's near miss: the wrong try it belongs to and the answer it was probably meant to be.
@@ -12212,9 +13989,12 @@ function readJson(key) {
   }
 }
 
+// A key for the day on screen, its mode and date (for things shown once per round).
+const dayRef = () => `${activeMode}:${activeDate}`;
+
 // Saved day state, merged over fresh defaults so older or partial saves still load.
-function readDayState(dateKey) {
-  const saved = readJson(`${DAY_STORAGE_PREFIX}${dateKey}`);
+function readDayState(dateKey, mode = "competitive") {
+  const saved = readJson(`${storagePrefix(mode)}${dateKey}`);
   if (!saved || !Array.isArray(saved.rounds)) return null;
   return {
     version: 2,
@@ -12229,18 +14009,26 @@ function readDayState(dateKey) {
   };
 }
 
-function loadDay(dateKey) {
-  return readDayState(dateKey) || { version: 2, rounds: ROUND_TYPES.map(createRoundState) };
+function loadDay(dateKey, mode = "competitive") {
+  return readDayState(dateKey, mode) || { version: 2, rounds: ROUND_TYPES.map(createRoundState) };
 }
 
 function saveDay() {
   try {
-    localStorage.setItem(`${DAY_STORAGE_PREFIX}${activeDate}`, JSON.stringify(day));
+    localStorage.setItem(`${storagePrefix(activeMode)}${activeDate}`, JSON.stringify(day));
     syncDayToAccount(activeDate);
   } catch (error) {
     console.error("Unable to save puzzle progress.", error);
     showToastNotice("Progress could not be saved in this browser.");
   }
+}
+
+// The round clock saves every second, in this browser only; the account gets it with the
+// next answer.
+function saveDayLocally() {
+  try {
+    localStorage.setItem(`${storagePrefix(activeMode)}${activeDate}`, JSON.stringify(day));
+  } catch { /* saved with the next answer instead */ }
 }
 
 // ---------------------------------------------------------------------------
@@ -12269,7 +14057,7 @@ function goToRound(index) {
   };
   // A round starting for the first time gets the title: the cards slide out with the
   // old round, swap while they're off screen, and slide back in once the title goes.
-  if (progressOf(index).done || shownIntros.has(`${activeDate}:${index}`)) { show(); slideCardsIn(); return; }
+  if (progressOf(index).done || shownIntros.has(`${dayRef()}:${index}`)) { show(); slideCardsIn(); return; }
   isAnimating = true;
   slideCardsOut();
   setTimeout(() => {
@@ -12289,7 +14077,7 @@ function slideCardsIn() { document.getElementById("gameView").classList.remove("
 // cards slid out of the way. It waits for a click or Enter, so there's time to read it.
 const shownIntros = new Set();
 function showRoundIntro(index) {
-  const key = `${activeDate}:${index}`;
+  const key = `${dayRef()}:${index}`;
   if (shownIntros.has(key)) { slideCardsIn(); return; }
   shownIntros.add(key);
   slideCardsOut();
@@ -12297,7 +14085,7 @@ function showRoundIntro(index) {
   const overlay = document.getElementById("roundIntro");
   setText("roundIntroCount", `ROUND ${index + 1} / ${plan.length}`);
   setText("roundIntroName", ROUND_INFO[round.type].name.toUpperCase());
-  setText("roundIntroTask", ROUND_INFO[round.type].task);
+  setText("roundIntroTask", `${ROUND_INFO[round.type].task}${activeMode === "competitive" ? " Answer within 30 seconds for up to ×1.5." : ""}`);
   overlay.classList.remove("hidden", "is-leaving");
   void overlay.offsetWidth;
   overlay.classList.add("is-showing");
@@ -12320,6 +14108,11 @@ function hideRoundIntro() {
 // Called after every change to a round's state.
 function commit({ animateGlobe = true } = {}) {
   const progress = progressOf(viewIndex);
+  // A competitive round's speed is locked in the moment it ends (no bonus unless solved).
+  const state = day.rounds[viewIndex];
+  if (activeMode === "competitive" && progress.done && state.speed === null) {
+    state.speed = progress.solved ? getSpeedMultiplier(state.elapsed) : 1;
+  }
   saveDay();
   render({ animateGlobe });
   if (progress.done && progress.solved) sounds.playVictory();
@@ -12355,13 +14148,16 @@ let climb = null;
 // Counts score cards, so a late replay never starts on a newer card.
 let burstRun = 0;
 // The day's journey, drawn into a container; kept while the day's journey stays the same.
+// Its goal is the mode's highest score: 9,000 in competitive, 6,000 in casual.
 function journeyIn(current, containerId) {
-  const type = getJourney(activeDate);
-  return current?.type === type ? current : createJourney(type, document.getElementById(containerId), { summit: MAX_DAILY_SCORE });
+  const type = getJourney(activeDate, activeMode);
+  const summit = getMaxScore(activeMode);
+  if (current?.type === type && current.summit === summit) return current;
+  return Object.assign(createJourney(type, document.getElementById(containerId), { summit }), { summit });
 }
 // The words for the day's journey ("m", "Depth", "seabed"), wherever the score is shown.
 function applyJourneyWords() {
-  const words = JOURNEYS[getJourney(activeDate)];
+  const words = JOURNEYS[getJourney(activeDate, activeMode)];
   document.querySelectorAll("[data-journey='unit']").forEach(node => { node.textContent = words.unit; });
   document.querySelectorAll("[data-journey='measure']").forEach(node => { node.textContent = words.measure; });
   document.querySelectorAll("[data-journey='goal']").forEach(node => { node.textContent = words.goal; });
@@ -12375,8 +14171,8 @@ function applyJourneyWords() {
 // real values as bars for Rank 'Em.
 function getRoundInfo(round) {
   // Each round's photo on the hand-made days (see tools/fetch-pictures.mjs).
-  // A re-rolled Rank 'Em topic has no photo of its own.
-  const photo = round.rerolled ? null : ROUND_PICTURES[activeDate]?.[round.type];
+  // A re-rolled Rank 'Em topic has no photo of its own, and casual days have none yet.
+  const photo = round.rerolled || activeMode !== "competitive" ? null : ROUND_PICTURES[activeDate]?.[round.type];
   switch (round.type) {
     case "deepcut":
       return round.info ? { ...round.info, picture: photo } : null;
@@ -12567,7 +14363,7 @@ function renderBurstAnswer(round, result) {
 }
 
 function showScoreBurst(index, { keepCardsOut = false } = {}) {
-  const key = `${activeDate}:${index}`;
+  const key = `${dayRef()}:${index}`;
   if (celebratedRounds.has(key) || !isGameViewVisible) return Promise.resolve(false);
   celebratedRounds.add(key);
   const dayScore = getDayScore(plan, day.rounds);
@@ -12576,9 +14372,10 @@ function showScoreBurst(index, { keepCardsOut = false } = {}) {
 
   setText("scoreBurstLabel", result.isPerfect ? "PERFECT ROUND" : result.points ? "ROUND COMPLETE" : "NO POINTS THIS TIME");
   const streak = document.getElementById("scoreBurstStreak");
-  streak.classList.toggle("hidden", !(result.multiplier > 1));
-  streak.textContent = `${result.score.toLocaleString()} × ${result.multiplier.toFixed(1)} streak`;
-  setText("scoreBurstMax", MAX_DAILY_SCORE.toLocaleString());
+  const boosts = describeBoosts(result);
+  streak.classList.toggle("hidden", !boosts);
+  streak.textContent = `${result.score.toLocaleString()} ${boosts}`;
+  setText("scoreBurstMax", getMaxScore(activeMode).toLocaleString());
   renderBurstAnswer(plan[index], result);
   const info = getRoundInfo(plan[index]);
   const infoCard = document.getElementById("scoreBurstInfo");
@@ -12645,6 +14442,76 @@ function showScoreBurst(index, { keepCardsOut = false } = {}) {
   });
 }
 
+// A round's multipliers in words, "× 1.1 streak × 1.38 speed" (empty without any).
+function describeBoosts(result) {
+  return [
+    result.multiplier > 1 ? `× ${result.multiplier.toFixed(1)} streak` : "",
+    result.speed > 1 ? `× ${result.speed.toFixed(2)} speed` : ""
+  ].filter(Boolean).join(" ");
+}
+
+// ---------------------------------------------------------------------------
+// Competitive clock
+// ---------------------------------------------------------------------------
+
+// A competitive round's clock runs only while you can play it: not during its title, a
+// guess being revealed, the score card or anything open on top, and not while the tab is
+// hidden (no frames then). Its time (state.elapsed) sets the speed multiplier.
+let clockLast = performance.now();
+let clockSavedAt = 0;
+function isClockRunning() {
+  return activeMode === "competitive" && isPlaying(plan[viewIndex].type)
+    && document.getElementById("roundIntro").classList.contains("hidden")
+    && !endScoreBurst
+    && !document.querySelector(".modal-overlay:not(.hidden)")
+    && !document.getElementById("gameView").classList.contains("is-switching");
+}
+
+function tickClock(now) {
+  requestAnimationFrame(tickClock);
+  const step = Math.min(250, now - clockLast);
+  clockLast = now;
+  if (!isGameViewVisible) return;
+  if (isClockRunning()) {
+    const state = day.rounds[viewIndex];
+    state.elapsed = (state.elapsed || 0) + step;
+    if (now - clockSavedAt > 1000) {
+      clockSavedAt = now;
+      saveDayLocally();
+    }
+  }
+  renderSpeedBar();
+}
+requestAnimationFrame(tickClock);
+
+// The 30-second bar on the round card: it drains while the clock runs, next to the
+// multiplier a right answer would get now. Once the round is over, the speed it scored.
+let shownSpeedBar = "";
+function renderSpeedBar() {
+  const bar = document.getElementById("speedBar");
+  const competitive = activeMode === "competitive";
+  bar.classList.toggle("hidden", !competitive);
+  if (!competitive) return;
+  const state = day.rounds[viewIndex];
+  const progress = progressOf(viewIndex);
+  const left = Math.max(0, 1 - (state.elapsed || 0) / SPEED_WINDOW_MS);
+  const speed = progress.done ? (progress.solved && state.speed > 1 ? state.speed : 1) : getSpeedMultiplier(state.elapsed);
+  const running = isClockRunning();
+  const label = speed > 1 ? `⚡ ×${speed.toFixed(2)}` : "NO BONUS";
+  const time = progress.done ? (speed > 1 ? "SPEED" : "") : left > 0 ? `${Math.ceil(left * SPEED_WINDOW_MS / 1000)}s` : "0s";
+  const fill = progress.done ? (speed - 1) / MAX_SPEED_BONUS : left;
+  const key = [fill.toFixed(3), label, time, running, progress.done].join("|");
+  if (key === shownSpeedBar) return;
+  shownSpeedBar = key;
+  document.getElementById("speedBarFill").style.transform = `scaleX(${fill})`;
+  setText("speedBarLabel", label);
+  setText("speedBarTime", time);
+  bar.classList.toggle("is-paused", !running && !progress.done);
+  bar.classList.toggle("is-done", progress.done);
+  bar.classList.toggle("is-low", fill < 0.34);
+  bar.classList.toggle("is-mid", fill >= 0.34 && fill < 0.67);
+}
+
 // ---------------------------------------------------------------------------
 // Rendering
 // ---------------------------------------------------------------------------
@@ -12665,9 +14532,11 @@ function render({ animateGlobe = true } = {}) {
   const activeIndex = getActiveRoundIndex();
 
   setText("dailyBadge", `DAY ${getPuzzleNumber(activeDate)}`);
+  setText("modeChip", MODE_INFO[activeMode].short);
+  document.getElementById("gameView").dataset.mode = activeMode;
   setText("puzzleDate", activeDate === today ? "Today" : activeDate < today ? "Archive" : "Upcoming");
   setText("roundCount", `${viewIndex + 1} / ${plan.length}`);
-  const dayInfo = getDayInfo(activeDate);
+  const dayInfo = getDayInfo(activeDate, activeMode);
   document.getElementById("dayName").classList.toggle("hidden", !dayInfo);
   setText("dayName", dayInfo?.name || "");
   renderScoreTile(dayScore);
@@ -12716,16 +14585,21 @@ function render({ animateGlobe = true } = {}) {
   // The hot-to-cold colours only mean something in Mystery Country.
   document.getElementById("stageHint").classList.toggle("hidden", isRank);
   document.querySelector(".stage-current").classList.toggle("hidden", isRank);
-  // Pinpoint and Paint the Map are played by clicking countries on the globe.
-  const clicking = ["pinpoint", "paint"].includes(round.type) && !progress.done;
+  // Pinpoint and Paint the Map are played by clicking countries on the globe, and so can
+  // casual Mystery Country be.
+  const casualPick = activeMode === "casual" && round.type === "mystery";
+  const clicking = (["pinpoint", "paint"].includes(round.type) || casualPick) && !progress.done;
   globe.setClickable(clicking);
-  if (clicking) {
+  if (clicking && casualPick) {
+    setText("stageHint", "Click a country to pick it, or type its name · drag to rotate");
+  } else if (clicking) {
     setText("stageHint", "Click a country to select it · drag to rotate");
   } else {
     setText("stageHint", "Drag to rotate · hover a marker for details");
   }
 
   ROUND_RENDERERS[round.type](round, state, progress, { animateGlobe });
+  renderSpeedBar();
 }
 
 // Once a round is over, the result card takes the answer box's place: the points
@@ -12737,7 +14611,7 @@ let shownResultKey = null;
 let tileClimb = null;
 function renderScoreTile(dayScore) {
   updateDailyScoreUI(dayScore.total);
-  setText("dailyMaxScore", `/ ${MAX_DAILY_SCORE.toLocaleString()} ${applyJourneyWords().unit}`);
+  setText("dailyMaxScore", `/ ${getMaxScore(activeMode).toLocaleString()} ${applyJourneyWords().unit}`);
   const stops = [];
   dayScore.rounds.reduce((altitude, round) => {
     if (round.done) stops.push(altitude + round.points);
@@ -12766,7 +14640,7 @@ function renderScoreTile(dayScore) {
   setText("scoreTileRoundLabel", `Round ${viewIndex + 1} is worth up to`);
   setText("scoreTileWorth", shownWorth.toLocaleString());
   // When the round's worth drops (a wrong guess, a re-roll), make the loss visible.
-  const worthKey = `${activeDate}:${viewIndex}`;
+  const worthKey = `${dayRef()}:${viewIndex}`;
   if (lastWorth.key === worthKey && shownWorth < lastWorth.value) showWorthDrop(lastWorth.value - shownWorth);
   lastWorth = { key: worthKey, value: shownWorth };
 }
@@ -12800,12 +14674,11 @@ function renderRoundResult(round, result, progress) {
 
   setText("roundResultLabel", result.isPerfect ? "PERFECT ROUND" : result.points ? "ROUND COMPLETE" : "NO POINTS THIS TIME");
   const streak = document.getElementById("roundResultStreak");
-  streak.classList.toggle("hidden", !(result.multiplier > 1));
-  streak.textContent = `×${result.multiplier.toFixed(1)} STREAK`;
-  setText("roundResultDetail", result.multiplier > 1
-    ? `${result.score.toLocaleString()} × ${result.multiplier.toFixed(1)}`
-    : `of ${MAX_ROUND_SCORE.toLocaleString()}`);
-  const key = `${activeDate}:${viewIndex}:${result.points}`;
+  const boosts = describeBoosts(result);
+  streak.classList.toggle("hidden", !boosts);
+  streak.textContent = boosts.replace(/× /g, "×").toUpperCase();
+  setText("roundResultDetail", boosts ? `${result.score.toLocaleString()} ${boosts}` : `of ${MAX_ROUND_SCORE.toLocaleString()}`);
+  const key = `${dayRef()}:${viewIndex}:${result.points}`;
   if (key !== shownResultKey) {
     shownResultKey = key;
     countUp(document.getElementById("roundResultPoints"), result.points);
@@ -12897,7 +14770,7 @@ const ROUND_RENDERERS = {
   mystery(round, state, progress, options) {
     const answer = { ...getCountry(round.answer), ...round.clues };
     const guesses = state.guesses.map(iso => evaluateGuess(getCountry(iso), answer));
-    renderProgressiveHints(answer, progress.wrong);
+    renderProgressiveHints(answer, progress.wrong + clueHeadStart(round));
     renderGuessHistory(guesses, (index, active) => globe.setMarkerHighlight(index, active), MAX_GUESSES);
     renderKnownStrip(progress.done ? [] : getGuessSummary(guesses));
     mysteryInput.setDisabled(progress.done || isAnimating);
@@ -12909,10 +14782,12 @@ const ROUND_RENDERERS = {
       .filter(guess => !guess.isCorrect)
       .map((guess, index, wrong) => ({ country: guess.country, color: guess.color, pulse: !progress.done && index === wrong.length - 1 }));
     if (progress.done) {
+      mysterySelection = null;
       globe.setHighlights([...outlines, { country: answer, color: 0x5cf28a, pulse: true }]);
       if (options.animateGlobe) globe.rotateTo(answer.lat, answer.lon, 900);
     } else {
-      globe.setHighlights(outlines);
+      const picked = mysterySelection && getCountry(mysterySelection);
+      globe.setHighlights([...outlines, ...(picked ? [{ country: picked, color: 0xffd45c, pulse: true, focus: true }] : [])]);
     }
   },
 
@@ -13020,6 +14895,14 @@ const ROUND_RENDERERS = {
   paint(round, state, progress) {
     const total = round.answers.length;
     setText("paintQuestion", round.question);
+    // Casual: every wrong click gives a clue about a country still to find.
+    const clues = round.mode === "casual" ? getPaintClues(round, state) : [];
+    const clueList = document.getElementById("paintClues");
+    clueList.classList.toggle("hidden", !clues.length || progress.done);
+    clueList.replaceChildren(...clues.map((text, index) => Object.assign(document.createElement("li"), {
+      className: index === clues.length - 1 ? "is-open is-latest" : "is-open",
+      textContent: text
+    })));
     setText("paintCount", `${state.found.length} / ${total}`);
     document.getElementById("paintDone").disabled = progress.done;
 
@@ -13152,6 +15035,18 @@ const ROUND_RENDERERS = {
   }
 };
 
+// Casual Mystery Country opens with two clues instead of one.
+const clueHeadStart = round => round.mode === "casual" ? 1 : 0;
+
+// Casual Paint the Map: one clue per wrong click, each about a country not found yet (its
+// hand-written location clue, with its name taken out).
+function getPaintClues(round, state) {
+  return round.answers
+    .filter(iso => !state.found.includes(iso))
+    .slice(0, state.wrong.length)
+    .map(iso => redactCountryName(CLUES[iso]?.[3] || getCountry(iso).trivia, getCountry(iso)));
+}
+
 // Average position of some countries on the sphere, so the globe can face all of them.
 function getCentroid(countries) {
   const sum = countries.reduce((total, country) => {
@@ -13221,6 +15116,7 @@ function revealGuess(guess, target, rowSelector, { commitOptions = {}, newClue =
   return playGuessReveal(guess, {
     sound: (status, streak) => sounds.playReveal(status, streak),
     nextLabel: guess.isCorrect ? "CONTINUE" : "NEXT GUESS",
+    autoContinue: activeMode === "competitive" ? AUTO_CONTINUE_MS : 0,
     outline: globe.outlineOf(guess.country),
     newClue,
     land: () => {
@@ -13259,25 +15155,38 @@ function submitMysteryGuess(value, selectedCountry) {
   if (state.guesses.includes(country.iso)) { showProblem("You already guessed that one.", answerBox("countryInput")); return { status: "duplicate" }; }
 
   state.guesses.push(country.iso);
+  mysterySelection = null;
   saveDay();
   const round = plan[viewIndex];
   const answer = { ...getCountry(round.answer), ...round.clues };
   // A wrong guess unlocks the next clue, shown last on the guess card.
   const progress = progressOf(viewIndex);
-  const newClue = progress.done ? null : getMysteryClue(answer, progress.wrong);
+  const newClue = progress.done ? null : getMysteryClue(answer, progress.wrong + clueHeadStart(round));
   revealGuess(evaluateGuess(country, answer), answerBox("countryInput"), "#history .guess-row", { newClue });
   return { status: "submitted" };
 }
 
 function handleGlobeClick({ ccn3 }) {
   const painting = isPlaying("paint");
-  if (!isPlaying("pinpoint") && !painting) return;
+  const picking = activeMode === "casual" && isPlaying("mystery");
+  if (!isPlaying("pinpoint") && !painting && !picking) return;
   const state = day.rounds[viewIndex];
   // Territories drawn as their own shape (Greenland, Puerto Rico…) count as their country.
   const iso = TERRITORIES.find(territory => territory.ccn3 && territory.ccn3 === ccn3)?.iso;
   const country = ccn3 && COUNTRIES.find(candidate => candidate.ccn3 === ccn3 || candidate.iso === iso);
   if (!country) {
-    showProblem(ccn3 ? "That place isn't one of the game's 195 countries." : "That's open sea. Click on a country.", pickCard(painting ? "paint" : "pinpoint"));
+    showProblem(ccn3 ? "That place isn't one of the game's 195 countries." : "That's open sea. Click on a country.", picking ? answerBox("countryInput") : pickCard(painting ? "paint" : "pinpoint"));
+    return;
+  }
+  // Casual Mystery Country: the clicked country goes into the answer box, to guess it.
+  if (picking) {
+    if (state.guesses.includes(country.iso)) { showProblem(`You already guessed ${country.name}.`, answerBox("countryInput")); return; }
+    mysterySelection = country.iso;
+    const field = document.getElementById("countryInput");
+    field.value = country.name;
+    field.focus();
+    sounds.playClick();
+    render({ animateGlobe: false });
     return;
   }
   if (painting) {
@@ -13456,6 +15365,7 @@ function submitRankOrder() {
     right,
     hint: hint ? `${getCountry(hint.iso).name}, ${metric.format(metric.value(getCountry(hint.iso)))}` : null,
     nextLabel: isRight ? "CONTINUE" : "NEXT TRY",
+    autoContinue: activeMode === "competitive" ? AUTO_CONTINUE_MS : 0,
     sound: (status, streak) => sounds.playReveal(status, streak),
     land: () => {
       isAnimating = false;
@@ -13476,7 +15386,7 @@ function rerollRank() {
   if (state.submissions.length || state.rerolled || !plan[viewIndex].reroll) return;
   state.rerolled = true;
   state.order = null;
-  plan[viewIndex] = resolveRound(getDailyPlan(activeDate)[viewIndex], state);
+  plan[viewIndex] = resolveRound(getDailyPlan(activeDate, activeMode)[viewIndex], state);
   sounds.playFlyTo();
   saveDay();
   render();
@@ -13515,11 +15425,11 @@ let endClimb = null;
 function showFinalModal() {
   const dayScore = getDayScore(plan, day.rounds);
   const perfect = dayScore.rounds.filter(round => round.isPerfect).length;
-  const dayInfo = getDayInfo(activeDate);
-  setText("perfectBadge", perfect === plan.length ? "FLAWLESS DAY" : "DAY COMPLETE");
+  const dayInfo = getDayInfo(activeDate, activeMode);
+  setText("perfectBadge", `${MODE_INFO[activeMode].short} · ${perfect === plan.length ? "FLAWLESS DAY" : "DAY COMPLETE"}`);
   setText("modalTitle", `Day ${getPuzzleNumber(activeDate)}${dayInfo ? `: ${dayInfo.name}` : ""}`);
   const words = applyJourneyWords();
-  setText("modalSubtext", `${words.unit} of ${MAX_DAILY_SCORE.toLocaleString()} · ${perfect} of ${plan.length} perfect rounds`);
+  setText("modalSubtext", `${words.unit} of ${getMaxScore(activeMode).toLocaleString()} · ${perfect} of ${plan.length} perfect rounds`);
 
   // The day's journey, round by round in each round's colour.
   endClimb = journeyIn(endClimb, "endClimb");
@@ -13530,14 +15440,14 @@ function showFinalModal() {
   countUp(document.getElementById("modalScore"), dayScore.total, { duration: 1800 });
 
   // You against everyone who played today (sample numbers for now).
-  const stats = getDayStats(activeDate);
+  const stats = getDayStats(activeDate, activeMode);
   const topPercent = getTopPercent(stats, dayScore.total);
   setText("endPercent", formatTopPercent(topPercent));
   setText("endWorldText", `Better than ${Math.max(0, Math.round(100 - topPercent))}% of ${stats.players.toLocaleString()} players today. The average was ${stats.averageScore.toLocaleString()} ${words.unit}.`);
   document.getElementById("endDistribution").replaceChildren(createDistributionChart({ stats, completed: true, score: dayScore.total }));
 
   // More to play: the earlier days not finished yet.
-  const unplayed = getAllPuzzleDays().filter(date => date <= today && date !== activeDate && !getDayRecord(date).completed).length;
+  const unplayed = getAllPuzzleDays().filter(date => date <= today && date !== activeDate && !getDayRecord(date, activeMode).completed).length;
   setText("endArchiveTitle", unplayed ? `${unplayed} more ${unplayed === 1 ? "day" : "days"} to play in the archive` : "You've played every day so far");
   document.getElementById("endArchiveButton").classList.toggle("hidden", !unplayed);
 
@@ -13552,7 +15462,7 @@ function showFinalModal() {
     row.title = `Review round ${index + 1}`;
     row.append(
       Object.assign(document.createElement("span"), { className: "breakdown-name", textContent: `${index + 1}. ${ROUND_INFO[round.type].name}` }),
-      Object.assign(document.createElement("span"), { className: "breakdown-mult", textContent: result.multiplier > 1 ? `×${result.multiplier.toFixed(1)}` : "" }),
+      Object.assign(document.createElement("span"), { className: "breakdown-mult", textContent: describeBoosts(result).replace(/ streak| speed/g, "").replace(/× /g, "×") }),
       Object.assign(document.createElement("strong"), { textContent: result.points.toLocaleString() }),
       Object.assign(document.createElement("span"), { className: "breakdown-open", textContent: "VIEW ›" })
     );
@@ -13571,9 +15481,11 @@ function showFinalModal() {
 function getResultText() {
   const dayScore = getDayScore(plan, day.rounds);
   const squares = dayScore.rounds.map(round => round.isPerfect ? "🟩" : round.score > 0 ? "🟨" : "🟥").join("");
+  const dayInfo = getDayInfo(activeDate, activeMode);
+  const journey = JOURNEYS[getJourney(activeDate, activeMode)];
   return [
-    `Expedition #${getPuzzleNumber(activeDate)}${getDayInfo(activeDate) ? `: ${getDayInfo(activeDate).name}` : ""}`,
-    `${JOURNEYS[getJourney(activeDate)].emoji} ${dayScore.total.toLocaleString("en-US")} / ${MAX_DAILY_SCORE.toLocaleString("en-US")} ${JOURNEYS[getJourney(activeDate)].unit}`,
+    `Expedition #${getPuzzleNumber(activeDate)} · ${MODE_INFO[activeMode].name}${dayInfo ? `: ${dayInfo.name}` : ""}`,
+    `${journey.emoji} ${dayScore.total.toLocaleString("en-US")} / ${getMaxScore(activeMode).toLocaleString("en-US")} ${journey.unit}`,
     squares
   ].join("\n");
 }
@@ -13609,9 +15521,10 @@ function getStats() {
   return valid ? { ...getDefaultStats(), ...stats } : getDefaultStats();
 }
 
-// Only today's puzzle counts towards games played and the streak; archive days don't.
+// Only today's competitive puzzle counts towards games played and the streak; archive
+// and casual days don't.
 function saveStats() {
-  if (activeDate !== today) return;
+  if (activeDate !== today || activeMode !== "competitive") return;
   const stats = getStats();
   if (stats.completedDates.includes(today)) return;
   const dayScore = getDayScore(plan, day.rounds);
@@ -13666,17 +15579,17 @@ function getLegacyRecord(dateKey) {
   };
 }
 
-// Read-only snapshot of one day for the archive and leaderboard screens.
-function getDayRecord(dateKey) {
-  const base = { dateKey, puzzleNumber: getPuzzleNumber(dateKey), isToday: dateKey === today, dayName: getDayInfo(dateKey)?.name || "" };
+// Read-only snapshot of one day in one mode, for the archive and leaderboard screens.
+function getDayRecord(dateKey, mode = "competitive") {
+  const base = { dateKey, mode, puzzleNumber: getPuzzleNumber(dateKey), isToday: dateKey === today, dayName: getDayInfo(dateKey, mode)?.name || "" };
   // Every change is saved straight away, so storage is always current.
-  const saved = readDayState(dateKey);
-  if (!saved) {
+  const saved = readDayState(dateKey, mode);
+  if (!saved && mode === "competitive") {
     const legacy = getLegacyRecord(dateKey);
     if (legacy) return { ...base, ...legacy };
   }
   const states = saved?.rounds || ROUND_TYPES.map(createRoundState);
-  const dayPlan = dateKey === activeDate ? plan : resolvePlan(getDailyPlan(dateKey), states);
+  const dayPlan = dateKey === activeDate && mode === activeMode ? plan : resolvePlan(getDailyPlan(dateKey, mode), states);
   const dayScore = getDayScore(dayPlan, states);
   const mystery = dayPlan[0];
   const answer = getCountry(mystery.answer);
@@ -13714,6 +15627,7 @@ function showMenuGlobe() {
   // A how-to message left open by a game belongs to that game.
   document.getElementById("howToDontShow").classList.add("hidden");
   afterGameIntro = null;
+  globe.setLabels(null);
   globe.mountTo("menuGlobe");
   globe.setMode("menu");
 }
@@ -13752,14 +15666,14 @@ function flyFromMenu() {
   });
 }
 
-// How to play shows each round in its own colour, the six badges and the three medals.
-document.querySelectorAll(".how-to-rounds li").forEach((item, index) => item.style.setProperty("--round-color", ROUND_COLORS[index]));
-document.getElementById("howToBadges").replaceChildren(...[...RANK_TIERS].reverse().map(tier => {
-  const badge = createBadge(tier, 30);
-  badge.setAttribute("aria-label", tier.name);
-  return badge;
+// How to play shows the six badges as a stack, from Tourist at the back to Mr. Worldwide
+// in front, each with the top % it asks for.
+document.getElementById("howToBadges").replaceChildren(...[...RANK_TIERS].reverse().map((tier, index) => {
+  const item = Object.assign(document.createElement("span"), { className: "how-to-badge", title: `${tier.name}: ${tier.range}` });
+  item.style.setProperty("--stack", index);
+  item.append(createBadge(tier, 46), Object.assign(document.createElement("small"), { textContent: tier.maxPercent >= 100 ? "ALL" : `<${tier.maxPercent}%` }));
+  return item;
 }));
-document.getElementById("howToMedals").replaceChildren(...[1, 2, 3].map(place => createMedal(getGroupMedal(place), 30)));
 
 // The how-to-play message, shown when a game starts until the player ticks
 // "Don't show this again". Calls `then` once it is closed (or straight away).
@@ -13787,21 +15701,25 @@ function closeGameIntro() {
   then?.();
 }
 
-// Opens the game on a day: today by default, or a past day from the archive.
-function enterGameView(dateKey = today) {
-  if (dateKey !== activeDate) {
+// Opens the game on a day and mode: today by default, or a past day from the archive.
+function enterGameView(dateKey = today, mode = "competitive") {
+  if (dateKey !== activeDate || mode !== activeMode) {
     activeDate = dateKey;
-    day = loadDay(activeDate);
-    plan = resolvePlan(getDailyPlan(activeDate), day.rounds);
+    activeMode = mode;
+    day = loadDay(activeDate, activeMode);
+    plan = resolvePlan(getDailyPlan(activeDate, activeMode), day.rounds);
     hasFinishedDay = getDayScore(plan, day.rounds).completed;
     pinpointSelection = null;
     paintSelection = null;
+    mysterySelection = null;
     resetCountryInput({ focus: false });
     document.getElementById("deepcutInput").value = "";
     deepcutSuggestion = null;
   }
   document.getElementById("victoryModal").classList.add("hidden");
   isGameViewVisible = true;
+  // Casual writes every country's name on the globe.
+  globe.setLabels(activeMode === "casual" ? COUNTRIES : null);
   // Started before render(), so the flight turns the globe to where the round wants it.
   const flight = globe.mode === "menu" ? flyFromMenu() : null;
   if (!flight) {
@@ -13888,12 +15806,21 @@ document.getElementById("soundToggle").addEventListener("click", () => {
   document.getElementById("soundToggle").setAttribute("aria-label", sounds.enabled ? "Mute sound" : "Enable sound");
 });
 
+// Under each game in PLAY: how today's game stands.
+function describeMode(mode) {
+  const record = getDayRecord(today, mode);
+  if (record.completed) return `Played · ${record.score.toLocaleString()} · ${formatTopPercent(getTopPercent(getDayStats(today, mode), record.score))}`;
+  if (record.started) return `Round ${record.rounds.filter(round => round.done).length + 1} of 5 · continue`;
+  return `Day ${getPuzzleNumber(today)} · ready to play`;
+}
+
 initializeMainMenu({
-  onDailyChallenge: () => enterGameView(today),
+  onPlay: mode => enterGameView(today, mode),
   onHome: () => {
     isGameViewVisible = false;
     showMenuGlobe();
-  }
+  },
+  describeMode
 });
 initializeStatsModal(() => {
   const stats = getStats();
@@ -13917,35 +15844,54 @@ function getSaveProgress(state) {
     + (round?.gaveUp ? 1 : 0) + (round?.finished ? 1 : 0) + (round?.answer ? 1 : 0), 0);
 }
 
-// Sends a day's progress to the account, if someone is signed in.
+// Sends a day's progress to the account, if someone is signed in. The account keeps one
+// row per day: the competitive day, with the casual day inside it (`casual`). The row's
+// score is the competitive one, the only one that counts for groups.
 function syncDayToAccount(dateKey) {
   if (!getUser()) return Promise.resolve(false);
-  const state = readDayState(dateKey);
-  if (!state) return Promise.resolve(true);
-  const dayScore = getDayScore(resolvePlan(getDailyPlan(dateKey), state.rounds), state.rounds);
+  const competitive = readDayState(dateKey, "competitive");
+  const casual = readDayState(dateKey, "casual");
+  if (!competitive && !casual) return Promise.resolve(true);
+  const rounds = competitive?.rounds || ROUND_TYPES.map(createRoundState);
+  const dayScore = getDayScore(resolvePlan(getDailyPlan(dateKey), rounds), rounds);
+  const state = { ...(competitive || { version: 2, rounds }), ...(casual ? { casual } : {}) };
   return pushDay(dateKey, state, { score: dayScore.completed ? dayScore.total : null, completed: dayScore.completed });
 }
 
-const getLocalDayDates = () => Object.keys(localStorage)
-  .filter(key => key.startsWith(DAY_STORAGE_PREFIX))
-  .map(key => key.slice(DAY_STORAGE_PREFIX.length));
+// An account row's state as { competitive, casual }.
+function splitAccountDay(state) {
+  const { casual = null, ...competitive } = state || {};
+  return { competitive: state ? competitive : null, casual };
+}
+
+// Every date this browser has a day for, in either mode.
+const getLocalDayDates = () => [...new Set(Object.keys(localStorage).flatMap(key =>
+  [DAY_STORAGE_PREFIX, CASUAL_STORAGE_PREFIX].filter(prefix => key.startsWith(prefix)).map(prefix => key.slice(prefix.length))))];
+
+function clearLocalDays() {
+  getLocalDayDates().forEach(dateKey => MODES.forEach(mode => localStorage.removeItem(`${storagePrefix(mode)}${dateKey}`)));
+}
 
 function readDayOwner() {
   try { return localStorage.getItem(DAY_OWNER_KEY); } catch { return null; }
 }
 
-// Sends every day this browser has further than the account has it; true if all arrived.
+// Sends every day this browser has further than the account has it (in either mode);
+// true if all arrived.
 async function pushDaysAhead(remote) {
   const saved = await Promise.all(getLocalDayDates()
-    .filter(dateKey => getSaveProgress(readJson(`${DAY_STORAGE_PREFIX}${dateKey}`)) > getSaveProgress(remote.get(dateKey)))
+    .filter(dateKey => {
+      const account = splitAccountDay(remote.get(dateKey));
+      return MODES.some(mode => getSaveProgress(readJson(`${storagePrefix(mode)}${dateKey}`)) > getSaveProgress(account[mode]));
+    })
     .map(syncDayToAccount));
   return saved.every(Boolean);
 }
 
 // The day on screen may have changed underneath (merged in from the account, or cleared).
 function reloadActiveDay() {
-  day = loadDay(activeDate);
-  plan = resolvePlan(getDailyPlan(activeDate), day.rounds);
+  day = loadDay(activeDate, activeMode);
+  plan = resolvePlan(getDailyPlan(activeDate, activeMode), day.rounds);
   hasFinishedDay = getDayScore(plan, day.rounds).completed;
   if (isGameViewVisible) render({ animateGlobe: false });
 }
@@ -13957,13 +15903,15 @@ async function mergeAccountDays() {
   try {
     const me = getUser().id;
     const owner = readDayOwner();
-    if (owner && owner !== me) getLocalDayDates().forEach(dateKey => localStorage.removeItem(`${DAY_STORAGE_PREFIX}${dateKey}`));
+    if (owner && owner !== me) clearLocalDays();
     localStorage.setItem(DAY_OWNER_KEY, me);
     const remote = new Map((await pullDays()).map(row => [row.date, row.state]));
     remote.forEach((state, dateKey) => {
-      if (getSaveProgress(state) > getSaveProgress(readJson(`${DAY_STORAGE_PREFIX}${dateKey}`))) {
-        localStorage.setItem(`${DAY_STORAGE_PREFIX}${dateKey}`, JSON.stringify(state));
-      }
+      const account = splitAccountDay(state);
+      MODES.forEach(mode => {
+        const key = `${storagePrefix(mode)}${dateKey}`;
+        if (getSaveProgress(account[mode]) > getSaveProgress(readJson(key))) localStorage.setItem(key, JSON.stringify(account[mode]));
+      });
     });
     await pushDaysAhead(remote);
     reloadActiveDay();
@@ -13985,7 +15933,7 @@ async function signOutAndForgetDays() {
   }
   await signOut();
   if (!saved) return false;
-  getLocalDayDates().forEach(dateKey => localStorage.removeItem(`${DAY_STORAGE_PREFIX}${dateKey}`));
+  clearLocalDays();
   localStorage.removeItem(DAY_OWNER_KEY);
   reloadActiveDay();
   return true;
@@ -13997,7 +15945,7 @@ let community = null;
 function renderAccount(account) {
   const profile = account ? getProfile(account) : null;
   const avatar = profile?.avatar ? Object.assign(document.createElement("img"), { src: profile.avatar, alt: "", referrerPolicy: "no-referrer" }) : null;
-  setText("menuAccountLabel", profile ? profile.name.toUpperCase() : "SIGN IN");
+  setText("menuAccountLabel", profile ? profile.name.toUpperCase() : "MY ACCOUNT");
   if (avatar) document.getElementById("menuAccountAvatar").replaceChildren(avatar);
   document.getElementById("accountSignedOut").classList.toggle("hidden", Boolean(account));
   document.getElementById("accountSignedIn").classList.toggle("hidden", !account);
