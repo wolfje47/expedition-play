@@ -1319,9 +1319,6 @@ h1, h2, h3 { font-weight: normal; }
 @keyframes slot-turn { from { opacity: 0.4; transform: perspective(300px) rotateX(90deg) scale(0.9); } }
 @keyframes slot-glow { from { box-shadow: 0 0 0 2px var(--t-correct), 0 0 26px rgba(92, 242, 138, 0.7); transform: scale(1.12); } }
 
-.reveal-slot.is-turned.is-miss.rank-peg { animation: slot-turn 0.32s cubic-bezier(0.2, 0.9, 0.3, 1.3) both, peg-red 0.9s ease-out 0.1s; }
-@keyframes peg-red { from { box-shadow: 0 0 0 2px var(--danger), 0 0 22px rgba(255, 107, 125, 0.7); transform: scale(1.15); } }
-
 /* A newly unlocked clue: a wide tile that reads "NEW CLUE" until it turns over. */
 .reveal-clue { position: relative; display: grid; gap: 0.4rem; padding: 0.7rem 0.85rem; border-radius: 12px; background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
 .reveal-clue p { font-size: 15px; font-weight: 500; line-height: 1.4; }
@@ -1331,18 +1328,21 @@ h1, h2, h3 { font-weight: normal; }
 .reveal-clue.reveal-slot:not(.is-turned) > :not(.slot-cover) { visibility: hidden; }
 .reveal-slot.is-turned .slot-cover { display: none; }
 
-/* Rank 'Em's lights: green for each country in the right place, then red for the rest. */
-.rank-pegs { display: flex; gap: 5px; }
-.rank-peg { width: 11px; height: 11px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); }
-.rank-peg.is-match { background: var(--t-correct); box-shadow: 0 0 8px rgba(92, 242, 138, 0.6); }
-.rank-peg.is-miss { background: var(--danger); }
-.rank-pegs.is-big { justify-content: center; gap: 12px; padding: 0.4rem 0; }
-.rank-pegs.is-big .rank-peg { width: 30px; height: 30px; }
+/* Rank 'Em's counter: "0/5" ticks up for each country in the right place, then glows
+   green (all right) or red. */
+.rank-tick { display: none; }
+.rank-count { display: flex; align-items: baseline; justify-content: center; gap: 0.1em; padding: 0.3rem 0 0; color: var(--muted); font: 700 64px/1 var(--font-mono); }
+.rank-count span { font-size: 0.5em; opacity: 0.6; }
+.rank-count.is-counting strong { color: var(--text); }
+.rank-count.is-ticking strong { display: inline-block; animation: count-pop 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.4); }
+.rank-count.is-right { color: var(--t-correct); text-shadow: 0 0 24px rgba(92, 242, 138, 0.55); }
+.rank-count.is-wrong { color: var(--danger); text-shadow: 0 0 24px rgba(255, 107, 125, 0.45); }
+.rank-count-caption { color: var(--muted); font: 700 10px var(--font-mono); letter-spacing: 0.14em; text-align: center; }
+@keyframes count-pop { from { transform: scale(1.45); text-shadow: 0 0 26px rgba(92, 242, 138, 0.8); } }
 .rank-reveal-head { display: grid; gap: 0.6rem; }
 .rank-reveal-order { display: grid; gap: 4px; list-style: none; counter-reset: rank; }
 .rank-reveal-order li { display: flex; align-items: center; gap: 0.55rem; font-size: 14px; counter-increment: rank; }
 .rank-reveal-order li::before { width: 1.2rem; color: var(--faint); font: 700 12px var(--font-mono); content: counter(rank); }
-.rank-reveal-tally { text-align: center; font: 700 15px var(--font-mono); }
 .rank-reveal-hint { justify-self: center; font-size: 14px; }
 /* A Rank 'Em attempt is one slim row: its number and its lights. */
 :is(.game-view, .modal) .attempt.rank-attempt { gap: 0.7rem; padding: 0.4rem 0.8rem; }
@@ -5630,6 +5630,9 @@ const GLOBE_RADIUS = 105;
 // Overlays sit just above the sphere surface so they are never hidden inside it.
 const BORDER_RADIUS = GLOBE_RADIUS + 0.3;
 const OUTLINE_RADIUS = GLOBE_RADIUS + 0.6;
+// Filled countries lie just under their outlines.
+const FILL_RADIUS = GLOBE_RADIUS + 0.45;
+const FILL_TEXTURE_WIDTH = 4096;
 const PATH_RADIUS = GLOBE_RADIUS + 1.5;
 const MARKER_RADIUS = GLOBE_RADIUS + 2.5;
 // Camera distance from the globe's centre: default view, closest zoom, furthest zoom.
@@ -5949,8 +5952,9 @@ class PixelGlobe {
     return points;
   }
 
-  // Outlines countries on the globe: [{ country, color, pulse }]. Kept and re-applied
-  // once the country shapes have loaded.
+  // Outlines countries on the globe: [{ country, color, pulse, focus, fill }]; with fill,
+  // the country is also tinted in its colour. Kept and re-applied once the country
+  // shapes have loaded.
   setHighlights(highlights) {
     this.highlights = highlights;
     this.highlightZoom = this.getZoomFactor();
@@ -5992,6 +5996,68 @@ class PixelGlobe {
       this.highlightGroups.push(group);
       this.globeGroup.add(group);
     });
+    this.setFills(highlights.filter(highlight => highlight.fill));
+  }
+
+  // A soft tint over whole countries ([{ country, color }]), so a country inside painted
+  // neighbours still shows whether it's painted itself. Drawn on a transparent map in the
+  // earth texture's projection, on a sphere just above the surface.
+  setFills(fills) {
+    const signature = fills.map(({ country, color }) => `${country.iso}:${color}`).join(",");
+    if (signature === this.fillSignature || (!fills.length && !this.fillCanvas)) return;
+    this.fillSignature = signature;
+    if (!this.fillCanvas) {
+      this.fillCanvas = Object.assign(document.createElement("canvas"), { width: FILL_TEXTURE_WIDTH, height: FILL_TEXTURE_WIDTH / 2 });
+      this.fillTexture = new THREE.CanvasTexture(this.fillCanvas);
+      this.fillTexture.encoding = THREE.sRGBEncoding;
+      this.fillTexture.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
+      this.fillMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(FILL_RADIUS, 160, 120),
+        new THREE.MeshBasicMaterial({ map: this.fillTexture, transparent: true, depthWrite: false })
+      );
+      this.fillMesh.renderOrder = 1;
+      this.globeGroup.add(this.fillMesh);
+    }
+    const { width, height } = this.fillCanvas;
+    const context = this.fillCanvas.getContext("2d");
+    context.clearRect(0, 0, width, height);
+    fills.forEach(({ country, color }) => {
+      const feature = this.findFeature(country);
+      if (!feature) return;
+      context.fillStyle = `#${new THREE.Color(color).getHexString()}`;
+      context.globalAlpha = 0.3;
+      const path = new Path2D();
+      let wraps = false;
+      getPolygons(feature).forEach(polygon => polygon.forEach(ring => {
+        // Rings across the antimeridian are unwrapped, then drawn again a world over.
+        let previous = ring[0][0];
+        let offset = 0;
+        ring.forEach(([lon, lat], index) => {
+          if (lon - previous > 180) offset -= 360;
+          else if (lon - previous < -180) offset += 360;
+          previous = lon;
+          const x = (lon + offset + 180) / 360 * width;
+          const y = (90 - lat) / 180 * height;
+          if (x < 0 || x > width) wraps = true;
+          if (index === 0) path.moveTo(x, y);
+          else path.lineTo(x, y);
+        });
+        path.closePath();
+      }));
+      context.fill(path, "evenodd");
+      if (wraps) {
+        [-width, width].forEach(shift => {
+          context.save();
+          context.translate(shift, 0);
+          context.fill(path, "evenodd");
+          context.restore();
+        });
+      }
+    });
+    context.globalAlpha = 1;
+    this.fillMesh.visible = fills.length > 0;
+    this.fillTexture.needsUpdate = true;
+    this.requestRender();
   }
 
   setCurrentGuess(country) {
@@ -10984,8 +11050,8 @@ function playGuessReveal(guess, { land, sound, nextLabel = "NEXT GUESS", outline
 }
 
 // Rank 'Em: a try as a pack-style card, Mastermind style. The order you tried is shown,
-// then five lights turn on one by one: green for each country in the right place, then
-// red for the rest (never which ones), and finally any hint the try unlocked.
+// then a counter ticks up to how many are in the right place (never which ones), and
+// finally any hint the try unlocked.
 function playRankReveal({ tryNumber, order, right, hint = null, land, sound, nextLabel = "NEXT TRY" }) {
   const card = document.createElement("div");
   card.style.setProperty("--temp", "var(--glass-line)");
@@ -10999,16 +11065,19 @@ function playRankReveal({ tryNumber, order, right, hint = null, land, sound, nex
     item.append(createFlagImage(country, "rank-try-flag"), country.name);
     head.lastChild.appendChild(item);
   });
-  const pegs = Object.assign(document.createElement("div"), { className: "rank-pegs is-big", role: "img" });
-  pegs.setAttribute("aria-label", `${right} of ${order.length} in the right place`);
-  const steps = order.map((_, index) => {
-    const peg = Object.assign(document.createElement("i"), { className: "rank-peg" });
-    pegs.appendChild(peg);
-    return { element: peg, status: index < right ? "match" : "miss" };
-  });
-  const tally = Object.assign(document.createElement("p"), { className: "rank-reveal-tally", textContent: `${right} of ${order.length} in the right place` });
-  card.append(head, pegs, tally);
-  steps.push({ element: tally, status: right === order.length ? "match" : "hint" });
+  // A big "0/5" that counts up, one tick per country in the right place, then settles in
+  // green (all right) or red. Just a number, so it can't be read as "the first one is right".
+  const count = Object.assign(document.createElement("div"), { className: "rank-count is-counting", role: "img" });
+  count.setAttribute("aria-label", `${right} of ${order.length} in the right place`);
+  const number = Object.assign(document.createElement("strong"), { textContent: "0" });
+  count.append(number, Object.assign(document.createElement("span"), { textContent: `/${order.length}` }));
+  const caption = Object.assign(document.createElement("p"), { className: "rank-count-caption", textContent: "IN THE RIGHT PLACE" });
+  // The steps are invisible ticks; each one turning over moves the counter on.
+  const tick = value => ({ element: Object.assign(document.createElement("i"), { className: "rank-tick" }), status: "match", value });
+  const steps = Array.from({ length: right }, (_, index) => tick(index + 1));
+  const allRight = right === order.length;
+  steps.push({ ...tick(right), status: allRight ? "match" : "miss", final: true });
+  card.append(head, count, caption, ...steps.map(step => step.element));
   if (hint) {
     const chip = Object.assign(document.createElement("span"), { className: "fact fact-hint rank-reveal-hint", textContent: `Hint: ${hint}` });
     card.appendChild(chip);
@@ -11016,7 +11085,19 @@ function playRankReveal({ tryNumber, order, right, hint = null, land, sound, nex
   }
   return playRevealCard({
     card, steps, nextLabel, land, sound,
-    onTurn: step => { if (step.element === tally) card.style.setProperty("--temp", right === order.length ? "var(--t-correct)" : "var(--danger)"); }
+    onTurn: step => {
+      if (step.value === undefined) return;
+      number.textContent = String(step.value);
+      // Restart the pop for every tick.
+      count.classList.remove("is-ticking");
+      void count.offsetWidth;
+      count.classList.add("is-ticking");
+      if (step.final) {
+        count.classList.remove("is-counting");
+        count.classList.add(allRight ? "is-right" : "is-wrong");
+        card.style.setProperty("--temp", allRight ? "var(--t-correct)" : "var(--danger)");
+      }
+    }
   });
 }
 
@@ -12950,9 +13031,10 @@ const ROUND_RENDERERS = {
     const highlight = round.highlight && getCountry(round.highlight);
     globe.setHighlights([
       ...(highlight ? [{ country: highlight, color: 0x45e3ff }] : []),
-      ...state.found.map(iso => ({ country: getCountry(iso), color: 0x5cf28a })),
-      ...state.wrong.map(iso => ({ country: getCountry(iso), color: 0xff6b7d })),
-      ...(progress.done ? missing.map(iso => ({ country: getCountry(iso), color: 0xff8a3d })) : []),
+      // Painted countries are tinted too, so one inside painted neighbours still shows.
+      ...state.found.map(iso => ({ country: getCountry(iso), color: 0x5cf28a, fill: true })),
+      ...state.wrong.map(iso => ({ country: getCountry(iso), color: 0xff6b7d, fill: true })),
+      ...(progress.done ? missing.map(iso => ({ country: getCountry(iso), color: 0xff8a3d, fill: true })) : []),
       // Gold, so a selection between painted (green) neighbours doesn't look painted already.
       ...(selected ? [{ country: selected, color: 0xffd45c, pulse: true, focus: true }] : [])
     ]);
