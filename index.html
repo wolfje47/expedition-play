@@ -180,7 +180,7 @@ h1, h2, h3 { font-weight: normal; }
   border: 1px solid var(--glass-line);
   border-radius: 26px;
   background: var(--glass);
-  box-shadow: var(--glass-shine), var(--glass-shadow), 0 0 60px rgba(69, 227, 255, 0.08);
+  box-shadow: var(--glass-shine), var(--glass-shadow), 0 0 60px color-mix(in srgb, var(--accent) 8%, transparent);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   text-align: center;
@@ -192,14 +192,14 @@ h1, h2, h3 { font-weight: normal; }
   padding: 1.25rem 1rem;
   border: 1px solid var(--glass-line-soft);
   border-radius: 18px;
-  background: radial-gradient(ellipse at 50% 0%, rgba(69, 227, 255, 0.14), transparent 70%), rgba(0, 0, 0, 0.25);
+  background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%), rgba(0, 0, 0, 0.25);
 }
 
 
 .menu-marquee h1 {
   color: var(--text);
   font: clamp(1.4rem, 5vw, 2rem)/1.3 var(--font-display);
-  text-shadow: 0 0 22px rgba(69, 227, 255, 0.4);
+  text-shadow: 0 0 22px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 
 .menu-tagline { color: var(--gold); font-size: 16px; font-weight: 500; }
@@ -221,7 +221,7 @@ h1, h2, h3 { font-weight: normal; }
 }
 
 .menu-option:hover,
-.menu-option:focus-visible { border-color: var(--accent); background: rgba(69, 227, 255, 0.1); color: var(--accent); outline: none; }
+.menu-option:focus-visible { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent); outline: none; }
 .menu-option:active { transform: translateY(1px); }
 
 .menu-option-primary { border-color: var(--accent); background: var(--accent); color: #04121a; }
@@ -310,7 +310,7 @@ h1, h2, h3 { font-weight: normal; }
 }
 
 .brand-name { font: 12px var(--font-display); }
-.menu-logo { justify-self: center; width: 48px; height: 48px; filter: drop-shadow(0 0 14px rgba(69, 227, 255, 0.35)); }
+.menu-logo { justify-self: center; width: 48px; height: 48px; filter: drop-shadow(0 0 14px color-mix(in srgb, var(--accent) 35%, transparent)); }
 
 /* Left column, last card: sound, archive, leaderboard, statistics, how to play. */
 .game-buttons { display: flex; justify-content: space-between; padding: 6px; border-radius: 999px !important; }
@@ -337,7 +337,7 @@ h1, h2, h3 { font-weight: normal; }
 
 .round-row:hover:not(:disabled) { background: rgba(255, 255, 255, 0.06); color: var(--text); }
 .round-row:disabled { opacity: 0.4; cursor: default; }
-.round-row.is-viewing { background: rgba(69, 227, 255, 0.1); box-shadow: inset 0 0 0 1px rgba(69, 227, 255, 0.45); color: var(--text); }
+.round-row.is-viewing { background: color-mix(in srgb, var(--accent) 10%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); color: var(--text); }
 /* The round's number in its mountain colour. */
 .round-row-number { color: var(--text); font: 700 12px var(--font-mono); }
 .round-row-name { overflow: hidden; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
@@ -781,7 +781,7 @@ h1, h2, h3 { font-weight: normal; }
   font-weight: 600;
   cursor: pointer;
 }
-.try-suggestion:hover { background: rgba(69, 227, 255, 0.22); }
+.try-suggestion:hover { background: color-mix(in srgb, var(--accent) 22%, transparent); }
 
 /* Deep Cut about several countries: a row of small flags. */
 #deepcutSubject.is-several .target-flag { display: flex; flex-wrap: wrap; gap: 4px; }
@@ -866,7 +866,7 @@ h1, h2, h3 { font-weight: normal; }
 .next-round-go { display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem; font-size: 18px; }
 
 @keyframes next-glow {
-  50% { box-shadow: 0 0 0 4px rgba(69, 227, 255, 0.18), 0 0 28px rgba(69, 227, 255, 0.45); }
+  50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent), 0 0 28px color-mix(in srgb, var(--accent) 45%, transparent); }
 }
 
 @keyframes result-in {
@@ -1108,7 +1108,7 @@ h1, h2, h3 { font-weight: normal; }
 /* One help option per row, so the labels never squeeze in a side column. */
 
 .game-view .rank-item { border: 1px solid var(--glass-line); border-left: 4px solid var(--rank-color, var(--glass-line)); border-radius: 12px; background: var(--glass-fill); box-shadow: none; }
-.game-view .rank-item.is-dragging { border-color: var(--accent); background: rgba(69, 227, 255, 0.12); }
+.game-view .rank-item.is-dragging { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
 .game-view .rank-moves button { border: 0; border-radius: 8px; background: rgba(255, 255, 255, 0.08); }
 
 /* End-of-day breakdown and archive rounds */
@@ -1187,15 +1187,18 @@ h1, h2, h3 { font-weight: normal; }
   border: 1px solid var(--glass-line);
   border-radius: 26px;
   background: var(--glass);
-  box-shadow: var(--glass-shine), var(--glass-shadow), 0 0 60px rgba(69, 227, 255, 0.12);
+  box-shadow: var(--glass-shine), var(--glass-shadow), 0 0 60px color-mix(in srgb, var(--accent) 12%, transparent);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   text-align: center;
 }
 
 .round-intro-count { color: var(--muted); font: 700 12px var(--font-mono); letter-spacing: 0.25em; }
-.round-intro-name { color: var(--accent); font: clamp(1.1rem, 2.6vw, 1.5rem)/1.4 var(--font-display); letter-spacing: 0.1em; text-shadow: 0 0 22px rgba(69, 227, 255, 0.35); }
-.round-intro-task { color: var(--text); font-size: 16px; }
+.round-intro-name { color: var(--accent); font: clamp(1.1rem, 2.6vw, 1.5rem)/1.4 var(--font-display); letter-spacing: 0.1em; text-shadow: 0 0 22px color-mix(in srgb, var(--accent) 35%, transparent); }
+.round-intro-task { color: var(--text); font-size: 18px; font-weight: 600; }
+.round-intro-clock { color: var(--accent); font: 700 13px var(--font-mono); }
+/* Country names on the globe (casual) stay out of the round's title card. */
+.game-view:has(#roundIntro:not(.hidden)) .globe-labels { opacity: 0; }
 .round-intro-start { margin-top: 0.2rem; color: var(--faint); font: 12px var(--font-mono); }
 
 .round-intro.is-showing .round-intro-card { animation: intro-in 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.1) both; }
@@ -1282,7 +1285,7 @@ h1, h2, h3 { font-weight: normal; }
 .journey-goal line { stroke: var(--muted); stroke-width: 1.5; }
 .journey-goal :is(polygon, rect) { fill: var(--faint); }
 .journey-goal .journey-goal-line { fill: none; stroke: var(--faint); stroke-width: 1.5; }
-.journey-goal .journey-goal-panel { fill: rgba(69, 227, 255, 0.35); }
+.journey-goal .journey-goal-panel { fill: color-mix(in srgb, var(--accent) 35%, transparent); }
 .journey.is-goal .journey-goal :is(polygon, rect) { fill: var(--gold); }
 .journey.is-goal .journey-goal .journey-goal-line { stroke: var(--gold); }
 
@@ -1374,7 +1377,12 @@ h1, h2, h3 { font-weight: normal; }
 @keyframes slot-glow { from { box-shadow: 0 0 0 2px var(--t-correct), 0 0 26px rgba(92, 242, 138, 0.7); transform: scale(1.12); } }
 
 /* A newly unlocked clue: a wide tile that reads "NEW CLUE" until it turns over. */
-.reveal-clue { position: relative; display: grid; gap: 0.4rem; padding: 0.7rem 0.85rem; border-radius: 12px; background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+.reveal-clue { position: relative; display: grid; gap: 0.4rem; padding: 0.7rem 0.85rem; border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent); border-radius: 12px; background: rgba(255, 212, 92, 0.08); }
+.reveal-clue .clue-tag { color: var(--gold); }
+/* A new clue or hint isn't about the guess above it: a dashed line and a label set it apart. */
+.reveal-divider { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.3rem; color: var(--gold); font: 9px var(--font-display); letter-spacing: 0.06em; white-space: nowrap; }
+.reveal-divider::before,
+.reveal-divider::after { flex: 1; border-top: 1px dashed color-mix(in srgb, var(--gold) 45%, transparent); content: ""; }
 .reveal-clue p { font-size: 15px; font-weight: 500; line-height: 1.4; }
 .reveal-clue .clue-tag { justify-self: start; margin: 0; }
 .reveal-clue .slot-cover { position: absolute; inset: 0; display: grid; place-items: center; font: 11px var(--font-display); letter-spacing: 0.06em; }
@@ -1394,9 +1402,10 @@ h1, h2, h3 { font-weight: normal; }
 .rank-count-caption { color: var(--muted); font: 700 10px var(--font-mono); letter-spacing: 0.14em; text-align: center; }
 @keyframes count-pop { from { transform: scale(1.45); text-shadow: 0 0 26px rgba(92, 242, 138, 0.8); } }
 .rank-reveal-head { display: grid; gap: 0.6rem; }
-.rank-reveal-order { display: grid; gap: 4px; list-style: none; counter-reset: rank; }
-.rank-reveal-order li { display: flex; align-items: center; gap: 0.55rem; font-size: 14px; counter-increment: rank; }
-.rank-reveal-order li::before { width: 1.2rem; color: var(--faint); font: 700 12px var(--font-mono); content: counter(rank); }
+.rank-reveal-order { display: grid; gap: 6px; list-style: none; counter-reset: rank; }
+.rank-reveal-order li { display: flex; align-items: center; gap: 0.7rem; font-size: 18px; font-weight: 600; counter-increment: rank; }
+.rank-reveal-order li::before { width: 1.4rem; color: var(--faint); font: 700 14px var(--font-mono); content: counter(rank); }
+.rank-reveal-order .rank-try-flag { width: 30px; height: 20px; margin: 0; border-radius: 3px; }
 .rank-reveal-hint { justify-self: center; font-size: 14px; }
 /* A Rank 'Em attempt is one slim row: its number and its lights. */
 :is(.game-view, .modal) .attempt.rank-attempt { gap: 0.7rem; padding: 0.4rem 0.8rem; }
@@ -1640,7 +1649,7 @@ h1, h2, h3 { font-weight: normal; }
 .end-rounds .breakdown-row { box-shadow: inset 4px 0 0 var(--round-color); }
 .end-percent { color: var(--accent); font: 700 2.4rem/1 var(--font-mono); }
 .end-world-text { color: var(--muted); font-size: 14px; }
-.end-archive { display: grid; gap: 0.5rem; margin-top: 0.4rem; padding: 1rem; border: 1px solid rgba(69, 227, 255, 0.35); border-radius: 16px; background: var(--accent-soft); }
+.end-archive { display: grid; gap: 0.5rem; margin-top: 0.4rem; padding: 1rem; border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: 16px; background: var(--accent-soft); }
 .end-archive strong { font-size: 16px; }
 .end-archive p { color: var(--muted); font-size: 13px; }
 .end-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
@@ -1682,7 +1691,7 @@ h1, h2, h3 { font-weight: normal; }
 .day-cell { display: grid; place-items: center; align-content: center; gap: 2px; aspect-ratio: 1; min-width: 0; padding: 2px; border: 1px solid transparent; border-radius: 10px; font: 700 11px var(--font-mono); }
 .day-cell.is-empty { visibility: hidden; }
 .day-cell.is-played { border-color: var(--glass-line); background: rgba(255, 255, 255, 0.1); color: var(--text); }
-.day-cell.is-progress { border: 1.5px solid var(--accent); background: rgba(69, 227, 255, 0.16); color: var(--accent); }
+.day-cell.is-progress { border: 1.5px solid var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
 .day-cell.is-open { border: 1px dashed rgba(255, 255, 255, 0.18); background: none; color: var(--faint); }
 .day-cell.is-today { box-shadow: 0 0 0 2px var(--gold), 0 0 14px rgba(255, 212, 92, 0.35); }
 .day-cell:not(.is-empty):hover { border-color: var(--accent); }
@@ -1777,7 +1786,7 @@ h1, h2, h3 { font-weight: normal; }
 .overview-world { display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.9rem 0.4rem 0.5rem; border: 1px solid rgba(255, 212, 92, 0.35); border-radius: 14px; background: rgba(255, 212, 92, 0.08); }
 .overview-world-percent { color: var(--gold); font: 700 26px var(--font-mono) !important; }
 .overview-status { padding: 0.45rem 0.9rem; border: 1px dashed rgba(255, 255, 255, 0.25); border-radius: 999px; color: var(--muted); font: 10px var(--font-display); }
-.overview-status.is-progress { border: 1.5px solid var(--accent); background: rgba(69, 227, 255, 0.16); color: var(--accent); box-shadow: 0 0 18px rgba(69, 227, 255, 0.3); }
+.overview-status.is-progress { border: 1.5px solid var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 30%, transparent); }
 
 /* The day panel's two views. */
 .overview-tabs { display: flex; gap: 0.4rem; padding: 4px; border-radius: 12px; background: rgba(0, 0, 0, 0.25); }
@@ -1833,7 +1842,7 @@ h1, h2, h3 { font-weight: normal; }
   flex-wrap: wrap;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  border: 1px solid rgba(69, 227, 255, 0.45);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
   border-radius: 14px;
   background: var(--accent-soft);
   font-size: 14px;
@@ -1867,10 +1876,10 @@ h1, h2, h3 { font-weight: normal; }
   position: relative;
   flex: 1;
   border-radius: 4px 4px 0 0;
-  background: rgba(69, 227, 255, 0.28);
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
 }
 
-.distribution-bar:hover { background: rgba(69, 227, 255, 0.5); }
+.distribution-bar:hover { background: color-mix(in srgb, var(--accent) 50%, transparent); }
 .distribution-bar.is-player { background: var(--gold); }
 
 .distribution-you {
@@ -1940,7 +1949,7 @@ h1, h2, h3 { font-weight: normal; }
 .account-lead { color: var(--muted); font-size: 14px; }
 .account-providers { display: grid; gap: 0.5rem; margin: 0.9rem 0; }
 .account-provider { display: flex; align-items: center; justify-content: center; gap: 0.7rem; min-height: 48px; border: 1px solid var(--glass-line); background: rgba(255, 255, 255, 0.06); color: var(--text); font: 600 15px var(--font-body); text-transform: none; letter-spacing: 0; }
-.account-provider:hover:not(:disabled) { border-color: var(--accent); background: rgba(69, 227, 255, 0.1); }
+.account-provider:hover:not(:disabled) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
 .account-provider:disabled { opacity: 0.45; cursor: not-allowed; }
 .provider-mark { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; background: #fff; color: #04121a; font: 700 15px var(--font-body); }
 .provider-mark.is-google { color: #4285f4; }
@@ -1975,7 +1984,7 @@ h1, h2, h3 { font-weight: normal; }
   .screen-modal { height: calc(100vh - 2rem); overflow-y: auto; }
   .screen-body,
   .archive-layout,
-  .community-layout { grid-template-columns: 1fr; flex: none; }
+  .community-layout { grid-template-columns: minmax(0, 1fr); flex: none; }
   .archive-calendar,
   .day-overview { overflow: visible; }
   .board-list { overflow: visible; }
@@ -2134,9 +2143,74 @@ h1, h2, h3 { font-weight: normal; }
 .globe-label.is-shown { opacity: 1; }
 
 /* The archive's two calendars, one per mode. */
-.archive-mode-tabs { max-width: 360px; margin-top: 0.7rem; }
+.archive-mode-tabs { flex: 0 1 340px; }
+/* The archive's title and its two tabs share one row, so the calendar gets the room. */
+.archive-head { display: flex; flex: 1; flex-wrap: wrap; align-items: center; gap: 0.6rem 1.25rem; }
 .archive-mode-tabs .overview-tab[data-mode="casual"][aria-selected="true"] { background: var(--gold); }
 .calendar-mode-note { padding: 0.7rem 0.9rem; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: rgba(255, 212, 92, 0.06); color: var(--muted); font-size: 13px; }
+
+/* The archive fits a laptop screen without scrolling: a compact badge card and ladder,
+   shorter day cells and a one-line play panel. */
+.archive-calendar .player-badge { gap: 0.7rem; padding: 0.45rem 0.7rem; }
+.archive-calendar .player-badge strong { font-size: 12px; }
+.archive-calendar .player-badge small { font-size: 12px; }
+.archive-calendar .player-badge-text { gap: 0.1rem; }
+.archive-ladder { margin: 0; padding: 0.15rem; }
+.archive-ladder .tier-step { gap: 0.1rem; padding: 0.25rem 0.1rem; }
+.archive-ladder .tier-name { display: none; }
+.archive-ladder .tier-range { font-size: 9px; }
+.archive-calendar .calendar-month { margin-top: 0; padding: 0.4rem 0.7rem; }
+.archive-calendar .day-cell { aspect-ratio: auto; height: clamp(34px, calc((100vh - 470px) / 5), 64px); }
+.archive-calendar .calendar-legend { margin-top: 0.2rem; }
+#archiveModal .modal-head { margin-bottom: 0.2rem; }
+#archivePlay .overview-play { padding: 0.5rem 0.6rem 0.5rem 0.9rem; font-size: 13px; }
+@media (min-width: 761px) { #archivePlay .overview-play { flex-wrap: nowrap; } }
+#archivePlay .overview-play .btn { flex: none; min-height: 38px; padding: 0 1rem; }
+#archiveModal .day-overview { gap: 0.8rem; padding: 0.9rem 1.1rem; }
+#archiveModal .overview-round { padding: 0.4rem 0.7rem; }
+.archive-calendar .player-badge .field-label { display: none; }
+.archive-calendar .calendar { gap: 5px; }
+.archive-calendar .calendar-legend i.day-cell { height: 14px; }
+/* A finished round on two lines: its name and the answer, then you and everyone else.
+   Long answers are cut short (the full text shows on hover). */
+#archiveModal .overview-round-text { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 0.15rem 0.7rem; }
+#archiveModal .overview-round-text > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#archiveModal .overview-round-text .overview-round-others > span { overflow: hidden; text-overflow: ellipsis; }
+/* The day panel's head stays compact when it has to wrap on narrower laptops. */
+#archiveModal .day-overview { gap: 0.6rem; }
+#archiveModal .overview-head { gap: 0.5rem 1rem; }
+#archiveModal .overview-date { font-size: 18px; }
+#archiveModal .overview-world { padding: 0.25rem 0.7rem 0.25rem 0.5rem; }
+#archiveModal .overview-world-percent { font-size: 20px !important; }
+#archiveModal .overview-answer strong { font-size: 18px; }
+#archiveModal .overview-tab { padding: 0.5rem 0.6rem; white-space: nowrap; }
+#archiveModal .overview-round { padding: 0.3rem 0.7rem; }
+#archiveModal .sample-note { font-size: 11px; }
+#archiveModal .overview-everyone { gap: 0.6rem; }
+#archiveModal .overview-stat { padding: 0.5rem 0.6rem; }
+#archiveModal .overview-stat-value { font-size: 18px; }
+#archiveModal .distribution-bars { height: clamp(70px, calc(100vh - 560px), 130px); }
+
+/* Casual has its own colour: gold instead of cyan, in the game, its end screen and the
+   archive's casual tab (data-mode is set by engine.js and screens.js). */
+.game-view[data-mode="casual"],
+#victoryModal[data-mode="casual"],
+#archiveModal[data-mode="casual"] {
+  --accent: #ffd45c;
+  --accent-hover: #ffe08a;
+  --accent-soft: rgba(255, 212, 92, 0.14);
+}
+
+/* The archive's badge ladder: the stones from How to play, in a box, the current one lit. */
+.badge-stones { padding: 0.5rem 0.9rem 0.35rem; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: rgba(255, 255, 255, 0.03); }
+.badge-stones .how-to-badge { opacity: 0.45; }
+.badge-stones .how-to-badge.is-current { opacity: 1; filter: drop-shadow(0 0 10px rgba(255, 212, 92, 0.45)); }
+.badge-stone-days { margin-top: 2px; color: var(--muted); font: 9px var(--font-mono); white-space: nowrap; }
+@media (max-width: 760px) {
+  .badge-stones { padding: 0.4rem 0.4rem 0.3rem; }
+  .badge-stones .how-to-badge svg { width: 24px; height: 24px; }
+  .badge-stone-days { font-size: 8px; }
+}
 
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -2533,6 +2607,7 @@ h1, h2, h3 { font-weight: normal; }
         <span class="round-intro-count" id="roundIntroCount">ROUND 1 / 5</span>
         <h2 class="round-intro-name" id="roundIntroName">MYSTERY COUNTRY</h2>
         <p class="round-intro-task" id="roundIntroTask"></p>
+        <p class="round-intro-clock hidden" id="roundIntroClock">⚡ Beat the clock for up to ×1.5</p>
         <span class="round-intro-start">Click to start</span>
       </div>
     </div>
@@ -2719,9 +2794,8 @@ h1, h2, h3 { font-weight: normal; }
   <div id="archiveModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="archiveTitle">
     <div class="modal screen-modal">
       <div class="modal-head">
-        <div>
+        <div class="archive-head">
           <h2 id="archiveTitle">ARCHIVE</h2>
-          <p class="modal-note">Your top % of the world for every day you play, and a badge each month for how often and how well you played. Pick a day to see its rounds and how everyone did.</p>
           <div class="overview-tabs archive-mode-tabs" id="archiveModeTabs" role="tablist" aria-label="Mode">
             <button class="overview-tab" type="button" role="tab" data-mode="competitive" aria-selected="true">COMPETITIVE</button>
             <button class="overview-tab" type="button" role="tab" data-mode="casual" aria-selected="false">CASUAL</button>
@@ -11173,9 +11247,9 @@ const ROUND_TYPES = ["mystery", "pinpoint", "deepcut", "paint", "rank"];
 
 const ROUND_INFO = {
   mystery: { name: "Mystery Country", task: "Guess the country from its clues." },
-  pinpoint: { name: "Pinpoint", task: "Find the country on the globe from the clues. Click a country, then confirm." },
-  deepcut: { name: "Deep Cut", task: "Give one right answer: the more niche, the more points. Wrong answers cost nothing." },
-  paint: { name: "Paint the Map", task: "Click every country that fits. Every wrong one costs 200; five wrong ends the round." },
+  pinpoint: { name: "Pinpoint", task: "Find the mystery country on the globe." },
+  deepcut: { name: "Deep Cut", task: "Name one answer. The more niche the better." },
+  paint: { name: "Paint the Map", task: "Paint every country that fits. Five misses and you're out." },
   rank: { name: "Rank 'Em", task: "Put the five countries in order." }
 };
 
@@ -12120,33 +12194,38 @@ function createMonthHead(month, weeks, mode) {
 function createMonthBadgeCard(badge, month) {
   const monthName = toDate(`${month}-01`).toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" }).toUpperCase();
   const card = element("div", "player-badge");
-  const icon = createBadge(badge.tier || RANK_TIERS.at(-1), 72);
+  const icon = createBadge(badge.tier || RANK_TIERS.at(-1), 44);
   icon.classList.toggle("is-locked", !badge.tier);
   const text = element("div", "player-badge-text");
   const name = element("strong", "", badge.tier ? badge.tier.name.toUpperCase() : "NO BADGE YET");
   if (badge.tier) name.style.color = badge.tier.color;
-  const note = !badge.tier
-    ? "Play a day this month to earn its badge."
-    : `${badge.played} ${badge.played === 1 ? "day" : "days"} played · on average ${formatTopPercent(badge.percent).toLowerCase()}`;
-  const next = badge.next
-    ? `Next: ${badge.next.name}, with ${badge.next.minDays}+ days ${badge.next.maxPercent >= 100 ? "played" : `and ${badge.next.range.toLowerCase()} on average`}.`
-    : "The highest badge there is.";
-  text.append(element("span", "field-label", `YOUR ${monthName} BADGE`), name, element("small", "", note), element("small", "player-badge-next", next));
+  // Short: how this month went (once there is a badge), and what the next one asks for.
+  const lines = [];
+  if (badge.tier) lines.push(element("small", "", `${badge.played} ${badge.played === 1 ? "day" : "days"} played · on average ${formatTopPercent(badge.percent).toLowerCase()}`));
+  lines.push(element("small", "player-badge-next", badge.next
+    ? `Next: ${badge.next.name} at ${badge.next.minDays}+ ${badge.next.minDays === 1 ? "day" : "days"}${badge.next.maxPercent >= 100 ? "" : `, ${badge.next.range.toLowerCase()}`}`
+    : "The highest badge there is."));
+  text.append(element("span", "field-label", `YOUR ${monthName} BADGE`), name, ...lines);
   card.append(icon, text);
   return card;
 }
 
-// Every badge from the first to the highest, with what it asks for in a month; the one
-// you have this month is lit.
+// Every badge from the first to the highest as the stones from How to play, each with the
+// top % and the days it asks for in a month; the one you have this month is lit.
 function createBadgeLadder(current) {
-  const ladder = element("ol", "tier-ladder archive-ladder");
+  const ladder = element("div", "how-to-badges badge-stones");
   ladder.setAttribute("aria-label", "Badges");
-  [...RANK_TIERS].reverse().forEach(tier => {
-    const step = element("li", "tier-step");
-    step.classList.toggle("is-current", tier === current);
-    step.title = `${tier.name}: ${tier.minDays}+ days in a month${tier.maxPercent >= 100 ? "" : `, ${tier.range.toLowerCase()} on average`}`;
-    step.append(createBadge(tier, 26), element("span", "tier-name", tier.name), element("span", "tier-range", tier.maxPercent >= 100 ? "Any score" : tier.range), element("span", "tier-range", `${tier.minDays}+ ${tier.minDays === 1 ? "day" : "days"}`));
-    ladder.appendChild(step);
+  [...RANK_TIERS].reverse().forEach((tier, index) => {
+    const stone = element("span", "how-to-badge");
+    stone.style.setProperty("--stack", index);
+    stone.classList.toggle("is-current", tier === current);
+    stone.title = `${tier.name}: ${tier.minDays}+ days in a month${tier.maxPercent >= 100 ? "" : `, ${tier.range.toLowerCase()} on average`}`;
+    stone.append(
+      createBadge(tier, 32),
+      element("small", "", tier.maxPercent >= 100 ? "ALL" : `<${tier.maxPercent}%`),
+      element("span", "badge-stone-days", `${tier.minDays}+ ${tier.minDays === 1 ? "day" : "days"}`)
+    );
+    ladder.appendChild(stone);
   });
   return ladder;
 }
@@ -12160,7 +12239,7 @@ function createCalendar(days, { selected, onSelect, mode }) {
     const thisMonth = getMonthBadge(days, todayKey.slice(0, 7));
     calendar.append(createMonthBadgeCard(thisMonth, todayKey.slice(0, 7)), createBadgeLadder(thisMonth.tier));
   } else {
-    calendar.appendChild(element("p", "calendar-mode-note", "Casual days: no clock, country names on the globe and extra clues. They don't count towards your badge."));
+    calendar.appendChild(element("p", "calendar-mode-note", "No clock, names on the globe and extra clues. No badges here: just for fun."));
   }
   [...new Set(weeks.map(week => week.month))].forEach(month => {
     const monthWeeks = weeks.filter(week => week.month === month);
@@ -12342,17 +12421,20 @@ function createRoundsSection(day) {
     const text = element("div", "overview-round-text");
     text.append(element("strong", "", `${index + 1}. ${round.name}`));
     if (day.completed) {
-      text.append(element("span", "", round.answerText), element("span", "overview-round-you", describeYourRound(round)));
+      const answer = element("span", "overview-round-answer", round.answerText);
+      answer.title = round.answerText;
+      text.append(answer, element("span", "overview-round-you", describeYourRound(round)));
       const others = describeOthers(getRoundStats(day.dateKey, index, round.plan), round.type);
       if (others) {
         const line = element("span", "overview-round-others");
         const bar = element("i", "overview-round-bar");
         bar.style.setProperty("--share", `${others.share}%`);
-        line.append(bar, others.text);
+        line.append(bar, element("span", "", others.text));
+        line.title = others.text;
         text.appendChild(line);
       }
     } else {
-      text.append(element("span", "", "🔒 Finish the day to see the answers and how others did"));
+      text.append(element("span", "overview-round-answer", "🔒 Finish the day to see the answers"));
     }
     const points = element("span", "overview-round-points", round.done ? round.points.toLocaleString() : "—");
     if (round.multiplier > 1) points.appendChild(element("small", "", ` ×${round.multiplier.toFixed(1)}`));
@@ -12431,6 +12513,7 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay }) {
 
   function openArchive(selectedDateKey = null, mode = archiveMode) {
     archiveMode = mode;
+    archiveModal.dataset.mode = mode;
     modeTabs.forEach(tab => tab.setAttribute("aria-selected", String(tab.dataset.mode === mode)));
     const days = loadDays(mode);
     // Selecting a day shows its overview; unfinished days start from a button there.
@@ -12718,6 +12801,11 @@ function playRevealCard({ card, steps, nextLabel, land, sound = () => {}, onTurn
   });
 }
 
+// The line between a guess's own feedback and what it unlocks for the next one.
+function createRevealDivider(text) {
+  return Object.assign(document.createElement("div"), { className: "reveal-divider", textContent: text });
+}
+
 // A face-down tile that turns over to show a newly unlocked clue (Mystery, Pinpoint).
 function createClueStep({ label, text }) {
   const tile = Object.assign(document.createElement("div"), { className: "reveal-clue" });
@@ -12756,7 +12844,7 @@ function playGuessReveal(guess, { land, sound, nextLabel = "NEXT GUESS", outline
   card.append(head, facts);
   if (newClue) {
     const clue = createClueStep(newClue);
-    card.appendChild(clue.element);
+    card.append(createRevealDivider("FOR YOUR NEXT GUESS"), clue.element);
     steps.push(clue);
   }
   return playRevealCard({
@@ -12796,7 +12884,7 @@ function playRankReveal({ tryNumber, order, right, hint = null, land, sound, nex
   card.append(head, count, caption, ...steps.map(step => step.element));
   if (hint) {
     const chip = Object.assign(document.createElement("span"), { className: "fact fact-hint rank-reveal-hint", textContent: `Hint: ${hint}` });
-    card.appendChild(chip);
+    card.append(createRevealDivider("FOR YOUR NEXT TRY"), chip);
     steps.push({ element: chip, status: "hint" });
   }
   return playRevealCard({
@@ -14136,7 +14224,10 @@ function showRoundIntro(index) {
   const overlay = document.getElementById("roundIntro");
   setText("roundIntroCount", `ROUND ${index + 1} / ${plan.length}`);
   setText("roundIntroName", ROUND_INFO[round.type].name.toUpperCase());
-  setText("roundIntroTask", `${ROUND_INFO[round.type].task}${activeMode === "competitive" ? " Answer within 30 seconds for up to ×1.5." : ""}`);
+  setText("roundIntroTask", ROUND_INFO[round.type].task);
+  // Competitive: the clock, as its own short line.
+  const clock = document.getElementById("roundIntroClock");
+  clock.classList.toggle("hidden", activeMode !== "competitive");
   overlay.classList.remove("hidden", "is-leaving");
   void overlay.offsetWidth;
   overlay.classList.add("is-showing");
@@ -15525,6 +15616,7 @@ function showFinalModal() {
     item.appendChild(row);
     return item;
   }));
+  document.getElementById("victoryModal").dataset.mode = activeMode;
   document.getElementById("victoryModal").classList.remove("hidden");
 }
 
