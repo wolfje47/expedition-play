@@ -1484,13 +1484,12 @@ h1, h2, h3 { font-weight: normal; }
 .screen-body { display: grid; flex: 1; gap: 1.25rem; min-height: 0; }
 .screen-column { display: flex; flex-direction: column; gap: 0.6rem; min-height: 0; }
 
-.archive-layout { grid-template-columns: minmax(280px, 380px) minmax(0, 1fr); }
-.leaderboard-layout { grid-template-columns: minmax(340px, 420px) minmax(0, 1fr); }
+.archive-layout { grid-template-columns: minmax(340px, 520px) minmax(0, 1fr); }
 
 /* Archive calendar: a row per week (Monday to Sunday) and its stamp, under month headers. */
 .archive-calendar { min-height: 0; padding-right: 0.25rem; overflow-y: auto; scrollbar-width: thin; }
-.calendar { display: grid; gap: 6px; max-width: 420px; }
-.calendar-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)) 44px; align-items: center; gap: 5px; }
+.calendar { display: grid; gap: 6px; max-width: 520px; }
+.calendar-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); align-items: center; gap: 5px; }
 .calendar-weekdays span { color: var(--faint); font: 700 10px var(--font-mono); text-align: center; }
 
 .calendar-month { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.7rem; margin-top: 0.5rem; padding: 0.55rem 0.7rem; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: rgba(255, 255, 255, 0.03); }
@@ -1513,17 +1512,108 @@ h1, h2, h3 { font-weight: normal; }
 .day-cell-number { line-height: 1; }
 .day-cell-progress { font-size: 10px; }
 .day-cell-done { color: var(--muted); }
+.day-cell-top { display: grid; justify-items: center; color: var(--accent); font: 700 13px/1.1 var(--font-mono); }
+.day-cell-top small { color: var(--faint); font-size: 8px; letter-spacing: 0.08em; }
+.calendar-month-top { color: var(--accent); }
 .day-cell .medal-svg { width: 55%; height: auto; }
 
-.week-stamp { display: grid; place-items: center; width: 40px; height: 40px; border: 1.5px dashed rgba(255, 255, 255, 0.18); border-radius: 50%; color: var(--faint); font: 700 10px var(--font-mono); }
-.week-stamp.is-earned { border: 0; transform: rotate(-8deg); }
+/* The one badge a player carries, above the calendar. */
+.player-badge { position: relative; display: flex; align-items: center; gap: 1rem; padding: 0.9rem 1rem; border: 1px solid var(--glass-line-soft); border-radius: 14px; background: rgba(255, 255, 255, 0.04); }
+.player-badge .rank-badge-svg { flex: none; filter: drop-shadow(0 0 12px rgba(255, 212, 92, 0.25)); }
+.player-badge-text { display: grid; gap: 0.25rem; min-width: 0; }
+.player-badge strong { font: 14px var(--font-display); }
+.player-badge small { color: var(--muted); font-size: 13px; }
+
+/* The "i" in the badge card: the medals and badges explained, on hover or tap. */
+.awards-info { position: absolute; top: 0.6rem; right: 0.6rem; }
+.awards-info-button { display: grid; place-items: center; width: 24px; height: 24px; border: 1px solid var(--glass-line); border-radius: 50%; background: rgba(255, 255, 255, 0.06); color: var(--muted); font: 700 13px var(--font-mono); cursor: help; }
+.awards-info-button:hover { border-color: var(--accent); color: var(--accent); }
+.awards-info .awards-legend { position: absolute; top: calc(100% + 8px); right: 0; z-index: 20; width: min(360px, 80vw); margin: 0; background: var(--glass-strong); box-shadow: var(--glass-shadow); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); opacity: 0; pointer-events: none; transform: translateY(-4px); transition: opacity 0.15s ease, transform 0.15s ease; }
+.awards-info:hover .awards-legend,
+.awards-info:focus-within .awards-legend,
+.awards-info.is-open .awards-legend { opacity: 1; pointer-events: auto; transform: none; }
+.player-badge .is-locked { filter: grayscale(1); opacity: 0.45; }
+.player-badge .player-badge-next { color: var(--accent); }
+.calendar-month-badge { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--gold); }
+.archive-ladder { margin: 0.5rem 0 0.25rem; padding: 0.3rem; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: rgba(255, 255, 255, 0.03); }
+
+/* Community: you and your friends on the left, your groups on the right. */
+.community-layout { grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); }
+.community-card { display: grid; gap: 0.6rem; padding: 0.9rem 1rem; border: 1px solid var(--glass-line-soft); border-radius: 14px; background: rgba(255, 255, 255, 0.04); }
+.community-card input:not([type="checkbox"]) { width: 100%; padding: 0.55rem 0.7rem; border: 1px solid var(--glass-line); border-radius: 10px; background: var(--glass-fill); color: var(--text); font: 14px var(--font-body); }
+.community-card input:focus { border-color: var(--accent); outline: none; }
+.community-profile-head { display: flex; align-items: center; gap: 0.9rem; }
+.community-profile-head > div { display: grid; flex: 1; gap: 0.3rem; min-width: 0; }
+.community-profile-head small { color: var(--muted); font-size: 13px; }
+.community-profile-head .is-locked { filter: grayscale(1); opacity: 0.45; }
+.community-name { display: flex; gap: 0.4rem; }
+.community-name .btn { flex: none; }
+.community-code { display: grid; gap: 0.2rem; padding: 0.6rem 0.7rem; border-radius: 10px; background: var(--glass-fill); }
+.community-code strong { color: var(--gold); font: 700 22px var(--font-mono); letter-spacing: 0.3em; }
+.community-code small { color: var(--muted); font-size: 12px; }
+.community-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.community-actions .btn { flex: 1; }
+.community-add { grid-template-columns: 1fr auto; align-items: center; }
+.community-add .field-label { grid-column: 1 / -1; }
+.community-add input { text-transform: uppercase; font-family: var(--font-mono); letter-spacing: 0.2em; }
+.community-add input::placeholder { font-family: var(--font-body); letter-spacing: normal; text-transform: none; }
+.community-friends { display: grid; gap: 0.25rem; list-style: none; }
+.community-friends li { display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0.6rem; border-radius: 10px; background: var(--glass-fill); font-size: 14px; }
+.community-remove,
+.community-leave { color: var(--faint); font-size: 13px; }
+.community-remove { padding: 0 0.3rem; font-size: 18px; }
+.community-remove:hover,
+.community-leave:hover { color: var(--danger); }
+.community-empty,
+.community-loading { color: var(--muted); font-size: 14px; }
+.community-group-tabs { flex-wrap: wrap; }
+.community-group { align-content: start; }
+.community-group-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; }
+.community-group-head > div { display: grid; flex: 1; gap: 0.15rem; }
+.community-group-head strong { font: 12px var(--font-display); }
+.community-group-head small { color: var(--muted); font-size: 12px; }
+.community-crowned { padding: 0.5rem 0.7rem; border: 1px solid rgba(255, 212, 92, 0.45); border-radius: 10px; background: rgba(255, 212, 92, 0.08); color: var(--gold); font-size: 13px; }
+.community-views { align-items: center; }
+.community-views .board-day { margin-left: auto; }
+.community-board .board-row { grid-template-columns: 44px minmax(0, 1fr) 90px 64px; }
+.community-board .board-rank .medal-svg { display: block; }
+.community-board .board-row.is-waiting { opacity: 0.55; }
+.community-picks { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.community-picks label { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.6rem; border-radius: 999px; background: var(--glass-fill); font-size: 13px; cursor: pointer; }
+.community-signin { max-width: 460px; justify-items: start; }
+.community-signin strong { font: 12px var(--font-display); line-height: 1.6; }
+.community-signin p { color: var(--muted); font-size: 14px; }
 
 .calendar-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.9rem; margin-top: 0.6rem; color: var(--muted); font-size: 12px; }
 .calendar-legend > span { display: inline-flex; align-items: center; gap: 0.35rem; }
 .calendar-legend i.day-cell { width: 14px; aspect-ratio: 1; padding: 0; border-radius: 4px; }
-.calendar-legend-medals { gap: 0.2rem !important; font: 11px var(--font-mono); }
 
 .overview-locked { color: var(--faint); }
+
+/* Day panel header: medal and score, then (big) where that puts you in the world. */
+.overview-answer { flex-wrap: wrap; gap: 0.9rem; }
+.overview-world { display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.9rem 0.4rem 0.5rem; border: 1px solid rgba(255, 212, 92, 0.35); border-radius: 14px; background: rgba(255, 212, 92, 0.08); }
+.overview-world-percent { color: var(--gold); font: 700 26px var(--font-mono) !important; }
+.overview-status { padding: 0.45rem 0.9rem; border: 1px dashed rgba(255, 255, 255, 0.25); border-radius: 999px; color: var(--muted); font: 10px var(--font-display); }
+.overview-status.is-progress { border: 1.5px solid var(--accent); background: rgba(69, 227, 255, 0.16); color: var(--accent); box-shadow: 0 0 18px rgba(69, 227, 255, 0.3); }
+
+/* The day panel's two views. */
+.overview-tabs { display: flex; gap: 0.4rem; padding: 4px; border-radius: 12px; background: rgba(0, 0, 0, 0.25); }
+.overview-tab { flex: 1; padding: 0.6rem 0.8rem; border: 0; border-radius: 9px; background: none; color: var(--muted); font: 10px var(--font-display); cursor: pointer; }
+.overview-tab:hover { color: var(--text); }
+.overview-tab[aria-selected="true"] { background: var(--accent); color: #04121a; }
+.overview-everyone { display: grid; gap: 1rem; }
+
+/* What the awards mean, under the calendar. */
+.awards-legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.8rem 1.2rem; margin-top: 0.8rem; padding: 0.8rem; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: rgba(255, 255, 255, 0.03); }
+.awards-legend-group { display: grid; align-content: start; gap: 0.35rem; }
+.awards-legend-group .field-label { margin-bottom: 0.15rem; font-size: 9px; }
+.awards-legend-row { display: grid; grid-template-columns: 20px minmax(0, 1fr) 3.2rem 4.6rem; align-items: center; gap: 0.5rem; color: var(--muted); font-size: 13px; }
+.awards-legend-row strong:last-child { text-align: right; }
+.awards-legend-row.is-head { color: var(--faint); font: 700 10px var(--font-mono); }
+.awards-legend-row.is-head span:last-child { text-align: right; }
+.awards-legend-note { color: var(--faint); font-size: 12px; }
+.awards-legend-row strong { color: var(--text); font: 700 12px var(--font-mono); }
 
 .rank-chip {
   display: inline-block;
@@ -1550,6 +1640,9 @@ h1, h2, h3 { font-weight: normal; }
 }
 
 .overview-empty { color: var(--faint); font-size: 14px; }
+
+/* Under the archive calendar, as wide as it. */
+#archivePlay { flex: none; max-width: 520px; }
 
 .overview-play {
   display: flex;
@@ -1609,38 +1702,11 @@ h1, h2, h3 { font-weight: normal; }
 
 .distribution-axis { display: flex; justify-content: space-between; color: var(--faint); font: 11px var(--font-mono); }
 
-/* Leaderboard: you on the left, everyone else on the right */
+/* Pixel badges (badges.js). */
 
-.rank-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  min-height: 0;
-  padding: 1rem;
-  overflow-y: auto;
-  border: 1px solid var(--glass-line-soft);
-  border-radius: 18px;
-  background: radial-gradient(ellipse at 30% 0%, rgba(23, 42, 85, 0.8) 0%, var(--glass-fill) 70%);
-}
-
-.rank-card { display: flex; align-items: center; gap: 0.9rem; }
-.rank-badge { display: grid; flex: none; filter: drop-shadow(0 0 12px rgba(255, 212, 92, 0.25)); }
 .rank-badge-svg { display: block; image-rendering: pixelated; }
-.rank-badge .is-locked { opacity: 0.35; filter: grayscale(1); }
-.rank-headline { display: grid; gap: 0.15rem; min-width: 0; }
-.rank-headline strong { color: var(--gold); font: 700 32px/1.1 var(--font-mono); }
-.rank-tier { color: var(--accent); font: 11px var(--font-display); }
-.rank-headline small { color: var(--muted); font-size: 13px; }
 
-.rank-progress { display: grid; gap: 0.35rem; }
-.rank-progress-bar { height: 8px; overflow: hidden; border-radius: 99px; background: rgba(255, 255, 255, 0.08); }
-.rank-progress-bar span { display: block; height: 100%; border-radius: inherit; transition: width 0.6s ease; }
-.rank-progress small { color: var(--muted); font-size: 12px; }
 
-.rank-route { display: grid; gap: 0.4rem; }
-.rank-route .journey { border-radius: 10px; }
-/* Before you've played, the route shows only where others got to. */
-.rank-route.is-unplayed .journey-traveller { display: none; }
 .journey-pin circle { fill: var(--glass-strong); stroke: var(--text); stroke-width: 1.5; }
 .journey-pin text { fill: var(--text); font: 700 9px var(--font-mono); paint-order: stroke; stroke: rgba(4, 18, 26, 0.85); stroke-width: 3px; }
 .journey-pin.is-gold circle { stroke: var(--gold); }
@@ -1651,10 +1717,6 @@ h1, h2, h3 { font-weight: normal; }
 .journey-pin.is-you circle { r: 5.5; fill: var(--gold); stroke: #04121a; }
 .journey-pin.is-you text { fill: #fff; font-size: 10px; }
 
-.rank-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; }
-.rank-stat { display: grid; gap: 0.15rem; padding: 0.55rem 0.5rem; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: rgba(255, 255, 255, 0.03); }
-.rank-stat dt { color: var(--faint); font-size: 11px; }
-.rank-stat dd { color: var(--text); font: 700 15px var(--font-mono); }
 
 .tier-ladder { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.25rem; margin-top: auto; list-style: none; }
 .tier-step { display: grid; justify-items: center; gap: 0.2rem; padding: 0.45rem 0.1rem; border-radius: 10px; color: var(--faint); text-align: center; opacity: 0.55; }
@@ -1672,42 +1734,20 @@ h1, h2, h3 { font-weight: normal; }
 .board-caption { color: var(--muted); font-size: 13px; }
 
 /* Rank · player · rounds or days · score, the same columns in every row. */
-.board-columns,
 .board-row { display: grid; grid-template-columns: 64px minmax(0, 1fr) 110px 76px; align-items: center; gap: 0.5rem; padding: 0 0.75rem; }
-.board-columns { color: var(--faint); font: 9px var(--font-display); }
-.board-columns span:nth-child(n + 3) { text-align: right; }
 .board-list { display: grid; align-content: start; gap: 0.3rem; min-height: 0; overflow-y: auto; list-style: none; }
 .board-row { min-height: 42px; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: var(--glass-fill); }
 .board-row:nth-child(-n + 3) .board-rank { color: var(--gold); }
 .board-rank { color: var(--muted); font: 700 13px var(--font-mono); }
 .board-name { display: flex; align-items: center; gap: 0.5rem; min-width: 0; overflow: hidden; font-size: 14px; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; }
 .board-name span { overflow: hidden; text-overflow: ellipsis; }
-.board-flag { width: 22px; height: 15px; flex: none; border-radius: 3px; object-fit: cover; }
 .board-name .rank-badge-svg { flex: none; }
 .board-extra { color: var(--muted); font-size: 12px; text-align: right; letter-spacing: 1px; white-space: nowrap; }
 .board-score { color: var(--text); font: 700 14px var(--font-mono); text-align: right; }
 .board-row.is-you { border-color: var(--gold); background: rgba(255, 212, 92, 0.12); }
 .board-row.is-you .board-score,
 .board-row.is-you .board-rank { color: var(--gold); }
-/* The rank ladder: badge · rank · score needed, with your own row slotted in. */
-.board-columns.is-steps,
-.board-step,
-.board-list .board-row.is-you { grid-template-columns: 34px minmax(0, 1fr) auto; }
-.board-columns.is-steps span:nth-child(3) { text-align: right; }
-.board-step { min-height: 52px; border-left: 4px solid var(--tier-color); }
-.board-step .board-name { flex-direction: column; align-items: flex-start; gap: 0.05rem; }
-.board-step .board-name b { color: var(--tier-color); font: 10px var(--font-display); }
-.board-step .board-name small { color: var(--muted); font-size: 12px; font-weight: 400; }
-.board-step .board-score { font-size: 16px; }
-.board-step.is-rest { opacity: 0.7; }
-.board-list .board-row.is-you { padding-top: 0.45rem; padding-bottom: 0.45rem; row-gap: 0.1rem; }
-.board-step-mark { color: var(--gold); font-size: 14px; text-align: center; }
-.board-gap { grid-column: 2 / -1; color: var(--gold); font-size: 12px; }
 .board-row.is-you .board-name { color: var(--gold); }
-
-/* Your own row stays at the bottom, wherever you are on the list. */
-.board-you { padding-top: 0.45rem; border-top: 1px solid var(--glass-line-soft); }
-.board-you-note { padding: 0.7rem 0.75rem; border: 1px dashed var(--glass-line); border-radius: 12px; color: var(--muted); font-size: 13px; }
 
 /* Account */
 
@@ -1754,7 +1794,7 @@ h1, h2, h3 { font-weight: normal; }
   .screen-modal { height: calc(100vh - 2rem); overflow-y: auto; }
   .screen-body,
   .archive-layout,
-  .leaderboard-layout { grid-template-columns: 1fr; flex: none; }
+  .community-layout { grid-template-columns: 1fr; flex: none; }
   .archive-calendar,
   .day-overview { overflow: visible; }
   .board-list { overflow: visible; }
@@ -1863,14 +1903,11 @@ h1, h2, h3 { font-weight: normal; }
   .modal { width: 100%; max-height: 100dvh; border-radius: 0; }
   .screen-modal { height: 100dvh; padding: 14px; }
   .end-actions { grid-template-columns: 1fr; }
-  .rank-stats { grid-template-columns: repeat(2, 1fr); }
   .board-tabs { width: 100%; overflow-x: auto; }
   .board-tab { flex: 1; padding: 0.55rem 0.4rem; font-size: 8px; white-space: nowrap; }
-  .board-day { width: 100%; }
-  .board-columns,
-  .board-row { grid-template-columns: 40px minmax(0, 1fr) 64px 56px; gap: 0.35rem; padding: 0 0.5rem; }
   .tier-name { font-size: 9px; }
   .tier-range { display: none; }
+  .archive-ladder .tier-range { display: block; font-size: 8px; }
 }
 
 @media (max-width: 560px) {
@@ -1927,11 +1964,11 @@ h1, h2, h3 { font-weight: normal; }
           </svg>
           <span>ARCHIVE</span>
         </button>
-        <button class="menu-option" id="menuLeaderboardButton" type="button">
+        <button class="menu-option community-open-button" id="menuCommunityButton" type="button">
           <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
-            <path d="M3 25h5v5H3zm9-7h5v12h-5zm9-7h5v19h-5zM1 3h30v4H1zm4 5h4v5H5zm18 0h4v5h-4zm-9 0h4v5h-4z" fill="currentColor"/>
+            <path d="M8 5h6v6H8zm10 0h6v6h-6zM5 13h12v3H5zm12 0h10v3H17zM5 16h3v11H5zm9 0h3v11h-3zm10 0h3v11h-3zM8 22h6v3H8zm9 0h7v3h-7z" fill="currentColor"/>
           </svg>
-          <span>LEADERBOARD</span>
+          <span>COMMUNITY</span>
         </button>
         <button class="menu-option" id="menuHowToButton" type="button">
           <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
@@ -2008,7 +2045,7 @@ h1, h2, h3 { font-weight: normal; }
               <path d="M5 4h4v3h14V4h4v4h2v21H3V8h2zm1 6v16h18V10zm3 2h12v3H9zm0 6h9v3H9z" fill="currentColor"/>
             </svg>
           </button>
-          <button class="icon-btn leaderboard-open-button" type="button" title="Leaderboard" aria-label="Leaderboard">
+          <button class="icon-btn community-open-button" type="button" title="Community" aria-label="Community">
             <svg viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
               <path d="M15 3h2v2h2v2h2v4h2v4h2v4h2v4h2v4h2v3H1v-3h2v-4h2v-4h2v-4h2v-4h2V7h2V5h2zm1 4h-1v4h-2v3h4v-3h2V9h-2z" fill="currentColor"/>
             </svg>
@@ -2328,57 +2365,18 @@ h1, h2, h3 { font-weight: normal; }
     </div>
   </div>
 
-  <section id="leaderboardModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="leaderboardTitle">
+  <!-- Community: your profile and invite code, your friends, and groups with their own
+       daily medals and weekly winner (social.js, data in Supabase). -->
+  <section id="communityModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="communityTitle">
     <div class="modal screen-modal">
       <div class="modal-head">
         <div>
-          <h2 id="leaderboardTitle">LEADERBOARD</h2>
-          <p class="modal-note">How you rank among everyone who played.</p>
+          <h2 id="communityTitle">COMMUNITY</h2>
+          <p class="modal-note">Add friends with your invite code, make groups, and see who wins each day and each week.</p>
         </div>
-        <button class="modal-close" id="closeLeaderboardButton" type="button" aria-label="Close leaderboard">×</button>
+        <button class="modal-close" id="closeCommunityButton" type="button" aria-label="Close community">×</button>
       </div>
-      <div class="screen-body leaderboard-layout">
-        <!-- You: your explorer rank, the day's route and your stats. -->
-        <section class="rank-panel" aria-label="Your rank">
-          <div class="rank-card">
-            <span class="rank-badge" id="rankBadge"></span>
-            <div class="rank-headline">
-              <span class="field-label" id="rankTitle">YOUR RANK</span>
-              <strong id="overallRank">Unranked</strong>
-              <span class="rank-tier" id="overallRankTier"></span>
-              <small id="overallRankNote"></small>
-            </div>
-          </div>
-          <div class="rank-progress">
-            <div class="rank-progress-bar"><span id="rankProgressFill"></span></div>
-            <small id="rankProgressText"></small>
-          </div>
-          <button class="btn btn-primary hidden" id="rankPlayButton" type="button">PLAY THIS DAY ▶</button>
-          <div class="rank-route">
-            <span class="field-label" id="rankRouteTitle">TODAY</span>
-            <div id="rankRoute"></div>
-          </div>
-          <dl class="rank-stats" id="rankStats"></dl>
-          <ol class="tier-ladder" id="tierLegend" aria-label="Explorer ranks"></ol>
-        </section>
-        <!-- Everyone else. -->
-        <section class="screen-column board" aria-label="Leaderboard">
-          <div class="board-head">
-            <div class="board-tabs" role="tablist">
-              <button class="board-tab is-active" type="button" role="tab" data-board="day">TODAY</button>
-              <button class="board-tab" type="button" role="tab" data-board="week">THIS WEEK</button>
-              <button class="board-tab" type="button" role="tab" data-board="all">ALL TIME</button>
-              <button class="board-tab" type="button" role="tab" data-board="countries">COUNTRIES</button>
-            </div>
-            <select class="board-day" id="boardDay" aria-label="Day"></select>
-          </div>
-          <p class="board-caption" id="boardCaption"></p>
-          <div class="board-columns" id="boardColumns"></div>
-          <ol class="board-list" id="boardList"></ol>
-          <div class="board-you" id="boardYou"></div>
-        </section>
-      </div>
-      <p class="sample-note">Player numbers and ranks are sample data until online leaderboards launch.</p>
+      <div class="screen-body community-layout" id="communityBody"></div>
     </div>
   </section>
 
@@ -2439,13 +2437,15 @@ h1, h2, h3 { font-weight: normal; }
       <div class="modal-head">
         <div>
           <h2 id="archiveTitle">ARCHIVE</h2>
-          <p class="modal-note">A medal for every day you play, and a stamp for every full week. Pick a day to see its rounds and how everyone did.</p>
+          <p class="modal-note">Your top % of the world for every day you play, and a badge each month for how often and how well you played. Pick a day to see its rounds and how everyone did.</p>
         </div>
         <button class="modal-close" id="closeArchiveButton" type="button" aria-label="Close archive">×</button>
       </div>
       <div class="screen-body archive-layout">
         <div class="screen-column">
           <div id="archiveListContainer" class="archive-calendar"></div>
+          <!-- Start, continue or "played" for the selected day, under the calendar. -->
+          <div id="archivePlay"></div>
         </div>
         <div class="day-overview" id="dayOverview" aria-live="polite"></div>
       </div>
@@ -7066,7 +7066,36 @@ async function pushDay(date, state, { score = null, completed = false } = {}) {
   if (error) console.warn("Couldn't save this day to your account.", error);
 }
 
-return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, signOut, pullDays, pushDay };
+// ---------------------------------------------------------------------------
+// Community (supabase/social.sql): your profile and invite code, friends, and groups.
+// Each call goes through a database function that checks who is asking.
+// ---------------------------------------------------------------------------
+
+async function call(name, args = {}) {
+  const supabase = await getClient();
+  if (!supabase || !user) throw new Error("Sign in first.");
+  const { data, error } = await supabase.rpc(name, args);
+  if (error) {
+    // The functions aren't there until social.sql has been run in Supabase.
+    if (error.code === "PGRST202" || error.code === "42883") throw Object.assign(new Error("Community isn't set up on the server yet."), { notSetUp: true });
+    throw new Error(error.message);
+  }
+  return data;
+}
+
+const getMyProfile = async () => (await call("my_profile", { fallback_name: getProfile().name }))?.[0] || null;
+const setDisplayName = name => call("set_display_name", { new_name: name });
+const addFriend = code => call("add_friend", { code });
+const removeFriend = friendId => call("remove_friend", { friend: friendId });
+const getFriends = () => call("my_friends");
+const createGroup = (name, memberIds) => call("create_group", { group_name: name, members: memberIds });
+const addToGroup = (groupId, friendId) => call("add_to_group", { group_ref: groupId, friend: friendId });
+const leaveGroup = groupId => call("leave_group", { group_ref: groupId });
+const getGroups = () => call("my_groups");
+// Rows of { user_id, display_name, date, score } for the group's finished days.
+const getGroupBoard = (groupId, from, to) => call("group_board", { group_ref: groupId, from_date: from, to_date: to });
+
+return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, addToGroup, leaveGroup, getGroups, getGroupBoard };
 })();
 
 // ---- round-pictures.js
@@ -7412,806 +7441,6 @@ class SoundEngine {
 
 const sounds = new SoundEngine();
 return { sounds };
-})();
-
-// ---- ui.js
-__modules["ui.js"] = (() => {
-const { sounds } = __modules["audio.js"];
-
-const input = document.getElementById("countryInput");
-const autocompleteList = document.getElementById("autocompleteList");
-const submitButton = document.getElementById("submitBtn");
-const toast = document.getElementById("inputToast");
-let toastTimer;
-
-// Region phrases that legitimately contain a country name/alias
-// (e.g. "Northern America" contains the US alias "America"). They are stashed
-// during redaction so they are never mangled into "Northern the target country".
-const REGION_PHRASES = [
-  "Northern America", "North America", "South America", "Central America", "Latin America"
-];
-
-function redactCountryName(value, country) {
-  let safeValue = value;
-  const names = [country.name, ...(country.aliases || [])]
-    .filter(name => name.length > 4)
-    .sort((left, right) => right.length - left.length);
-
-  const stash = [];
-  // Capitals can contain the country's name ("Mexico City"), so they're protected too.
-  const protectedPhrases = [...REGION_PHRASES, "Gulf of Guinea", "New Guinea", ...(country.capital || [])]
-    .map(phrase => phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-  const regionPattern = new RegExp(`(${protectedPhrases.join("|")})`, "gi");
-  safeValue = safeValue.replace(regionPattern, (match) => {
-    stash.push(match);
-    return `\u0000${stash.length - 1}\u0000`;
-  });
-
-  names.forEach(name => {
-    const escapedName = name.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&");
-    safeValue = safeValue.replace(new RegExp(`(^|[^\\p{L}])${escapedName}(?=$|[^\\p{L}])`, "giu"), "$1the target country");
-  });
-
-  safeValue = safeValue.replace(/\u0000(\d+)\u0000/g, (_, index) => stash[Number(index)]);
-  return safeValue;
-}
-
-// A short note in the right column. A problem with an answer (an unknown name, a repeat)
-// gets the red ✕ of a miss and sits right under the place you answered (near).
-const toastHome = { parent: toast.parentElement, next: toast.nextElementSibling };
-function showToastNotice(message, { problem = false, near = null } = {}) {
-  toast.textContent = message;
-  toast.classList.toggle("is-problem", problem);
-  if (near) near.after(toast);
-  else toastHome.parent.insertBefore(toast, toastHome.next);
-  toast.classList.remove("hidden");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.add("hidden"), 2400);
-}
-
-function resetCountryInput({ focus = true } = {}) {
-  input.value = "";
-  autocompleteList.replaceChildren();
-  autocompleteList.classList.add("hidden");
-  input.setAttribute("aria-expanded", "false");
-  if (focus && !input.disabled) input.focus();
-}
-
-function normalizeCountryName(value) {
-  return value.normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLocaleLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim()
-    .replace(/\s+/g, " ");
-}
-
-function updateDailyScoreUI(score) {
-  document.getElementById("dailyTotalScore").textContent = score.toLocaleString();
-}
-
-function createFlagImage(country, className) {
-  const image = document.createElement("img");
-  image.className = className;
-  image.src = `https://flagcdn.com/w80/${country.iso.toLowerCase()}.png`;
-  image.alt = `Flag of ${country.name}`;
-  image.loading = "lazy";
-  image.decoding = "async";
-  image.addEventListener("error", () => {
-    image.classList.add("flag-image-unavailable");
-    image.alt = `Flag unavailable for ${country.name}`;
-  }, { once: true });
-  return image;
-}
-
-// A country's outline as an SVG, from the globe's own map polygons (GeoJSON order:
-// polygon -> rings -> [lon, lat]). It is drawn in a Lambert azimuthal equal-area
-// projection centred on the country, so the shape and proportions match the globe (a
-// flat world map stretches Canada and Russia). Far-off overseas parts, like French Guiana
-// for France or Hawaii for the United States, are left out so the country fills the box.
-const toVector = ([lon, lat]) => {
-  const phi = lat * Math.PI / 180;
-  const lambda = lon * Math.PI / 180;
-  return [Math.cos(phi) * Math.cos(lambda), Math.cos(phi) * Math.sin(lambda), Math.sin(phi)];
-};
-const angleBetween = (a, b) => Math.acos(Math.max(-1, Math.min(1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2])));
-const normalize = ([x, y, z]) => { const length = Math.hypot(x, y, z) || 1; return [x / length, y / length, z / length]; };
-
-function drawCountryOutline(polygons, label) {
-  if (!polygons?.length) return null;
-  const parts = polygons.map(rings => {
-    const points = rings[0].map(toVector);
-    const centre = normalize(points.reduce((sum, point) => sum.map((value, axis) => value + point[axis]), [0, 0, 0]));
-    return { rings, centre, reach: Math.max(...points.map(point => angleBetween(centre, point))) };
-  });
-  const main = parts.reduce((best, part) => part.reach > best.reach ? part : best);
-  const kept = parts.filter(part => angleBetween(part.centre, main.centre) <= main.reach + 15 * Math.PI / 180);
-  const [cx, cy, cz] = main.centre;
-  const lat0 = Math.asin(cz);
-  const lon0 = Math.atan2(cy, cx);
-  const project = ([lon, lat]) => {
-    const phi = lat * Math.PI / 180;
-    const dLambda = lon * Math.PI / 180 - lon0;
-    const cosC = Math.sin(lat0) * Math.sin(phi) + Math.cos(lat0) * Math.cos(phi) * Math.cos(dLambda);
-    const k = Math.sqrt(2 / Math.max(1e-6, 1 + cosC));
-    return [k * Math.cos(phi) * Math.sin(dLambda), -k * (Math.cos(lat0) * Math.sin(phi) - Math.sin(lat0) * Math.cos(phi) * Math.cos(dLambda))];
-  };
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  const d = kept.flatMap(part => part.rings).map(ring => ring.map((point, index) => {
-    const [x, y] = project(point);
-    minX = Math.min(minX, x); maxX = Math.max(maxX, x);
-    minY = Math.min(minY, y); maxY = Math.max(maxY, y);
-    return `${index ? "L" : "M"}${(x * 1000).toFixed(1)},${(y * 1000).toFixed(1)}`;
-  }).join("") + "Z").join("");
-  const padding = Math.max(maxX - minX, maxY - minY) * 0.06;
-  const namespace = "http://www.w3.org/2000/svg";
-  const svg = document.createElementNS(namespace, "svg");
-  svg.setAttribute("class", "country-outline");
-  svg.setAttribute("viewBox", [minX - padding, minY - padding, maxX - minX + padding * 2, maxY - minY + padding * 2].map(value => (value * 1000).toFixed(1)).join(" "));
-  svg.setAttribute("role", "img");
-  svg.setAttribute("aria-label", `Outline of ${label}`);
-  const path = document.createElementNS(namespace, "path");
-  path.setAttribute("d", d);
-  path.setAttribute("fill-rule", "evenodd");
-  svg.appendChild(path);
-  return svg;
-}
-
-// A card in the middle of the screen that opens like a pack: its steps (elements already
-// in the card, each with a status) start face down and turn over one at a time, matches
-// popping with a chime. It then waits for its button (a click or Enter); a click while
-// steps are still turning shows them all at once. land() commits the move and returns the
-// row the card should fly into. Resolves once the card is gone.
-const REVEAL_FIRST_MS = 650;
-const REVEAL_STEP_MS = 700;
-const REVEAL_FLY_MS = 380;
-function playRevealCard({ card, steps, nextLabel, land, sound = () => {}, onTurn = () => {} }) {
-  const host = document.getElementById("gameView");
-  const overlay = Object.assign(document.createElement("div"), { className: "guess-reveal" });
-  card.classList.add("guess-reveal-card");
-  steps.forEach(({ element }) => element.classList.add("reveal-slot"));
-  const next = Object.assign(document.createElement("button"), { type: "button", className: "guess-reveal-next" });
-  next.textContent = `${nextLabel} ▶`;
-  card.appendChild(next);
-  overlay.appendChild(card);
-  host.appendChild(overlay);
-
-  let shown = 0;
-  let streak = 0;
-  let timer = null;
-  const turnOver = (step, quiet) => {
-    step.element.classList.add("is-turned", `is-${step.status}`);
-    streak = step.status === "match" ? streak + 1 : 0;
-    onTurn(step);
-    if (!quiet) sound(step.status === "clue" ? "hint" : step.status, streak - 1);
-  };
-  const complete = () => {
-    card.classList.add("is-complete");
-    next.focus({ preventScroll: true });
-  };
-  const showNext = () => {
-    turnOver(steps[shown], false);
-    shown += 1;
-    if (shown < steps.length) {
-      // The step about to turn shimmers for a moment first, for a little suspense.
-      steps[shown].element.classList.add("is-next");
-      timer = setTimeout(showNext, REVEAL_STEP_MS);
-    } else {
-      complete();
-    }
-  };
-  steps[0].element.classList.add("is-next");
-  timer = setTimeout(showNext, REVEAL_FIRST_MS);
-
-  return new Promise(resolve => {
-    let landed = false;
-    const finish = () => {
-      if (landed) return;
-      landed = true;
-      window.removeEventListener("keydown", onKey, true);
-      const row = land();
-      const from = card.getBoundingClientRect();
-      const to = row?.getBoundingClientRect();
-      // Fly into the row when it's on screen; otherwise just fade out.
-      const visible = to && to.width && to.bottom > 0 && to.top < innerHeight;
-      if (visible) {
-        row.classList.add("is-landing");
-        card.style.transformOrigin = "0 0";
-        card.style.transform = `translate(${to.left - from.left}px, ${to.top - from.top}px) scale(${to.width / from.width}, ${to.height / from.height})`;
-      }
-      overlay.classList.add("is-leaving");
-      setTimeout(() => {
-        row?.classList.remove("is-landing");
-        overlay.remove();
-        resolve();
-      }, REVEAL_FLY_MS);
-    };
-    // A click or Enter: show the remaining steps at once, or, once all are shown, go on.
-    const advance = () => {
-      if (shown >= steps.length) { finish(); return; }
-      clearTimeout(timer);
-      steps.slice(shown).forEach(step => turnOver(step, true));
-      shown = steps.length;
-      complete();
-    };
-    const onKey = event => {
-      if (event.key !== "Enter" && event.key !== " " && event.key !== "Escape") return;
-      // Typing a space in the answer box is still just a space.
-      if (event.key === " " && event.target.closest?.("input, textarea")) return;
-      event.preventDefault();
-      event.stopPropagation();
-      advance();
-    };
-    window.addEventListener("keydown", onKey, true);
-    overlay.addEventListener("click", advance);
-  });
-}
-
-// A face-down tile that turns over to show a newly unlocked clue (Mystery, Pinpoint).
-function createClueStep({ label, text }) {
-  const tile = Object.assign(document.createElement("div"), { className: "reveal-clue" });
-  tile.append(
-    Object.assign(document.createElement("span"), { className: "slot-cover", textContent: "🔓 NEW CLUE" }),
-    Object.assign(document.createElement("span"), { className: "clue-tag", textContent: label }),
-    Object.assign(document.createElement("p"), { textContent: text })
-  );
-  return { element: tile, status: "clue" };
-}
-
-// Mystery and Pinpoint: a guess as a pack-style card. Flag, name and outline show at once;
-// hot/cold, each hint and any newly unlocked clue turn over one by one.
-function playGuessReveal(guess, { land, sound, nextLabel = "NEXT GUESS", outline = null, newClue = null }) {
-  const card = document.createElement("div");
-  // The card's edge takes the hot/cold colour only when that badge turns over.
-  card.style.setProperty("--temp", "var(--glass-line)");
-  const head = Object.assign(document.createElement("div"), { className: "guess-reveal-head" });
-  const temperature = Object.assign(document.createElement("span"), { className: "temp-badge", textContent: guess.temperature });
-  head.append(
-    createFlagImage(guess.country, "guess-reveal-flag"),
-    Object.assign(document.createElement("strong"), { className: "guess-reveal-name", textContent: guess.country.name }),
-    temperature
-  );
-  const shape = drawCountryOutline(outline, guess.country.name);
-  if (shape) head.appendChild(Object.assign(document.createElement("div"), { className: "guess-reveal-outline" })).appendChild(shape);
-  const facts = Object.assign(document.createElement("div"), { className: "guess-facts" });
-  const steps = [{ element: temperature, status: guess.isCorrect ? "match" : "hint" }];
-  getGuessFacts(guess).forEach(({ label, status, indicator }) => {
-    const fact = Object.assign(document.createElement("span"), { className: `fact fact-${status}` });
-    if (indicator) fact.appendChild(Object.assign(document.createElement("b"), { textContent: indicator }));
-    fact.append(label);
-    facts.appendChild(fact);
-    steps.push({ element: fact, status });
-  });
-  card.append(head, facts);
-  if (newClue) {
-    const clue = createClueStep(newClue);
-    card.appendChild(clue.element);
-    steps.push(clue);
-  }
-  return playRevealCard({
-    card, steps, nextLabel, land, sound,
-    onTurn: step => { if (step.element === temperature) card.style.setProperty("--temp", guess.color); }
-  });
-}
-
-// Rank 'Em: a try as a pack-style card, Mastermind style. The order you tried is shown,
-// then five lights turn on one by one: green for each country in the right place, then
-// red for the rest (never which ones), and finally any hint the try unlocked.
-function playRankReveal({ tryNumber, order, right, hint = null, land, sound, nextLabel = "NEXT TRY" }) {
-  const card = document.createElement("div");
-  card.style.setProperty("--temp", "var(--glass-line)");
-  const head = Object.assign(document.createElement("div"), { className: "rank-reveal-head" });
-  head.append(
-    Object.assign(document.createElement("span"), { className: "field-label", textContent: `TRY ${tryNumber}` }),
-    Object.assign(document.createElement("ol"), { className: "rank-reveal-order" })
-  );
-  order.forEach(country => {
-    const item = document.createElement("li");
-    item.append(createFlagImage(country, "rank-try-flag"), country.name);
-    head.lastChild.appendChild(item);
-  });
-  const pegs = Object.assign(document.createElement("div"), { className: "rank-pegs is-big", role: "img" });
-  pegs.setAttribute("aria-label", `${right} of ${order.length} in the right place`);
-  const steps = order.map((_, index) => {
-    const peg = Object.assign(document.createElement("i"), { className: "rank-peg" });
-    pegs.appendChild(peg);
-    return { element: peg, status: index < right ? "match" : "miss" };
-  });
-  const tally = Object.assign(document.createElement("p"), { className: "rank-reveal-tally", textContent: `${right} of ${order.length} in the right place` });
-  card.append(head, pegs, tally);
-  steps.push({ element: tally, status: right === order.length ? "match" : "hint" });
-  if (hint) {
-    const chip = Object.assign(document.createElement("span"), { className: "fact fact-hint rank-reveal-hint", textContent: `Hint: ${hint}` });
-    card.appendChild(chip);
-    steps.push({ element: chip, status: "hint" });
-  }
-  return playRevealCard({
-    card, steps, nextLabel, land, sound,
-    onTurn: step => { if (step.element === tally) card.style.setProperty("--temp", right === order.length ? "var(--t-correct)" : "var(--danger)"); }
-  });
-}
-
-const CLUE_DIFFICULTIES = ["VERY DIFFICULT", "DIFFICULT", "MEDIUM", "EASY", "EASIEST"];
-
-// Mystery's clue number index (0-based), with the answer's name kept out of it.
-function getMysteryClue(targetCountry, index) {
-  const text = targetCountry[`clue${index + 1}`];
-  return text ? { label: `CLUE ${index + 1} · ${CLUE_DIFFICULTIES[index]}`, text: redactCountryName(text, targetCountry) } : null;
-}
-
-function renderProgressiveHints(targetCountry, wrongGuessCount) {
-  const clues = [
-    targetCountry.clue1,
-    targetCountry.clue2,
-    targetCountry.clue3,
-    targetCountry.clue4,
-    targetCountry.clue5
-  ];
-  const unlockedCount = Math.min(wrongGuessCount + 1, clues.length);
-  const currentIndex = unlockedCount - 1;
-
-  const pips = document.getElementById("cluePips");
-  pips.replaceChildren(...clues.map((_, index) => {
-    const pip = document.createElement("i");
-    if (index < unlockedCount) pip.className = "on";
-    return pip;
-  }));
-  pips.setAttribute("aria-label", `${unlockedCount} of ${clues.length} clues unlocked`);
-
-  document.getElementById("clueCurrentLabel").textContent =
-    `CLUE ${currentIndex + 1} · ${CLUE_DIFFICULTIES[currentIndex]}`;
-  document.getElementById("clueCurrentText").textContent =
-    redactCountryName(clues[currentIndex], targetCountry);
-
-  // Earlier clues stay visible underneath, newest first.
-  const earlier = document.getElementById("clueEarlier");
-  earlier.replaceChildren();
-  for (let index = currentIndex - 1; index >= 0; index -= 1) {
-    const item = document.createElement("li");
-    const number = document.createElement("b");
-    number.textContent = String(index + 1);
-    item.append(number, redactCountryName(clues[index], targetCountry));
-    earlier.appendChild(item);
-  }
-
-  const remaining = clues.length - unlockedCount;
-  document.getElementById("clueLocked").textContent = remaining > 0
-    ? `🔒 ${remaining} more ${remaining === 1 ? "clue unlocks" : "clues unlock"} with each wrong guess`
-    : "";
-}
-
-function renderGlobeMarkerTooltip(guess, index) {
-  const tooltip = document.querySelector(".globe-marker-tooltip");
-  if (!tooltip || !guess) return;
-  tooltip.replaceChildren();
-  const heading = document.createElement("div");
-  heading.className = "marker-tooltip-heading";
-  const flag = createFlagImage(guess.country, "marker-tooltip-flag");
-  const name = document.createElement("strong");
-  name.textContent = `${index + 1}. ${guess.country.name}`;
-  heading.append(flag, name);
-  const details = document.createElement("span");
-  details.className = "marker-tooltip-details";
-  details.textContent = guess.temperature;
-  tooltip.append(heading, details);
-}
-
-function initializeMainMenu({ onDailyChallenge, onHome }) {
-  const menu = document.getElementById("mainMenu");
-  const menuOptions = menu.querySelector(".menu-options");
-  const menuButtons = [...menuOptions.querySelectorAll(".menu-option")];
-  const gameView = document.getElementById("gameView");
-  const howToModal = document.getElementById("howToPlayModal");
-  let resumeBlinkTimer = null;
-
-  function updateMenuButtonActivity() {
-    const buttonIsActive = menuButtons.some(button =>
-      button.matches(":hover") || button === document.activeElement
-    );
-    menuOptions.classList.toggle("has-menu-button-active", buttonIsActive);
-  }
-
-  function pauseBlinkForPointer() {
-    clearTimeout(resumeBlinkTimer);
-    resumeBlinkTimer = null;
-    menuOptions.classList.add("has-hover-cooldown");
-  }
-
-  menuButtons.forEach(button => button.addEventListener("pointerenter", () => {
-    pauseBlinkForPointer();
-    updateMenuButtonActivity();
-  }));
-  menuButtons.forEach(button => button.addEventListener("pointerleave", () => {
-    updateMenuButtonActivity();
-    if (!menuButtons.some(button => button.matches(":hover"))) pauseBlinkForPointer();
-  }));
-  menuOptions.addEventListener("pointerenter", () => {
-    pauseBlinkForPointer();
-    updateMenuButtonActivity();
-  });
-  menuOptions.addEventListener("pointerleave", () => {
-    if (menuButtons.some(button => button.matches(":hover"))) return;
-
-    clearTimeout(resumeBlinkTimer);
-    resumeBlinkTimer = setTimeout(() => {
-      resumeBlinkTimer = null;
-      if (menuOptions.matches(":hover")) return;
-      menuOptions.classList.remove("has-hover-cooldown");
-      updateMenuButtonActivity();
-    }, 1000);
-  });
-  menuOptions.addEventListener("focusin", updateMenuButtonActivity);
-  menuOptions.addEventListener("focusout", updateMenuButtonActivity);
-  updateMenuButtonActivity();
-  menuOptions.classList.add("is-boot-complete");
-
-  function showMenu() {
-    gameView.classList.add("hidden");
-    menu.classList.remove("hidden");
-    howToModal.classList.add("hidden");
-    document.getElementById("victoryModal").classList.add("hidden");
-    document.getElementById("statsModal").classList.add("hidden");
-    document.getElementById("archiveModal").classList.add("hidden");
-    document.getElementById("leaderboardModal").classList.add("hidden");
-    onHome();
-  }
-
-  // The game hides the menu itself, so it can play the menu's exit animation.
-  function showGame() {
-    howToModal.classList.add("hidden");
-    gameView.classList.remove("hidden");
-    onDailyChallenge();
-  }
-
-  document.getElementById("menuDailyButton").addEventListener("click", () => {
-    sounds.playClick();
-    showGame();
-  });
-  document.querySelectorAll("#menuHowToButton, .how-to-open-button").forEach(button => {
-    button.addEventListener("click", () => {
-      sounds.playClick();
-      howToModal.classList.remove("hidden");
-    });
-  });
-  document.getElementById("closeHowToButton").addEventListener("click", () => {
-    sounds.playClick();
-    howToModal.classList.add("hidden");
-  });
-  document.getElementById("howToMenuButton").addEventListener("click", () => {
-    sounds.playClick();
-    howToModal.classList.add("hidden");
-  });
-  document.querySelectorAll(".home-button").forEach(button => {
-    button.addEventListener("click", () => {
-      sounds.playClick();
-      showMenu();
-    });
-  });
-}
-
-// A text input with country suggestions. onSubmit(value, country) receives either the
-// typed text or the picked suggestion and returns { status }; "submitted" clears the input.
-function createCountryInput({ input: field, list, button, countries, isExcluded = () => false, onSubmit }) {
-  let activeIndex = -1;
-  let suggestions = [];
-
-  function reset({ focus = true } = {}) {
-    field.value = "";
-    list.replaceChildren();
-    list.classList.add("hidden");
-    field.setAttribute("aria-expanded", "false");
-    activeIndex = -1;
-    if (focus && !field.disabled) field.focus();
-  }
-
-  function submit(value, country) {
-    const result = onSubmit(value, country);
-    if (result?.status === "submitted") reset();
-  }
-
-  function renderSuggestions(query) {
-    const normalizedQuery = normalizeCountryName(query);
-    list.replaceChildren();
-    suggestions = [];
-    activeIndex = -1;
-    if (field.disabled || !normalizedQuery) {
-      list.classList.add("hidden");
-      field.setAttribute("aria-expanded", "false");
-      return;
-    }
-
-    const rankOf = label => getMatchRank(normalizedQuery, normalizeCountryName(label));
-    const matches = countries.map(country => {
-      if (isExcluded(country.iso)) return false;
-      const rank = Math.min(...[country.name, ...country.aliases].map(rankOf));
-      // A territory only shows when it matches better than the country's own names
-      // (and once a few letters are typed, so short queries aren't flooded), and then
-      // says which country it counts as ("French Guiana → France").
-      const territory = normalizedQuery.length < 3 ? null : (country.territories || [])
-        .map(name => ({ name, rank: rankOf(name) }))
-        .sort((left, right) => left.rank - right.rank)[0];
-      if (territory && territory.rank < rank) return { country, rank: territory.rank, via: territory.name };
-      return Number.isFinite(rank) ? { country, rank } : false;
-    }).filter(Boolean)
-      .sort((left, right) => left.rank - right.rank || left.country.name.localeCompare(right.country.name))
-      .slice(0, 8);
-    suggestions = matches.map(match => match.country);
-
-    if (suggestions.length === 0) {
-      list.classList.add("hidden");
-      field.setAttribute("aria-expanded", "false");
-      return;
-    }
-
-    matches.forEach(({ country, via }) => {
-      const item = document.createElement("div");
-      item.className = "autocomplete-item";
-      item.setAttribute("role", "option");
-      item.setAttribute("aria-selected", "false");
-      const name = document.createElement("span");
-      name.textContent = via ? `${via} → ${country.name}` : country.name;
-      const continent = document.createElement("small");
-      continent.textContent = country.continent;
-      item.append(createFlagImage(country, "autocomplete-flag"), name, continent);
-      item.addEventListener("click", () => {
-        sounds.playClick();
-        submit("", country);
-      });
-      list.appendChild(item);
-    });
-
-    list.classList.remove("hidden");
-    field.setAttribute("aria-expanded", "true");
-  }
-
-  function setActiveSuggestion(index) {
-    if (suggestions.length === 0) return;
-    activeIndex = (index + suggestions.length) % suggestions.length;
-    const items = list.querySelectorAll('[role="option"]');
-    items.forEach((item, itemIndex) => {
-      const isActive = itemIndex === activeIndex;
-      item.classList.toggle("active", isActive);
-      item.setAttribute("aria-selected", String(isActive));
-    });
-    items[activeIndex].scrollIntoView({ block: "nearest" });
-  }
-
-  field.addEventListener("input", event => renderSuggestions(event.target.value));
-  // When exactly one country matches what's typed, use it, so "portu" + Enter works.
-  function submitTyped() {
-    if (suggestions.length === 1 && !list.classList.contains("hidden")) submit("", suggestions[0]);
-    else submit(field.value);
-  }
-
-  button.addEventListener("click", () => {
-    sounds.playClick();
-    submitTyped();
-  });
-  field.addEventListener("keydown", event => {
-    const items = list.querySelectorAll(".autocomplete-item");
-    if (event.key === "ArrowDown" && items.length > 0) {
-      event.preventDefault();
-      setActiveSuggestion(activeIndex + 1);
-    } else if (event.key === "ArrowUp" && items.length > 0) {
-      event.preventDefault();
-      setActiveSuggestion(activeIndex < 0 ? items.length - 1 : activeIndex - 1);
-    } else if (event.key === "Escape") {
-      list.classList.add("hidden");
-      activeIndex = -1;
-    } else if (event.key === "Enter") {
-      event.preventDefault();
-      sounds.playClick();
-      if (activeIndex >= 0 && items[activeIndex]) items[activeIndex].click();
-      else submitTyped();
-    }
-  });
-
-  return {
-    reset,
-    setDisabled(disabled) {
-      field.disabled = disabled;
-      button.disabled = disabled;
-      if (disabled) {
-        list.classList.add("hidden");
-        field.setAttribute("aria-expanded", "false");
-      }
-    }
-  };
-}
-
-function initializeCountryInput({ countries, hasGuessed, onSubmit, onGiveUp = () => {} }) {
-  document.getElementById("giveUpBtn").addEventListener("click", () => {
-    sounds.playClick();
-    onGiveUp();
-  });
-  return createCountryInput({ input, list: autocompleteList, button: submitButton, countries, isExcluded: hasGuessed, onSubmit });
-}
-
-// Forgiving comparison for typed answers: ignores accents, case and punctuation, and
-// allows a typo or two in longer names.
-function isCloseMatch(guess, answer) {
-  const left = normalizeCountryName(guess);
-  const right = normalizeCountryName(answer);
-  if (!left || !right) return false;
-  if (left === right) return true;
-  if (right.length < 4) return false;
-  return editDistance(left, right) <= (right.length > 8 ? 2 : 1);
-}
-
-function getMatchRank(query, label) {
-  if (query === label) return 0;
-  if (label.startsWith(query)) return 1;
-  if (label.includes(query)) return 2;
-  if (query.length < 4) return Infinity;
-  const distance = editDistance(query, label);
-  const maximumDistance = query.length > 8 ? 2 : 1;
-  return distance <= maximumDistance ? 3 + distance : Infinity;
-}
-
-function editDistance(left, right) {
-  const previous = Array.from({ length: right.length + 1 }, (_, index) => index);
-  for (let row = 1; row <= left.length; row += 1) {
-    let diagonal = previous[0];
-    previous[0] = row;
-    for (let column = 1; column <= right.length; column += 1) {
-      const above = previous[column];
-      previous[column] = Math.min(
-        previous[column] + 1,
-        previous[column - 1] + 1,
-        diagonal + (left[row - 1] === right[column - 1] ? 0 : 1)
-      );
-      diagonal = above;
-    }
-  }
-  return previous[right.length];
-}
-
-// Plain-text arrows (not emoji) so they sit nicely in the monospace chips.
-const DIRECTION_ARROWS = { N: "↑", NE: "↗", E: "→", SE: "↘", S: "↓", SW: "↙", W: "←", NW: "↖" };
-
-// Words for how far the answer is from a guess, given guess ÷ answer.
-function getRatioFact(ratio, { similar, more, much, less, muchLess }) {
-  const relativeRatio = Math.max(ratio, 1 / ratio);
-  if (relativeRatio <= 1.5) return { status: "match", indicator: "≈", label: similar };
-  const isMore = ratio < 1;
-  return {
-    status: "hint",
-    indicator: isMore ? "▲" : "▼",
-    label: relativeRatio > 3 ? (isMore ? much : muchLess) : (isMore ? more : less)
-  };
-}
-
-// Every chip is a fact about the answer, compared with this guess: green when the
-// answer matches the guess, blue when it points somewhere, grey when it rules something out.
-function getGuessFacts(guess) {
-  if (guess.isCorrect) return [{ status: "match", indicator: "✓", label: "This is the answer" }];
-  const name = guess.country.name;
-  const facts = [
-    {
-      status: "direction",
-      indicator: DIRECTION_ARROWS[guess.direction] || "",
-      label: `Answer lies ${guess.direction}`,
-      title: `The answer lies to the ${guess.direction} of ${name}`
-    },
-    guess.continentMatch
-      ? { status: "match", indicator: "✓", label: "Same continent", title: `The answer is also in ${guess.country.continent}` }
-      : { status: "miss", label: "Other continent", title: `The answer is not in ${guess.country.continent}` }
-  ];
-  // A different region is a given on another continent, so it only shows within one.
-  if (guess.continentMatch) {
-    facts.push(guess.subregionMatch
-      ? { status: "match", indicator: "✓", label: "Same region", title: `The answer is also in ${guess.country.subregion}` }
-      : { status: "miss", label: "Other region", title: `The answer is not in ${guess.country.subregion}` });
-  }
-  facts.push(
-    guess.borderMatch
-      ? { status: "match", indicator: "✓", label: "Neighbour", title: `The answer borders ${name}` }
-      : { status: "miss", label: "Not a neighbour", title: `The answer doesn't border ${name}` },
-    {
-      ...getRatioFact(guess.populationRatio, {
-        similar: "Similar population", more: "More people", much: "Far more people", less: "Fewer people", muchLess: "Far fewer people"
-      }),
-      title: `Population compared with ${name}`
-    },
-    {
-      ...getRatioFact(guess.areaRatio, {
-        similar: "Similar size", more: "Bigger", much: "Much bigger", less: "Smaller", muchLess: "Much smaller"
-      }),
-      title: `Area compared with ${name}`
-    },
-    guess.landlockedMatch
-      ? { status: "match", indicator: "✓", label: guess.country.isLandlocked ? "Also landlocked" : "Also coastal", title: `Like ${name}` }
-      : { status: "hint", label: guess.country.isLandlocked ? "Has a coast" : "Landlocked", title: `Unlike ${name}` }
-  );
-  return facts;
-}
-
-// One guess as a list row; pass onHover to link the row with its globe marker.
-function createGuessRow(guess, index, onHover = null) {
-  const row = document.createElement("li");
-  row.className = "guess-row";
-  row.dataset.guessIndex = String(index);
-  row.style.setProperty("--temp", guess.color);
-
-  const number = document.createElement("span");
-  number.className = "guess-number";
-  number.textContent = String(index + 1);
-  const name = document.createElement("span");
-  name.className = "guess-name";
-  name.textContent = guess.country.name;
-  const temperature = document.createElement("span");
-  temperature.className = "temp-badge";
-  temperature.textContent = guess.temperature;
-
-  const facts = getGuessFacts(guess);
-  const factList = document.createElement("div");
-  factList.className = "guess-facts";
-  facts.forEach(({ label, status, indicator, title }) => {
-    const fact = document.createElement("span");
-    fact.className = `fact fact-${status}`;
-    if (title) fact.title = title;
-    if (indicator) fact.appendChild(Object.assign(document.createElement("b"), { textContent: indicator }));
-    fact.append(label);
-    factList.appendChild(fact);
-  });
-
-  row.append(number, createFlagImage(guess.country, "guess-flag"), name, temperature, factList);
-  if (onHover) {
-    row.addEventListener("mouseenter", () => {
-      setGuessHighlight(index, true);
-      onHover(index, true);
-    });
-    row.addEventListener("mouseleave", () => {
-      setGuessHighlight(index, false);
-      onHover(index, false);
-    });
-  }
-  return row;
-}
-
-function renderGuessHistory(guesses, onHover = () => {}, maxGuesses = guesses.length) {
-  const history = document.getElementById("history");
-  history.replaceChildren(...guesses.map((guess, index) => createGuessRow(guess, index, onHover)));
-  document.getElementById("guessCount").textContent = `${guesses.length} / ${maxGuesses}`;
-
-  for (let index = guesses.length; index < maxGuesses; index += 1) {
-    const empty = document.createElement("li");
-    empty.className = "guess-empty";
-    const number = document.createElement("span");
-    number.className = "guess-number";
-    number.textContent = String(index + 1);
-    empty.append(number, "Unused guess");
-    history.appendChild(empty);
-  }
-}
-
-function setGuessHighlight(index, active) {
-  document.querySelectorAll(`[data-guess-index="${index}"]`).forEach(element => {
-    element.classList.toggle("guess-highlighted", active);
-  });
-}
-
-function initializeStatsModal(getStats) {
-  const statsModal = document.getElementById("statsModal");
-  document.querySelectorAll(".stats-open-button").forEach(button => {
-    button.addEventListener("click", () => {
-      sounds.playClick();
-      const stats = getStats();
-      document.getElementById("statsGamesPlayed").textContent = stats.gamesPlayed;
-      document.getElementById("statsWinStreak").textContent = stats.winStreak;
-      document.getElementById("statsMaxStreak").textContent = stats.maxStreak;
-      document.getElementById("statsAverageScore").textContent = stats.averageScore;
-      document.getElementById("statsPerfectGuesses").textContent = stats.perfectGuesses;
-      statsModal.classList.remove("hidden");
-    });
-  });
-  document.getElementById("closeStatsButton").addEventListener("click", () => {
-    sounds.playClick();
-    statsModal.classList.add("hidden");
-  });
-}
-
-return { showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, playGuessReveal, playRankReveal, getMysteryClue, renderProgressiveHints, renderGlobeMarkerTooltip, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight, initializeStatsModal };
 })();
 
 // ---- shape-data.js
@@ -10705,7 +9934,7 @@ __modules["community.js"] = (() => {
 // Community stats for each daily puzzle.
 // PLACEHOLDER: there is no online service yet, so these numbers are generated from the
 // date (stable per day, flagged with isSample so the UI can label them). Replace
-// getDayStats with a call to a real leaderboard API later; the rest can stay as is.
+// getDayStats with real figures later; the rest can stay as is.
 
 const { COUNTRIES } = __modules["countries.js"];
 const { MAX_DAILY_SCORE, getCountry } = __modules["daily.js"];
@@ -10715,13 +9944,15 @@ const SCORE_BUCKET_SIZE = MAX_DAILY_SCORE / SCORE_BUCKET_COUNT;
 
 // Explorer ranks, highest first; maxPercent is the "top X%" a player must be within. Each
 // has a pixel badge (badges.js) in its colour.
+// As a month's badge (getMonthBadge), each also asks for a number of days played that
+// month (minDays).
 const RANK_TIERS = [
-  { key: "legend", maxPercent: 1, name: "Legend", range: "Top 1%", color: "#ffd45c" },
-  { key: "pioneer", maxPercent: 5, name: "Pioneer", range: "Top 5%", color: "#ff8a3d" },
-  { key: "pathfinder", maxPercent: 10, name: "Pathfinder", range: "Top 10%", color: "#c58cff" },
-  { key: "navigator", maxPercent: 25, name: "Navigator", range: "Top 25%", color: "#45e3ff" },
-  { key: "backpacker", maxPercent: 50, name: "Backpacker", range: "Top 50%", color: "#5cf28a" },
-  { key: "tourist", maxPercent: 100, name: "Tourist", range: "Everyone else", color: "#8f9bbd" }
+  { key: "legend", maxPercent: 1, minDays: 25, name: "Legend", range: "Top 1%", color: "#ffd45c" },
+  { key: "pioneer", maxPercent: 5, minDays: 20, name: "Pioneer", range: "Top 5%", color: "#ff8a3d" },
+  { key: "pathfinder", maxPercent: 10, minDays: 14, name: "Pathfinder", range: "Top 10%", color: "#c58cff" },
+  { key: "navigator", maxPercent: 25, minDays: 7, name: "Navigator", range: "Top 25%", color: "#45e3ff" },
+  { key: "backpacker", maxPercent: 50, minDays: 3, name: "Backpacker", range: "Top 50%", color: "#5cf28a" },
+  { key: "tourist", maxPercent: 100, minDays: 1, name: "Tourist", range: "Everyone else", color: "#8f9bbd" }
 ];
 
 function createSeededRandom(seedText) {
@@ -10786,69 +10017,23 @@ function formatTopPercent(percent) {
   return `Top ${percent < 1 ? 1 : Math.ceil(percent)}%`;
 }
 
-function getRankTier(percent) {
-  return RANK_TIERS.find(tier => percent <= tier.maxPercent) || RANK_TIERS.at(-1);
-}
+// Badges are per month, a mix of how much and how well you played that month: the highest
+// explorer rank whose days played (minDays) you reached that month and whose "top X%" your
+// average over those days meets.
 
-// The score that puts a player in the top `percent` of a day: the inverse of getTopPercent.
-function getScoreAtTopPercent(stats, percent) {
-  const target = percent / 100 * stats.players;
-  let above = 0;
-  for (let bucket = SCORE_BUCKET_COUNT - 1; bucket >= 0; bucket -= 1) {
-    const count = stats.distribution[bucket];
-    if (above + count >= target) {
-      const share = count ? (target - above) / count : 0;
-      return Math.round((bucket + 1 - share) * SCORE_BUCKET_SIZE);
-    }
-    above += count;
-  }
-  return 0;
-}
-
-// ---------------------------------------------------------------------------
-// Leaderboards
-// There is no list of names: anyone can look answers up, so a list would fill with
-// perfect scores. Instead the board shows what it took to reach each rank, a share of
-// everyone that a few cheaters barely move.
-// ---------------------------------------------------------------------------
-
-// A badge is only earned after this many finished days.
-const DAYS_FOR_BADGE = 3;
-
-// The score needed for each rank (all but the last, which is everyone else), over one
-// day or several: the average of each day's threshold, rounded to tens.
-function getRankThresholds(dateKeys) {
-  const stats = dateKeys.map(getDayStats);
-  return RANK_TIERS.slice(0, -1).map(tier => ({
-    tier,
-    // One round short of perfect is at most 5,400, so no rank asks for more than that.
-    score: Math.min(5400, Math.round(stats.reduce((sum, day) => sum + getScoreAtTopPercent(day, tier.maxPercent), 0) / stats.length / 10) * 10)
-  }));
-}
-
-// How many people played over some days: more than on the busiest day, not everyone returns.
-function getPlayerCount(dateKeys) {
-  const busiest = Math.max(...dateKeys.map(dateKey => getDayStats(dateKey).players));
-  return Math.round(busiest * (1 + 0.35 * Math.log2(dateKeys.length)));
-}
-
-// Where the sample players come from, the first ones most often.
-const PLAYER_COUNTRIES = ["US", "GB", "NL", "DE", "CA", "AU", "FR", "BR", "IN", "SE", "PL", "ES", "IT", "MX", "BE", "NO", "IE", "NZ", "DK",
-  "FI", "PH", "JP", "KR", "ZA", "AR", "PT", "CH", "AT", "CZ", "TR", "CL", "CO", "EG", "NG", "ID", "SG", "GR", "RO", "HU", "IS"];
-
-// Countries by their players' average daily score, over every day so far.
-function getCountryBoard(dateKeys) {
-  const random = createSeededRandom(`community:countries:${dateKeys.length}`);
-  const rows = PLAYER_COUNTRIES.map((iso, index) => {
-    const players = Math.round(2400 / (index + 1.6) ** 0.9 * dateKeys.length * (0.8 + random() * 0.4));
-    return { country: iso, players, score: Math.round(2900 + random() * 1300 + Math.min(300, players / dateKeys.length / 10)) };
-  });
-  rows.sort((left, right) => right.score - left.score).forEach((row, index) => { row.rank = index + 1; });
-  return rows;
+// `days` are archive records (with completed, dateKey, topPercent); `month` is "2026-10".
+// Returns { tier, next, percent, played, total } (tier null until a day is played).
+function getMonthBadge(days, month) {
+  const inMonth = days.filter(day => day.dateKey.startsWith(month));
+  const played = inMonth.filter(day => day.completed);
+  if (!played.length) return { tier: null, next: RANK_TIERS.at(-1), percent: null, played: 0, total: inMonth.length };
+  const percent = played.reduce((sum, day) => sum + day.topPercent, 0) / played.length;
+  const tier = RANK_TIERS.find(item => played.length >= item.minDays && percent <= item.maxPercent) || RANK_TIERS.at(-1);
+  return { tier, next: RANK_TIERS[RANK_TIERS.indexOf(tier) - 1] || null, percent, played: played.length, total: inMonth.length };
 }
 
 // How other players did in one round of a day, for the archive (PLACEHOLDER like the rest:
-// generated from the date until real guesses come from the leaderboard). `round` is the
+// generated from the date until real guesses are collected). `round` is the
 // round as planned in daily.js. Every share is a whole percentage of the day's players.
 function getRoundStats(dateKey, index, round) {
   const random = createSeededRandom(`round:${dateKey}:${index}`);
@@ -10880,7 +10065,7 @@ function getRoundStats(dateKey, index, round) {
   }
 }
 
-return { SCORE_BUCKET_COUNT, SCORE_BUCKET_SIZE, RANK_TIERS, getDayStats, getScoreBucket, getTopPercent, formatTopPercent, getRankTier, getScoreAtTopPercent, DAYS_FOR_BADGE, getRankThresholds, getPlayerCount, getCountryBoard, getRoundStats };
+return { SCORE_BUCKET_COUNT, SCORE_BUCKET_SIZE, RANK_TIERS, getDayStats, getScoreBucket, getTopPercent, formatTopPercent, getMonthBadge, getRoundStats };
 })();
 
 // ---- badges.js
@@ -10967,15 +10152,16 @@ function createBadge(tier, size = 48) {
   return svg;
 }
 
-// Medals for a single day, by its score: gold, silver and bronze (no medal below that).
+// Medals are only for groups of friends: the day's first, second and third place in the
+// group. Against the whole world a day is just your "top X%" and your score.
 const MEDALS = [
-  { key: "gold", name: "Gold", minScore: 5000, fill: "#ffd45c", edge: "#fff0b3" },
-  { key: "silver", name: "Silver", minScore: 3500, fill: "#c9d3e6", edge: "#f4f7fc" },
-  { key: "bronze", name: "Bronze", minScore: 2000, fill: "#d6884a", edge: "#f2c49b" }
+  { key: "gold", name: "Gold", place: 1, fill: "#ffd45c", edge: "#fff0b3" },
+  { key: "silver", name: "Silver", place: 2, fill: "#c9d3e6", edge: "#f4f7fc" },
+  { key: "bronze", name: "Bronze", place: 3, fill: "#d6884a", edge: "#f2c49b" }
 ];
 
-function getMedal(score) {
-  return score === null || score === undefined ? null : MEDALS.find(medal => score >= medal.minScore) || null;
+function getGroupMedal(place) {
+  return MEDALS.find(medal => medal.place === place) || null;
 }
 
 // A medal ({ key, name, fill, edge }) as a pixel <svg>: a V-shaped ribbon over a coin with
@@ -11013,19 +10199,17 @@ function createMedal(medal, size = 24) {
   return svg;
 }
 
-return { createBadge, MEDALS, getMedal, createMedal };
+return { createBadge, MEDALS, getGroupMedal, createMedal };
 })();
 
 // ---- screens.js
 __modules["screens.js"] = (() => {
 const { sounds } = __modules["audio.js"];
-const { createFlagImage } = __modules["ui.js"];
-const { DAYS_FOR_BADGE, RANK_TIERS, SCORE_BUCKET_SIZE, formatTopPercent, getCountryBoard, getDayStats, getPlayerCount, getRankThresholds, getRankTier, getScoreAtTopPercent, getRoundStats, getScoreBucket, getTopPercent } = __modules["community.js"];
-const { MAX_DAILY_SCORE, getCountry, getJourney } = __modules["daily.js"];
-const { JOURNEYS, ROUND_COLORS, createJourney } = __modules["journeys.js"];
-const { MEDALS, createBadge, createMedal, getMedal } = __modules["badges.js"];
+const { RANK_TIERS, SCORE_BUCKET_SIZE, formatTopPercent, getDayStats, getMonthBadge, getRoundStats, getScoreBucket, getTopPercent } = __modules["community.js"];
+const { MAX_DAILY_SCORE } = __modules["daily.js"];
+const { createBadge } = __modules["badges.js"];
 
-const SAMPLE_NOTE = "Player numbers and ranks are sample data until online leaderboards launch.";
+const SAMPLE_NOTE = "Player numbers and ranks are sample data until the game has real players.";
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
@@ -11043,9 +10227,8 @@ function withCommunity(record) {
 
 // ---------------------------------------------------------------------------
 // Archive calendar: the days by week (Monday to Sunday) under a header per month. A
-// played day shows its medal, a day in progress how many rounds are done, a day not
-// played is just an outline. Each week ends in a stamp: once every day of it is played,
-// the explorer shield for the week's average rank against everyone else.
+// played day shows your top % of the world that day, a day in progress how many rounds
+// are done, a day not played is just an outline.
 // ---------------------------------------------------------------------------
 
 const WEEKDAYS = ["M", "T", "W", "T", "F", "S", "S"];
@@ -11073,15 +10256,6 @@ function groupByWeek(days) {
   return [...weeks.values()].sort((left, right) => left.monday.localeCompare(right.monday));
 }
 
-// A week's stamp: the explorer shield for its average rank once every day is played.
-function getWeekStamp(cells) {
-  const days = cells.filter(Boolean);
-  const played = days.filter(day => day.completed);
-  if (played.length < days.length) return { played: played.length, total: days.length, tier: null };
-  const percent = played.reduce((sum, day) => sum + day.topPercent, 0) / played.length;
-  return { played: played.length, total: days.length, tier: getRankTier(percent), percent };
-}
-
 function createDayCell(day, { isSelected, onSelect }) {
   const cell = element("button", "day-cell");
   cell.type = "button";
@@ -11092,9 +10266,10 @@ function createDayCell(day, { isSelected, onSelect }) {
   cell.classList.toggle("is-selected", isSelected);
   cell.appendChild(element("span", "day-cell-number", String(day.puzzleNumber)));
   if (state === "played") {
-    const medal = getMedal(day.score);
-    cell.appendChild(medal ? createMedal(medal, 22) : element("span", "day-cell-done", "✓"));
-    cell.title = `Day ${day.puzzleNumber}: ${day.score.toLocaleString()}${medal ? ` · ${medal.name}` : ""}`;
+    const top = element("span", "day-cell-top");
+    top.append(element("small", "", "TOP"), formatTopPercent(day.topPercent).replace(/^Top /, ""));
+    cell.appendChild(top);
+    cell.title = `Day ${day.puzzleNumber}: ${formatTopPercent(day.topPercent)} of the world · ${day.score.toLocaleString()}`;
   } else if (state === "progress") {
     cell.appendChild(element("span", "day-cell-progress", `${roundsDone}/5`));
     cell.title = `Day ${day.puzzleNumber}: in progress, ${roundsDone} of 5 rounds`;
@@ -11108,20 +10283,7 @@ function createDayCell(day, { isSelected, onSelect }) {
   return cell;
 }
 
-function createWeekStamp(stamp) {
-  const box = element("span", "week-stamp");
-  if (stamp.tier) {
-    box.classList.add("is-earned");
-    box.appendChild(createBadge(stamp.tier, 30));
-    box.title = `${stamp.tier.name} week: on average ${formatTopPercent(stamp.percent).toLowerCase()}`;
-  } else {
-    box.textContent = `${stamp.played}/${stamp.total}`;
-    box.title = `Play all ${stamp.total} days of this week for its stamp`;
-  }
-  return box;
-}
-
-// A month's header: days played, medals won, the best week stamp, and "FULL MONTH" once
+// A month's header: days played, your average top % that month, and "FULL MONTH" once
 // every day of the month in the archive is played.
 function createMonthHead(month, weeks) {
   const days = weeks.flatMap(week => week.cells).filter(day => day && day.dateKey.startsWith(month));
@@ -11131,35 +10293,72 @@ function createMonthHead(month, weeks) {
   const name = toDate(`${month}-01`).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }).toUpperCase();
   const summary = element("span", "calendar-month-summary");
   summary.appendChild(element("span", "", `${played.length}/${days.length} days`));
-  MEDALS.forEach(medal => {
-    const count = played.filter(day => getMedal(day.score) === medal).length;
-    if (!count) return;
-    const tally = element("span", "calendar-medal-count");
-    tally.append(createMedal(medal, 16), String(count));
-    summary.appendChild(tally);
-  });
-  const best = weeks.map(week => getWeekStamp(week.cells).tier).filter(Boolean)
-    .sort((left, right) => RANK_TIERS.indexOf(left) - RANK_TIERS.indexOf(right))[0];
-  if (best) summary.appendChild(createBadge(best, 18));
+  if (played.length) {
+    const average = played.reduce((sum, day) => sum + day.topPercent, 0) / played.length;
+    summary.appendChild(element("span", "calendar-month-top", `avg. ${formatTopPercent(average).toLowerCase()}`));
+    // The badge earned that month.
+    const badge = getMonthBadge(days, month);
+    const earned = element("span", "calendar-month-badge");
+    earned.append(createBadge(badge.tier, 20), badge.tier.name);
+    summary.appendChild(earned);
+  }
   head.append(element("span", "calendar-month-name", name), summary);
   if (played.length === days.length) head.appendChild(element("span", "calendar-full", "FULL MONTH"));
   return head;
 }
 
+// This month's badge at the top of the archive (as big as it was on the leaderboard),
+// with how you're doing and what the next one asks for.
+function createMonthBadgeCard(badge, month) {
+  const monthName = toDate(`${month}-01`).toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" }).toUpperCase();
+  const card = element("div", "player-badge");
+  const icon = createBadge(badge.tier || RANK_TIERS.at(-1), 72);
+  icon.classList.toggle("is-locked", !badge.tier);
+  const text = element("div", "player-badge-text");
+  const name = element("strong", "", badge.tier ? badge.tier.name.toUpperCase() : "NO BADGE YET");
+  if (badge.tier) name.style.color = badge.tier.color;
+  const note = !badge.tier
+    ? "Play a day this month to earn its badge."
+    : `${badge.played} ${badge.played === 1 ? "day" : "days"} played · on average ${formatTopPercent(badge.percent).toLowerCase()}`;
+  const next = badge.next
+    ? `Next: ${badge.next.name}, with ${badge.next.minDays}+ days ${badge.next.maxPercent >= 100 ? "played" : `and ${badge.next.range.toLowerCase()} on average`}.`
+    : "The highest badge there is.";
+  text.append(element("span", "field-label", `YOUR ${monthName} BADGE`), name, element("small", "", note), element("small", "player-badge-next", next));
+  card.append(icon, text);
+  return card;
+}
+
+// Every badge from the first to the highest, with what it asks for in a month; the one
+// you have this month is lit.
+function createBadgeLadder(current) {
+  const ladder = element("ol", "tier-ladder archive-ladder");
+  ladder.setAttribute("aria-label", "Badges");
+  [...RANK_TIERS].reverse().forEach(tier => {
+    const step = element("li", "tier-step");
+    step.classList.toggle("is-current", tier === current);
+    step.title = `${tier.name}: ${tier.minDays}+ days in a month${tier.maxPercent >= 100 ? "" : `, ${tier.range.toLowerCase()} on average`}`;
+    step.append(createBadge(tier, 26), element("span", "tier-name", tier.name), element("span", "tier-range", tier.maxPercent >= 100 ? "Any score" : tier.range), element("span", "tier-range", `${tier.minDays}+ ${tier.minDays === 1 ? "day" : "days"}`));
+    ladder.appendChild(step);
+  });
+  return ladder;
+}
+
 function createCalendar(days, { selected, onSelect }) {
   const weeks = groupByWeek(days);
   const calendar = element("div", "calendar");
-  const weekdays = element("div", "calendar-week calendar-weekdays");
-  WEEKDAYS.forEach(letter => weekdays.appendChild(element("span", "", letter)));
-  weekdays.appendChild(element("span", "", "WEEK"));
-  calendar.appendChild(weekdays);
+  const todayKey = days.find(day => day.isToday)?.dateKey || days.at(-1).dateKey;
+  const thisMonth = getMonthBadge(days, todayKey.slice(0, 7));
+  calendar.append(createMonthBadgeCard(thisMonth, todayKey.slice(0, 7)), createBadgeLadder(thisMonth.tier));
   [...new Set(weeks.map(week => week.month))].forEach(month => {
     const monthWeeks = weeks.filter(week => week.month === month);
+    // The month's header with its medals, then the weekday letters, then its weeks.
     calendar.appendChild(createMonthHead(month, monthWeeks));
+    const weekdays = element("div", "calendar-week calendar-weekdays");
+    WEEKDAYS.forEach(letter => weekdays.appendChild(element("span", "", letter)));
+    calendar.appendChild(weekdays);
     monthWeeks.forEach(week => {
       const row = element("div", "calendar-week");
       week.cells.forEach(day => row.appendChild(day ? createDayCell(day, { isSelected: day === selected, onSelect }) : element("span", "day-cell is-empty")));
-      row.appendChild(createWeekStamp(getWeekStamp(week.cells)));
       calendar.appendChild(row);
     });
   });
@@ -11169,9 +10368,6 @@ function createCalendar(days, { selected, onSelect }) {
     item.append(element("i", `day-cell ${state}`), label);
     legend.appendChild(item);
   });
-  const medals = element("span", "calendar-legend-medals");
-  MEDALS.forEach(medal => medals.append(createMedal(medal, 16), `${medal.minScore.toLocaleString()}+ `));
-  legend.appendChild(medals);
   calendar.appendChild(legend);
   return calendar;
 }
@@ -11233,10 +10429,14 @@ function createPlayPanel(day, onPlay) {
 
 function renderDayOverview(container, day, onPlay) {
   container.replaceChildren();
+  // The selected day's start / continue button sits under the calendar.
+  const playSlot = document.getElementById("archivePlay");
+  playSlot.replaceChildren();
   if (!day) {
     container.appendChild(element("p", "overview-empty", "Pick a day to see it here."));
     return;
   }
+  playSlot.appendChild(createPlayPanel(day, onPlay));
 
   const head = element("div", "overview-head");
   const titles = element("div");
@@ -11244,17 +10444,22 @@ function renderDayOverview(container, day, onPlay) {
     element("span", "field-label", day.isToday ? "TODAY'S PUZZLE" : "DAILY PUZZLE"),
     element("h3", "overview-date", `Day ${day.puzzleNumber}${day.dayName ? `: ${day.dayName}` : ""}`)
   );
-  // The day's medal and score once it's played.
+  // Played: the medal and score, and, big, where that puts you in the world. Otherwise
+  // a clear status: in progress (how far) or not played.
   const result = element("div", "overview-answer");
-  const resultText = element("div");
-  const medal = day.completed ? getMedal(day.score) : null;
   if (day.completed) {
-    resultText.append(element("span", "field-label", medal ? `${medal.name.toUpperCase()} MEDAL` : "NO MEDAL"), element("strong", "", day.score.toLocaleString()));
-    if (medal) result.appendChild(createMedal(medal, 44));
-    result.appendChild(resultText);
+    const world = element("div", "overview-world");
+    const worldText = element("div");
+    worldText.append(element("span", "field-label", "YOU VS THE WORLD"), element("strong", "overview-world-percent", formatTopPercent(day.topPercent).toUpperCase()));
+    world.appendChild(worldText);
+    const scoreText = element("div");
+    scoreText.append(element("span", "field-label", "SCORE"), element("strong", "", day.score.toLocaleString()));
+    result.append(world, scoreText);
+  } else if (day.started) {
+    const done = day.rounds ? day.rounds.filter(round => round.done).length : 0;
+    result.appendChild(element("span", "overview-status is-progress", `IN PROGRESS · ${done}/5 ROUNDS`));
   } else {
-    resultText.append(element("span", "field-label", day.started ? "IN PROGRESS" : "NOT PLAYED"), element("strong", "overview-locked", day.started ? "Continue it below" : "🔒 Locked"));
-    result.appendChild(resultText);
+    result.appendChild(element("span", "overview-status", "NOT PLAYED"));
   }
   head.append(titles, result);
 
@@ -11282,15 +10487,35 @@ function renderDayOverview(container, day, onPlay) {
   const distribution = element("section", "overview-section");
   distribution.append(element("h4", "field-label", "SCORE DISTRIBUTION"), createDistributionChart(day));
 
-  const sections = [head, createPlayPanel(day, onPlay)];
-  // The rounds first: what you did and what everyone else answered.
-  if (day.rounds) sections.push(createRoundsSection(day));
-  else if (day.completed) sections.push(element("p", "overview-empty", `Played before the five-round format. The original score (out of 1,000) is shown ×${MAX_DAILY_SCORE / 1000}.`));
-  sections.push(stats, distribution);
+  // Two views instead of one long page: your answers per round, and how everyone did.
+  const answers = day.rounds ? createRoundsSection(day)
+    : element("p", "overview-empty", day.completed ? `Played before the five-round format. The original score (out of 1,000) is shown ×${MAX_DAILY_SCORE / 1000}.` : "Nothing played yet.");
+  const everyone = element("div", "overview-everyone");
+  everyone.append(stats, distribution);
+  const views = { answers, everyone };
+  const tabs = element("div", "overview-tabs");
+  tabs.setAttribute("role", "tablist");
+  const show = name => {
+    overviewTab = name;
+    Object.entries(views).forEach(([key, view]) => view.classList.toggle("hidden", key !== name));
+    tabs.querySelectorAll("button").forEach(button => button.setAttribute("aria-selected", String(button.dataset.view === name)));
+  };
+  [["answers", "YOUR ANSWERS"], ["everyone", "HOW EVERYONE DID"]].forEach(([key, label]) => {
+    const button = element("button", "overview-tab", label);
+    button.type = "button";
+    button.dataset.view = key;
+    button.setAttribute("role", "tab");
+    button.addEventListener("click", () => { sounds.playClick(); show(key); });
+    tabs.appendChild(button);
+  });
+  show(overviewTab);
 
-  container.append(...sections, element("p", "sample-note", SAMPLE_NOTE));
+  container.append(head, tabs, answers, everyone, element("p", "sample-note", SAMPLE_NOTE));
   container.scrollTop = 0;
 }
+
+// Which view the day panel shows; it stays the same while picking other days.
+let overviewTab = "answers";
 
 // The day's five rounds: the answer, how you did, and how everyone else did (who got it,
 // what they answered most). All locked until you've finished the day.
@@ -11321,7 +10546,7 @@ function createRoundsSection(day) {
     item.append(text, points);
     list.appendChild(item);
   });
-  section.append(element("h4", "field-label", "ROUNDS"), list);
+  section.appendChild(list);
   return section;
 }
 
@@ -11366,8 +10591,6 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay }) {
   const archiveModal = document.getElementById("archiveModal");
   const archiveGrid = document.getElementById("archiveListContainer");
   const overview = document.getElementById("dayOverview");
-  const leaderboardModal = document.getElementById("leaderboardModal");
-  const tierLegend = document.getElementById("tierLegend");
 
   function loadDays() {
     return getDays().map(dateKey => withCommunity(getDayRecord(dateKey)));
@@ -11375,7 +10598,7 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay }) {
 
   function playDay(dateKey) {
     archiveModal.classList.add("hidden");
-    leaderboardModal.classList.add("hidden");
+    document.getElementById("communityModal")?.classList.add("hidden");
     document.getElementById("victoryModal").classList.add("hidden");
     document.getElementById("gameView").classList.remove("hidden");
     onPlayDay(dateKey);
@@ -11398,286 +10621,9 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay }) {
     };
     renderGrid();
     renderDayOverview(overview, selected, playDay);
-    leaderboardModal.classList.add("hidden");
+    document.getElementById("communityModal")?.classList.add("hidden");
     archiveModal.classList.remove("hidden");
     archiveGrid.querySelector(".day-cell.is-selected")?.scrollIntoView({ block: "nearest" });
-  }
-
-  // ---------------------------------------------------------------------------
-  // Leaderboard: you on the left (explorer badge, the day's route, your stats); on the
-  // right what it took to reach each rank (Today, This week, All time), with your own
-  // place among them, and Countries.
-  // ---------------------------------------------------------------------------
-  const board = { tab: "day", dateKey: null };
-
-  // The player over several days: their average score, and their average "top X%", where they played.
-  const youOver = list => {
-    const played = list.filter(day => day.completed);
-    if (!played.length) return null;
-    return {
-      score: Math.round(played.reduce((sum, day) => sum + day.score, 0) / played.length),
-      days: played.length,
-      percent: played.reduce((sum, day) => sum + day.topPercent, 0) / played.length
-    };
-  };
-  // Monday to Sunday around a day, up to today.
-  const weekOf = (dateKey, playable) => {
-    const date = new Date(`${dateKey}T00:00:00Z`);
-    const monday = new Date(date);
-    monday.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7));
-    const sunday = new Date(monday);
-    sunday.setUTCDate(monday.getUTCDate() + 6);
-    const [from, to] = [monday, sunday].map(day => day.toISOString().slice(0, 10));
-    return playable.filter(day => day.dateKey >= from && day.dateKey <= to);
-  };
-  // Consecutive finished days up to today (today may still be open).
-  const streakOf = playable => {
-    let streak = 0;
-    for (let index = playable.length - 1; index >= 0; index -= 1) {
-      if (playable[index].completed) streak += 1;
-      else if (!playable[index].isToday) break;
-    }
-    return streak;
-  };
-
-  // The ranks from the top down, each with the score it took, and you slotted in where
-  // your score falls. `format` writes a score ("5,400 m", "4,210 avg").
-  function renderThresholds({ thresholds, you, format, emptyNote }) {
-    document.getElementById("boardColumns").replaceChildren(...["", "RANK", "SCORE NEEDED"].map(text => element("span", "", text)));
-    document.getElementById("boardColumns").classList.add("is-steps");
-    const rows = [];
-    const youRow = () => {
-      const above = [...thresholds].reverse().find(step => step.score > you.score);
-      const row = element("li", "board-row is-you");
-      row.append(
-        element("span", "board-step-mark", "▶"),
-        element("span", "board-name", "You"),
-        element("strong", "board-score", format(you.score))
-      );
-      row.appendChild(element("span", "board-gap", above
-        ? `${(above.score - you.score).toLocaleString()} short of ${above.tier.range.toLowerCase()}`
-        : "In the top 1%"));
-      return row;
-    };
-    let placed = !you;
-    thresholds.forEach(step => {
-      if (!placed && you.score >= step.score) {
-        rows.push(youRow());
-        placed = true;
-      }
-      const row = element("li", "board-row board-step");
-      row.style.setProperty("--tier-color", step.tier.color);
-      const name = element("span", "board-name");
-      name.append(element("b", "", step.tier.name), element("small", "", step.tier.range));
-      row.append(createBadge(step.tier, 26), name, element("strong", "board-score", `${format(step.score)}+`));
-      rows.push(row);
-    });
-    if (!placed) rows.push(youRow());
-    // Everyone below the last threshold.
-    const last = RANK_TIERS.at(-1);
-    const rest = element("li", "board-row board-step is-rest");
-    const restName = element("span", "board-name");
-    restName.append(element("b", "", last.name), element("small", "", last.range));
-    rest.append(createBadge(last, 26), restName, element("strong", "board-score", `under ${format(thresholds.at(-1).score)}`));
-    rows.push(rest);
-    document.getElementById("boardList").replaceChildren(...rows);
-    document.getElementById("boardYou").replaceChildren(...(you ? [] : [element("p", "board-you-note", emptyNote)]));
-  }
-
-  function renderCountries(rows) {
-    document.getElementById("boardColumns").replaceChildren(...["#", "COUNTRY", "PLAYERS", "AVERAGE"].map(text => element("span", "", text)));
-    document.getElementById("boardColumns").classList.remove("is-steps");
-    document.getElementById("boardList").replaceChildren(...rows.map(entry => {
-      const country = getCountry(entry.country);
-      const row = element("li", "board-row board-country");
-      const name = element("span", "board-name");
-      name.append(createFlagImage(country, "board-flag"), element("span", "", country.name));
-      row.append(
-        element("span", "board-rank", `#${entry.rank}`),
-        name,
-        element("span", "board-extra", entry.players.toLocaleString()),
-        element("strong", "board-score", entry.score.toLocaleString())
-      );
-      return row;
-    }));
-    document.getElementById("boardYou").replaceChildren(element("p", "board-you-note", "Your country counts once player accounts launch."));
-  }
-
-  // Left side. The headline is your rank for what's on the right (a day, the week, all
-  // time); the badge is your explorer rank over every day, earned after a few days.
-  function renderRankPanel({ title, percent, totalPlayers, emptyText, emptyNote, routeDay, playable, allDays }) {
-    const finished = allDays.filter(day => day.completed);
-    const earned = finished.length >= DAYS_FOR_BADGE;
-    const overall = youOver(allDays);
-    const tier = earned ? getRankTier(overall.percent) : null;
-    document.getElementById("rankTitle").textContent = title;
-    document.getElementById("overallRank").textContent = percent === null ? emptyText : formatTopPercent(percent);
-    document.getElementById("overallRankTier").textContent = tier ? tier.name.toUpperCase() : "NO BADGE YET";
-    document.getElementById("overallRankTier").style.color = tier?.color || "";
-    document.getElementById("overallRankNote").textContent = percent === null
-      ? emptyNote
-      : `Better than ${Math.max(0, Math.round(100 - percent))}% of ${totalPlayers.toLocaleString()} players`;
-    const badge = createBadge(tier || RANK_TIERS.at(-1), 72);
-    badge.classList.toggle("is-locked", !tier);
-    document.getElementById("rankBadge").replaceChildren(badge);
-
-    // Towards your first badge, or the next rank up.
-    let progress;
-    let progressText;
-    let progressColor = (tier || RANK_TIERS.at(-1)).color;
-    if (!earned) {
-      const left = DAYS_FOR_BADGE - finished.length;
-      progress = finished.length / DAYS_FOR_BADGE;
-      progressText = `Finish ${left} more ${left === 1 ? "day" : "days"} to earn your badge (${finished.length} of ${DAYS_FOR_BADGE}).`;
-      progressColor = "var(--accent)";
-    } else {
-      const next = RANK_TIERS[RANK_TIERS.indexOf(tier) - 1];
-      progress = !next ? 1 : Math.min(1, Math.max(0.04, (tier.maxPercent - overall.percent) / (tier.maxPercent - next.maxPercent)));
-      progressText = next ? `Next badge: ${next.name}, for ${next.range.toLowerCase()} over all your days` : "The highest badge there is.";
-    }
-    document.getElementById("rankProgressFill").style.width = `${progress * 100}%`;
-    document.getElementById("rankProgressFill").style.background = progressColor;
-    document.getElementById("rankProgressText").textContent = progressText;
-
-    // The day's route, with where the best players, the average player and you got to.
-    const stats = getDayStats(routeDay.dateKey);
-    const type = getJourney(routeDay.dateKey);
-    const words = JOURNEYS[type];
-    document.getElementById("rankRouteTitle").textContent = `DAY ${routeDay.puzzleNumber} · ${words.name.toUpperCase()}`;
-    const route = createJourney(type, document.getElementById("rankRoute"), { summit: MAX_DAILY_SCORE });
-    let from = 0;
-    const stretches = routeDay.completed ? routeDay.rounds.map((round, roundIndex) => {
-      const stretch = { from, to: from + round.points, color: ROUND_COLORS[roundIndex] };
-      from = stretch.to;
-      return stretch;
-    }) : [];
-    route.draw(0, { stretches });
-    if (routeDay.completed) route.replay({ stretches });
-    route.pins([
-      { value: getScoreAtTopPercent(stats, 1), label: "Top 1%", tone: "gold" },
-      { value: getScoreAtTopPercent(stats, 10), label: "Top 10%", tone: "accent" },
-      { value: stats.averageScore, label: "Average", tone: "muted" },
-      ...(routeDay.completed ? [{ value: routeDay.score, label: `You · ${routeDay.score.toLocaleString()} ${words.unit}`, tone: "you" }] : [])
-    ]);
-    document.getElementById("rankRoute").classList.toggle("is-unplayed", !routeDay.completed);
-
-    // Your stats over every day.
-    const stat = (label, value) => {
-      const item = element("div", "rank-stat");
-      item.append(element("dt", "", label), element("dd", "", value));
-      return item;
-    };
-    document.getElementById("rankStats").replaceChildren(
-      stat("Days played", String(finished.length)),
-      stat("Perfect rounds", String(finished.reduce((sum, day) => sum + day.rounds.filter(round => round.isPerfect).length, 0))),
-      stat("Streak", `${streakOf(playable)} ${streakOf(playable) === 1 ? "day" : "days"}`),
-      stat("Best day", finished.length ? Math.max(...finished.map(day => day.score)).toLocaleString() : "—")
-    );
-
-    // The badges, from the first to the highest.
-    tierLegend.replaceChildren(...[...RANK_TIERS].reverse().map(item => {
-      const step = element("li", "tier-step");
-      step.classList.toggle("is-current", item === tier);
-      step.title = `${item.name} · ${item.range}`;
-      step.append(createBadge(item, 26), element("span", "tier-name", item.name), element("span", "tier-range", item.range.replace("Everyone else", "Start")));
-      return step;
-    }));
-  }
-
-  function openLeaderboard() {
-    const allDays = loadDays();
-    const todayKey = allDays.find(day => day.isToday)?.dateKey || allDays.at(-1).dateKey;
-    const playable = allDays.filter(day => day.dateKey <= todayKey);
-    if (!board.dateKey || !playable.some(day => day.dateKey === board.dateKey)) board.dateKey = todayKey;
-    const picker = document.getElementById("boardDay");
-    picker.replaceChildren(...[...playable].reverse().map(day => {
-      const option = element("option", "", `Day ${day.puzzleNumber}${day.dayName ? ` · ${day.dayName}` : ""}${day.isToday ? " (today)" : ""}`);
-      option.value = day.dateKey;
-      return option;
-    }));
-    const setCaption = text => { document.getElementById("boardCaption").textContent = text; };
-
-    const render = () => {
-      document.querySelectorAll(".board-tab").forEach(tab => {
-        const active = tab.dataset.board === board.tab;
-        tab.classList.toggle("is-active", active);
-        tab.setAttribute("aria-selected", String(active));
-      });
-      picker.value = board.dateKey;
-      picker.classList.toggle("hidden", board.tab !== "day");
-      const todayRecord = playable.find(item => item.dateKey === todayKey);
-      const playButton = document.getElementById("rankPlayButton");
-      playButton.classList.add("hidden");
-
-      if (board.tab === "day") {
-        const day = playable.find(item => item.dateKey === board.dateKey);
-        const stats = getDayStats(day.dateKey);
-        const unit = JOURNEYS[getJourney(day.dateKey)].unit;
-        setCaption(`${day.isToday ? "Today" : `Day ${day.puzzleNumber}`}${day.dayName ? `: ${day.dayName}` : ""} · what it took to reach each rank · ${stats.players.toLocaleString()} players`);
-        renderThresholds({
-          thresholds: getRankThresholds([day.dateKey]),
-          you: day.completed ? { score: day.score } : null,
-          format: score => `${score.toLocaleString()} ${unit}`,
-          emptyNote: "Finish this day to see where you land."
-        });
-        // An unfinished day can be started from here; a finished one can't be replayed.
-        if (!day.completed) {
-          playButton.classList.remove("hidden");
-          playButton.textContent = day.started ? "CONTINUE DAY ▶" : day.isToday ? "PLAY TODAY ▶" : "PLAY THIS DAY ▶";
-          playButton.onclick = () => {
-            sounds.playClick();
-            playDay(day.dateKey);
-          };
-        }
-        renderRankPanel({
-          title: `YOUR RANK · DAY ${day.puzzleNumber}`, percent: day.completed ? day.topPercent : null, totalPlayers: stats.players,
-          emptyText: "Not played", emptyNote: `${stats.players.toLocaleString()} players took on Day ${day.puzzleNumber}.`, routeDay: day, playable, allDays
-        });
-      } else if (board.tab === "countries") {
-        setCaption("Average daily score of each country's players, every day so far");
-        renderCountries(getCountryBoard(playable.map(item => item.dateKey)));
-        const you = youOver(playable);
-        renderRankPanel({
-          title: "YOUR RANK · ALL TIME", percent: you?.percent ?? null, totalPlayers: getPlayerCount(playable.map(item => item.dateKey)),
-          emptyText: "Unranked", emptyNote: "Finish a day to get your first rank.", routeDay: todayRecord, playable, allDays
-        });
-      } else {
-        const range = board.tab === "week" ? weekOf(todayKey, playable) : playable;
-        const dateKeys = range.map(item => item.dateKey);
-        const you = youOver(range);
-        const players = getPlayerCount(dateKeys);
-        setCaption(board.tab === "week"
-          ? `This week, Day ${range[0].puzzleNumber} to ${range.at(-1).puzzleNumber} · average score per day played · ${players.toLocaleString()} players`
-          : `Every day so far · average score per day played · ${players.toLocaleString()} players`);
-        renderThresholds({
-          thresholds: getRankThresholds(dateKeys),
-          you,
-          format: score => `${score.toLocaleString()} avg`,
-          emptyNote: board.tab === "week" ? "Finish a day this week to see where you land." : "Finish a day to see where you land."
-        });
-        renderRankPanel({
-          title: board.tab === "week" ? "YOUR RANK · THIS WEEK" : "YOUR RANK · ALL TIME", percent: you?.percent ?? null, totalPlayers: players,
-          emptyText: "Unranked", emptyNote: board.tab === "week" ? "Finish a day this week to get ranked." : "Finish a day to get your first rank.", routeDay: todayRecord, playable, allDays
-        });
-      }
-      document.getElementById("boardList").scrollTop = 0;
-    };
-
-    document.querySelectorAll(".board-tab").forEach(tab => {
-      tab.onclick = () => {
-        sounds.playClick();
-        board.tab = tab.dataset.board;
-        render();
-      };
-    });
-    picker.onchange = () => {
-      board.dateKey = picker.value;
-      render();
-    };
-
-    archiveModal.classList.add("hidden");
-    leaderboardModal.classList.remove("hidden");
-    render();
   }
 
   document.querySelectorAll(".archive-open-button, #menuArchiveButton").forEach(button => {
@@ -11686,23 +10632,1218 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay }) {
       openArchive();
     });
   });
-  document.querySelectorAll(".leaderboard-open-button, #menuLeaderboardButton").forEach(button => {
-    button.addEventListener("click", () => {
-      sounds.playClick();
-      openLeaderboard();
-    });
-  });
   document.getElementById("closeArchiveButton").addEventListener("click", () => {
     sounds.playClick();
     archiveModal.classList.add("hidden");
   });
-  document.getElementById("closeLeaderboardButton").addEventListener("click", () => {
-    sounds.playClick();
-    leaderboardModal.classList.add("hidden");
-  });
+
+  return { loadDays };
 }
 
 return { createDistributionChart, initializeHistoryScreens };
+})();
+
+// ---- ui.js
+__modules["ui.js"] = (() => {
+const { sounds } = __modules["audio.js"];
+
+const input = document.getElementById("countryInput");
+const autocompleteList = document.getElementById("autocompleteList");
+const submitButton = document.getElementById("submitBtn");
+const toast = document.getElementById("inputToast");
+let toastTimer;
+
+// Region phrases that legitimately contain a country name/alias
+// (e.g. "Northern America" contains the US alias "America"). They are stashed
+// during redaction so they are never mangled into "Northern the target country".
+const REGION_PHRASES = [
+  "Northern America", "North America", "South America", "Central America", "Latin America"
+];
+
+function redactCountryName(value, country) {
+  let safeValue = value;
+  const names = [country.name, ...(country.aliases || [])]
+    .filter(name => name.length > 4)
+    .sort((left, right) => right.length - left.length);
+
+  const stash = [];
+  // Capitals can contain the country's name ("Mexico City"), so they're protected too.
+  const protectedPhrases = [...REGION_PHRASES, "Gulf of Guinea", "New Guinea", ...(country.capital || [])]
+    .map(phrase => phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const regionPattern = new RegExp(`(${protectedPhrases.join("|")})`, "gi");
+  safeValue = safeValue.replace(regionPattern, (match) => {
+    stash.push(match);
+    return `\u0000${stash.length - 1}\u0000`;
+  });
+
+  names.forEach(name => {
+    const escapedName = name.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&");
+    safeValue = safeValue.replace(new RegExp(`(^|[^\\p{L}])${escapedName}(?=$|[^\\p{L}])`, "giu"), "$1the target country");
+  });
+
+  safeValue = safeValue.replace(/\u0000(\d+)\u0000/g, (_, index) => stash[Number(index)]);
+  return safeValue;
+}
+
+// A short note in the right column. A problem with an answer (an unknown name, a repeat)
+// gets the red ✕ of a miss and sits right under the place you answered (near).
+const toastHome = { parent: toast.parentElement, next: toast.nextElementSibling };
+function showToastNotice(message, { problem = false, near = null } = {}) {
+  toast.textContent = message;
+  toast.classList.toggle("is-problem", problem);
+  if (near) near.after(toast);
+  else toastHome.parent.insertBefore(toast, toastHome.next);
+  toast.classList.remove("hidden");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.add("hidden"), 2400);
+}
+
+function resetCountryInput({ focus = true } = {}) {
+  input.value = "";
+  autocompleteList.replaceChildren();
+  autocompleteList.classList.add("hidden");
+  input.setAttribute("aria-expanded", "false");
+  if (focus && !input.disabled) input.focus();
+}
+
+function normalizeCountryName(value) {
+  return value.normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+function updateDailyScoreUI(score) {
+  document.getElementById("dailyTotalScore").textContent = score.toLocaleString();
+}
+
+function createFlagImage(country, className) {
+  const image = document.createElement("img");
+  image.className = className;
+  image.src = `https://flagcdn.com/w80/${country.iso.toLowerCase()}.png`;
+  image.alt = `Flag of ${country.name}`;
+  image.loading = "lazy";
+  image.decoding = "async";
+  image.addEventListener("error", () => {
+    image.classList.add("flag-image-unavailable");
+    image.alt = `Flag unavailable for ${country.name}`;
+  }, { once: true });
+  return image;
+}
+
+// A country's outline as an SVG, from the globe's own map polygons (GeoJSON order:
+// polygon -> rings -> [lon, lat]). It is drawn in a Lambert azimuthal equal-area
+// projection centred on the country, so the shape and proportions match the globe (a
+// flat world map stretches Canada and Russia). Far-off overseas parts, like French Guiana
+// for France or Hawaii for the United States, are left out so the country fills the box.
+const toVector = ([lon, lat]) => {
+  const phi = lat * Math.PI / 180;
+  const lambda = lon * Math.PI / 180;
+  return [Math.cos(phi) * Math.cos(lambda), Math.cos(phi) * Math.sin(lambda), Math.sin(phi)];
+};
+const angleBetween = (a, b) => Math.acos(Math.max(-1, Math.min(1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2])));
+const normalize = ([x, y, z]) => { const length = Math.hypot(x, y, z) || 1; return [x / length, y / length, z / length]; };
+
+function drawCountryOutline(polygons, label) {
+  if (!polygons?.length) return null;
+  const parts = polygons.map(rings => {
+    const points = rings[0].map(toVector);
+    const centre = normalize(points.reduce((sum, point) => sum.map((value, axis) => value + point[axis]), [0, 0, 0]));
+    return { rings, centre, reach: Math.max(...points.map(point => angleBetween(centre, point))) };
+  });
+  const main = parts.reduce((best, part) => part.reach > best.reach ? part : best);
+  const kept = parts.filter(part => angleBetween(part.centre, main.centre) <= main.reach + 15 * Math.PI / 180);
+  const [cx, cy, cz] = main.centre;
+  const lat0 = Math.asin(cz);
+  const lon0 = Math.atan2(cy, cx);
+  const project = ([lon, lat]) => {
+    const phi = lat * Math.PI / 180;
+    const dLambda = lon * Math.PI / 180 - lon0;
+    const cosC = Math.sin(lat0) * Math.sin(phi) + Math.cos(lat0) * Math.cos(phi) * Math.cos(dLambda);
+    const k = Math.sqrt(2 / Math.max(1e-6, 1 + cosC));
+    return [k * Math.cos(phi) * Math.sin(dLambda), -k * (Math.cos(lat0) * Math.sin(phi) - Math.sin(lat0) * Math.cos(phi) * Math.cos(dLambda))];
+  };
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  const d = kept.flatMap(part => part.rings).map(ring => ring.map((point, index) => {
+    const [x, y] = project(point);
+    minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+    minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+    return `${index ? "L" : "M"}${(x * 1000).toFixed(1)},${(y * 1000).toFixed(1)}`;
+  }).join("") + "Z").join("");
+  const padding = Math.max(maxX - minX, maxY - minY) * 0.06;
+  const namespace = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(namespace, "svg");
+  svg.setAttribute("class", "country-outline");
+  svg.setAttribute("viewBox", [minX - padding, minY - padding, maxX - minX + padding * 2, maxY - minY + padding * 2].map(value => (value * 1000).toFixed(1)).join(" "));
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", `Outline of ${label}`);
+  const path = document.createElementNS(namespace, "path");
+  path.setAttribute("d", d);
+  path.setAttribute("fill-rule", "evenodd");
+  svg.appendChild(path);
+  return svg;
+}
+
+// A card in the middle of the screen that opens like a pack: its steps (elements already
+// in the card, each with a status) start face down and turn over one at a time, matches
+// popping with a chime. It then waits for its button (a click or Enter); a click while
+// steps are still turning shows them all at once. land() commits the move and returns the
+// row the card should fly into. Resolves once the card is gone.
+const REVEAL_FIRST_MS = 650;
+const REVEAL_STEP_MS = 700;
+const REVEAL_FLY_MS = 380;
+function playRevealCard({ card, steps, nextLabel, land, sound = () => {}, onTurn = () => {} }) {
+  const host = document.getElementById("gameView");
+  const overlay = Object.assign(document.createElement("div"), { className: "guess-reveal" });
+  card.classList.add("guess-reveal-card");
+  steps.forEach(({ element }) => element.classList.add("reveal-slot"));
+  const next = Object.assign(document.createElement("button"), { type: "button", className: "guess-reveal-next" });
+  next.textContent = `${nextLabel} ▶`;
+  card.appendChild(next);
+  overlay.appendChild(card);
+  host.appendChild(overlay);
+
+  let shown = 0;
+  let streak = 0;
+  let timer = null;
+  const turnOver = (step, quiet) => {
+    step.element.classList.add("is-turned", `is-${step.status}`);
+    streak = step.status === "match" ? streak + 1 : 0;
+    onTurn(step);
+    if (!quiet) sound(step.status === "clue" ? "hint" : step.status, streak - 1);
+  };
+  const complete = () => {
+    card.classList.add("is-complete");
+    next.focus({ preventScroll: true });
+  };
+  const showNext = () => {
+    turnOver(steps[shown], false);
+    shown += 1;
+    if (shown < steps.length) {
+      // The step about to turn shimmers for a moment first, for a little suspense.
+      steps[shown].element.classList.add("is-next");
+      timer = setTimeout(showNext, REVEAL_STEP_MS);
+    } else {
+      complete();
+    }
+  };
+  steps[0].element.classList.add("is-next");
+  timer = setTimeout(showNext, REVEAL_FIRST_MS);
+
+  return new Promise(resolve => {
+    let landed = false;
+    const finish = () => {
+      if (landed) return;
+      landed = true;
+      window.removeEventListener("keydown", onKey, true);
+      const row = land();
+      const from = card.getBoundingClientRect();
+      const to = row?.getBoundingClientRect();
+      // Fly into the row when it's on screen; otherwise just fade out.
+      const visible = to && to.width && to.bottom > 0 && to.top < innerHeight;
+      if (visible) {
+        row.classList.add("is-landing");
+        card.style.transformOrigin = "0 0";
+        card.style.transform = `translate(${to.left - from.left}px, ${to.top - from.top}px) scale(${to.width / from.width}, ${to.height / from.height})`;
+      }
+      overlay.classList.add("is-leaving");
+      setTimeout(() => {
+        row?.classList.remove("is-landing");
+        overlay.remove();
+        resolve();
+      }, REVEAL_FLY_MS);
+    };
+    // A click or Enter: show the remaining steps at once, or, once all are shown, go on.
+    const advance = () => {
+      if (shown >= steps.length) { finish(); return; }
+      clearTimeout(timer);
+      steps.slice(shown).forEach(step => turnOver(step, true));
+      shown = steps.length;
+      complete();
+    };
+    const onKey = event => {
+      if (event.key !== "Enter" && event.key !== " " && event.key !== "Escape") return;
+      // Typing a space in the answer box is still just a space.
+      if (event.key === " " && event.target.closest?.("input, textarea")) return;
+      event.preventDefault();
+      event.stopPropagation();
+      advance();
+    };
+    window.addEventListener("keydown", onKey, true);
+    overlay.addEventListener("click", advance);
+  });
+}
+
+// A face-down tile that turns over to show a newly unlocked clue (Mystery, Pinpoint).
+function createClueStep({ label, text }) {
+  const tile = Object.assign(document.createElement("div"), { className: "reveal-clue" });
+  tile.append(
+    Object.assign(document.createElement("span"), { className: "slot-cover", textContent: "🔓 NEW CLUE" }),
+    Object.assign(document.createElement("span"), { className: "clue-tag", textContent: label }),
+    Object.assign(document.createElement("p"), { textContent: text })
+  );
+  return { element: tile, status: "clue" };
+}
+
+// Mystery and Pinpoint: a guess as a pack-style card. Flag, name and outline show at once;
+// hot/cold, each hint and any newly unlocked clue turn over one by one.
+function playGuessReveal(guess, { land, sound, nextLabel = "NEXT GUESS", outline = null, newClue = null }) {
+  const card = document.createElement("div");
+  // The card's edge takes the hot/cold colour only when that badge turns over.
+  card.style.setProperty("--temp", "var(--glass-line)");
+  const head = Object.assign(document.createElement("div"), { className: "guess-reveal-head" });
+  const temperature = Object.assign(document.createElement("span"), { className: "temp-badge", textContent: guess.temperature });
+  head.append(
+    createFlagImage(guess.country, "guess-reveal-flag"),
+    Object.assign(document.createElement("strong"), { className: "guess-reveal-name", textContent: guess.country.name }),
+    temperature
+  );
+  const shape = drawCountryOutline(outline, guess.country.name);
+  if (shape) head.appendChild(Object.assign(document.createElement("div"), { className: "guess-reveal-outline" })).appendChild(shape);
+  const facts = Object.assign(document.createElement("div"), { className: "guess-facts" });
+  const steps = [{ element: temperature, status: guess.isCorrect ? "match" : "hint" }];
+  getGuessFacts(guess).forEach(({ label, status, indicator }) => {
+    const fact = Object.assign(document.createElement("span"), { className: `fact fact-${status}` });
+    if (indicator) fact.appendChild(Object.assign(document.createElement("b"), { textContent: indicator }));
+    fact.append(label);
+    facts.appendChild(fact);
+    steps.push({ element: fact, status });
+  });
+  card.append(head, facts);
+  if (newClue) {
+    const clue = createClueStep(newClue);
+    card.appendChild(clue.element);
+    steps.push(clue);
+  }
+  return playRevealCard({
+    card, steps, nextLabel, land, sound,
+    onTurn: step => { if (step.element === temperature) card.style.setProperty("--temp", guess.color); }
+  });
+}
+
+// Rank 'Em: a try as a pack-style card, Mastermind style. The order you tried is shown,
+// then five lights turn on one by one: green for each country in the right place, then
+// red for the rest (never which ones), and finally any hint the try unlocked.
+function playRankReveal({ tryNumber, order, right, hint = null, land, sound, nextLabel = "NEXT TRY" }) {
+  const card = document.createElement("div");
+  card.style.setProperty("--temp", "var(--glass-line)");
+  const head = Object.assign(document.createElement("div"), { className: "rank-reveal-head" });
+  head.append(
+    Object.assign(document.createElement("span"), { className: "field-label", textContent: `TRY ${tryNumber}` }),
+    Object.assign(document.createElement("ol"), { className: "rank-reveal-order" })
+  );
+  order.forEach(country => {
+    const item = document.createElement("li");
+    item.append(createFlagImage(country, "rank-try-flag"), country.name);
+    head.lastChild.appendChild(item);
+  });
+  const pegs = Object.assign(document.createElement("div"), { className: "rank-pegs is-big", role: "img" });
+  pegs.setAttribute("aria-label", `${right} of ${order.length} in the right place`);
+  const steps = order.map((_, index) => {
+    const peg = Object.assign(document.createElement("i"), { className: "rank-peg" });
+    pegs.appendChild(peg);
+    return { element: peg, status: index < right ? "match" : "miss" };
+  });
+  const tally = Object.assign(document.createElement("p"), { className: "rank-reveal-tally", textContent: `${right} of ${order.length} in the right place` });
+  card.append(head, pegs, tally);
+  steps.push({ element: tally, status: right === order.length ? "match" : "hint" });
+  if (hint) {
+    const chip = Object.assign(document.createElement("span"), { className: "fact fact-hint rank-reveal-hint", textContent: `Hint: ${hint}` });
+    card.appendChild(chip);
+    steps.push({ element: chip, status: "hint" });
+  }
+  return playRevealCard({
+    card, steps, nextLabel, land, sound,
+    onTurn: step => { if (step.element === tally) card.style.setProperty("--temp", right === order.length ? "var(--t-correct)" : "var(--danger)"); }
+  });
+}
+
+const CLUE_DIFFICULTIES = ["VERY DIFFICULT", "DIFFICULT", "MEDIUM", "EASY", "EASIEST"];
+
+// Mystery's clue number index (0-based), with the answer's name kept out of it.
+function getMysteryClue(targetCountry, index) {
+  const text = targetCountry[`clue${index + 1}`];
+  return text ? { label: `CLUE ${index + 1} · ${CLUE_DIFFICULTIES[index]}`, text: redactCountryName(text, targetCountry) } : null;
+}
+
+function renderProgressiveHints(targetCountry, wrongGuessCount) {
+  const clues = [
+    targetCountry.clue1,
+    targetCountry.clue2,
+    targetCountry.clue3,
+    targetCountry.clue4,
+    targetCountry.clue5
+  ];
+  const unlockedCount = Math.min(wrongGuessCount + 1, clues.length);
+  const currentIndex = unlockedCount - 1;
+
+  const pips = document.getElementById("cluePips");
+  pips.replaceChildren(...clues.map((_, index) => {
+    const pip = document.createElement("i");
+    if (index < unlockedCount) pip.className = "on";
+    return pip;
+  }));
+  pips.setAttribute("aria-label", `${unlockedCount} of ${clues.length} clues unlocked`);
+
+  document.getElementById("clueCurrentLabel").textContent =
+    `CLUE ${currentIndex + 1} · ${CLUE_DIFFICULTIES[currentIndex]}`;
+  document.getElementById("clueCurrentText").textContent =
+    redactCountryName(clues[currentIndex], targetCountry);
+
+  // Earlier clues stay visible underneath, newest first.
+  const earlier = document.getElementById("clueEarlier");
+  earlier.replaceChildren();
+  for (let index = currentIndex - 1; index >= 0; index -= 1) {
+    const item = document.createElement("li");
+    const number = document.createElement("b");
+    number.textContent = String(index + 1);
+    item.append(number, redactCountryName(clues[index], targetCountry));
+    earlier.appendChild(item);
+  }
+
+  const remaining = clues.length - unlockedCount;
+  document.getElementById("clueLocked").textContent = remaining > 0
+    ? `🔒 ${remaining} more ${remaining === 1 ? "clue unlocks" : "clues unlock"} with each wrong guess`
+    : "";
+}
+
+function renderGlobeMarkerTooltip(guess, index) {
+  const tooltip = document.querySelector(".globe-marker-tooltip");
+  if (!tooltip || !guess) return;
+  tooltip.replaceChildren();
+  const heading = document.createElement("div");
+  heading.className = "marker-tooltip-heading";
+  const flag = createFlagImage(guess.country, "marker-tooltip-flag");
+  const name = document.createElement("strong");
+  name.textContent = `${index + 1}. ${guess.country.name}`;
+  heading.append(flag, name);
+  const details = document.createElement("span");
+  details.className = "marker-tooltip-details";
+  details.textContent = guess.temperature;
+  tooltip.append(heading, details);
+}
+
+function initializeMainMenu({ onDailyChallenge, onHome }) {
+  const menu = document.getElementById("mainMenu");
+  const menuOptions = menu.querySelector(".menu-options");
+  const menuButtons = [...menuOptions.querySelectorAll(".menu-option")];
+  const gameView = document.getElementById("gameView");
+  const howToModal = document.getElementById("howToPlayModal");
+  let resumeBlinkTimer = null;
+
+  function updateMenuButtonActivity() {
+    const buttonIsActive = menuButtons.some(button =>
+      button.matches(":hover") || button === document.activeElement
+    );
+    menuOptions.classList.toggle("has-menu-button-active", buttonIsActive);
+  }
+
+  function pauseBlinkForPointer() {
+    clearTimeout(resumeBlinkTimer);
+    resumeBlinkTimer = null;
+    menuOptions.classList.add("has-hover-cooldown");
+  }
+
+  menuButtons.forEach(button => button.addEventListener("pointerenter", () => {
+    pauseBlinkForPointer();
+    updateMenuButtonActivity();
+  }));
+  menuButtons.forEach(button => button.addEventListener("pointerleave", () => {
+    updateMenuButtonActivity();
+    if (!menuButtons.some(button => button.matches(":hover"))) pauseBlinkForPointer();
+  }));
+  menuOptions.addEventListener("pointerenter", () => {
+    pauseBlinkForPointer();
+    updateMenuButtonActivity();
+  });
+  menuOptions.addEventListener("pointerleave", () => {
+    if (menuButtons.some(button => button.matches(":hover"))) return;
+
+    clearTimeout(resumeBlinkTimer);
+    resumeBlinkTimer = setTimeout(() => {
+      resumeBlinkTimer = null;
+      if (menuOptions.matches(":hover")) return;
+      menuOptions.classList.remove("has-hover-cooldown");
+      updateMenuButtonActivity();
+    }, 1000);
+  });
+  menuOptions.addEventListener("focusin", updateMenuButtonActivity);
+  menuOptions.addEventListener("focusout", updateMenuButtonActivity);
+  updateMenuButtonActivity();
+  menuOptions.classList.add("is-boot-complete");
+
+  function showMenu() {
+    gameView.classList.add("hidden");
+    menu.classList.remove("hidden");
+    howToModal.classList.add("hidden");
+    document.getElementById("victoryModal").classList.add("hidden");
+    document.getElementById("statsModal").classList.add("hidden");
+    document.getElementById("archiveModal").classList.add("hidden");
+    document.getElementById("leaderboardModal").classList.add("hidden");
+    onHome();
+  }
+
+  // The game hides the menu itself, so it can play the menu's exit animation.
+  function showGame() {
+    howToModal.classList.add("hidden");
+    gameView.classList.remove("hidden");
+    onDailyChallenge();
+  }
+
+  document.getElementById("menuDailyButton").addEventListener("click", () => {
+    sounds.playClick();
+    showGame();
+  });
+  document.querySelectorAll("#menuHowToButton, .how-to-open-button").forEach(button => {
+    button.addEventListener("click", () => {
+      sounds.playClick();
+      howToModal.classList.remove("hidden");
+    });
+  });
+  document.getElementById("closeHowToButton").addEventListener("click", () => {
+    sounds.playClick();
+    howToModal.classList.add("hidden");
+  });
+  document.getElementById("howToMenuButton").addEventListener("click", () => {
+    sounds.playClick();
+    howToModal.classList.add("hidden");
+  });
+  document.querySelectorAll(".home-button").forEach(button => {
+    button.addEventListener("click", () => {
+      sounds.playClick();
+      showMenu();
+    });
+  });
+}
+
+// A text input with country suggestions. onSubmit(value, country) receives either the
+// typed text or the picked suggestion and returns { status }; "submitted" clears the input.
+function createCountryInput({ input: field, list, button, countries, isExcluded = () => false, onSubmit }) {
+  let activeIndex = -1;
+  let suggestions = [];
+
+  function reset({ focus = true } = {}) {
+    field.value = "";
+    list.replaceChildren();
+    list.classList.add("hidden");
+    field.setAttribute("aria-expanded", "false");
+    activeIndex = -1;
+    if (focus && !field.disabled) field.focus();
+  }
+
+  function submit(value, country) {
+    const result = onSubmit(value, country);
+    if (result?.status === "submitted") reset();
+  }
+
+  function renderSuggestions(query) {
+    const normalizedQuery = normalizeCountryName(query);
+    list.replaceChildren();
+    suggestions = [];
+    activeIndex = -1;
+    if (field.disabled || !normalizedQuery) {
+      list.classList.add("hidden");
+      field.setAttribute("aria-expanded", "false");
+      return;
+    }
+
+    const rankOf = label => getMatchRank(normalizedQuery, normalizeCountryName(label));
+    const matches = countries.map(country => {
+      if (isExcluded(country.iso)) return false;
+      const rank = Math.min(...[country.name, ...country.aliases].map(rankOf));
+      // A territory only shows when it matches better than the country's own names
+      // (and once a few letters are typed, so short queries aren't flooded), and then
+      // says which country it counts as ("French Guiana → France").
+      const territory = normalizedQuery.length < 3 ? null : (country.territories || [])
+        .map(name => ({ name, rank: rankOf(name) }))
+        .sort((left, right) => left.rank - right.rank)[0];
+      if (territory && territory.rank < rank) return { country, rank: territory.rank, via: territory.name };
+      return Number.isFinite(rank) ? { country, rank } : false;
+    }).filter(Boolean)
+      .sort((left, right) => left.rank - right.rank || left.country.name.localeCompare(right.country.name))
+      .slice(0, 8);
+    suggestions = matches.map(match => match.country);
+
+    if (suggestions.length === 0) {
+      list.classList.add("hidden");
+      field.setAttribute("aria-expanded", "false");
+      return;
+    }
+
+    matches.forEach(({ country, via }) => {
+      const item = document.createElement("div");
+      item.className = "autocomplete-item";
+      item.setAttribute("role", "option");
+      item.setAttribute("aria-selected", "false");
+      const name = document.createElement("span");
+      name.textContent = via ? `${via} → ${country.name}` : country.name;
+      const continent = document.createElement("small");
+      continent.textContent = country.continent;
+      item.append(createFlagImage(country, "autocomplete-flag"), name, continent);
+      item.addEventListener("click", () => {
+        sounds.playClick();
+        submit("", country);
+      });
+      list.appendChild(item);
+    });
+
+    list.classList.remove("hidden");
+    field.setAttribute("aria-expanded", "true");
+  }
+
+  function setActiveSuggestion(index) {
+    if (suggestions.length === 0) return;
+    activeIndex = (index + suggestions.length) % suggestions.length;
+    const items = list.querySelectorAll('[role="option"]');
+    items.forEach((item, itemIndex) => {
+      const isActive = itemIndex === activeIndex;
+      item.classList.toggle("active", isActive);
+      item.setAttribute("aria-selected", String(isActive));
+    });
+    items[activeIndex].scrollIntoView({ block: "nearest" });
+  }
+
+  field.addEventListener("input", event => renderSuggestions(event.target.value));
+  // When exactly one country matches what's typed, use it, so "portu" + Enter works.
+  function submitTyped() {
+    if (suggestions.length === 1 && !list.classList.contains("hidden")) submit("", suggestions[0]);
+    else submit(field.value);
+  }
+
+  button.addEventListener("click", () => {
+    sounds.playClick();
+    submitTyped();
+  });
+  field.addEventListener("keydown", event => {
+    const items = list.querySelectorAll(".autocomplete-item");
+    if (event.key === "ArrowDown" && items.length > 0) {
+      event.preventDefault();
+      setActiveSuggestion(activeIndex + 1);
+    } else if (event.key === "ArrowUp" && items.length > 0) {
+      event.preventDefault();
+      setActiveSuggestion(activeIndex < 0 ? items.length - 1 : activeIndex - 1);
+    } else if (event.key === "Escape") {
+      list.classList.add("hidden");
+      activeIndex = -1;
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      sounds.playClick();
+      if (activeIndex >= 0 && items[activeIndex]) items[activeIndex].click();
+      else submitTyped();
+    }
+  });
+
+  return {
+    reset,
+    setDisabled(disabled) {
+      field.disabled = disabled;
+      button.disabled = disabled;
+      if (disabled) {
+        list.classList.add("hidden");
+        field.setAttribute("aria-expanded", "false");
+      }
+    }
+  };
+}
+
+function initializeCountryInput({ countries, hasGuessed, onSubmit, onGiveUp = () => {} }) {
+  document.getElementById("giveUpBtn").addEventListener("click", () => {
+    sounds.playClick();
+    onGiveUp();
+  });
+  return createCountryInput({ input, list: autocompleteList, button: submitButton, countries, isExcluded: hasGuessed, onSubmit });
+}
+
+// Forgiving comparison for typed answers: ignores accents, case and punctuation, and
+// allows a typo or two in longer names.
+function isCloseMatch(guess, answer) {
+  const left = normalizeCountryName(guess);
+  const right = normalizeCountryName(answer);
+  if (!left || !right) return false;
+  if (left === right) return true;
+  if (right.length < 4) return false;
+  return editDistance(left, right) <= (right.length > 8 ? 2 : 1);
+}
+
+function getMatchRank(query, label) {
+  if (query === label) return 0;
+  if (label.startsWith(query)) return 1;
+  if (label.includes(query)) return 2;
+  if (query.length < 4) return Infinity;
+  const distance = editDistance(query, label);
+  const maximumDistance = query.length > 8 ? 2 : 1;
+  return distance <= maximumDistance ? 3 + distance : Infinity;
+}
+
+function editDistance(left, right) {
+  const previous = Array.from({ length: right.length + 1 }, (_, index) => index);
+  for (let row = 1; row <= left.length; row += 1) {
+    let diagonal = previous[0];
+    previous[0] = row;
+    for (let column = 1; column <= right.length; column += 1) {
+      const above = previous[column];
+      previous[column] = Math.min(
+        previous[column] + 1,
+        previous[column - 1] + 1,
+        diagonal + (left[row - 1] === right[column - 1] ? 0 : 1)
+      );
+      diagonal = above;
+    }
+  }
+  return previous[right.length];
+}
+
+// Plain-text arrows (not emoji) so they sit nicely in the monospace chips.
+const DIRECTION_ARROWS = { N: "↑", NE: "↗", E: "→", SE: "↘", S: "↓", SW: "↙", W: "←", NW: "↖" };
+
+// Words for how far the answer is from a guess, given guess ÷ answer.
+function getRatioFact(ratio, { similar, more, much, less, muchLess }) {
+  const relativeRatio = Math.max(ratio, 1 / ratio);
+  if (relativeRatio <= 1.5) return { status: "match", indicator: "≈", label: similar };
+  const isMore = ratio < 1;
+  return {
+    status: "hint",
+    indicator: isMore ? "▲" : "▼",
+    label: relativeRatio > 3 ? (isMore ? much : muchLess) : (isMore ? more : less)
+  };
+}
+
+// Every chip is a fact about the answer, compared with this guess: green when the
+// answer matches the guess, blue when it points somewhere, grey when it rules something out.
+function getGuessFacts(guess) {
+  if (guess.isCorrect) return [{ status: "match", indicator: "✓", label: "This is the answer" }];
+  const name = guess.country.name;
+  const facts = [
+    {
+      status: "direction",
+      indicator: DIRECTION_ARROWS[guess.direction] || "",
+      label: `Answer lies ${guess.direction}`,
+      title: `The answer lies to the ${guess.direction} of ${name}`
+    },
+    guess.continentMatch
+      ? { status: "match", indicator: "✓", label: "Same continent", title: `The answer is also in ${guess.country.continent}` }
+      : { status: "miss", label: "Other continent", title: `The answer is not in ${guess.country.continent}` }
+  ];
+  // A different region is a given on another continent, so it only shows within one.
+  if (guess.continentMatch) {
+    facts.push(guess.subregionMatch
+      ? { status: "match", indicator: "✓", label: "Same region", title: `The answer is also in ${guess.country.subregion}` }
+      : { status: "miss", label: "Other region", title: `The answer is not in ${guess.country.subregion}` });
+  }
+  facts.push(
+    guess.borderMatch
+      ? { status: "match", indicator: "✓", label: "Neighbour", title: `The answer borders ${name}` }
+      : { status: "miss", label: "Not a neighbour", title: `The answer doesn't border ${name}` },
+    {
+      ...getRatioFact(guess.populationRatio, {
+        similar: "Similar population", more: "More people", much: "Far more people", less: "Fewer people", muchLess: "Far fewer people"
+      }),
+      title: `Population compared with ${name}`
+    },
+    {
+      ...getRatioFact(guess.areaRatio, {
+        similar: "Similar size", more: "Bigger", much: "Much bigger", less: "Smaller", muchLess: "Much smaller"
+      }),
+      title: `Area compared with ${name}`
+    },
+    guess.landlockedMatch
+      ? { status: "match", indicator: "✓", label: guess.country.isLandlocked ? "Also landlocked" : "Also coastal", title: `Like ${name}` }
+      : { status: "hint", label: guess.country.isLandlocked ? "Has a coast" : "Landlocked", title: `Unlike ${name}` }
+  );
+  return facts;
+}
+
+// One guess as a list row; pass onHover to link the row with its globe marker.
+function createGuessRow(guess, index, onHover = null) {
+  const row = document.createElement("li");
+  row.className = "guess-row";
+  row.dataset.guessIndex = String(index);
+  row.style.setProperty("--temp", guess.color);
+
+  const number = document.createElement("span");
+  number.className = "guess-number";
+  number.textContent = String(index + 1);
+  const name = document.createElement("span");
+  name.className = "guess-name";
+  name.textContent = guess.country.name;
+  const temperature = document.createElement("span");
+  temperature.className = "temp-badge";
+  temperature.textContent = guess.temperature;
+
+  const facts = getGuessFacts(guess);
+  const factList = document.createElement("div");
+  factList.className = "guess-facts";
+  facts.forEach(({ label, status, indicator, title }) => {
+    const fact = document.createElement("span");
+    fact.className = `fact fact-${status}`;
+    if (title) fact.title = title;
+    if (indicator) fact.appendChild(Object.assign(document.createElement("b"), { textContent: indicator }));
+    fact.append(label);
+    factList.appendChild(fact);
+  });
+
+  row.append(number, createFlagImage(guess.country, "guess-flag"), name, temperature, factList);
+  if (onHover) {
+    row.addEventListener("mouseenter", () => {
+      setGuessHighlight(index, true);
+      onHover(index, true);
+    });
+    row.addEventListener("mouseleave", () => {
+      setGuessHighlight(index, false);
+      onHover(index, false);
+    });
+  }
+  return row;
+}
+
+function renderGuessHistory(guesses, onHover = () => {}, maxGuesses = guesses.length) {
+  const history = document.getElementById("history");
+  history.replaceChildren(...guesses.map((guess, index) => createGuessRow(guess, index, onHover)));
+  document.getElementById("guessCount").textContent = `${guesses.length} / ${maxGuesses}`;
+
+  for (let index = guesses.length; index < maxGuesses; index += 1) {
+    const empty = document.createElement("li");
+    empty.className = "guess-empty";
+    const number = document.createElement("span");
+    number.className = "guess-number";
+    number.textContent = String(index + 1);
+    empty.append(number, "Unused guess");
+    history.appendChild(empty);
+  }
+}
+
+function setGuessHighlight(index, active) {
+  document.querySelectorAll(`[data-guess-index="${index}"]`).forEach(element => {
+    element.classList.toggle("guess-highlighted", active);
+  });
+}
+
+function initializeStatsModal(getStats) {
+  const statsModal = document.getElementById("statsModal");
+  document.querySelectorAll(".stats-open-button").forEach(button => {
+    button.addEventListener("click", () => {
+      sounds.playClick();
+      const stats = getStats();
+      document.getElementById("statsGamesPlayed").textContent = stats.gamesPlayed;
+      document.getElementById("statsWinStreak").textContent = stats.winStreak;
+      document.getElementById("statsMaxStreak").textContent = stats.maxStreak;
+      document.getElementById("statsAverageScore").textContent = stats.averageScore;
+      document.getElementById("statsPerfectGuesses").textContent = stats.perfectGuesses;
+      statsModal.classList.remove("hidden");
+    });
+  });
+  document.getElementById("closeStatsButton").addEventListener("click", () => {
+    sounds.playClick();
+    statsModal.classList.add("hidden");
+  });
+}
+
+return { showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, playGuessReveal, playRankReveal, getMysteryClue, renderProgressiveHints, renderGlobeMarkerTooltip, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight, initializeStatsModal };
+})();
+
+// ---- social.js
+__modules["social.js"] = (() => {
+// The Community screen: your profile and invite code, your friends, and groups of friends.
+// In a group each day has a gold, silver and bronze medal for its top three, and each week
+// (Monday to Sunday) a winner is crowned: the highest total of daily scores. The data
+// lives in Supabase (supabase/social.sql); without an account the screen asks you to sign in.
+const { sounds } = __modules["audio.js"];
+const { addFriend, addToGroup, createGroup, getFriends, getGroupBoard, getGroups, getMyProfile, getUser, isConfigured, leaveGroup, removeFriend, setDisplayName } = __modules["auth.js"];
+const { createBadge, createMedal, getGroupMedal } = __modules["badges.js"];
+const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getTopPercent } = __modules["community.js"];
+const { showToastNotice } = __modules["ui.js"];
+
+const PENDING_INVITE_KEY = "daily-geography:pending-invite:v1";
+
+function element(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function button(className, text, onClick) {
+  const node = element("button", className, text);
+  node.type = "button";
+  node.addEventListener("click", () => { sounds.playClick(); onClick(); });
+  return node;
+}
+
+const toKey = date => date.toISOString().slice(0, 10);
+const addDays = (dateKey, days) => {
+  const date = new Date(`${dateKey}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return toKey(date);
+};
+const mondayOf = dateKey => addDays(dateKey, -((new Date(`${dateKey}T00:00:00Z`).getUTCDay() + 6) % 7));
+const topPercentOf = (dateKey, score) => getTopPercent(getDayStats(dateKey), score);
+
+// getDays() gives the archive's day records (with each day's top %); today is the current
+// puzzle date; dayLabel(dateKey) names a day ("Day 27").
+function initializeCommunity({ getDays, today, dayLabel }) {
+  const modal = document.getElementById("communityModal");
+  const body = document.getElementById("communityBody");
+  const state = { profile: null, friends: [], groups: [], groupId: null, view: "day", dateKey: today, creating: false, error: null };
+
+  // An invite link (?invite=CODE) is kept until you're signed in, then used.
+  const invite = new URLSearchParams(location.search).get("invite");
+  if (invite) {
+    try { localStorage.setItem(PENDING_INVITE_KEY, invite.toUpperCase()); } catch { /* storage off */ }
+    history.replaceState(null, "", location.pathname);
+  }
+
+  async function load() {
+    state.error = null;
+    try {
+      state.profile = await getMyProfile();
+      const pending = (() => { try { return localStorage.getItem(PENDING_INVITE_KEY); } catch { return null; } })();
+      if (pending) {
+        try { localStorage.removeItem(PENDING_INVITE_KEY); } catch { /* storage off */ }
+        if (pending !== state.profile?.invite_code) {
+          try {
+            const name = await addFriend(pending);
+            showToastNotice(`You and ${name} are now friends.`);
+          } catch (error) {
+            showToastNotice(error.message);
+          }
+        }
+      }
+      [state.friends, state.groups] = await Promise.all([getFriends(), getGroups()]);
+      if (!state.groups.some(group => group.id === state.groupId)) state.groupId = state.groups[0]?.id || null;
+    } catch (error) {
+      state.error = error;
+    }
+  }
+
+  async function open() {
+    modal.classList.remove("hidden");
+    document.getElementById("archiveModal")?.classList.add("hidden");
+    await render(true);
+  }
+
+  async function render(reload = false) {
+    if (!isConfigured || !getUser()) {
+      body.replaceChildren(createSignInCard());
+      return;
+    }
+    if (reload) {
+      body.replaceChildren(element("p", "community-loading", "Loading your friends and groups…"));
+      await load();
+    }
+    if (state.error) {
+      body.replaceChildren(element("p", "community-empty", state.error.notSetUp
+        ? "Community isn't switched on yet: supabase/social.sql still has to be run in Supabase (see docs/accounts-setup.md)."
+        : `Couldn't load your friends and groups: ${state.error.message}`));
+      return;
+    }
+    const you = element("section", "screen-column community-you");
+    you.append(createProfileCard(), createAddFriendCard(), createFriendsCard());
+    const groups = element("section", "screen-column community-groups");
+    groups.append(createGroupTabs());
+    if (state.creating) groups.appendChild(createNewGroupCard());
+    else if (state.groupId) groups.appendChild(await createGroupCard(state.groups.find(group => group.id === state.groupId)));
+    else groups.appendChild(element("p", "community-empty", state.friends.length
+      ? "Make a group with your friends to see who wins each day and each week."
+      : "Add a friend with their invite code, then make a group together."));
+    body.replaceChildren(you, groups);
+  }
+
+  function createSignInCard() {
+    const card = element("div", "community-card community-signin");
+    card.append(
+      element("strong", "", "SIGN IN TO PLAY WITH FRIENDS"),
+      element("p", "", isConfigured
+        ? "With an account you get an invite code to add friends, and you can make groups that crown a winner every day and every week."
+        : "Accounts aren't switched on yet, so there are no friends or groups for now.")
+    );
+    if (isConfigured) card.appendChild(button("btn btn-primary", "SIGN IN", () => {
+      modal.classList.add("hidden");
+      document.getElementById("accountModal").classList.remove("hidden");
+    }));
+    return card;
+  }
+
+  // Your name (editable), this month's badge, and your invite code and link.
+  function createProfileCard() {
+    const card = element("div", "community-card community-profile");
+    const month = today.slice(0, 7);
+    const badge = getMonthBadge(getDays(), month);
+    const icon = createBadge(badge.tier || RANK_TIERS.at(-1), 56);
+    icon.classList.toggle("is-locked", !badge.tier);
+    const nameForm = element("form", "community-name");
+    const nameInput = Object.assign(element("input"), { value: state.profile.display_name, maxLength: 24, ariaLabel: "Your name" });
+    nameForm.append(nameInput, Object.assign(element("button", "btn btn-secondary", "SAVE"), { type: "submit" }));
+    nameForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      try {
+        await setDisplayName(nameInput.value);
+        state.profile.display_name = nameInput.value.trim();
+        showToastNotice("Name saved.");
+      } catch (error) {
+        showToastNotice(error.message);
+      }
+    });
+    const head = element("div", "community-profile-head");
+    const text = element("div");
+    text.append(element("span", "field-label", "YOU"), nameForm, element("small", "", badge.tier ? `This month: ${badge.tier.name}` : "No badge this month yet"));
+    head.append(icon, text);
+
+    const link = `${location.origin}${location.pathname}?invite=${state.profile.invite_code}`;
+    const code = element("div", "community-code");
+    code.append(
+      element("span", "field-label", "YOUR INVITE CODE"),
+      element("strong", "", state.profile.invite_code),
+      element("small", "", "Friends who open your link (or enter your code) while signed in become your friends.")
+    );
+    const copy = (text, done) => navigator.clipboard?.writeText(text).then(() => showToastNotice(done), () => showToastNotice(text));
+    const actions = element("div", "community-actions");
+    actions.append(
+      button("btn btn-primary", "COPY INVITE LINK", () => copy(link, "Invite link copied.")),
+      button("btn btn-secondary", "COPY CODE", () => copy(state.profile.invite_code, "Code copied."))
+    );
+    card.append(head, code, actions);
+    return card;
+  }
+
+  function createAddFriendCard() {
+    const card = element("form", "community-card community-add");
+    const input = Object.assign(element("input"), { placeholder: "Friend's code, e.g. K7Q2XM", maxLength: 6, ariaLabel: "Friend's invite code" });
+    card.append(element("span", "field-label", "ADD A FRIEND"), input, Object.assign(element("button", "btn btn-secondary", "ADD"), { type: "submit" }));
+    card.addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!input.value.trim()) return;
+      try {
+        const name = await addFriend(input.value);
+        showToastNotice(`You and ${name} are now friends.`);
+        await render(true);
+      } catch (error) {
+        showToastNotice(error.message);
+      }
+    });
+    return card;
+  }
+
+  function createFriendsCard() {
+    const card = element("div", "community-card");
+    card.appendChild(element("span", "field-label", `FRIENDS · ${state.friends.length}`));
+    if (!state.friends.length) card.appendChild(element("p", "community-empty", "No friends yet. Share your invite link to add some."));
+    const list = element("ul", "community-friends");
+    state.friends.forEach(friend => {
+      const row = element("li");
+      row.append(element("span", "", friend.display_name), button("community-remove", "×", async () => {
+        if (!confirm(`Remove ${friend.display_name} as a friend?`)) return;
+        await removeFriend(friend.user_id);
+        await render(true);
+      }));
+      row.lastChild.setAttribute("aria-label", `Remove ${friend.display_name}`);
+      list.appendChild(row);
+    });
+    card.appendChild(list);
+    return card;
+  }
+
+  function createGroupTabs() {
+    const tabs = element("div", "board-tabs community-group-tabs");
+    state.groups.forEach(group => {
+      const tab = button(`board-tab${group.id === state.groupId && !state.creating ? " is-active" : ""}`, group.name.toUpperCase(), () => {
+        state.groupId = group.id;
+        state.creating = false;
+        render();
+      });
+      tabs.appendChild(tab);
+    });
+    tabs.appendChild(button(`board-tab${state.creating ? " is-active" : ""}`, "+ NEW GROUP", () => {
+      state.creating = true;
+      render();
+    }));
+    return tabs;
+  }
+
+  function createNewGroupCard() {
+    const card = element("form", "community-card community-new-group");
+    const name = Object.assign(element("input"), { placeholder: "Group name, e.g. Office crew", maxLength: 30, ariaLabel: "Group name" });
+    const picks = element("div", "community-picks");
+    state.friends.forEach(friend => {
+      const label = element("label");
+      label.append(Object.assign(element("input"), { type: "checkbox", value: friend.user_id }), friend.display_name);
+      picks.appendChild(label);
+    });
+    if (!state.friends.length) picks.appendChild(element("p", "community-empty", "Add friends first; you can still make a group and add them later."));
+    card.append(element("span", "field-label", "NEW GROUP"), name, element("span", "field-label", "WITH"), picks, Object.assign(element("button", "btn btn-primary", "CREATE GROUP"), { type: "submit" }));
+    card.addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!name.value.trim()) { showToastNotice("Give the group a name."); return; }
+      try {
+        state.groupId = await createGroup(name.value.trim(), [...picks.querySelectorAll("input:checked")].map(box => box.value));
+        state.creating = false;
+        await render(true);
+      } catch (error) {
+        showToastNotice(error.message);
+      }
+    });
+    return card;
+  }
+
+  // A group: who's in it, then a day's ranking (medals for the top three) or this week's
+  // (a crown for the leader), and last week's winner.
+  async function createGroupCard(group) {
+    const card = element("div", "community-card community-group");
+    const monthStart = `${today.slice(0, 7)}-01`;
+    const weekStart = mondayOf(today);
+    const lastWeekStart = addDays(weekStart, -7);
+    const from = [monthStart, lastWeekStart, state.dateKey].sort()[0];
+    let rows;
+    try {
+      rows = await getGroupBoard(group.id, from, today);
+    } catch (error) {
+      card.appendChild(element("p", "community-empty", error.message));
+      return card;
+    }
+    // Everyone in the group, each with their finished days.
+    const members = new Map();
+    rows.forEach(row => {
+      if (!members.has(row.user_id)) members.set(row.user_id, { id: row.user_id, name: row.display_name, days: new Map() });
+      if (row.date) members.get(row.user_id).days.set(row.date, row.score);
+    });
+    const people = [...members.values()];
+    const me = getUser().id;
+
+    const head = element("div", "community-group-head");
+    const title = element("div");
+    title.append(element("strong", "", group.name), element("small", "", `${people.length} ${people.length === 1 ? "member" : "members"}`));
+    const addSelect = element("select", "board-day");
+    addSelect.setAttribute("aria-label", "Add a friend to this group");
+    addSelect.appendChild(Object.assign(element("option", "", "+ Add a friend"), { value: "" }));
+    state.friends.filter(friend => !members.has(friend.user_id)).forEach(friend => addSelect.appendChild(Object.assign(element("option", "", friend.display_name), { value: friend.user_id })));
+    addSelect.addEventListener("change", async () => {
+      if (!addSelect.value) return;
+      try {
+        await addToGroup(group.id, addSelect.value);
+        await render(true);
+      } catch (error) {
+        showToastNotice(error.message);
+      }
+    });
+    const leave = button("community-leave", "Leave group", async () => {
+      if (!confirm(`Leave ${group.name}?`)) return;
+      await leaveGroup(group.id);
+      state.groupId = null;
+      await render(true);
+    });
+    head.append(title, addSelect, leave);
+
+    // Last week's winner, crowned.
+    const lastWeek = weekTotals(people, lastWeekStart, addDays(lastWeekStart, 6));
+    const crowned = element("p", "community-crowned");
+    crowned.textContent = lastWeek[0]?.total ? `👑 Last week's winner: ${lastWeek[0].person.name} · ${lastWeek[0].total.toLocaleString()}` : "👑 Last week nobody in this group played yet.";
+
+    const views = element("div", "board-tabs community-views");
+    [["day", "DAY"], ["week", "THIS WEEK"]].forEach(([key, label]) => views.appendChild(button(`board-tab${state.view === key ? " is-active" : ""}`, label, () => {
+      state.view = key;
+      render();
+    })));
+    const list = element("ol", "board-list community-board");
+    if (state.view === "day") {
+      const picker = element("select", "board-day");
+      picker.setAttribute("aria-label", "Day");
+      getDays().map(day => day.dateKey).filter(dateKey => dateKey <= today).reverse().forEach(dateKey => {
+        picker.appendChild(Object.assign(element("option", "", `${dayLabel(dateKey)}${dateKey === today ? " (today)" : ""}`), { value: dateKey, selected: dateKey === state.dateKey }));
+      });
+      picker.addEventListener("change", () => {
+        state.dateKey = picker.value;
+        render();
+      });
+      views.appendChild(picker);
+      dayRanking(people, state.dateKey, me).forEach(row => list.appendChild(row));
+    } else {
+      const totals = weekTotals(people, weekStart, addDays(weekStart, 6));
+      totals.forEach((entry, index) => {
+        const row = element("li", "board-row");
+        row.classList.toggle("is-you", entry.person.id === me);
+        const rank = element("span", "board-rank", index === 0 && entry.total ? "👑" : `#${index + 1}`);
+        row.append(rank, memberName(entry.person), element("span", "board-extra", `${entry.played} ${entry.played === 1 ? "day" : "days"}`), element("strong", "board-score", entry.total.toLocaleString()));
+        list.appendChild(row);
+      });
+    }
+    card.append(head, crowned, views, list, element("p", "sample-note", "Top % against the world is still sample data until the game has real players."));
+    return card;
+  }
+
+  // A member's name with the badge they've earned this month.
+  function memberName(person) {
+    const name = element("span", "board-name");
+    const playedDays = [...person.days.entries()].filter(([dateKey]) => dateKey.startsWith(today.slice(0, 7)))
+      .map(([dateKey, score]) => ({ dateKey, completed: true, topPercent: topPercentOf(dateKey, score) }));
+    const badge = getMonthBadge(playedDays, today.slice(0, 7));
+    const icon = createBadge(badge.tier || RANK_TIERS.at(-1), 22);
+    icon.classList.toggle("is-locked", !badge.tier);
+    if (badge.tier) icon.setAttribute("aria-label", `${badge.tier.name} this month`);
+    name.append(icon, element("span", "", person.name));
+    return name;
+  }
+
+  // A day's ranking: highest score first, gold, silver and bronze for the top three, and
+  // everyone who hasn't played it yet at the bottom.
+  function dayRanking(people, dateKey, me) {
+    const played = people.filter(person => person.days.has(dateKey)).sort((left, right) => right.days.get(dateKey) - left.days.get(dateKey));
+    const waiting = people.filter(person => !person.days.has(dateKey));
+    let place = 0;
+    let lastScore = null;
+    const rows = played.map((person, index) => {
+      const score = person.days.get(dateKey);
+      // Equal scores share a place (and a medal).
+      if (score !== lastScore) place = index + 1;
+      lastScore = score;
+      const row = element("li", "board-row");
+      row.classList.toggle("is-you", person.id === me);
+      const medal = getGroupMedal(place);
+      const rank = element("span", "board-rank");
+      if (medal) rank.appendChild(createMedal(medal, 26));
+      else rank.textContent = `#${place}`;
+      row.append(rank, memberName(person), element("span", "board-extra", formatTopPercent(topPercentOf(dateKey, score))), element("strong", "board-score", score.toLocaleString()));
+      return row;
+    });
+    waiting.forEach(person => {
+      const row = element("li", "board-row is-waiting");
+      row.classList.toggle("is-you", person.id === me);
+      row.append(element("span", "board-rank", "—"), memberName(person), element("span", "board-extra", "not played"), element("strong", "board-score", "—"));
+      rows.push(row);
+    });
+    if (!people.length) rows.push(element("li", "community-empty", "Nobody here yet."));
+    return rows;
+  }
+
+  // Each member's total of daily scores over a week (Monday to Sunday), highest first.
+  function weekTotals(people, from, to) {
+    return people.map(person => {
+      const scores = [...person.days.entries()].filter(([dateKey]) => dateKey >= from && dateKey <= to).map(([, score]) => score);
+      return { person, total: scores.reduce((sum, score) => sum + score, 0), played: scores.length };
+    }).sort((left, right) => right.total - left.total);
+  }
+
+  document.querySelectorAll(".community-open-button").forEach(openButton => openButton.addEventListener("click", () => {
+    sounds.playClick();
+    open();
+  }));
+  document.getElementById("closeCommunityButton").addEventListener("click", () => {
+    sounds.playClick();
+    modal.classList.add("hidden");
+  });
+
+  return {
+    // After signing in or out: refresh the screen if it's open, and use a waiting invite.
+    onAccountChange(account) {
+      let pending = null;
+      try { pending = localStorage.getItem(PENDING_INVITE_KEY); } catch { /* storage off */ }
+      if (account && pending) open();
+      else if (!modal.classList.contains("hidden")) render(true);
+    }
+  };
+}
+
+return { initializeCommunity };
 })();
 
 // ---- engine.js
@@ -11716,6 +11857,7 @@ const { CLUES } = __modules["clues.js"];
 const { sounds } = __modules["audio.js"];
 const { createDistributionChart, initializeHistoryScreens } = __modules["screens.js"];
 const { formatTopPercent, getDayStats, getTopPercent } = __modules["community.js"];
+const { initializeCommunity } = __modules["social.js"];
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
 const { MAX_DAILY_SCORE, MAX_GUESSES, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
@@ -13549,6 +13691,9 @@ async function mergeAccountDays() {
   }
 }
 
+// The Community screen, set up at the end of this file.
+let community = null;
+
 function renderAccount(account) {
   const profile = account ? getProfile(account) : null;
   const avatar = profile?.avatar ? Object.assign(document.createElement("img"), { src: profile.avatar, alt: "", referrerPolicy: "no-referrer" }) : null;
@@ -13588,12 +13733,14 @@ document.getElementById("signOutButton").addEventListener("click", async () => {
   sounds.playClick();
   await signOut();
   renderAccount(null);
+  community?.onAccountChange(null);
   showToastNotice("Signed out. Your days stay in this browser.");
 });
 renderAccount(null);
 initAuth(account => {
   renderAccount(account);
   if (account) mergeAccountDays();
+  community?.onAccountChange(account);
 });
 
 // Phones: the globe sits in the gap between the top bar and the round's sheet, so it's
@@ -13624,11 +13771,12 @@ document.getElementById("sheetHandle").addEventListener("click", () => {
   handle.setAttribute("aria-label", expanded ? "Show more of the globe" : "Show more of the round");
 });
 
-initializeHistoryScreens({
+const archive = initializeHistoryScreens({
   getDays: getAllPuzzleDays,
   getDayRecord,
   onPlayDay: enterGameView
 });
+community = initializeCommunity({ getDays: archive.loadDays, today, dayLabel: dateKey => `Day ${getPuzzleNumber(dateKey)}` });
 render({ animateGlobe: false });
 showMenuGlobe();
 
