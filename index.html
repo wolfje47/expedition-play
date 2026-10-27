@@ -1068,6 +1068,10 @@ h1, h2, h3 { font-weight: normal; }
 .overview-round { grid-template-columns: minmax(0, 1fr) auto; }
 .overview-round-text { display: grid; gap: 0.15rem; }
 .overview-round-text span { color: var(--muted); font-size: 13px; }
+/* Under each round: how you did, then how everyone else did, with a bar for the share. */
+.overview-round-text .overview-round-you { color: var(--text); }
+.overview-round-text .overview-round-others { display: flex; align-items: center; gap: 0.5rem; font-size: 12px; }
+.overview-round-bar { flex: 0 0 60px; height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--accent) var(--share), rgba(255, 255, 255, 0.1) var(--share)); }
 .overview-round-points small { color: var(--accent); }
 
 /* ---------- Round title card ---------- */
@@ -1483,48 +1487,43 @@ h1, h2, h3 { font-weight: normal; }
 .archive-layout { grid-template-columns: minmax(280px, 380px) minmax(0, 1fr); }
 .leaderboard-layout { grid-template-columns: minmax(340px, 420px) minmax(0, 1fr); }
 
-.day-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  align-content: start;
-  gap: 0.5rem;
-  min-height: 0;
-  padding-right: 0.25rem;
-  overflow-y: auto;
-}
+/* Archive calendar: a row per week (Monday to Sunday) and its stamp, under month headers. */
+.archive-calendar { min-height: 0; padding-right: 0.25rem; overflow-y: auto; scrollbar-width: thin; }
+.calendar { display: grid; gap: 6px; max-width: 420px; }
+.calendar-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)) 44px; align-items: center; gap: 5px; }
+.calendar-weekdays span { color: var(--faint); font: 700 10px var(--font-mono); text-align: center; }
 
-.archive-layout .day-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.calendar-month { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.7rem; margin-top: 0.5rem; padding: 0.55rem 0.7rem; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: rgba(255, 255, 255, 0.03); }
+.calendar-month.is-full { border-color: rgba(255, 212, 92, 0.6); box-shadow: 0 0 18px rgba(255, 212, 92, 0.15); }
+.calendar-month-name { font: 10px var(--font-display); letter-spacing: 0.06em; }
+.calendar-month-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; color: var(--muted); font: 12px var(--font-mono); }
+.calendar-medal-count { display: inline-flex; align-items: center; gap: 2px; }
+.calendar-full { margin-left: auto; color: var(--gold); font: 9px var(--font-display); }
 
-.day-tile {
-  display: grid;
-  gap: 0.45rem;
-  padding: 0.7rem 0.8rem;
-  border: 1px solid var(--glass-line-soft);
-  border-radius: 14px;
-  background: var(--glass-fill);
-  text-align: left;
-}
+/* A day: played (solid, with its medal), in progress (blue, rounds done), not played
+   (just a dashed outline). Today has a glowing ring. */
+.day-cell { display: grid; place-items: center; align-content: center; gap: 2px; aspect-ratio: 1; min-width: 0; padding: 2px; border: 1px solid transparent; border-radius: 10px; font: 700 11px var(--font-mono); }
+.day-cell.is-empty { visibility: hidden; }
+.day-cell.is-played { border-color: var(--glass-line); background: rgba(255, 255, 255, 0.1); color: var(--text); }
+.day-cell.is-progress { border: 1.5px solid var(--accent); background: rgba(69, 227, 255, 0.16); color: var(--accent); }
+.day-cell.is-open { border: 1px dashed rgba(255, 255, 255, 0.18); background: none; color: var(--faint); }
+.day-cell.is-today { box-shadow: 0 0 0 2px var(--gold), 0 0 14px rgba(255, 212, 92, 0.35); }
+.day-cell:not(.is-empty):hover { border-color: var(--accent); }
+.day-cell.is-selected { outline: 2px solid var(--accent); outline-offset: 2px; }
+.day-cell-number { line-height: 1; }
+.day-cell-progress { font-size: 10px; }
+.day-cell-done { color: var(--muted); }
+.day-cell .medal-svg { width: 55%; height: auto; }
 
-.day-tile:hover { border-color: var(--glass-line); background: rgba(255, 255, 255, 0.06); }
-.day-tile.is-selected { border-color: var(--accent); background: rgba(69, 227, 255, 0.08); box-shadow: 0 0 0 1px var(--accent); }
-.day-tile.is-open { border-style: dashed; border-color: var(--glass-line); }
-.day-tile.is-open:hover { border-color: var(--accent); }
+.week-stamp { display: grid; place-items: center; width: 40px; height: 40px; border: 1.5px dashed rgba(255, 255, 255, 0.18); border-radius: 50%; color: var(--faint); font: 700 10px var(--font-mono); }
+.week-stamp.is-earned { border: 0; transform: rotate(-8deg); }
 
-.day-tile-head { display: flex; justify-content: space-between; gap: 0.5rem; }
-.day-tile-date { font-size: 13px; font-weight: 600; }
-.day-tile-number { color: var(--faint); font: 11px var(--font-mono); }
-.day-tile-name { overflow: hidden; color: var(--gold); font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.calendar-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.9rem; margin-top: 0.6rem; color: var(--muted); font-size: 12px; }
+.calendar-legend > span { display: inline-flex; align-items: center; gap: 0.35rem; }
+.calendar-legend i.day-cell { width: 14px; aspect-ratio: 1; padding: 0; border-radius: 4px; }
+.calendar-legend-medals { gap: 0.2rem !important; font: 11px var(--font-mono); }
 
-.day-tile-answer { display: flex; align-items: center; gap: 0.45rem; min-width: 0; color: var(--muted); font-size: 13px; }
-.day-tile-answer span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.day-tile-flag { width: 22px; height: 15px; flex: 0 0 22px; border-radius: 3px; object-fit: cover; }
-
-.day-tile-result { display: flex; justify-content: space-between; align-items: center; gap: 0.4rem; }
-.day-tile-score { color: var(--gold); font: 700 18px var(--font-mono); }
-.day-tile-missed { color: var(--faint); font-size: 13px; }
-.day-tile-answer .day-tile-locked,
 .overview-locked { color: var(--faint); }
-.day-tile-cta { color: var(--accent); font: 10px var(--font-display); }
 
 .rank-chip {
   display: inline-block;
@@ -1756,7 +1755,7 @@ h1, h2, h3 { font-weight: normal; }
   .screen-body,
   .archive-layout,
   .leaderboard-layout { grid-template-columns: 1fr; flex: none; }
-  .day-grid,
+  .archive-calendar,
   .day-overview { overflow: visible; }
   .board-list { overflow: visible; }
 }
@@ -2440,13 +2439,13 @@ h1, h2, h3 { font-weight: normal; }
       <div class="modal-head">
         <div>
           <h2 id="archiveTitle">ARCHIVE</h2>
-          <p class="modal-note">Pick a day to see how everyone did. Days you haven't played can be started once; finished days show the answers and your guesses.</p>
+          <p class="modal-note">A medal for every day you play, and a stamp for every full week. Pick a day to see its rounds and how everyone did.</p>
         </div>
         <button class="modal-close" id="closeArchiveButton" type="button" aria-label="Close archive">×</button>
       </div>
       <div class="screen-body archive-layout">
         <div class="screen-column">
-          <div id="archiveListContainer" class="day-grid"></div>
+          <div id="archiveListContainer" class="archive-calendar"></div>
         </div>
         <div class="day-overview" id="dayOverview" aria-live="polite"></div>
       </div>
@@ -10708,7 +10707,8 @@ __modules["community.js"] = (() => {
 // date (stable per day, flagged with isSample so the UI can label them). Replace
 // getDayStats with a call to a real leaderboard API later; the rest can stay as is.
 
-const { MAX_DAILY_SCORE } = __modules["daily.js"];
+const { COUNTRIES } = __modules["countries.js"];
+const { MAX_DAILY_SCORE, getCountry } = __modules["daily.js"];
 
 const SCORE_BUCKET_COUNT = 10;
 const SCORE_BUCKET_SIZE = MAX_DAILY_SCORE / SCORE_BUCKET_COUNT;
@@ -10847,7 +10847,40 @@ function getCountryBoard(dateKeys) {
   return rows;
 }
 
-return { SCORE_BUCKET_COUNT, SCORE_BUCKET_SIZE, RANK_TIERS, getDayStats, getScoreBucket, getTopPercent, formatTopPercent, getRankTier, getScoreAtTopPercent, DAYS_FOR_BADGE, getRankThresholds, getPlayerCount, getCountryBoard };
+// How other players did in one round of a day, for the archive (PLACEHOLDER like the rest:
+// generated from the date until real guesses come from the leaderboard). `round` is the
+// round as planned in daily.js. Every share is a whole percentage of the day's players.
+function getRoundStats(dateKey, index, round) {
+  const random = createSeededRandom(`round:${dateKey}:${index}`);
+  const share = (low, high) => Math.round(low + random() * (high - low));
+  const pick = items => items[Math.floor(random() * items.length)];
+  switch (round.type) {
+    case "mystery":
+    case "pinpoint": {
+      // The wrong guess tried most often: a neighbour, or a country on the same continent.
+      const answer = getCountry(round.answer);
+      const nearby = answer?.borders?.length ? answer.borders
+        : COUNTRIES.filter(country => country.continent === answer?.continent && country.iso !== answer?.iso).map(country => country.iso);
+      return { solved: share(35, 85), commonWrong: getCountry(pick(nearby))?.name || null };
+    }
+    case "deepcut": {
+      // The two answers given most, from the more obvious ones.
+      const obvious = [...(round.answers[200] || []), ...(round.answers[400] || [])];
+      const first = pick(obvious);
+      const second = pick(obvious.filter(text => text !== first));
+      const firstShare = share(22, 40);
+      return { solved: share(60, 95), top: [{ text: first, share: firstShare }, ...(second ? [{ text: second, share: share(8, firstShare - 4) }] : [])] };
+    }
+    case "paint":
+      return { allFound: share(8, 35), mostMissed: getCountry(pick(round.answers))?.name || null, missedShare: share(40, 80) };
+    case "rank":
+      return { firstTry: share(4, 22), solved: share(35, 75) };
+    default:
+      return null;
+  }
+}
+
+return { SCORE_BUCKET_COUNT, SCORE_BUCKET_SIZE, RANK_TIERS, getDayStats, getScoreBucket, getTopPercent, formatTopPercent, getRankTier, getScoreAtTopPercent, DAYS_FOR_BADGE, getRankThresholds, getPlayerCount, getCountryBoard, getRoundStats };
 })();
 
 // ---- badges.js
@@ -10934,17 +10967,63 @@ function createBadge(tier, size = 48) {
   return svg;
 }
 
-return { createBadge };
+// Medals for a single day, by its score: gold, silver and bronze (no medal below that).
+const MEDALS = [
+  { key: "gold", name: "Gold", minScore: 5000, fill: "#ffd45c", edge: "#fff0b3" },
+  { key: "silver", name: "Silver", minScore: 3500, fill: "#c9d3e6", edge: "#f4f7fc" },
+  { key: "bronze", name: "Bronze", minScore: 2000, fill: "#d6884a", edge: "#f2c49b" }
+];
+
+function getMedal(score) {
+  return score === null || score === undefined ? null : MEDALS.find(medal => score >= medal.minScore) || null;
+}
+
+// A medal ({ key, name, fill, edge }) as a pixel <svg>: a V-shaped ribbon over a coin with
+// a lighter rim at the top left, in the badges' 8-bit style.
+function createMedal(medal, size = 24) {
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("viewBox", "0 0 16 16");
+  svg.setAttribute("width", size);
+  svg.setAttribute("height", size);
+  svg.setAttribute("shape-rendering", "crispEdges");
+  svg.setAttribute("class", `medal-svg is-${medal.key}`);
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", `${medal.name} medal`);
+  const pixel = (x, y, fill) => {
+    const rect = document.createElementNS(SVG_NS, "rect");
+    Object.entries({ x, y, width: 1, height: 1, fill }).forEach(([name, value]) => rect.setAttribute(name, value));
+    svg.appendChild(rect);
+  };
+  // The ribbon: two straps meeting above the coin.
+  for (let y = 0; y < 5; y += 1) {
+    pixel(3 + y, y, "#2f8fd8");
+    pixel(4 + y, y, "#45e3ff");
+    pixel(12 - y, y, "#2f8fd8");
+    pixel(11 - y, y, "#45e3ff");
+  }
+  // The coin: a dark outline, a light rim at the top left, the metal inside.
+  for (let y = 4; y < 16; y += 1) {
+    for (let x = 1; x < 15; x += 1) {
+      const distance = Math.hypot(x + 0.5 - 8, y + 0.5 - 10);
+      if (distance > 5.6) continue;
+      const rim = distance > 4.4;
+      pixel(x, y, rim ? (x + y < 16 ? medal.edge : "#04121a") : medal.fill);
+    }
+  }
+  return svg;
+}
+
+return { createBadge, MEDALS, getMedal, createMedal };
 })();
 
 // ---- screens.js
 __modules["screens.js"] = (() => {
 const { sounds } = __modules["audio.js"];
-const { createFlagImage, createGuessRow } = __modules["ui.js"];
-const { DAYS_FOR_BADGE, RANK_TIERS, SCORE_BUCKET_SIZE, formatTopPercent, getCountryBoard, getDayStats, getPlayerCount, getRankThresholds, getRankTier, getScoreAtTopPercent, getScoreBucket, getTopPercent } = __modules["community.js"];
+const { createFlagImage } = __modules["ui.js"];
+const { DAYS_FOR_BADGE, RANK_TIERS, SCORE_BUCKET_SIZE, formatTopPercent, getCountryBoard, getDayStats, getPlayerCount, getRankThresholds, getRankTier, getScoreAtTopPercent, getRoundStats, getScoreBucket, getTopPercent } = __modules["community.js"];
 const { MAX_DAILY_SCORE, getCountry, getJourney } = __modules["daily.js"];
 const { JOURNEYS, ROUND_COLORS, createJourney } = __modules["journeys.js"];
-const { createBadge } = __modules["badges.js"];
+const { MEDALS, createBadge, createMedal, getMedal } = __modules["badges.js"];
 
 const SAMPLE_NOTE = "Player numbers and ranks are sample data until online leaderboards launch.";
 
@@ -10962,45 +11041,139 @@ function withCommunity(record) {
   return { ...record, stats, topPercent };
 }
 
-function createDayTile(day, { isSelected, onSelect }) {
-  const tile = element("button", "day-tile");
-  tile.type = "button";
-  tile.classList.toggle("is-selected", isSelected);
-  tile.classList.toggle("is-played", day.completed);
+// ---------------------------------------------------------------------------
+// Archive calendar: the days by week (Monday to Sunday) under a header per month. A
+// played day shows its medal, a day in progress how many rounds are done, a day not
+// played is just an outline. Each week ends in a stamp: once every day of it is played,
+// the explorer shield for the week's average rank against everyone else.
+// ---------------------------------------------------------------------------
 
-  const head = element("span", "day-tile-head");
-  head.append(
-    element("span", "day-tile-date", `Day ${day.puzzleNumber}`),
-    element("span", "day-tile-number", day.isToday ? "Today" : "")
-  );
-  tile.appendChild(head);
-  if (day.dayName) tile.appendChild(element("span", "day-tile-name", day.dayName));
+const WEEKDAYS = ["M", "T", "W", "T", "F", "S", "S"];
+const toDate = dateKey => new Date(`${dateKey}T00:00:00Z`);
+const toKey = date => date.toISOString().slice(0, 10);
 
-  // Unfinished days (today or past) can be played once; their answers stay hidden until then.
-  if (!day.completed) {
-    tile.classList.add("is-open");
-    const answer = element("span", "day-tile-answer");
-    answer.appendChild(element("span", "day-tile-locked", day.isToday ? "Today's puzzle" : "🔒 Answer locked"));
-    const result = element("span", "day-tile-result");
-    result.append(element("span", "day-tile-cta", day.started ? "IN PROGRESS" : "NOT PLAYED"));
-    tile.append(answer, result);
+// The days in weeks of seven (null where a date isn't in the archive), each week filed
+// under the month its Thursday falls in.
+function groupByWeek(days) {
+  const byKey = new Map(days.map(day => [day.dateKey, day]));
+  const weeks = new Map();
+  days.forEach(day => {
+    const monday = toDate(day.dateKey);
+    monday.setUTCDate(monday.getUTCDate() - (monday.getUTCDay() + 6) % 7);
+    if (weeks.has(toKey(monday))) return;
+    const cells = WEEKDAYS.map((_, offset) => {
+      const date = new Date(monday);
+      date.setUTCDate(date.getUTCDate() + offset);
+      return byKey.get(toKey(date)) || null;
+    });
+    const thursday = new Date(monday);
+    thursday.setUTCDate(thursday.getUTCDate() + 3);
+    weeks.set(toKey(monday), { monday: toKey(monday), month: toKey(thursday).slice(0, 7), cells });
+  });
+  return [...weeks.values()].sort((left, right) => left.monday.localeCompare(right.monday));
+}
+
+// A week's stamp: the explorer shield for its average rank once every day is played.
+function getWeekStamp(cells) {
+  const days = cells.filter(Boolean);
+  const played = days.filter(day => day.completed);
+  if (played.length < days.length) return { played: played.length, total: days.length, tier: null };
+  const percent = played.reduce((sum, day) => sum + day.topPercent, 0) / played.length;
+  return { played: played.length, total: days.length, tier: getRankTier(percent), percent };
+}
+
+function createDayCell(day, { isSelected, onSelect }) {
+  const cell = element("button", "day-cell");
+  cell.type = "button";
+  const roundsDone = day.rounds ? day.rounds.filter(round => round.done).length : 0;
+  const state = day.completed ? "played" : day.started ? "progress" : "open";
+  cell.classList.add(`is-${state}`);
+  cell.classList.toggle("is-today", day.isToday);
+  cell.classList.toggle("is-selected", isSelected);
+  cell.appendChild(element("span", "day-cell-number", String(day.puzzleNumber)));
+  if (state === "played") {
+    const medal = getMedal(day.score);
+    cell.appendChild(medal ? createMedal(medal, 22) : element("span", "day-cell-done", "✓"));
+    cell.title = `Day ${day.puzzleNumber}: ${day.score.toLocaleString()}${medal ? ` · ${medal.name}` : ""}`;
+  } else if (state === "progress") {
+    cell.appendChild(element("span", "day-cell-progress", `${roundsDone}/5`));
+    cell.title = `Day ${day.puzzleNumber}: in progress, ${roundsDone} of 5 rounds`;
   } else {
-    const answer = element("span", "day-tile-answer");
-    if (day.answer) answer.append(createFlagImage(day.answer, "day-tile-flag"), element("span", "", day.answer.name));
-    else answer.append(element("span", "day-tile-locked", "Answer unavailable"));
-    const result = element("span", "day-tile-result");
-    result.append(
-      element("strong", "day-tile-score", day.score.toLocaleString()),
-      element("span", "rank-chip", formatTopPercent(day.topPercent))
-    );
-    tile.append(answer, result);
+    cell.title = `Day ${day.puzzleNumber}: not played${day.isToday ? " (today)" : ""}`;
   }
-
-  tile.addEventListener("click", () => {
+  cell.addEventListener("click", () => {
     sounds.playClick();
     onSelect(day);
   });
-  return tile;
+  return cell;
+}
+
+function createWeekStamp(stamp) {
+  const box = element("span", "week-stamp");
+  if (stamp.tier) {
+    box.classList.add("is-earned");
+    box.appendChild(createBadge(stamp.tier, 30));
+    box.title = `${stamp.tier.name} week: on average ${formatTopPercent(stamp.percent).toLowerCase()}`;
+  } else {
+    box.textContent = `${stamp.played}/${stamp.total}`;
+    box.title = `Play all ${stamp.total} days of this week for its stamp`;
+  }
+  return box;
+}
+
+// A month's header: days played, medals won, the best week stamp, and "FULL MONTH" once
+// every day of the month in the archive is played.
+function createMonthHead(month, weeks) {
+  const days = weeks.flatMap(week => week.cells).filter(day => day && day.dateKey.startsWith(month));
+  const played = days.filter(day => day.completed);
+  const head = element("div", "calendar-month");
+  head.classList.toggle("is-full", played.length === days.length);
+  const name = toDate(`${month}-01`).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }).toUpperCase();
+  const summary = element("span", "calendar-month-summary");
+  summary.appendChild(element("span", "", `${played.length}/${days.length} days`));
+  MEDALS.forEach(medal => {
+    const count = played.filter(day => getMedal(day.score) === medal).length;
+    if (!count) return;
+    const tally = element("span", "calendar-medal-count");
+    tally.append(createMedal(medal, 16), String(count));
+    summary.appendChild(tally);
+  });
+  const best = weeks.map(week => getWeekStamp(week.cells).tier).filter(Boolean)
+    .sort((left, right) => RANK_TIERS.indexOf(left) - RANK_TIERS.indexOf(right))[0];
+  if (best) summary.appendChild(createBadge(best, 18));
+  head.append(element("span", "calendar-month-name", name), summary);
+  if (played.length === days.length) head.appendChild(element("span", "calendar-full", "FULL MONTH"));
+  return head;
+}
+
+function createCalendar(days, { selected, onSelect }) {
+  const weeks = groupByWeek(days);
+  const calendar = element("div", "calendar");
+  const weekdays = element("div", "calendar-week calendar-weekdays");
+  WEEKDAYS.forEach(letter => weekdays.appendChild(element("span", "", letter)));
+  weekdays.appendChild(element("span", "", "WEEK"));
+  calendar.appendChild(weekdays);
+  [...new Set(weeks.map(week => week.month))].forEach(month => {
+    const monthWeeks = weeks.filter(week => week.month === month);
+    calendar.appendChild(createMonthHead(month, monthWeeks));
+    monthWeeks.forEach(week => {
+      const row = element("div", "calendar-week");
+      week.cells.forEach(day => row.appendChild(day ? createDayCell(day, { isSelected: day === selected, onSelect }) : element("span", "day-cell is-empty")));
+      row.appendChild(createWeekStamp(getWeekStamp(week.cells)));
+      calendar.appendChild(row);
+    });
+  });
+  const legend = element("div", "calendar-legend");
+  [["is-played", "Played"], ["is-progress", "In progress"], ["is-open", "Not played"]].forEach(([state, label]) => {
+    const item = element("span", "");
+    item.append(element("i", `day-cell ${state}`), label);
+    legend.appendChild(item);
+  });
+  const medals = element("span", "calendar-legend-medals");
+  MEDALS.forEach(medal => medals.append(createMedal(medal, 16), `${medal.minScore.toLocaleString()}+ `));
+  legend.appendChild(medals);
+  calendar.appendChild(legend);
+  return calendar;
 }
 
 function createStatCard(label, value, note) {
@@ -11071,16 +11244,19 @@ function renderDayOverview(container, day, onPlay) {
     element("span", "field-label", day.isToday ? "TODAY'S PUZZLE" : "DAILY PUZZLE"),
     element("h3", "overview-date", `Day ${day.puzzleNumber}${day.dayName ? `: ${day.dayName}` : ""}`)
   );
-  const answer = element("div", "overview-answer");
-  const answerText = element("div");
-  if (day.completed && day.answer) {
-    answerText.append(element("span", "field-label", day.rounds ? "MYSTERY COUNTRY" : "ANSWER"), element("strong", "", day.answer.name));
-    answer.append(createFlagImage(day.answer, "overview-flag"), answerText);
+  // The day's medal and score once it's played.
+  const result = element("div", "overview-answer");
+  const resultText = element("div");
+  const medal = day.completed ? getMedal(day.score) : null;
+  if (day.completed) {
+    resultText.append(element("span", "field-label", medal ? `${medal.name.toUpperCase()} MEDAL` : "NO MEDAL"), element("strong", "", day.score.toLocaleString()));
+    if (medal) result.appendChild(createMedal(medal, 44));
+    result.appendChild(resultText);
   } else {
-    answerText.append(element("span", "field-label", "ANSWER"), element("strong", "overview-locked", "🔒 Locked"));
-    answer.append(answerText);
+    resultText.append(element("span", "field-label", day.started ? "IN PROGRESS" : "NOT PLAYED"), element("strong", "overview-locked", day.started ? "Continue it below" : "🔒 Locked"));
+    result.appendChild(resultText);
   }
-  head.append(titles, answer);
+  head.append(titles, result);
 
   const yourResult = !day.completed
     ? "—"
@@ -11106,27 +11282,18 @@ function renderDayOverview(container, day, onPlay) {
   const distribution = element("section", "overview-section");
   distribution.append(element("h4", "field-label", "SCORE DISTRIBUTION"), createDistributionChart(day));
 
-  const sections = [head, createPlayPanel(day, onPlay), stats, distribution];
+  const sections = [head, createPlayPanel(day, onPlay)];
+  // The rounds first: what you did and what everyone else answered.
   if (day.rounds) sections.push(createRoundsSection(day));
   else if (day.completed) sections.push(element("p", "overview-empty", `Played before the five-round format. The original score (out of 1,000) is shown ×${MAX_DAILY_SCORE / 1000}.`));
+  sections.push(stats, distribution);
 
-  const guesses = element("section", "overview-section");
-  guesses.appendChild(element("h4", "field-label", day.rounds ? "MYSTERY COUNTRY GUESSES" : "YOUR GUESSES"));
-  if (day.guesses.length) {
-    const list = element("ol", "guess-list overview-guesses");
-    day.guesses.forEach((guess, index) => list.appendChild(createGuessRow(guess, index)));
-    guesses.appendChild(list);
-  } else {
-    guesses.appendChild(element("p", "overview-empty", day.completed
-      ? "You gave up before guessing."
-      : "You didn't play this day, so its answer stays locked."));
-  }
-
-  container.append(...sections, guesses, element("p", "sample-note", SAMPLE_NOTE));
+  container.append(...sections, element("p", "sample-note", SAMPLE_NOTE));
   container.scrollTop = 0;
 }
 
-// The day's five rounds with their answers (locked until the day is finished) and points.
+// The day's five rounds: the answer, how you did, and how everyone else did (who got it,
+// what they answered most). All locked until you've finished the day.
 function createRoundsSection(day) {
   const section = element("section", "overview-section");
   const list = element("ol", "overview-rounds");
@@ -11135,10 +11302,20 @@ function createRoundsSection(day) {
     item.classList.toggle("is-perfect", round.done && round.isPerfect);
     item.classList.toggle("is-failed", round.done && round.score === 0);
     const text = element("div", "overview-round-text");
-    text.append(
-      element("strong", "", `${index + 1}. ${round.name}`),
-      element("span", "", day.completed ? round.answerText : "🔒 Answer locked")
-    );
+    text.append(element("strong", "", `${index + 1}. ${round.name}`));
+    if (day.completed) {
+      text.append(element("span", "", round.answerText), element("span", "overview-round-you", describeYourRound(round)));
+      const others = describeOthers(getRoundStats(day.dateKey, index, round.plan), round.type);
+      if (others) {
+        const line = element("span", "overview-round-others");
+        const bar = element("i", "overview-round-bar");
+        bar.style.setProperty("--share", `${others.share}%`);
+        line.append(bar, others.text);
+        text.appendChild(line);
+      }
+    } else {
+      text.append(element("span", "", "🔒 Finish the day to see the answers and how others did"));
+    }
     const points = element("span", "overview-round-points", round.done ? round.points.toLocaleString() : "—");
     if (round.multiplier > 1) points.appendChild(element("small", "", ` ×${round.multiplier.toFixed(1)}`));
     item.append(text, points);
@@ -11146,6 +11323,43 @@ function createRoundsSection(day) {
   });
   section.append(element("h4", "field-label", "ROUNDS"), list);
   return section;
+}
+
+// One line on how you did in a round.
+function describeYourRound({ type, state, plan, solved }) {
+  switch (type) {
+    case "mystery":
+    case "pinpoint":
+      return solved ? `You: found it in ${state.guesses.length} ${state.guesses.length === 1 ? "guess" : "guesses"}` : state.gaveUp ? "You: gave up" : "You: not found";
+    case "deepcut": {
+      const answer = state.answer && Object.entries(plan.answers).find(([, texts]) => texts.includes(state.answer));
+      return answer ? `You: ${state.answer} (${Number(answer[0]).toLocaleString()})` : "You: gave up";
+    }
+    case "paint":
+      return `You: ${state.found.length} of ${plan.answers.length}${state.wrong.length ? `, ${state.wrong.length} wrong` : ""}`;
+    case "rank":
+      return solved ? `You: right on try ${state.submissions.length}` : "You: not solved";
+    default:
+      return "";
+  }
+}
+
+// One line on how everyone else did in a round, with the share for its bar.
+function describeOthers(stats, type) {
+  if (!stats) return null;
+  switch (type) {
+    case "mystery":
+    case "pinpoint":
+      return { share: stats.solved, text: `${stats.solved}% found it${stats.commonWrong ? ` · most tried wrong: ${stats.commonWrong}` : ""}` };
+    case "deepcut":
+      return { share: stats.solved, text: `Most given: ${stats.top.map(answer => `${answer.text} (${answer.share}%)`).join(", ")}` };
+    case "paint":
+      return { share: stats.allFound, text: `${stats.allFound}% found them all · most missed: ${stats.mostMissed} (${stats.missedShare}%)` };
+    case "rank":
+      return { share: stats.firstTry, text: `${stats.firstTry}% right on the first try · ${stats.solved}% within five` };
+    default:
+      return null;
+  }
 }
 
 function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay }) {
@@ -11173,20 +11387,20 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay }) {
     let selected = days.find(day => day.dateKey === selectedDateKey) || days.find(day => day.isToday) || days[0] || null;
 
     const renderGrid = () => {
-      archiveGrid.replaceChildren(...days.map(day => createDayTile(day, {
-        isSelected: day === selected,
+      archiveGrid.replaceChildren(createCalendar(days, {
+        selected,
         onSelect: picked => {
           selected = picked;
           renderGrid();
           renderDayOverview(overview, selected, playDay);
         }
-      })));
+      }));
     };
     renderGrid();
     renderDayOverview(overview, selected, playDay);
     leaderboardModal.classList.add("hidden");
     archiveModal.classList.remove("hidden");
-    archiveGrid.querySelector(".day-tile.is-selected")?.scrollIntoView({ block: "nearest" });
+    archiveGrid.querySelector(".day-cell.is-selected")?.scrollIntoView({ block: "nearest" });
   }
 
   // ---------------------------------------------------------------------------
@@ -13087,6 +13301,9 @@ function getDayRecord(dateKey) {
       name: ROUND_INFO[round.type].name,
       difficulty: round.difficulty,
       answerText: getAnswerText(round),
+      // The round as planned and your progress in it, for the archive's round list.
+      plan: round,
+      state: states[index],
       ...dayScore.rounds[index]
     }))
   };
