@@ -1525,49 +1525,90 @@ h1, h2, h3 { font-weight: normal; }
 .modal-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
 .modal-actions .btn { padding: 0 0.5rem; font-size: 10px; }
 
-.how-to-play-modal { width: min(100%, 520px); }
-.how-to-rounds { display: grid; gap: 0.3rem; list-style: none; counter-reset: round; }
-.how-to-rounds li { display: grid; grid-template-columns: 28px auto 1fr; align-items: center; gap: 0.6rem; padding: 0.4rem 0.6rem; border-radius: 10px; background: var(--glass-fill); counter-increment: round; font-size: 14px; }
-.how-to-rounds li::before { content: counter(round); display: grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; background: rgba(255, 255, 255, 0.1); color: var(--text); font: 700 12px var(--font-mono); }
-.how-to-rounds b { color: var(--text); white-space: nowrap; }
-.how-to-rounds span { color: var(--muted); font-size: 13px; text-align: right; }
-.how-to-warmth { display: grid; gap: 0.35rem; }
-.how-to-temps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; list-style: none; }
-.how-to-temps li { display: grid; justify-items: center; gap: 2px; padding: 0.35rem 0.2rem; border-radius: 9px; background: color-mix(in srgb, var(--temp) 16%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--temp) 45%, transparent); text-align: center; }
+/* How to play: one screen, no scrolling, mostly pictures. Every part is a box with a
+   small 8-bit heading, like the menu. */
+.how-to-play-modal { width: min(100%, 680px); gap: 0.55rem; padding: 1.2rem 1.3rem; overflow-x: hidden; }
+/* The goal, on the right of the scoring heading. */
+.how-to-goal { margin-left: auto; color: var(--text); font: 600 13px var(--font-body); letter-spacing: 0; }
+.how-to-box { display: grid; gap: 0.45rem; padding: 0.55rem 0.6rem; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: rgba(255, 255, 255, 0.03); }
+.how-to-heading { display: flex; align-items: center; gap: 0.5rem; color: var(--muted); font: 9px var(--font-display); letter-spacing: 0.04em; }
+.how-to-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.how-to-modes > div { display: grid; grid-template-columns: 56px 1fr; grid-template-rows: auto auto auto; align-content: center; align-items: center; column-gap: 0.7rem; row-gap: 3px; padding: 0.5rem; border: 1px solid color-mix(in srgb, var(--tile) 45%, transparent); border-radius: 14px; background: linear-gradient(110deg, color-mix(in srgb, var(--tile) 14%, transparent), transparent 75%); }
+.how-to-modes b { color: var(--tile); font: 11px var(--font-display); }
+.how-to-modes > div > span:not(.how-to-art) { color: var(--muted); font-size: 12px; }
+.how-to-art { grid-row: 1 / 4; display: grid; place-items: center; height: 56px; border-radius: 10px; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0 2px, transparent 2px 4px), radial-gradient(circle, color-mix(in srgb, var(--tile) 30%, #04121a), #04121a 75%); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tile) 55%, transparent); }
+.how-to-art svg { width: 38px; height: 38px; }
+/* The six badges small in a row on the competitive tile: that's where they're earned. */
+.how-to-mode-badges { display: flex; gap: 2px; }
+.how-to-mode-badges svg { width: 16px; height: 16px; }
+.how-to-sum { display: flex; align-items: stretch; justify-content: space-between; gap: 0.3rem; }
+.sum-chip { display: grid; flex: 1; justify-items: center; align-content: center; gap: 2px; padding: 0.4rem 0.3rem; border-radius: 10px; background: var(--glass-fill); box-shadow: inset 0 0 0 1px var(--glass-line); text-align: center; }
+.sum-chip b { color: var(--gold); font: 700 14px var(--font-mono); white-space: nowrap; }
+.sum-chip small { color: var(--muted); font-size: 11px; }
+.sum-chip.is-bad b { color: var(--danger); }
+.sum-chip.is-streak b { color: #ff8a3d; }
+.sum-chip.is-fast b { color: var(--accent); }
+.sum-tag { padding: 1px 5px; border-radius: 5px; background: var(--accent-soft); color: var(--accent); font: 700 8px var(--font-mono); font-style: normal; letter-spacing: 0.05em; }
+.sum-op { align-self: center; color: var(--muted); font: 700 16px var(--font-mono); }
+.how-to-rounds { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; list-style: none; counter-reset: round; }
+.how-to-rounds li { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.35rem 0.3rem; border-radius: 10px; background: var(--glass-fill); counter-increment: round; color: var(--text); font-size: 12px; font-weight: 600; line-height: 1.2; text-align: center; white-space: nowrap; }
+.how-to-rounds li::before { content: counter(round); display: grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; background: rgba(255, 255, 255, 0.1); font: 9px var(--font-display); }
+/* Warm or cold: one continuous scale. */
+.how-to-temps { display: grid; grid-template-columns: repeat(5, 1fr); overflow: hidden; border-radius: 999px; list-style: none; background: linear-gradient(90deg, var(--t-very-hot), var(--t-hot), var(--t-warm), var(--t-cool), var(--t-very-cold)); }
+.how-to-temps li { display: grid; justify-items: center; gap: 1px; padding: 0.3rem 0.2rem; background: rgba(4, 18, 26, 0.72); text-align: center; }
+.how-to-temps li + li { box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.08); }
 .how-to-temps b { color: var(--temp); font: 700 10px var(--font-mono); letter-spacing: 0.04em; white-space: nowrap; }
 .how-to-temps span { color: var(--muted); font: 10px var(--font-mono); white-space: nowrap; }
-.how-to-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-.how-to-modes > div { display: grid; align-content: start; gap: 0.25rem; padding: 0.6rem 0.7rem; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: rgba(255, 255, 255, 0.03); }
-.how-to-modes b { color: var(--accent); font: 700 12px var(--font-mono); letter-spacing: 0.06em; }
-.how-to-modes > div + div b { color: var(--gold); }
-.how-to-modes span { color: var(--muted); font-size: 12px; }
-/* Points: the 1,000 per round, and the two multipliers stacking on top. */
-.how-to-scoring { display: grid; gap: 0.45rem; padding: 0.7rem 0.8rem; border: 1px solid rgba(255, 212, 92, 0.3); border-radius: 12px; background: rgba(255, 212, 92, 0.05); color: var(--muted); font-size: 13px; }
-.how-to-scoring p b { color: var(--gold); }
-.how-to-multipliers { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; list-style: none; }
-.how-to-multipliers li { display: grid; gap: 0.15rem; padding: 0.45rem 0.6rem; border-radius: 9px; background: var(--glass-fill); }
-.how-to-multipliers b { color: var(--text); font: 700 13px var(--font-mono); }
-.how-to-multipliers span { font-size: 12px; }
-.how-to-max { font-size: 12px; }
-/* A sample of the top % shown after a game. */
-.how-to-top { justify-self: start; margin-top: 0.2rem; padding: 0.3rem 0.6rem; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font: 700 13px var(--font-mono); }
-.how-to-awards { display: grid; grid-template-columns: 1fr 1.4fr; gap: 0.5rem; }
-.how-to-awards > div { display: grid; align-content: start; gap: 0.3rem; padding: 0.6rem 0.7rem; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: rgba(255, 255, 255, 0.03); }
-.how-to-awards p { color: var(--muted); font-size: 12px; }
-/* The badges as a stack of stones seen at an angle, Mr. Worldwide in front; hover fans
-   them out. Each has the top % it asks for. */
-.how-to-badges { display: flex; margin-top: 0.3rem; padding: 0.2rem 0 0.5rem 0.4rem; perspective: 500px; }
-.how-to-badge { position: relative; z-index: var(--stack); display: grid; justify-items: center; margin-left: -20px; transform: rotateY(40deg) translateY(calc(var(--stack) * -2px)) translateZ(calc(var(--stack) * 8px)); transform-origin: left center; transition: margin 0.25s ease, transform 0.25s ease; filter: drop-shadow(-5px 4px 3px rgba(0, 0, 0, 0.6)); }
-.how-to-badge:first-child { margin-left: 0; }
-.how-to-badges:hover .how-to-badge { margin-left: 2px; transform: none; }
+.how-to-awards { display: grid; grid-template-columns: 1fr 1.5fr; gap: 0.5rem; }
+.how-to-awards .how-to-box { justify-items: center; align-content: start; text-align: center; }
+.how-to-awards .how-to-box > .how-to-top { margin-top: 0.4rem; }
+.how-to-awards .how-to-heading { justify-self: start; }
+.how-to-awards small { color: var(--muted); font-size: 11px; }
+.how-to-top { padding: 0.3rem 0.8rem; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font: 13px var(--font-display); white-space: nowrap; }
+/* The badges spread across the box, rising a little from Tourist to Mr. Worldwide and
+   turned slightly towards you; each with the top % it asks for. */
+.how-to-badges { display: flex; justify-content: space-between; align-items: end; width: 100%; padding: 0.4rem 0.6rem 0; perspective: 600px; }
+.how-to-badge { display: grid; justify-items: center; transform: translateY(calc(var(--stack) * -2px)) rotateY(-18deg); filter: drop-shadow(3px 4px 3px rgba(0, 0, 0, 0.55)); transition: transform 0.2s ease; }
+.how-to-badge:hover { transform: translateY(calc(var(--stack) * -2px - 4px)); }
 .how-to-badge small { margin-top: -6px; padding: 1px 4px; border-radius: 5px; background: var(--glass-strong); color: var(--text); font: 700 9px var(--font-mono); white-space: nowrap; box-shadow: inset 0 0 0 1px var(--glass-line); }
+/* Short laptop screens: a little less air, so it still fits without scrolling. */
+@media (max-height: 760px) and (min-width: 761px) {
+  .how-to-play-modal { gap: 0.45rem; padding: 1rem 1.2rem; }
+  .how-to-box { padding: 0.45rem 0.55rem; gap: 0.35rem; }
+  .how-to-modes > div { padding: 0.4rem; }
+  .how-to-art { height: 48px; }
+  .how-to-art svg { width: 32px; height: 32px; }
+  .sum-chip { padding: 0.3rem; }
+}
+
+/* Phones: smaller mode tiles, the sum as a 2×2 grid with each operator inside its
+   chip, and smaller type in the rows of five. */
 @media (max-width: 760px) {
-  .how-to-awards,
-  .how-to-modes,
-  .how-to-multipliers { grid-template-columns: 1fr; }
-  .how-to-rounds li { grid-template-columns: 28px 1fr; row-gap: 0; }
-  .how-to-rounds li::before { grid-row: span 2; }
-  .how-to-rounds span { text-align: left; }
+  .how-to-play-modal { gap: 0.5rem; }
+  .how-to-modes > div { grid-template-columns: 36px 1fr; column-gap: 0.5rem; padding: 0.4rem; }
+  .how-to-modes b { font-size: 9px; }
+  .how-to-modes > div > span:not(.how-to-art) { font-size: 11px; }
+  .how-to-art { height: 36px; }
+  .how-to-art svg { width: 28px; height: 28px; }
+  .how-to-mode-badges svg { width: 12px; height: 12px; }
+  .how-to-box { padding: 0.45rem 0.5rem; gap: 0.35rem; }
+  .how-to-sum { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  .sum-op { display: none; }
+  .sum-chip { padding: 0.3rem; }
+  .sum-chip b[data-op]::before { content: attr(data-op) " "; color: var(--muted); }
+  .how-to-rounds li { flex-direction: column; gap: 3px; font-size: 10px; white-space: normal; }
+  .how-to-rounds li::before { width: 18px; height: 18px; }
+  .how-to-temps li { padding: 0.25rem 0.1rem; }
+  .how-to-temps b { font-size: 8px; }
+  .how-to-temps span { font-size: 8px; }
+  .how-to-awards { grid-template-columns: 1fr 1.6fr; }
+  .how-to-badges { padding: 0.3rem 0 0; }
+  .how-to-badge { transform: rotateY(-18deg); }
+  .how-to-badge svg { width: 28px; height: 28px; }
+  .how-to-badge small { font-size: 8px; }
+  .how-to-heading { flex-wrap: wrap; }
+  .how-to-goal { flex-basis: 100%; margin-left: 0; font-size: 12px; }
+  .how-to-top { padding: 0.3rem 0.6rem; font-size: 10px; }
 }
 
 .stats-modal { width: min(100%, 520px); }
@@ -2503,54 +2544,64 @@ h1, h2, h3 { font-weight: normal; }
         <h2 id="howToPlayTitle">HOW TO PLAY</h2>
         <button class="modal-close" id="closeHowToButton" type="button" aria-label="Close instructions">×</button>
       </div>
-      <p class="modal-note">Two games a day, each with its own theme and five rounds. The goal: score as many points as you can.</p>
       <div class="how-to-modes">
-        <div>
-          <b>⚡ COMPETITIVE</b>
-          <span>A 30-second bar every round. Counts for your badge and your groups.</span>
+        <div style="--tile: var(--accent)">
+          <span class="how-to-art" data-art="competitive" aria-hidden="true"></span>
+          <b>COMPETITIVE</b>
+          <span>⏱ 30 s a round · earns badges</span>
+          <span class="how-to-mode-badges" id="howToModeBadges" aria-hidden="true"></span>
         </div>
-        <div>
-          <b>☕ CASUAL</b>
-          <span>No clock, country names on the globe and extra clues. Just for fun.</span>
+        <div style="--tile: var(--gold)">
+          <span class="how-to-art" data-art="casual" aria-hidden="true"></span>
+          <b>CASUAL</b>
+          <span>No clock</span>
+          <span>Just for fun</span>
         </div>
       </div>
-      <div class="how-to-scoring">
-        <span class="field-label">POINTS</span>
-        <p>Every round starts at <b>1,000</b>; every mistake costs 200. Then the multipliers stack on top of each other:</p>
-        <ul class="how-to-multipliers">
-          <li><b>🔥 ×1.1, ×1.2 …</b><span>for perfect rounds in a row</span></li>
-          <li><b>⚡ up to ×1.5</b><span>for a fast right answer (competitive)</span></li>
-        </ul>
-        <p class="how-to-max">A day goes up to <b>9,000</b> in competitive and <b>6,000</b> in casual.</p>
-      </div>
-      <ol class="how-to-rounds">
-        <li><b>Mystery Country</b><span>Guess it from clues</span></li>
-        <li><b>Pinpoint</b><span>Find it on the globe</span></li>
-        <li><b>Deep Cut</b><span>The more niche, the more points</span></li>
-        <li><b>Paint the Map</b><span>Click every country that fits</span></li>
-        <li><b>Rank 'Em</b><span>Drag five into order</span></li>
-      </ol>
-      <div class="how-to-warmth">
-        <span class="field-label">HOW CLOSE A GUESS IS · ROUNDS 1–2</span>
-        <ol class="how-to-temps">
+      <!-- Points as a sum: the round's 1,000, minus mistakes, times both multipliers. -->
+      <section class="how-to-box">
+        <h3 class="how-to-heading">SCORING RULES <span class="how-to-goal">Score as many points as you can</span></h3>
+        <div class="how-to-sum" role="img" aria-label="Each round: 1,000 points, minus 200 per mistake, times the streak multiplier, times the speed multiplier">
+          <span class="sum-chip"><b>1,000</b><small>a round</small></span>
+          <span class="sum-op">−</span>
+          <span class="sum-chip is-bad"><b data-op="−">200</b><small>a mistake</small></span>
+          <span class="sum-op">×</span>
+          <span class="sum-chip is-streak"><b data-op="×">🔥 1.1 · 1.2…</b><small>perfect in a row</small></span>
+          <span class="sum-op">×</span>
+          <span class="sum-chip is-fast"><b data-op="×">⚡ 1.5</b><small>fast answer</small><i class="sum-tag">COMPETITIVE ONLY</i></span>
+        </div>
+      </section>
+      <section class="how-to-box">
+        <h3 class="how-to-heading">FIVE ROUNDS A DAY</h3>
+        <ol class="how-to-rounds">
+          <li>Mystery Country</li>
+          <li>Pinpoint</li>
+          <li>Deep Cut</li>
+          <li>Paint the Map</li>
+          <li>Rank 'Em</li>
+        </ol>
+      </section>
+      <!-- One scale from hot to cold, so it doesn't read as a colour per round. -->
+      <section class="how-to-box">
+        <h3 class="how-to-heading">🌡 HOW CLOSE A GUESS IS</h3>
+        <ol class="how-to-temps" aria-label="How close a guess is">
           <li style="--temp: var(--t-very-hot)"><b>VERY HOT</b><span>&lt; 1,000 km</span></li>
           <li style="--temp: var(--t-hot)"><b>HOT</b><span>&lt; 2,500 km</span></li>
           <li style="--temp: var(--t-warm)"><b>WARM</b><span>&lt; 4,500 km</span></li>
           <li style="--temp: var(--t-cool)"><b>COOL</b><span>&lt; 7,000 km</span></li>
           <li style="--temp: var(--t-very-cold)"><b>VERY COLD</b><span>further</span></li>
         </ol>
-      </div>
+      </section>
       <div class="how-to-awards">
-        <div>
-          <span class="field-label">YOUR TOP %</span>
-          <p>After every game you see where you rank in the world, so you can compare yourself with everyone else.</p>
+        <section class="how-to-box">
+          <h3 class="how-to-heading">YOUR TOP %</h3>
           <span class="how-to-top">TOP 12%</span>
-        </div>
-        <div>
-          <span class="field-label">BADGES</span>
-          <p>Earn badges every month.</p>
+          <small>Your rank in the world, after every game</small>
+        </section>
+        <section class="how-to-box">
+          <h3 class="how-to-heading">MONTHLY BADGES <i class="sum-tag">COMPETITIVE ONLY</i></h3>
           <div class="how-to-badges" id="howToBadges"></div>
-        </div>
+        </section>
       </div>
       <label id="howToDontShow" class="dont-show hidden">
         <input type="checkbox" id="howToDontShowBox">
@@ -12979,7 +13030,7 @@ function initializeMainMenu({ onPlay, onHome, describeMode = () => "" }) {
   updateMenuButtonActivity();
   menuOptions.classList.add("is-boot-complete");
 
-  document.querySelectorAll(".play-tile-art").forEach(slot => slot.appendChild(createPixelArt(PLAY_ART[slot.dataset.art], PLAY_ART_COLORS)));
+  document.querySelectorAll("[data-art]").forEach(slot => slot.appendChild(createPixelArt(PLAY_ART[slot.dataset.art], PLAY_ART_COLORS)));
 
   // PLAY swaps the main options for the day's games; BACK (or Escape) swaps them back.
   const mainOptions = document.querySelector(".menu-options:not(.menu-play-options)");
@@ -15671,9 +15722,11 @@ function flyFromMenu() {
 document.getElementById("howToBadges").replaceChildren(...[...RANK_TIERS].reverse().map((tier, index) => {
   const item = Object.assign(document.createElement("span"), { className: "how-to-badge", title: `${tier.name}: ${tier.range}` });
   item.style.setProperty("--stack", index);
-  item.append(createBadge(tier, 46), Object.assign(document.createElement("small"), { textContent: tier.maxPercent >= 100 ? "ALL" : `<${tier.maxPercent}%` }));
+  item.append(createBadge(tier, 40), Object.assign(document.createElement("small"), { textContent: tier.maxPercent >= 100 ? "ALL" : `<${tier.maxPercent}%` }));
   return item;
 }));
+// And small, in a row, on the competitive tile: badges are earned there only.
+document.getElementById("howToModeBadges").replaceChildren(...[...RANK_TIERS].reverse().map(tier => createBadge(tier, 16)));
 
 // The how-to-play message, shown when a game starts until the player ticks
 // "Don't show this again". Calls `then` once it is closed (or straight away).
