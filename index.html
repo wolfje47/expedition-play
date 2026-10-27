@@ -1505,7 +1505,11 @@ h1, h2, h3 { font-weight: normal; }
   font-size: 0;
   transition: background 0.15s ease, color 0.15s ease;
 }
+/* Placed absolutely: the hidden "×" text still takes a grid row and pushed the X up. */
 .modal-close::before {
+  position: absolute;
+  inset: 0;
+  margin: auto;
   width: 14px;
   height: 14px;
   background: currentColor;
