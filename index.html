@@ -7058,16 +7058,17 @@ async function pullDays() {
   return data || [];
 }
 
-// Saves one day's progress in the account (the score and whether it's finished too, for
-// real leaderboards later).
+// Saves one day's progress in the account, with the score and whether it's finished (for
+// group boards). Returns whether it was saved.
 async function pushDay(date, state, { score = null, completed = false } = {}) {
   const supabase = await getClient();
-  if (!supabase || !user) return;
+  if (!supabase || !user) return false;
   const { error } = await supabase.from("day_results").upsert(
     { user_id: user.id, date, state, score, completed, updated_at: new Date().toISOString() },
     { onConflict: "user_id,date" }
   );
   if (error) console.warn("Couldn't save this day to your account.", error);
+  return !error;
 }
 
 // ---------------------------------------------------------------------------
@@ -11914,6 +11915,9 @@ const DAY_STORAGE_PREFIX = "daily-geography:day:v3:";
 const LEGACY_SESSION_PREFIX = "daily-geography:session:v1:";
 const LEGACY_SCORES_KEY = "daily-geography:scores:v1";
 const STATS_STORAGE_KEY = "daily-geography:stats:v1";
+// Whose days this browser holds (an account's user id), so a second account signing in on
+// the same browser never takes over the first one's days.
+const DAY_OWNER_KEY = "daily-geography:day-owner:v1";
 const HIDE_INTRO_KEY = "daily-geography:hide-intro:v1";
 // Old one-round days were scored out of 1,000; scaled so they compare with 6,000-point days.
 const LEGACY_SCORE_SCALE = MAX_DAILY_SCORE / 1000;
@@ -13704,37 +13708,76 @@ function getSaveProgress(state) {
 
 // Sends a day's progress to the account, if someone is signed in.
 function syncDayToAccount(dateKey) {
-  if (!getUser()) return;
+  if (!getUser()) return Promise.resolve(false);
   const state = readDayState(dateKey);
-  if (!state) return;
+  if (!state) return Promise.resolve(true);
   const dayScore = getDayScore(resolvePlan(getDailyPlan(dateKey), state.rounds), state.rounds);
-  pushDay(dateKey, state, { score: dayScore.completed ? dayScore.total : null, completed: dayScore.completed });
+  return pushDay(dateKey, state, { score: dayScore.completed ? dayScore.total : null, completed: dayScore.completed });
+}
+
+const getLocalDayDates = () => Object.keys(localStorage)
+  .filter(key => key.startsWith(DAY_STORAGE_PREFIX))
+  .map(key => key.slice(DAY_STORAGE_PREFIX.length));
+
+function readDayOwner() {
+  try { return localStorage.getItem(DAY_OWNER_KEY); } catch { return null; }
+}
+
+// Sends every day this browser has further than the account has it; true if all arrived.
+async function pushDaysAhead(remote) {
+  const saved = await Promise.all(getLocalDayDates()
+    .filter(dateKey => getSaveProgress(readJson(`${DAY_STORAGE_PREFIX}${dateKey}`)) > getSaveProgress(remote.get(dateKey)))
+    .map(syncDayToAccount));
+  return saved.every(Boolean);
+}
+
+// The day on screen may have changed underneath (merged in from the account, or cleared).
+function reloadActiveDay() {
+  day = loadDay(activeDate);
+  plan = resolvePlan(getDailyPlan(activeDate), day.rounds);
+  hasFinishedDay = getDayScore(plan, day.rounds).completed;
+  if (isGameViewVisible) render({ animateGlobe: false });
 }
 
 // After signing in: days only in the account come to this browser, days only here go to
-// the account, and where both have one, the further one wins.
+// the account, and where both have one, the further one wins. Days this browser holds for
+// another account are dropped first (they're safe in that account).
 async function mergeAccountDays() {
   try {
+    const me = getUser().id;
+    const owner = readDayOwner();
+    if (owner && owner !== me) getLocalDayDates().forEach(dateKey => localStorage.removeItem(`${DAY_STORAGE_PREFIX}${dateKey}`));
+    localStorage.setItem(DAY_OWNER_KEY, me);
     const remote = new Map((await pullDays()).map(row => [row.date, row.state]));
-    const localDates = Object.keys(localStorage)
-      .filter(key => key.startsWith(DAY_STORAGE_PREFIX))
-      .map(key => key.slice(DAY_STORAGE_PREFIX.length));
     remote.forEach((state, dateKey) => {
       if (getSaveProgress(state) > getSaveProgress(readJson(`${DAY_STORAGE_PREFIX}${dateKey}`))) {
         localStorage.setItem(`${DAY_STORAGE_PREFIX}${dateKey}`, JSON.stringify(state));
       }
     });
-    localDates.forEach(dateKey => {
-      if (getSaveProgress(readJson(`${DAY_STORAGE_PREFIX}${dateKey}`)) > getSaveProgress(remote.get(dateKey))) syncDayToAccount(dateKey);
-    });
-    // The day on screen may have moved on in the account.
-    day = loadDay(activeDate);
-    plan = resolvePlan(getDailyPlan(activeDate), day.rounds);
-    hasFinishedDay = getDayScore(plan, day.rounds).completed;
-    if (isGameViewVisible) render({ animateGlobe: false });
+    await pushDaysAhead(remote);
+    reloadActiveDay();
   } catch (error) {
     console.warn("Couldn't load your days from your account.", error);
   }
+}
+
+// Signing out: anything not in the account yet goes there first, then this browser
+// forgets the account's days, so whoever plays or signs in next starts fresh. If saving
+// fails, the days stay here, still marked as that account's (so no one else gets them).
+// Returns whether the days were cleared.
+async function signOutAndForgetDays() {
+  let saved = false;
+  try {
+    saved = await pushDaysAhead(new Map((await pullDays()).map(row => [row.date, row.state])));
+  } catch (error) {
+    console.warn("Couldn't save your last days to your account.", error);
+  }
+  await signOut();
+  if (!saved) return false;
+  getLocalDayDates().forEach(dateKey => localStorage.removeItem(`${DAY_STORAGE_PREFIX}${dateKey}`));
+  localStorage.removeItem(DAY_OWNER_KEY);
+  reloadActiveDay();
+  return true;
 }
 
 // The Community screen, set up at the end of this file.
@@ -13777,10 +13820,10 @@ document.querySelectorAll(".account-provider").forEach(button => {
 });
 document.getElementById("signOutButton").addEventListener("click", async () => {
   sounds.playClick();
-  await signOut();
+  const cleared = await signOutAndForgetDays();
   renderAccount(null);
   community?.onAccountChange(null);
-  showToastNotice("Signed out. Your days stay in this browser.");
+  showToastNotice(cleared ? "Signed out. Your days are safe in your account." : "Signed out. Some days couldn't reach your account yet, so they stay in this browser.");
 });
 renderAccount(null);
 initAuth(account => {
