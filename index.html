@@ -481,6 +481,11 @@ h1, h2, h3 { font-weight: normal; }
 .clue-earlier:empty { display: none; }
 .clue-earlier li { display: grid; grid-template-columns: 1.4rem 1fr; gap: 0.4rem; color: var(--muted); font-size: 14px; }
 .clue-earlier b { color: var(--faint); font: 700 12px/1.6 var(--font-mono); }
+.clue-earlier { gap: 0.3rem; }
+.clue-earlier li { cursor: pointer; }
+.clue-earlier li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.clue-earlier li.is-open span { white-space: normal; }
+.clue-earlier li:hover span { color: var(--text); }
 
 .clue-locked {
   padding: 0.65rem 1rem;
@@ -598,6 +603,19 @@ h1, h2, h3 { font-weight: normal; }
 }
 
 .guess-facts { display: flex; flex-wrap: wrap; grid-column: 3 / -1; gap: 0.3rem; }
+.guess-toggle { display: none; }
+
+/* In the game a guess is one line; a click opens its facts. */
+.game-view .guess-row { grid-template-columns: 1.4rem 30px minmax(0, 1fr) auto 14px; cursor: pointer; }
+.game-view .guess-row:not(.is-open) .guess-facts { display: none; }
+.game-view .guess-list .guess-row { padding: 0.35rem 0.8rem; }
+.game-view .side-right .guess-list { gap: 4px; padding: 6px 8px 2px; }
+.game-view .clue-current { padding: 0.75rem 1rem 0.6rem; }
+.game-view .clue-earlier { padding-bottom: 0.6rem; }
+.game-view .guess-entry { gap: 0.3rem; }
+.game-view .guess-toggle { display: block; color: var(--faint); font-size: 12px; text-align: center; transition: transform 0.15s ease; }
+.game-view .guess-row.is-open .guess-toggle { transform: rotate(180deg); }
+.game-view .guess-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
 .fact {
   display: inline-flex;
@@ -752,9 +770,14 @@ h1, h2, h3 { font-weight: normal; }
 .score-burst-card.has-info .burst-answer,
 .score-burst-card.has-info .score-burst-climb { width: 100%; }
 .score-burst-card.has-info #scoreBurstNext { grid-column: 1 / -1; width: 100%; }
+/* Deep Cut: answers, then your points, on the left; info, then the journey, on the right. */
+.score-burst-card.has-info.is-deepcut .burst-info { grid-row: 1; }
+.score-burst-card.has-info.is-deepcut .score-burst-climb { grid-column: 2; grid-row: 2 / span 3; width: min(100%, 360px); justify-self: center; }
+.score-burst-card.has-info.is-deepcut .score-burst-total { grid-column: 2; grid-row: 5; }
 @media (max-width: 760px) {
   .score-burst-card.has-info { grid-template-columns: minmax(0, 1fr); }
   .score-burst-card.has-info .burst-info { grid-column: 1; grid-row: auto; }
+  .score-burst-card.has-info.is-deepcut :is(.burst-info, .score-burst-climb, .score-burst-total) { grid-column: 1; grid-row: auto; }
 }
 .burst-info .info-picture img { max-height: 150px; border-radius: 12px; }
 .burst-info .info-text { padding: 0; }
@@ -1020,6 +1043,8 @@ h1, h2, h3 { font-weight: normal; }
 :is(.game-view, .modal) .fact-miss { background: none; box-shadow: inset 0 0 0 1px var(--glass-line-soft); }
 
 :is(.game-view, .modal) .guess-empty { border: 1px dashed var(--glass-line); border-radius: 12px; padding: 0.45rem 0.8rem; }
+.game-view .side-right .guess-empty { padding: 0.1rem 0.8rem; font-size: 11px; }
+.game-view .known-strip { gap: 0.3rem; padding: 0.45rem 0.8rem 0; }
 
 .game-view .neighbour { border-width: 1px; border-radius: 999px; background: var(--glass-fill); }
 .game-view .neighbour.is-found { background: rgba(92, 242, 138, 0.1); }
@@ -1225,12 +1250,14 @@ h1, h2, h3 { font-weight: normal; }
 /* Rank 'Em's order reads top to bottom. */
 .burst-answer-list.is-order { flex-direction: column; align-items: flex-start; }
 /* Deep Cut's answers on the score card: one row per points tier, yours in green. */
-.burst-answer-list:has(.burst-tier) { flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 0.5rem; max-height: 24vh; overflow-y: auto; scrollbar-width: thin; }
-.burst-answer-list li.burst-tier { display: grid; gap: 0.3rem; padding: 0; border-radius: 0; background: none; text-align: center; }
-.burst-tier-label { color: var(--faint); font: 700 10px var(--font-mono); letter-spacing: 0.08em; }
-.burst-tier-answers { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; }
-.burst-tier-answers span { padding: 3px 9px; border-radius: 999px; background: var(--glass-fill); font-size: 13px; }
-.burst-tier-answers span.is-found { background: rgba(92, 242, 138, 0.14); color: var(--t-correct); box-shadow: inset 0 0 0 1px rgba(92, 242, 138, 0.6); }
+.burst-answer-list:has(.burst-tier) { flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 0.35rem; }
+.burst-answer-list li.burst-tier { display: grid; grid-template-columns: 92px minmax(0, 1fr); align-items: center; gap: 0.6rem; padding: 0.3rem 0.5rem; border-radius: 10px; background: none; }
+.burst-answer-list li.burst-tier.is-yours { background: rgba(92, 242, 138, 0.06); }
+.burst-tier-label { display: grid; color: var(--faint); font: 700 9px var(--font-mono); letter-spacing: 0.04em; text-align: left; }
+.burst-tier-label strong { color: var(--gold); font-size: 15px; letter-spacing: 0; }
+.burst-tier-answers { display: flex; flex-wrap: wrap; gap: 4px; }
+.burst-tier-answers span { padding: 2px 8px; border-radius: 999px; background: var(--glass-fill); font-size: 12px; font-weight: 500; }
+.burst-tier-answers span.is-found { background: rgba(92, 242, 138, 0.14); color: var(--t-correct); font-weight: 700; box-shadow: inset 0 0 0 1px rgba(92, 242, 138, 0.6); }
 
 /* A missed round: the answer leads, the score steps back, and a button moves on. */
 .score-burst.is-missed { cursor: default; }
@@ -1430,8 +1457,24 @@ h1, h2, h3 { font-weight: normal; }
 .modal-actions .btn { padding: 0 0.5rem; font-size: 10px; }
 
 .how-to-play-modal { width: min(100%, 520px); }
-.how-to-play-list { display: grid; gap: 0.6rem; padding-left: 1.4rem; font-size: 15px; }
-.how-to-play-list li::marker { color: var(--accent); font-family: var(--font-mono); font-weight: 700; }
+.how-to-rounds { display: grid; gap: 0.3rem; list-style: none; counter-reset: round; }
+.how-to-rounds li { display: grid; grid-template-columns: 28px auto 1fr; align-items: center; gap: 0.6rem; padding: 0.4rem 0.6rem; border-left: 3px solid var(--round-color); border-radius: 10px; background: var(--glass-fill); counter-increment: round; font-size: 14px; }
+.how-to-rounds li::before { content: counter(round); display: grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; background: var(--round-color); color: #04121a; font: 700 12px var(--font-mono); }
+.how-to-rounds b { color: var(--round-color); white-space: nowrap; }
+.how-to-rounds span { color: var(--muted); font-size: 13px; text-align: right; }
+.how-to-streak { color: var(--muted); font-size: 13px; }
+.how-to-streak b { color: var(--gold); }
+.how-to-awards { display: grid; grid-template-columns: 1.6fr 1fr; gap: 0.5rem; }
+.how-to-awards > div { display: grid; align-content: start; gap: 0.3rem; padding: 0.6rem 0.7rem; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: rgba(255, 255, 255, 0.03); }
+.how-to-awards p { color: var(--muted); font-size: 12px; }
+.how-to-badges,
+.how-to-medals { display: flex; gap: 0.3rem; margin-top: 0.2rem; }
+@media (max-width: 760px) {
+  .how-to-awards { grid-template-columns: 1fr; }
+  .how-to-rounds li { grid-template-columns: 28px 1fr; row-gap: 0; }
+  .how-to-rounds li::before { grid-row: span 2; }
+  .how-to-rounds span { text-align: left; }
+}
 
 .stats-modal { width: min(100%, 520px); }
 .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; }
@@ -2314,15 +2357,27 @@ h1, h2, h3 { font-weight: normal; }
         <h2 id="howToPlayTitle">HOW TO PLAY</h2>
         <button class="modal-close" id="closeHowToButton" type="button" aria-label="Close instructions">×</button>
       </div>
-      <p class="modal-note">Every day has its own theme and five rounds. Most rounds start at 1,000 points and lose 200 for every wrong answer.</p>
-      <ol class="how-to-play-list">
-        <li><b>Mystery Country</b>: guess the country from clues that get easier with each wrong guess.</li>
-        <li><b>Pinpoint</b>: find the country on the globe from a clue. Click it to select it, then confirm. Every wrong guess unlocks another clue.</li>
-        <li><b>Deep Cut</b>: a question with lots of right answers. Give one: the more niche, the more it's worth (up to 1,000). Answers that aren't on the list cost nothing.</li>
-        <li><b>Paint the Map</b>: click every country that fits the question. Each wrong one costs 200; five wrong ends the round.</li>
-        <li><b>Rank 'Em</b>: drag five countries into order by the day's topic. A wrong try with at least one in the right place reveals one country's real value.</li>
+      <p class="modal-note">Five rounds a day, one theme. Each round is worth up to 1,000; every mistake costs 200.</p>
+      <ol class="how-to-rounds">
+        <li><b>Mystery Country</b><span>Guess it from clues</span></li>
+        <li><b>Pinpoint</b><span>Find it on the globe</span></li>
+        <li><b>Deep Cut</b><span>The more niche, the more points</span></li>
+        <li><b>Paint the Map</b><span>Click every country that fits</span></li>
+        <li><b>Rank 'Em</b><span>Drag five into order</span></li>
       </ol>
-      <p class="modal-note">Perfect rounds in a row build a streak: the second scores ×1.1, the third ×1.2, up to 6,000 for a flawless day.</p>
+      <p class="how-to-streak">🔥 Perfect rounds in a row multiply: ×1.1, ×1.2 … up to <b>6,000</b>.</p>
+      <div class="how-to-awards">
+        <div>
+          <span class="field-label">A BADGE EACH MONTH</span>
+          <p>Play more days and rank higher in the world.</p>
+          <div class="how-to-badges" id="howToBadges"></div>
+        </div>
+        <div>
+          <span class="field-label">MEDALS WITH FRIENDS</span>
+          <p>Top 3 of your group, every day, week and month.</p>
+          <div class="how-to-medals" id="howToMedals"></div>
+        </div>
+      </div>
       <label id="howToDontShow" class="dont-show hidden">
         <input type="checkbox" id="howToDontShowBox">
         <span>Don't show this again</span>
@@ -9952,7 +10007,7 @@ const SCORE_BUCKET_SIZE = MAX_DAILY_SCORE / SCORE_BUCKET_COUNT;
 // As a month's badge (getMonthBadge), each also asks for a number of days played that
 // month (minDays).
 const RANK_TIERS = [
-  { key: "legend", maxPercent: 1, minDays: 25, name: "Legend", range: "Top 1%", color: "#ffd45c" },
+  { key: "legend", maxPercent: 1, minDays: 25, name: "Mr. Worldwide", range: "Top 1%", color: "#ffd45c" },
   { key: "pioneer", maxPercent: 5, minDays: 20, name: "Pioneer", range: "Top 5%", color: "#ff8a3d" },
   { key: "pathfinder", maxPercent: 10, minDays: 14, name: "Pathfinder", range: "Top 10%", color: "#c58cff" },
   { key: "navigator", maxPercent: 25, minDays: 7, name: "Navigator", range: "Top 25%", color: "#45e3ff" },
@@ -10997,14 +11052,26 @@ function renderProgressiveHints(targetCountry, wrongGuessCount) {
   document.getElementById("clueCurrentText").textContent =
     redactCountryName(clues[currentIndex], targetCountry);
 
-  // Earlier clues stay visible underneath, newest first.
+  // Earlier clues stay underneath, newest first, each on one line; a click shows it whole.
   const earlier = document.getElementById("clueEarlier");
   earlier.replaceChildren();
   for (let index = currentIndex - 1; index >= 0; index -= 1) {
     const item = document.createElement("li");
     const number = document.createElement("b");
     number.textContent = String(index + 1);
-    item.append(number, redactCountryName(clues[index], targetCountry));
+    const text = document.createElement("span");
+    text.textContent = redactCountryName(clues[index], targetCountry);
+    item.append(number, text);
+    item.tabIndex = 0;
+    item.title = text.textContent;
+    const toggle = () => item.classList.toggle("is-open");
+    item.addEventListener("click", toggle);
+    item.addEventListener("keydown", event => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      event.stopPropagation();
+      toggle();
+    });
     earlier.appendChild(item);
   }
 
@@ -11360,7 +11427,12 @@ function getGuessFacts(guess) {
   return facts;
 }
 
-// One guess as a list row; pass onHover to link the row with its globe marker.
+// The guess whose facts are open in the game's list (one at a time), kept across redraws.
+let openGuessIso = null;
+
+// One guess as a list row; pass onHover to link the row with its globe marker. In the game
+// a row is one line, and clicking it opens its facts (the chips under "What we know" sum
+// them all up), so five guesses fit without scrolling.
 function createGuessRow(guess, index, onHover = null) {
   const row = document.createElement("li");
   row.className = "guess-row";
@@ -11389,7 +11461,34 @@ function createGuessRow(guess, index, onHover = null) {
     factList.appendChild(fact);
   });
 
-  row.append(number, createFlagImage(guess.country, "guess-flag"), name, temperature, factList);
+  const toggle = document.createElement("span");
+  toggle.className = "guess-toggle";
+  toggle.setAttribute("aria-hidden", "true");
+  toggle.textContent = "▾";
+  row.append(number, createFlagImage(guess.country, "guess-flag"), name, temperature, toggle, factList);
+
+  const iso = guess.country.iso;
+  row.tabIndex = 0;
+  row.setAttribute("aria-expanded", String(openGuessIso === iso));
+  row.classList.toggle("is-open", openGuessIso === iso);
+  const setOpen = open => {
+    row.parentElement?.querySelectorAll(".guess-row.is-open").forEach(other => {
+      other.classList.remove("is-open");
+      other.setAttribute("aria-expanded", "false");
+    });
+    row.classList.toggle("is-open", open);
+    row.setAttribute("aria-expanded", String(open));
+    openGuessIso = open ? iso : null;
+    // Its facts show in full without having to scroll for them.
+    if (open) requestAnimationFrame(() => row.scrollIntoView({ block: "nearest", behavior: "smooth" }));
+  };
+  row.addEventListener("click", () => setOpen(!row.classList.contains("is-open")));
+  row.addEventListener("keydown", event => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    event.stopPropagation();
+    setOpen(!row.classList.contains("is-open"));
+  });
   if (onHover) {
     row.addEventListener("mouseenter", () => {
       setGuessHighlight(index, true);
@@ -11903,8 +12002,9 @@ const { ROUND_PICTURES } = __modules["round-pictures.js"];
 const { CLUES } = __modules["clues.js"];
 const { sounds } = __modules["audio.js"];
 const { createDistributionChart, initializeHistoryScreens } = __modules["screens.js"];
-const { formatTopPercent, getDayStats, getTopPercent } = __modules["community.js"];
+const { RANK_TIERS, formatTopPercent, getDayStats, getTopPercent } = __modules["community.js"];
 const { initializeCommunity } = __modules["social.js"];
+const { createBadge, createMedal, getGroupMedal } = __modules["badges.js"];
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
 const { MAX_DAILY_SCORE, MAX_GUESSES, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
@@ -12325,14 +12425,13 @@ function renderBurstAnswer(round, result) {
   let note = "";
   let items = [];
   if (round.type === "deepcut") {
-    // Your answer and its worth, then every answer that counted, grouped by its points
-    // (most niche first), yours picked out in green.
+    // Every answer that counted, one row per points tier (most niche first), yours in
+    // green; your answer isn't repeated above them, so it all fits without scrolling.
     const state = day.rounds[plan.indexOf(round)];
     const answers = getDeepCutAnswers(round);
     const mine = answers.find(answer => answer.text === state.answer);
     kicker = mine ? `YOUR ANSWER · ${describeNiche(mine.points)}` : "ANSWERS THAT WOULD HAVE COUNTED";
-    name = mine?.text || "";
-    note = `All ${answers.length} answers`;
+    name = "";
     items = DEEP_CUT_TIERS.map(points => {
       const tier = answers.filter(answer => answer.points === points);
       if (!tier.length) return null;
@@ -12342,7 +12441,10 @@ function renderBurstAnswer(round, result) {
         className: answer.text === mine?.text ? "is-found" : "",
         textContent: answer.text === mine?.text ? `✓ ${answer.text}` : answer.text
       })));
-      group.append(Object.assign(document.createElement("span"), { className: "burst-tier-label", textContent: `${points.toLocaleString()} · ${describeNiche(points)}` }), chips);
+      const label = Object.assign(document.createElement("span"), { className: "burst-tier-label" });
+      label.append(Object.assign(document.createElement("strong"), { textContent: points.toLocaleString() }), describeNiche(points).toLowerCase());
+      group.classList.toggle("is-yours", Boolean(mine && points === mine.points));
+      group.append(label, chips);
       return group;
     }).filter(Boolean);
   } else if (round.type === "paint") {
@@ -12385,6 +12487,8 @@ function showScoreBurst(index, { keepCardsOut = false } = {}) {
   infoCard.classList.toggle("hidden", !info);
   if (info) renderInfoCard(infoCard, info);
   document.querySelector(".score-burst-card").classList.toggle("has-info", Boolean(info));
+  // Deep Cut's long answer list gets the left column; its journey moves under the info.
+  document.querySelector(".score-burst-card").classList.toggle("is-deepcut", plan[index].type === "deepcut");
   // A missed round's card puts the answer first, in gold. Every card waits for its
   // button (or Enter), so there's time to read it.
   overlay.classList.toggle("is-missed", !result.solved);
@@ -13549,6 +13653,15 @@ function flyFromMenu() {
     menu.classList.remove("is-leaving");
   });
 }
+
+// How to play shows each round in its own colour, the six badges and the three medals.
+document.querySelectorAll(".how-to-rounds li").forEach((item, index) => item.style.setProperty("--round-color", ROUND_COLORS[index]));
+document.getElementById("howToBadges").replaceChildren(...[...RANK_TIERS].reverse().map(tier => {
+  const badge = createBadge(tier, 30);
+  badge.setAttribute("aria-label", tier.name);
+  return badge;
+}));
+document.getElementById("howToMedals").replaceChildren(...[1, 2, 3].map(place => createMedal(getGroupMedal(place), 30)));
 
 // The how-to-play message, shown when a game starts until the player ticks
 // "Don't show this again". Calls `then` once it is closed (or straight away).
