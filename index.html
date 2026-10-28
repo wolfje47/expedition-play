@@ -2094,8 +2094,6 @@ h1, h2, h3 { font-weight: normal; }
   .side-right .panel { border-radius: 16px; }
   .side-right .round-view > .guesses-panel { flex: none; min-height: 0; }
   .side-right .guess-list { overflow: visible; }
-  /* What you tapped on the globe, and its button, come first, where they can be seen. */
-  .side-right .round-view > .pinpoint-pick { order: -1; }
   /* Big enough to tap. */
   .side-right .btn { min-height: 46px; }
   .side-right input { font-size: 16px; }
@@ -2229,6 +2227,113 @@ h1, h2, h3 { font-weight: normal; }
   .badge-stone-days { font-size: 8px; }
 }
 
+/* ---------- Phones: the first round of mobile fixes ---------- */
+.burst-more,
+.overview-sheet-close { display: none; }
+
+@media (max-width: 760px) {
+  /* Top bar: the logo, the day and mode on one line and the day's name on another, the
+     score small on the right. */
+  .side-left { grid-template-columns: minmax(0, 1fr) auto auto; }
+  .side-left .game-card { grid-column: 1 / 3; min-width: 0; padding: 6px 10px; }
+  .side-left .score-tile { grid-column: 3; grid-row: 1; }
+  .side-left .game-buttons { grid-column: 1; grid-row: 2; }
+  .side-left .rounds-card { grid-column: 2 / 4; grid-row: 2; }
+  .side-left .brand-block { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 8px; row-gap: 2px; }
+  .side-left .brand { grid-row: span 2; }
+  .side-left .brand-name { display: none; }
+  .side-left .brand-meta,
+  .side-left .day-name { min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .side-left .brand-meta { font-size: 8px; }
+  .side-left .meta-when { display: none; }
+  .side-left .day-name { font-size: 11px; }
+  .side-left .score-tile { padding: 6px 12px; }
+  .score-tile-total strong { font-size: 22px; }
+
+  /* A note about the round floats just above the sheet (ui.js showToastNotice). */
+  .game-view > .input-toast { position: fixed; right: 12px; bottom: calc(var(--phone-sheet, 300px) + 10px); left: 12px; z-index: 80; margin: 0; }
+
+  /* What you tapped and its button stay at the bottom of the sheet, in thumb reach;
+     in Pinpoint the clues come first, without the label that only repeated the task. */
+  .side-right .pinpoint-pick { position: sticky; bottom: 0; z-index: 2; background: rgb(10, 16, 32); box-shadow: 0 -10px 16px rgba(6, 10, 22, 0.9); }
+  .round-view[data-round="pinpoint"] .target-card:has(.target-country.hidden) { display: none; }
+
+  /* Rank 'Em: the sheet gets most of the screen, all five rows fit, and SUBMIT stays in
+     view. With a finger only the handle drags (engine.js enableRankDrag). */
+  .game-view[data-round="rank"] .side-right { max-height: 74dvh; }
+  .side-right .rank-board { gap: 0.4rem; padding: 0.6rem; }
+  .side-right .rank-list { gap: 0.3rem; }
+  .side-right .rank-item { min-height: 0; gap: 0.45rem; padding: 0.3rem 0.5rem; touch-action: pan-y; }
+  .side-right .rank-handle { display: grid; place-items: center; width: 28px; height: 36px; margin: -0.3rem 0 -0.3rem -0.4rem; touch-action: none; }
+  .side-right .rank-flag { width: 28px; height: 19px; }
+  .side-right .rank-name { font-size: 14px; }
+  .side-right .rank-moves button { width: 32px; height: 32px; }
+  .side-right .rank-actions .btn { padding: 0 0.7rem; font-size: 9px; white-space: nowrap; }
+  .side-right .rank-actions { position: sticky; bottom: 0; z-index: 2; padding: 6px 0; background: rgb(10, 16, 32); box-shadow: 0 -10px 16px rgba(6, 10, 22, 0.9); }
+
+  /* Score card: the points first, then the answer and the journey; the info card folds
+     away behind MORE ABOUT IT, and NEXT stays at the bottom. */
+  .score-burst-card .score-burst-label { order: 1; }
+  .score-burst-card .score-burst-points { order: 2; }
+  .score-burst-card .score-burst-streak { order: 3; }
+  .score-burst-card .burst-answer { order: 4; }
+  .score-burst-card .score-burst-climb { order: 5; }
+  .score-burst-card .score-burst-total { order: 6; }
+  .score-burst-card .burst-more { order: 7; }
+  .score-burst-card .burst-info { order: 8; }
+  .score-burst-card #scoreBurstNext { position: sticky; bottom: 0; z-index: 2; order: 9; }
+  .score-burst-points { font-size: clamp(3rem, 16vw, 4.2rem); }
+  .score-burst-climb svg { max-height: 120px; }
+  .score-burst-card:not(.is-info-open) .burst-info { display: none; }
+  .burst-more:not(.hidden) { display: flex; justify-content: center; gap: 0.5rem; width: 100%; padding: 0.6rem; border: 1px solid var(--glass-line); border-radius: 12px; background: rgba(255, 255, 255, 0.05); color: var(--text); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+  .burst-more::after { content: "+"; }
+  .is-info-open .burst-more::after { content: "−"; }
+
+  /* Full-screen screens are solid on a phone (no glass over the menu behind them). */
+  .modal { background: rgb(10, 15, 30); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .modal-overlay { backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+  /* End screen: score, top % and SHARE first; the rounds, the charts and the archive below. */
+  .end-screen .end-grid,
+  .end-screen .end-climb,
+  .end-screen .end-world,
+  .end-screen .end-actions { display: contents; }
+  .end-screen > .end-head { order: 0; }
+  .end-screen .end-score { order: 1; }
+  .end-screen .end-world > .field-label { order: 2; }
+  .end-screen .end-percent { order: 3; }
+  .end-screen .end-world-text { order: 4; }
+  .end-screen #copyResultBtn { order: 5; border-color: var(--accent); background: var(--accent); color: #04121a; }
+  .end-screen .end-climb-chart { order: 6; }
+  .end-screen .end-rounds { order: 7; }
+  .end-screen #endDistribution { order: 8; }
+  .end-screen .sample-note { order: 9; }
+  .end-screen .end-archive { order: 10; }
+  .end-screen .home-button { order: 11; }
+  .end-screen #reviewRoundsButton { order: 12; }
+
+  /* Archive: a picked day slides up as a sheet over the calendar, START at its foot. */
+  #archiveModal .day-overview { display: none; }
+  #archiveModal.is-day-open .screen-modal { overflow: hidden; }
+  #archiveModal.is-day-open .screen-modal::after { position: fixed; inset: 0; z-index: 4; background: rgba(2, 3, 8, 0.6); content: ""; }
+  #archiveModal.is-day-open .day-overview {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 5;
+    display: flex;
+    max-height: 82dvh;
+    padding: 0.8rem 1rem calc(var(--play-height, 96px) + 16px);
+    overflow-y: auto;
+    border-radius: 22px 22px 0 0;
+    background: rgb(10, 15, 30);
+    box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.5);
+  }
+  #archiveModal.is-day-open #archivePlay { position: fixed; right: 0; bottom: 0; left: 0; z-index: 6; max-width: none; padding: 8px 12px calc(env(safe-area-inset-bottom, 0px) + 10px); background: rgb(10, 15, 30); }
+  #archiveModal.is-day-open .overview-sheet-close { display: inline-flex; align-self: flex-start; order: -1; padding: 0.3rem 0; color: var(--accent); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+}
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -2337,7 +2442,7 @@ h1, h2, h3 { font-weight: normal; }
               <span class="brand-mark" aria-hidden="true"></span>
               <span class="brand-name">EXPEDITION</span>
             </button>
-            <small class="brand-meta"><span id="dailyBadge">DAILY</span> · <span class="mode-chip" id="modeChip">COMPETITIVE</span> · <span id="puzzleDate"></span></small>
+            <small class="brand-meta"><span id="dailyBadge">DAILY</span> · <span class="mode-chip" id="modeChip">COMPETITIVE</span><span class="meta-when"> · <span id="puzzleDate"></span></span></small>
             <strong class="day-name hidden" id="dayName"></strong>
           </div>
         </section>
@@ -2601,6 +2706,8 @@ h1, h2, h3 { font-weight: normal; }
           <span class="burst-answer-note" id="scoreBurstAnswerNote"></span>
           <ol class="burst-answer-list hidden" id="scoreBurstAnswerList"></ol>
         </div>
+        <!-- Phones only: opens the info card below. -->
+        <button class="burst-more hidden" id="scoreBurstMore" type="button" aria-expanded="false" aria-controls="scoreBurstInfo">MORE ABOUT IT</button>
         <section class="info-card burst-info hidden" id="scoreBurstInfo" aria-label="About this question"></section>
         <span class="score-burst-label" id="scoreBurstLabel">ROUND COMPLETE</span>
         <strong class="score-burst-points"><span aria-hidden="true">+</span><span id="scoreBurstPoints">0</span><small data-journey="unit">m</small></strong>
@@ -12346,6 +12453,14 @@ function renderDayOverview(container, day, onPlay) {
     return;
   }
   playSlot.appendChild(createPlayPanel(day, onPlay));
+  // Phones show the day as a sheet over the calendar; this closes it.
+  const back = element("button", "overview-sheet-close", "‹ CALENDAR");
+  back.type = "button";
+  back.addEventListener("click", () => {
+    sounds.playClick();
+    document.getElementById("archiveModal").classList.remove("is-day-open");
+  });
+  container.appendChild(back);
 
   const head = element("div", "overview-head");
   const titles = element("div");
@@ -12528,7 +12643,18 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay }) {
     openArchive(currentSelection, tab.dataset.mode);
   }));
 
+  // Phones: a picked day slides up as a sheet (its details, and START under them).
+  const phone = window.matchMedia("(max-width: 760px)");
+  function openDaySheet() {
+    if (!phone.matches) return;
+    archiveModal.querySelector(".screen-modal").scrollTop = 0;
+    archiveModal.classList.add("is-day-open");
+    archiveModal.style.setProperty("--play-height", `${document.getElementById("archivePlay").offsetHeight}px`);
+    overview.scrollTop = 0;
+  }
+
   function openArchive(selectedDateKey = null, mode = archiveMode) {
+    archiveModal.classList.remove("is-day-open");
     archiveMode = mode;
     archiveModal.dataset.mode = mode;
     modeTabs.forEach(tab => tab.setAttribute("aria-selected", String(tab.dataset.mode === mode)));
@@ -12546,6 +12672,7 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay }) {
           currentSelection = picked.dateKey;
           renderGrid();
           renderDayOverview(overview, selected, playDay);
+          openDaySheet();
         }
       }));
     };
@@ -12620,10 +12747,15 @@ function redactCountryName(value, country) {
 // A short note in the right column. A problem with an answer (an unknown name, a repeat)
 // gets the red ✕ of a miss and sits right under the place you answered (near).
 const toastHome = { parent: toast.parentElement, next: toast.nextElementSibling };
+// On a phone, a note about the round floats just above its sheet: placed after what it's
+// about, it could end up below the bottom of the screen.
+const phoneScreen = window.matchMedia("(max-width: 760px)");
+
 function showToastNotice(message, { problem = false, near = null } = {}) {
   toast.textContent = message;
   toast.classList.toggle("is-problem", problem);
-  if (near) near.after(toast);
+  if (near && phoneScreen.matches && near.closest(".side-right")) document.getElementById("gameView").appendChild(toast);
+  else if (near) near.after(toast);
   else toastHome.parent.insertBefore(toast, toastHome.next);
   toast.classList.remove("hidden");
   clearTimeout(toastTimer);
@@ -14541,6 +14673,9 @@ function showScoreBurst(index, { keepCardsOut = false } = {}) {
   infoCard.classList.toggle("hidden", !info);
   if (info) renderInfoCard(infoCard, info);
   document.querySelector(".score-burst-card").classList.toggle("has-info", Boolean(info));
+  // Phones fold the info card away behind MORE ABOUT IT, so the points come first.
+  document.querySelector(".score-burst-card").classList.remove("is-info-open");
+  document.getElementById("scoreBurstMore").classList.toggle("hidden", !info);
   // Deep Cut's long answer list gets the left column; its journey moves under the info.
   document.querySelector(".score-burst-card").classList.toggle("is-deepcut", plan[index].type === "deepcut");
   // A missed round's card puts the answer first, in gold. Every card waits for its
@@ -14693,6 +14828,8 @@ function render({ animateGlobe = true } = {}) {
   setText("dailyBadge", `DAY ${getPuzzleNumber(activeDate)}`);
   setText("modeChip", MODE_INFO[activeMode].short);
   document.getElementById("gameView").dataset.mode = activeMode;
+  // Phones size the round's sheet to the round (Rank 'Em needs most of the screen).
+  document.getElementById("gameView").dataset.round = round.type;
   setText("puzzleDate", activeDate === today ? "Today" : activeDate < today ? "Archive" : "Upcoming");
   setText("roundCount", `${viewIndex + 1} / ${plan.length}`);
   const dayInfo = getDayInfo(activeDate, activeMode);
@@ -15471,6 +15608,8 @@ function moveRankItem(from, to) {
 function enableRankDrag(item, list) {
   item.addEventListener("pointerdown", event => {
     if (event.target.closest("button") || !isPlaying("rank")) return;
+    // With a finger, only the handle drags, so the rest of the row still scrolls the sheet.
+    if (event.pointerType !== "mouse" && !event.target.closest(".rank-handle")) return;
     event.preventDefault();
     item.classList.add("is-dragging");
     const startOrder = [...list.children].map(child => child.dataset.iso).join();
@@ -15650,8 +15789,20 @@ function getResultText() {
   ].join("\n");
 }
 
+// Phones open their own share sheet (WhatsApp, Messages, ...); elsewhere the result is copied.
+const canShare = Boolean(navigator.share) && window.matchMedia("(pointer: coarse)").matches;
+if (canShare) document.getElementById("copyResultBtn").textContent = "SHARE RESULT";
+
 async function copyResult() {
   const text = getResultText();
+  if (canShare) {
+    try {
+      await navigator.share({ text });
+      return;
+    } catch (error) {
+      if (error.name === "AbortError") return;
+    }
+  }
   try {
     await navigator.clipboard.writeText(text);
   } catch {
@@ -15946,6 +16097,12 @@ document.getElementById("copyResultBtn").addEventListener("click", () => { sound
 document.getElementById("backToResultsButton").addEventListener("click", () => { sounds.playClick(); showFinalModal(); });
 document.getElementById("roundIntro").addEventListener("click", hideRoundIntro);
 document.getElementById("scoreBurstNext").addEventListener("click", () => { sounds.playClick(); endScoreBurst?.(); });
+document.getElementById("scoreBurstMore").addEventListener("click", () => {
+  sounds.playClick();
+  const card = document.querySelector(".score-burst-card");
+  const open = card.classList.toggle("is-info-open");
+  document.getElementById("scoreBurstMore").setAttribute("aria-expanded", String(open));
+});
 ["howToMenuButton", "closeHowToButton"].forEach(id => document.getElementById(id).addEventListener("click", closeGameIntro));
 document.addEventListener("keydown", event => {
   if (["Enter", " ", "Escape"].includes(event.key) && !document.getElementById("roundIntro").classList.contains("hidden")) {
