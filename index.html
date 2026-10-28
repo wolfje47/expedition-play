@@ -2,7 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <!-- Added to a phone's home screen it opens like an app: full screen, in the game's colours. -->
+  <meta name="theme-color" content="#05070d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Expedition">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <title>Expedition: Daily Geography Game</title>
   <!-- LOGO START -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2016%2016%22%20shape-rendering%3D%22crispEdges%22%3E%3Crect%20x%3D%225%22%20y%3D%220%22%20width%3D%226%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%221%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%221%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%227%22%20y%3D%221%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%229%22%20y%3D%221%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%2211%22%20y%3D%221%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%222%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%222%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%224%22%20y%3D%222%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%238af0ff%22%2F%3E%3Crect%20x%3D%226%22%20y%3D%222%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%228%22%20y%3D%222%22%20width%3D%225%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%2213%22%20y%3D%222%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%223%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%223%22%20width%3D%223%22%20height%3D%221%22%20fill%3D%22%238af0ff%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%223%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%227%22%20y%3D%223%22%20width%3D%227%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%2214%22%20y%3D%223%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%224%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%224%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%238af0ff%22%2F%3E%3Crect%20x%3D%224%22%20y%3D%224%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%226%22%20y%3D%224%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%228%22%20y%3D%224%22%20width%3D%223%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%2211%22%20y%3D%224%22%20width%3D%223%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%2214%22%20y%3D%224%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%225%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%225%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%238af0ff%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%225%22%20width%3D%223%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%226%22%20y%3D%225%22%20width%3D%229%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%2215%22%20y%3D%225%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%226%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%226%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%238af0ff%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%226%22%20width%3D%223%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%226%22%20width%3D%228%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%2213%22%20y%3D%226%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%2215%22%20y%3D%226%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%227%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%227%22%20width%3D%224%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%227%22%20width%3D%228%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%2213%22%20y%3D%227%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%2215%22%20y%3D%227%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%228%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%228%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%228%22%20width%3D%226%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%228%22%20y%3D%228%22%20width%3D%225%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%2213%22%20y%3D%228%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%2215%22%20y%3D%228%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%229%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%229%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%229%22%20width%3D%225%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%228%22%20y%3D%229%22%20width%3D%224%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%2212%22%20y%3D%229%22%20width%3D%223%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%2215%22%20y%3D%229%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2210%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2210%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2210%22%20width%3D%226%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%229%22%20y%3D%2210%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%2211%22%20y%3D%2210%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%232fb35e%22%2F%3E%3Crect%20x%3D%2212%22%20y%3D%2210%22%20width%3D%223%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%2215%22%20y%3D%2210%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2211%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2211%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2211%22%20width%3D%225%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%228%22%20y%3D%2211%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%235cf28a%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%2211%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%232fb35e%22%2F%3E%3Crect%20x%3D%2211%22%20y%3D%2211%22%20width%3D%223%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%2214%22%20y%3D%2211%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2212%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2212%22%20width%3D%227%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%229%22%20y%3D%2212%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%232fb35e%22%2F%3E%3Crect%20x%3D%2211%22%20y%3D%2212%22%20width%3D%223%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%2214%22%20y%3D%2212%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2213%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2213%22%20width%3D%2210%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%2213%22%20y%3D%2213%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2214%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%2214%22%20width%3D%226%22%20height%3D%221%22%20fill%3D%22%232f8fd8%22%2F%3E%3Crect%20x%3D%2211%22%20y%3D%2214%22%20width%3D%222%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%2215%22%20width%3D%226%22%20height%3D%221%22%20fill%3D%22%2304121a%22%2F%3E%3C%2Fsvg%3E">
@@ -66,7 +74,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg);
   color: var(--text);
   font: 14px/1.45 var(--font-body);
@@ -130,7 +138,7 @@ h1, h2, h3 { font-weight: normal; }
 .main-menu {
   position: relative;
   display: grid;
-  min-height: 100vh;
+  min-height: 100dvh;
   place-items: start center;
   padding: clamp(1.5rem, 7vh, 5rem) 1rem 1.5rem;
 }
@@ -284,7 +292,7 @@ h1, h2, h3 { font-weight: normal; }
   --right-width: 400px;
   --side-top: var(--gutter);
   position: relative;
-  height: 100vh;
+  height: 100dvh;
   min-height: 600px;
   overflow: hidden;
   background: radial-gradient(ellipse at 50% 50%, #05070d 0%, #020306 70%, #000 100%);
@@ -459,7 +467,7 @@ h1, h2, h3 { font-weight: normal; }
   flex-direction: column;
   gap: 14px;
   width: var(--left-width);
-  max-height: calc(100vh - var(--side-top) - var(--gutter));
+  max-height: calc(100dvh - var(--side-top) - var(--gutter));
   pointer-events: none;
 }
 
@@ -819,7 +827,7 @@ h1, h2, h3 { font-weight: normal; }
 /* On the score card the info sits beside the answer and score, on a wider card, so it
    all fits on one screen. */
 .burst-info { width: min(440px, 80vw); text-align: left; }
-.score-burst-card { max-height: calc(100vh - 32px); overflow-y: auto; }
+.score-burst-card { max-height: calc(100dvh - 32px); overflow-y: auto; }
 .score-burst-card.has-info { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; column-gap: 1.8rem; width: min(940px, 94vw); }
 .score-burst-card.has-info > * { grid-column: 1; }
 .score-burst-card.has-info .burst-info { grid-column: 2; grid-row: 1 / span 6; width: auto; }
@@ -1475,7 +1483,7 @@ h1, h2, h3 { font-weight: normal; }
   display: grid;
   gap: 0.9rem;
   width: min(100%, 460px);
-  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
   overflow-y: auto;
   padding: 1.5rem;
   border: 1px solid var(--glass-line);
@@ -1683,7 +1691,7 @@ h1, h2, h3 { font-weight: normal; }
   display: flex;
   flex-direction: column;
   width: min(100%, 1180px);
-  height: min(860px, calc(100vh - 2rem));
+  height: min(860px, calc(100dvh - 2rem));
   overflow: hidden;
 }
 
@@ -1991,7 +1999,7 @@ h1, h2, h3 { font-weight: normal; }
 /* Too narrow for cards beside the globe: everything stacks, with the globe in a box. */
 @media (max-width: 980px) {
   /* Clipped sideways so cards sliding out between rounds never add a scrollbar. */
-  .game-view { height: auto; min-height: 100vh; overflow: visible; overflow-x: clip; }
+  .game-view { height: auto; min-height: 100dvh; overflow: visible; overflow-x: clip; }
   .game { display: flex; flex-direction: column; gap: 14px; padding: 16px; }
   .stage { position: relative; height: 380px; overflow: hidden; border: 1px solid var(--glass-line); border-radius: 18px; }
   .globe-canvas { position: absolute; }
@@ -2000,7 +2008,7 @@ h1, h2, h3 { font-weight: normal; }
   .side { position: static; width: auto; max-height: none; }
   .stage-hint { display: none; }
   .guess-list { overflow: visible; }
-  .screen-modal { height: calc(100vh - 2rem); overflow-y: auto; }
+  .screen-modal { height: calc(100dvh - 2rem); overflow-y: auto; }
   .screen-body,
   .archive-layout,
   .community-layout { grid-template-columns: minmax(0, 1fr); flex: none; }
@@ -2175,7 +2183,7 @@ h1, h2, h3 { font-weight: normal; }
 .archive-ladder .tier-name { display: none; }
 .archive-ladder .tier-range { font-size: 12px; }
 .archive-calendar .calendar-month { margin-top: 0; padding: 0.4rem 0.7rem; }
-.archive-calendar .day-cell { aspect-ratio: auto; height: clamp(34px, calc((100vh - 470px) / 5), 64px); }
+.archive-calendar .day-cell { aspect-ratio: auto; height: clamp(34px, calc((100dvh - 470px) / 5), 64px); }
 .archive-calendar .calendar-legend { margin-top: 0.2rem; }
 #archiveModal .modal-head { margin-bottom: 0.2rem; }
 #archivePlay .overview-play { padding: 0.5rem 0.6rem 0.5rem 0.9rem; font-size: 14px; }
@@ -2204,7 +2212,7 @@ h1, h2, h3 { font-weight: normal; }
 #archiveModal .overview-everyone { gap: 0.6rem; }
 #archiveModal .overview-stat { padding: 0.5rem 0.6rem; }
 #archiveModal .overview-stat-value { font-size: 16px; }
-#archiveModal .distribution-bars { height: clamp(70px, calc(100vh - 560px), 130px); }
+#archiveModal .distribution-bars { height: clamp(70px, calc(100dvh - 560px), 130px); }
 
 /* Casual has its own colour: gold instead of cyan, in the game, its end screen and the
    archive's casual tab (data-mode is set by engine.js and screens.js). */
@@ -2332,6 +2340,48 @@ h1, h2, h3 { font-weight: normal; }
   }
   #archiveModal.is-day-open #archivePlay { position: fixed; right: 0; bottom: 0; left: 0; z-index: 6; max-width: none; padding: 8px 12px calc(env(safe-area-inset-bottom, 0px) + 10px); background: rgb(10, 15, 30); }
   #archiveModal.is-day-open .overview-sheet-close { display: inline-flex; align-self: flex-start; order: -1; padding: 0.3rem 0; color: var(--accent); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+}
+
+/* ---------- Phones: the second round of mobile fixes ---------- */
+.guess-chips { display: none; }
+
+@media (max-width: 760px) {
+  /* The sheet's three heights (engine.js setSheetStep): peek, half (default) and full.
+     It sits above the keyboard while you type (--keyboard). */
+  .side-right { bottom: var(--keyboard, 0px); transition: max-height 0.3s ease, bottom 0.2s ease; }
+  .side-right.is-peek { max-height: 26dvh; }
+  .game-view[data-round="rank"] .side-right.is-peek { max-height: 26dvh; }
+  .game-view[data-round="rank"] .side-right.is-expanded { max-height: 84dvh; }
+  .sheet-handle { height: 28px; touch-action: none; cursor: grab; }
+
+  /* The answer box (Mystery Country, Deep Cut) stays at the bottom of the sheet, in thumb
+     reach, with your guesses as chips right under it. */
+  .side-right .round-view > .guess-entry { position: sticky; bottom: 0; z-index: 2; padding-top: 6px; background: rgb(10, 16, 32); box-shadow: 0 -10px 16px rgba(6, 10, 22, 0.9); }
+  .side-right .guess-entry .give-up { display: block; margin: 4px 0 0 auto; }
+  .guess-chips:not(:empty) { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .guess-chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px 3px 4px; border: 1px solid color-mix(in srgb, var(--temp) 60%, transparent); border-radius: 999px; background: color-mix(in srgb, var(--temp) 14%, transparent); font-size: 12px; font-weight: 600; }
+  .guess-chip-flag { width: 18px; height: 12px; border-radius: 2px; object-fit: cover; }
+
+  /* Community: the close button keeps its size; the tables fit a phone (no days column). */
+  .modal-close { flex: none; }
+  .community-board .board-row { grid-template-columns: 30px minmax(0, 1fr) auto auto; gap: 0.4rem; padding: 0 0.5rem; }
+  .community-board .board-days { display: none; }
+
+  /* Full-screen screens keep clear of the notch and the home bar (viewport-fit=cover). */
+  .modal { padding-top: calc(env(safe-area-inset-top, 0px) + 1.25rem); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1.25rem); }
+  .screen-modal { padding-top: calc(env(safe-area-inset-top, 0px) + 14px); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); }
+  .score-burst-card { padding-top: calc(env(safe-area-inset-top, 0px) + 18px); }
+  .main-menu { padding-top: calc(env(safe-area-inset-top, 0px) + clamp(1.5rem, 7vh, 5rem)); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1.5rem); }
+
+  /* How to play: the small tags fit their chips. */
+  .sum-tag { font-size: 7px; letter-spacing: 0; white-space: nowrap; }
+  .how-to-temps b { font-size: 7px; letter-spacing: 0; }
+}
+
+@media (max-width: 760px) and (hover: none) {
+  /* Hover looks stay off on touch screens (they'd stick after a tap). */
+  .play-tile:hover:not(:disabled) { box-shadow: none; transform: none; }
+  .play-tile:hover:not(:disabled) .play-tile-art svg { animation: none; }
 }
 
 </style>
@@ -2581,6 +2631,8 @@ h1, h2, h3 { font-weight: normal; }
               <button class="btn btn-primary" id="submitBtn" type="button">GUESS</button>
               <div id="autocompleteList" class="autocomplete-list hidden" role="listbox"></div>
             </div>
+            <!-- Phones: your guesses, small, right under the answer box. -->
+            <div class="guess-chips" id="mysteryGuessChips" aria-hidden="true"></div>
             <button class="give-up" id="giveUpBtn" type="button">Give up and reveal the answer</button>
           </div>
           <section class="panel guesses-panel" aria-label="Guesses">
@@ -14338,6 +14390,7 @@ function isDayComplete() {
 function goToRound(index) {
   if (index < 0 || index > getActiveRoundIndex() || isAnimating) return;
   const show = () => {
+    if (index !== viewIndex) setSheetStep(1);
     viewIndex = index;
     pinpointSelection = null;
     paintSelection = null;
@@ -14392,7 +14445,7 @@ function hideRoundIntro() {
     overlay.classList.remove("is-showing", "is-leaving");
     // Put the cursor in the round's text box, if it has one.
     const field = { mystery: "countryInput", deepcut: "deepcutInput" }[plan[viewIndex].type];
-    if (field && !document.getElementById(field).disabled) document.getElementById(field).focus();
+    if (field && !onTouch && !document.getElementById(field).disabled) document.getElementById(field).focus();
   }, 320);
 }
 
@@ -14810,8 +14863,12 @@ function renderSpeedBar() {
 // Rendering
 // ---------------------------------------------------------------------------
 
+// Touch screens are tapped, not clicked: "Click a country" reads "Tap a country" there.
+const onTouch = window.matchMedia("(pointer: coarse)").matches;
+const tapWords = text => onTouch && typeof text === "string" ? text.replace(/\bClick\b/g, "Tap").replace(/\bclick\b/g, "tap") : text;
+
 function setText(id, text) {
-  document.getElementById(id).textContent = text;
+  document.getElementById(id).textContent = tapWords(text);
 }
 
 function setFlag(id, country) {
@@ -15069,6 +15126,13 @@ const ROUND_RENDERERS = {
     renderProgressiveHints(answer, progress.wrong + clueHeadStart(round));
     renderGuessHistory(guesses, (index, active) => globe.setMarkerHighlight(index, active), MAX_GUESSES);
     renderKnownStrip(progress.done ? [] : getGuessSummary(guesses));
+    // Phones: your guesses as small chips right under the answer box.
+    document.getElementById("mysteryGuessChips").replaceChildren(...guesses.map(guess => {
+      const chip = Object.assign(document.createElement("span"), { className: `guess-chip ${guess.isCorrect ? "is-right" : ""}`, title: `${guess.country.name}: ${guess.temperature}` });
+      chip.style.setProperty("--temp", guess.color);
+      chip.append(createFlagImage(guess.country, "guess-chip-flag"), guess.country.name);
+      return chip;
+    }));
     mysteryInput.setDisabled(progress.done || isAnimating);
     document.getElementById("giveUpBtn").disabled = progress.done;
     showGuessMarkers(guesses, options);
@@ -15116,7 +15180,7 @@ const ROUND_RENDERERS = {
     }));
     const list = document.getElementById("pinpointGuesses");
     list.replaceChildren(...guesses.map((guess, index) => createGuessRow(guess, index, (rowIndex, active) => globe.setMarkerHighlight(rowIndex, active))));
-    for (let index = guesses.length; index < MAX_GUESSES; index += 1) list.appendChild(createEmptyRow(index, "Click the globe"));
+    for (let index = guesses.length; index < MAX_GUESSES; index += 1) list.appendChild(createEmptyRow(index, tapWords("Click the globe")));
     setText("pinpointCount", `${guesses.length} / ${MAX_GUESSES}`);
     document.getElementById("pinpointGiveUp").disabled = progress.done;
 
@@ -15127,7 +15191,7 @@ const ROUND_RENDERERS = {
     selection.classList.toggle("is-chosen", Boolean(selected));
     selection.replaceChildren(...(selected
       ? [createFlagImage(selected, "pinpoint-pick-flag"), selected.name]
-      : [progress.done ? "Round finished" : "Click a country"]));
+      : [progress.done ? "Round finished" : tapWords("Click a country")]));
     document.getElementById("pinpointConfirm").disabled = !selected || progress.done;
 
     showGuessMarkers(guesses, options);
@@ -15185,7 +15249,8 @@ const ROUND_RENDERERS = {
       globe.rotateTo(centre.lat, centre.lon, 900);
     }
     setStageChip("ABOUT", subjects.length === 1 ? subjects[0] : null, subjects.length > 1 ? `${subjects.length} countries` : subjects.length ? null : "any answer counts");
-    if (!progress.done && isGameViewVisible) requestAnimationFrame(() => field.focus());
+    // On a touch screen the keyboard waits until you tap the box.
+    if (!progress.done && isGameViewVisible && !onTouch) requestAnimationFrame(() => field.focus());
   },
 
   paint(round, state, progress) {
@@ -15209,7 +15274,7 @@ const ROUND_RENDERERS = {
     selection.classList.toggle("is-chosen", Boolean(selected));
     selection.replaceChildren(...(selected
       ? [createFlagImage(selected, "pinpoint-pick-flag"), selected.name]
-      : [progress.done ? "Round finished" : "Click a country on the globe"]));
+      : [progress.done ? "Round finished" : tapWords("Click a country on the globe")]));
     document.getElementById("paintConfirm").disabled = !selected || progress.done;
 
     const missing = round.answers.filter(iso => !state.found.includes(iso));
@@ -15235,7 +15300,8 @@ const ROUND_RENDERERS = {
     ]);
     // The globe stays where it is: turning it to the right region gave the answer away.
     const last = state.found.length || state.wrong.length ? getCountry([...state.found, ...state.wrong].at(-1)) : null;
-    setStageChip("LAST PAINTED", last);
+    // The count is in the chip under the globe too, as the list can be out of sight on a phone.
+    setStageChip(`${state.found.length}/${total} PAINTED · LAST`, last);
   },
 
   rank(round, state, progress, { animateGlobe }) {
@@ -15430,7 +15496,7 @@ function revealGuess(guess, target, rowSelector, { commitOptions = {}, newClue =
 function showProblem(message, target) {
   sounds.playError();
   flashMiss(target);
-  showToastNotice(message, { problem: true, near: target });
+  showToastNotice(tapWords(message), { problem: true, near: target });
 }
 
 function flashMiss(target) {
@@ -16330,13 +16396,58 @@ phoneFrameObserver.observe(document.querySelector(".side-left"));
 phoneFrameObserver.observe(document.querySelector(".side-right"));
 phoneLayout.addEventListener("change", updatePhoneFrame);
 window.addEventListener("resize", updatePhoneFrame);
-document.getElementById("sheetHandle").addEventListener("click", () => {
+// The few "Click" texts written in the page itself.
+if (onTouch) document.querySelectorAll("#pinpointSelection, #paintSelection, .round-intro-start").forEach(node => { node.textContent = tapWords(node.textContent); });
+
+// The round's sheet on a phone has three heights: peek (mostly globe), half (the default)
+// and full. Swipe the handle up or down to move between them; a tap goes half ⇄ full.
+const SHEET_STEPS = ["is-peek", "", "is-expanded"];
+let sheetStep = 1;
+function setSheetStep(step) {
+  sheetStep = Math.max(0, Math.min(2, step));
   const sheet = document.querySelector(".side-right");
-  const expanded = sheet.classList.toggle("is-expanded");
+  sheet.style.maxHeight = "";
+  sheet.classList.toggle("is-peek", sheetStep === 0);
+  sheet.classList.toggle("is-expanded", sheetStep === 2);
   const handle = document.getElementById("sheetHandle");
-  handle.setAttribute("aria-expanded", String(expanded));
-  handle.setAttribute("aria-label", expanded ? "Show more of the globe" : "Show more of the round");
-});
+  handle.setAttribute("aria-expanded", String(sheetStep === 2));
+  handle.setAttribute("aria-label", sheetStep === 2 ? "Show more of the globe" : "Show more of the round");
+}
+{
+  const handle = document.getElementById("sheetHandle");
+  let drag = null;
+  handle.addEventListener("pointerdown", event => {
+    const sheet = document.querySelector(".side-right");
+    drag = { y: event.clientY, height: sheet.getBoundingClientRect().height, moved: false };
+    try { handle.setPointerCapture(event.pointerId); } catch { /* the swipe works without it, just less smoothly */ }
+  });
+  handle.addEventListener("pointermove", event => {
+    if (!drag) return;
+    const dy = event.clientY - drag.y;
+    if (Math.abs(dy) > 6) drag.moved = true;
+    if (drag.moved) document.querySelector(".side-right").style.maxHeight = `${Math.max(90, drag.height - dy)}px`;
+  });
+  const release = event => {
+    if (!drag) return;
+    const dy = event.clientY - drag.y;
+    const moved = drag.moved;
+    drag = null;
+    if (!moved) { setSheetStep(sheetStep === 2 ? 1 : 2); return; }
+    setSheetStep(sheetStep + (dy < -40 ? 1 : dy > 40 ? -1 : 0));
+  };
+  handle.addEventListener("pointerup", release);
+  handle.addEventListener("pointercancel", release);
+}
+
+// Phones: the keyboard covers the bottom of the screen, so the sheet moves up above it.
+if (window.visualViewport) {
+  const liftForKeyboard = () => {
+    const keyboard = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
+    document.getElementById("gameView").style.setProperty("--keyboard", `${Math.round(keyboard)}px`);
+  };
+  window.visualViewport.addEventListener("resize", liftForKeyboard);
+  window.visualViewport.addEventListener("scroll", liftForKeyboard);
+}
 
 const archive = initializeHistoryScreens({
   getDays: getAllPuzzleDays,
