@@ -1208,7 +1208,8 @@ h1, h2, h3 { font-weight: normal; }
 .round-intro-task { color: var(--text); font-size: 16px; font-weight: 600; }
 .round-intro-clock { color: var(--accent); font: 14px var(--font-body); }
 /* Country names on the globe (casual) stay out of the round's title card. */
-.game-view:has(#roundIntro:not(.hidden)) .globe-labels { opacity: 0; }
+.game-view:has(#roundIntro:not(.hidden)) .globe-labels,
+.game-view:has(#scoreBurst:not(.hidden)) .globe-labels { opacity: 0; }
 .round-intro-start { margin-top: 0.2rem; color: var(--faint); font: 12px var(--font-body); }
 
 .round-intro.is-showing .round-intro-card { animation: intro-in 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.1) both; }
@@ -1677,10 +1678,14 @@ h1, h2, h3 { font-weight: normal; }
 .end-rounds .breakdown-row { box-shadow: inset 4px 0 0 var(--round-color); }
 .end-percent { color: var(--accent); font: 700 2.4rem/1 var(--font-mono); }
 .end-world-text { color: var(--muted); font-size: 14px; }
-.end-archive { display: grid; gap: 0.5rem; margin-top: 0.4rem; padding: 1rem; border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: 16px; background: var(--accent-soft); }
-.end-archive strong { font-size: 16px; }
-.end-archive p { color: var(--muted); font-size: 14px; }
+/* The two pages: the result on the left, the rounds on the right (swiped on a phone). */
+.end-page { display: grid; align-content: start; gap: 0.7rem; min-width: 0; }
+.end-world { display: grid; gap: 0.3rem; }
+.end-next-page,
+.end-dots { display: none; }
+.end-archive-note { color: var(--muted); font-size: 12px; text-align: center; }
 .end-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+.end-screen .end-share { width: 100%; }
 .end-actions .btn { padding: 0 0.5rem; font-size: 9px; }
 @media (max-width: 760px) {
   .end-grid { grid-template-columns: minmax(0, 1fr); }
@@ -2219,7 +2224,8 @@ h1, h2, h3 { font-weight: normal; }
    archive's casual tab (data-mode is set by engine.js and screens.js). */
 .game-view[data-mode="casual"],
 #victoryModal[data-mode="casual"],
-#archiveModal[data-mode="casual"] {
+#archiveModal[data-mode="casual"],
+.how-to-play-modal.is-game-intro[data-mode="casual"] {
   --accent: #ffd45c;
   --accent-hover: #ffe08a;
   --accent-soft: rgba(255, 212, 92, 0.14);
@@ -2302,25 +2308,6 @@ h1, h2, h3 { font-weight: normal; }
   .modal { background: rgb(10, 15, 30); backdrop-filter: none; -webkit-backdrop-filter: none; }
   .modal-overlay { backdrop-filter: none; -webkit-backdrop-filter: none; }
 
-  /* End screen: score, top % and SHARE first; the rounds, the charts and the archive below. */
-  .end-screen .end-grid,
-  .end-screen .end-climb,
-  .end-screen .end-world,
-  .end-screen .end-actions { display: contents; }
-  .end-screen > .end-head { order: 0; }
-  .end-screen .end-score { order: 1; }
-  .end-screen .end-world > .field-label { order: 2; }
-  .end-screen .end-percent { order: 3; }
-  .end-screen .end-world-text { order: 4; }
-  .end-screen #copyResultBtn { order: 5; border-color: var(--accent); background: var(--accent); color: #04121a; }
-  .end-screen .end-climb-chart { order: 6; }
-  .end-screen .end-rounds { order: 7; }
-  .end-screen #endDistribution { order: 8; }
-  .end-screen .sample-note { order: 9; }
-  .end-screen .end-archive { order: 10; }
-  .end-screen .home-button { order: 11; }
-  .end-screen #reviewRoundsButton { order: 12; }
-
   /* Archive: a picked day slides up as a sheet over the calendar, START at its foot. */
   #archiveModal .day-overview { display: none; }
   #archiveModal.is-day-open .screen-modal { overflow: hidden; }
@@ -2384,6 +2371,61 @@ h1, h2, h3 { font-weight: normal; }
   .play-tile:hover:not(:disabled) { box-shadow: none; transform: none; }
   .play-tile:hover:not(:disabled) .play-tile-art svg { animation: none; }
 }
+
+/* ---------- Phones: the end screen on one screen ---------- */
+@media (max-width: 760px) {
+  /* The two pages side by side, swiped (scroll snap); the second peeks in at the edge so
+     it's clear there's more. HOME and ARCHIVE stay at the bottom. */
+  .end-screen { display: flex; flex-direction: column; height: 100dvh; gap: 0.6rem; overflow: hidden; }
+  .end-screen .end-grid { display: flex; flex: 1; gap: 12px; min-height: 0; margin: 0 -1.25rem; padding: 0 1.25rem; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-padding: 0 1.25rem; scrollbar-width: none; }
+  .end-screen .end-grid::-webkit-scrollbar { display: none; }
+  .end-screen .end-page { flex: 0 0 calc(100% - 22px); align-content: start; gap: 0.5rem; overflow-y: auto; scroll-snap-align: start; }
+  .end-screen .end-score .score-display { font-size: 2.6rem; }
+  .end-screen .end-percent { font-size: 2rem; }
+  .end-screen .end-climb-chart svg { max-height: 150px; }
+  .end-screen .end-next-page { display: block; justify-self: end; padding: 0.4rem 0; color: var(--accent); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+  .end-screen .end-dots { display: flex; justify-content: center; gap: 6px; }
+  .end-dots i { width: 7px; height: 7px; border-radius: 2px; background: var(--glass-line); }
+  .end-dots i.is-on { background: var(--accent); }
+  .end-screen .end-actions { grid-template-columns: 1fr 1fr; }
+  .end-screen #reviewRoundsButton,
+  .end-screen .end-archive-note { display: none; }
+  .end-screen .end-rounds .breakdown-row { padding: 0.4rem 0.7rem; }
+}
+
+/* ---------- Phones: round three (from testing on an iPhone) ---------- */
+.how-to-now { display: none; }
+
+@media (max-width: 760px) {
+  /* Archive: START (or CONTINUE) is always in view at the bottom; a day not started yet
+     shows only its name and START in its sheet. */
+  #archiveModal:not(.is-day-open) #archivePlay { position: sticky; bottom: calc(-1 * (env(safe-area-inset-bottom, 0px) + 14px)); z-index: 3; margin: 0 -14px; padding: 8px 14px calc(env(safe-area-inset-bottom, 0px) + 12px); background: rgb(10, 15, 30); box-shadow: 0 -12px 18px rgba(10, 15, 30, 0.95); }
+  #archivePlay .overview-play { justify-content: center; }
+  #archivePlay .overview-play .btn { flex: 1; }
+  #archiveModal .day-overview.is-unplayed > :not(.overview-head, .overview-sheet-close) { display: none; }
+
+  /* The round's name is a slim line instead of its own box (with the clock beside it in
+     competitive), and the question sits closer to it, so the answer box moves up. */
+  .side-right .round-card { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 0.7rem; padding: 2px 6px; border: 0; background: none; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .side-right .round-card-head h2 { color: var(--muted); font-size: 9px; }
+  .side-right .round-view { gap: 8px; }
+  .side-right .target-card { gap: 0.4rem; padding: 0.7rem 0.85rem; }
+  .side-right .target-country { gap: 0.6rem; }
+  .side-right .target-country strong { font-size: 16px; }
+  .side-right .target-flag img { width: 34px; height: 23px; box-shadow: none; }
+}
+
+/* In-game How to play: only the mode you're playing, marked NOW PLAYING, and GOT IT
+   (no close button) to go on. */
+.how-to-play-modal.is-game-intro .modal-close { display: none; }
+.how-to-play-modal.is-game-intro .how-to-modes { grid-template-columns: 1fr; }
+.how-to-play-modal.is-game-intro[data-mode="competitive"] .how-to-modes > [data-mode="casual"],
+.how-to-play-modal.is-game-intro[data-mode="casual"] .how-to-modes > [data-mode="competitive"] { display: none; }
+.how-to-play-modal.is-game-intro .how-to-now { display: block; grid-column: 2; color: var(--tile); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); opacity: 0.8; }
+.how-to-play-modal.is-game-intro .how-to-art { grid-row: 1 / 5; }
+
+/* Paint the Map's score card: the question as a readable sentence. */
+.score-burst-card .burst-answer-note { color: var(--text); font-size: 14px; text-align: center; }
 
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -2797,13 +2839,15 @@ h1, h2, h3 { font-weight: normal; }
         <button class="modal-close" id="closeHowToButton" type="button" aria-label="Close instructions">×</button>
       </div>
       <div class="how-to-modes">
-        <div style="--tile: var(--accent)">
+        <div style="--tile: var(--accent)" data-mode="competitive">
+          <span class="how-to-now">NOW PLAYING</span>
           <span class="how-to-art" data-art="competitive" aria-hidden="true"></span>
           <b>COMPETITIVE</b>
           <span>⏱ 30 s a round · earns badges</span>
           <span class="how-to-mode-badges" id="howToModeBadges" aria-hidden="true"></span>
         </div>
-        <div style="--tile: var(--gold)">
+        <div style="--tile: var(--gold)" data-mode="casual">
+          <span class="how-to-now">NOW PLAYING</span>
           <span class="how-to-art" data-art="casual" aria-hidden="true"></span>
           <b>CASUAL</b>
           <span>No clock</span>
@@ -2871,33 +2915,38 @@ h1, h2, h3 { font-weight: normal; }
         <span class="modal-badge" id="perfectBadge">DAY COMPLETE</span>
         <h2 id="modalTitle">DAY COMPLETE</h2>
       </header>
-      <div class="end-grid">
-        <section class="end-climb" aria-label="Your climb">
+      <!-- Two pages: the result (score, top %, journey, share) and the rounds (with how
+           everyone scored). Side by side on a computer; swiped on a phone. -->
+      <div class="end-grid" id="endPages">
+        <section class="end-page end-main" aria-label="Your result">
           <div class="end-score">
             <strong class="score-display" id="modalScore">0</strong>
             <span id="modalSubtext"></span>
           </div>
+          <div class="end-world">
+            <span class="field-label">YOU VS THE WORLD TODAY</span>
+            <strong class="end-percent" id="endPercent"></strong>
+            <p class="end-world-text" id="endWorldText"></p>
+          </div>
           <div class="end-climb-chart" id="endClimb"></div>
-          <ol class="round-breakdown end-rounds" id="modalBreakdown"></ol>
+          <button class="btn btn-primary end-share" id="copyResultBtn" type="button">COPY RESULT</button>
+          <button class="end-next-page" id="endNextPage" type="button">ROUNDS ›</button>
         </section>
-        <section class="end-world" aria-label="You and the world">
-          <span class="field-label">YOU VS THE WORLD TODAY</span>
-          <strong class="end-percent" id="endPercent"></strong>
-          <p class="end-world-text" id="endWorldText"></p>
+        <section class="end-page end-more" aria-label="Your rounds">
+          <span class="field-label">YOUR ROUNDS</span>
+          <ol class="round-breakdown end-rounds" id="modalBreakdown"></ol>
+          <span class="field-label">EVERYONE TODAY</span>
           <div id="endDistribution"></div>
           <p class="sample-note">Sample numbers until the game has real players.</p>
-          <div class="end-archive">
-            <strong id="endArchiveTitle"></strong>
-            <p id="endArchiveText">Every day has its own theme, and each can be played once.</p>
-            <button class="btn btn-primary btn-block archive-open-button" id="endArchiveButton" type="button">PLAY THE ARCHIVE</button>
-          </div>
         </section>
       </div>
+      <div class="end-dots" id="endDots" aria-hidden="true"><i class="is-on"></i><i></i></div>
       <div class="end-actions">
         <button class="btn btn-secondary home-button" type="button">HOME</button>
+        <button class="btn btn-secondary archive-open-button" id="endArchiveButton" type="button">ARCHIVE</button>
         <button class="btn btn-secondary" id="reviewRoundsButton" type="button">REVIEW ROUNDS</button>
-        <button class="btn btn-secondary" id="copyResultBtn" type="button">COPY RESULT</button>
       </div>
+      <p class="end-archive-note" id="endArchiveTitle"></p>
     </div>
   </div>
 
@@ -12479,7 +12528,7 @@ function createPlayPanel(day, onPlay) {
   const panel = element("div", "overview-play");
   if (day.completed) {
     panel.classList.add("is-played");
-    panel.appendChild(element("p", "", "✓ You've played this day. Each puzzle can only be played once."));
+    panel.appendChild(element("p", "", "✓ Played. Each day can be played once."));
     return panel;
   }
   const label = day.started ? "CONTINUE DAY ▶" : day.isToday ? "START TODAY'S PUZZLE ▶" : "START DAY ▶";
@@ -12489,10 +12538,7 @@ function createPlayPanel(day, onPlay) {
     sounds.playClick();
     onPlay(day.dateKey, day.mode);
   });
-  panel.append(
-    element("p", "", day.started ? "You started this day but haven't finished it yet." : "You haven't played this day yet. You can play it once."),
-    button
-  );
+  panel.appendChild(button);
   return panel;
 }
 
@@ -12588,6 +12634,8 @@ function renderDayOverview(container, day, onPlay) {
   show(overviewTab);
 
   container.append(head, tabs, answers, everyone, element("p", "sample-note", SAMPLE_NOTE));
+  // A day not started yet has nothing to show but its name; phones show just that and START.
+  container.classList.toggle("is-unplayed", !day.started && !day.completed);
   container.scrollTop = 0;
 }
 
@@ -14687,10 +14735,11 @@ function renderBurstAnswer(round, result) {
       return group;
     }).filter(Boolean);
   } else if (round.type === "paint") {
-    kicker = round.question.toUpperCase();
+    // The question as a normal sentence (in capitals it was hard to read), over the result.
     const found = new Set(day.rounds[plan.indexOf(round)].found);
+    kicker = `YOU PAINTED ${found.size} OF ${round.answers.length}`;
     items = round.answers.map(iso => listItem(getCountry(iso), getCountry(iso).name, found.has(iso) ? "is-found" : "is-missed"));
-    note = `You painted ${found.size} of ${round.answers.length}`;
+    note = tapWords(round.question);
   } else if (round.type === "rank") {
     const metric = getRankMetric(round);
     kicker = `THE RIGHT ORDER · ${metric.label.toUpperCase()}`;
@@ -15814,7 +15863,8 @@ function showFinalModal() {
   // More to play: the earlier days not finished yet.
   const unplayed = getAllPuzzleDays().filter(date => date <= today && date !== activeDate && !getDayRecord(date, activeMode).completed).length;
   setText("endArchiveTitle", unplayed ? `${unplayed} more ${unplayed === 1 ? "day" : "days"} to play in the archive` : "You've played every day so far");
-  document.getElementById("endArchiveButton").classList.toggle("hidden", !unplayed);
+  // Phones: back to the first page (the result) every time.
+  document.getElementById("endPages").scrollLeft = 0;
 
   const breakdown = document.getElementById("modalBreakdown");
   breakdown.replaceChildren(...plan.map((round, index) => {
@@ -16004,6 +16054,7 @@ function showMenuGlobe() {
   document.getElementById("globeTransition").classList.add("hidden");
   // A how-to message left open by a game belongs to that game.
   document.getElementById("howToDontShow").classList.add("hidden");
+  document.querySelector(".how-to-play-modal").classList.remove("is-game-intro");
   afterGameIntro = null;
   globe.setLabels(null);
   globe.mountTo("menuGlobe");
@@ -16063,6 +16114,10 @@ function showGameIntro(then) {
   try { hidden = localStorage.getItem(HIDE_INTRO_KEY) === "1"; } catch { /* storage blocked: just show it */ }
   if (hidden) { then(); return; }
   afterGameIntro = then;
+  // At the start of a game it shows only the mode being played, and it closes with GOT IT.
+  const modal = document.querySelector(".how-to-play-modal");
+  modal.classList.add("is-game-intro");
+  modal.dataset.mode = activeMode;
   document.getElementById("howToDontShowBox").checked = false;
   document.getElementById("howToDontShow").classList.remove("hidden");
   document.getElementById("howToPlayModal").classList.remove("hidden");
@@ -16073,6 +16128,7 @@ function closeGameIntro() {
   const label = document.getElementById("howToDontShow");
   if (label.classList.contains("hidden")) return;
   label.classList.add("hidden");
+  document.querySelector(".how-to-play-modal").classList.remove("is-game-intro");
   if (document.getElementById("howToDontShowBox").checked) {
     try { localStorage.setItem(HIDE_INTRO_KEY, "1"); } catch { /* not saved; it shows again next time */ }
   }
@@ -16158,6 +16214,19 @@ document.addEventListener("keydown", event => {
   event.preventDefault();
   continueFromResult();
 });
+// Phones swipe between the end screen's two pages; the dots and ROUNDS › show there's a second.
+{
+  const pages = document.getElementById("endPages");
+  pages.addEventListener("scroll", () => {
+    const second = pages.scrollLeft > pages.clientWidth / 2;
+    document.querySelectorAll("#endDots i").forEach((dot, index) => dot.classList.toggle("is-on", index === (second ? 1 : 0)));
+  }, { passive: true });
+  document.getElementById("endNextPage").addEventListener("click", () => {
+    sounds.playClick();
+    pages.scrollTo({ left: pages.scrollWidth, behavior: "smooth" });
+  });
+}
+
 // The archive opens over the game; the end screen steps aside for it.
 document.getElementById("endArchiveButton").addEventListener("click", () => document.getElementById("victoryModal").classList.add("hidden"));
 document.getElementById("copyResultBtn").addEventListener("click", () => { sounds.playClick(); copyResult(); });
@@ -16400,19 +16469,17 @@ window.addEventListener("resize", updatePhoneFrame);
 // The few "Click" texts written in the page itself.
 if (onTouch) document.querySelectorAll("#pinpointSelection, #paintSelection, .round-intro-start").forEach(node => { node.textContent = tapWords(node.textContent); });
 
-// The round's sheet on a phone has three heights: peek (mostly globe), half (the default)
-// and full. Swipe the handle up or down to move between them; a tap goes half ⇄ full.
-const SHEET_STEPS = ["is-peek", "", "is-expanded"];
+// The round's sheet on a phone has two heights: the round (the default, after every new
+// round) and the globe (the sheet tucked down). Swipe the handle, or tap it, to switch.
 let sheetStep = 1;
 function setSheetStep(step) {
-  sheetStep = Math.max(0, Math.min(2, step));
+  sheetStep = Math.max(0, Math.min(1, step));
   const sheet = document.querySelector(".side-right");
   sheet.style.maxHeight = "";
   sheet.classList.toggle("is-peek", sheetStep === 0);
-  sheet.classList.toggle("is-expanded", sheetStep === 2);
   const handle = document.getElementById("sheetHandle");
-  handle.setAttribute("aria-expanded", String(sheetStep === 2));
-  handle.setAttribute("aria-label", sheetStep === 2 ? "Show more of the globe" : "Show more of the round");
+  handle.setAttribute("aria-expanded", String(sheetStep === 1));
+  handle.setAttribute("aria-label", sheetStep === 1 ? "Show more of the globe" : "Show more of the round");
 }
 {
   const handle = document.getElementById("sheetHandle");
@@ -16433,8 +16500,8 @@ function setSheetStep(step) {
     const dy = event.clientY - drag.y;
     const moved = drag.moved;
     drag = null;
-    if (!moved) { setSheetStep(sheetStep === 2 ? 1 : 2); return; }
-    setSheetStep(sheetStep + (dy < -40 ? 1 : dy > 40 ? -1 : 0));
+    if (!moved) { setSheetStep(1 - sheetStep); return; }
+    setSheetStep(dy < -40 ? 1 : dy > 40 ? 0 : sheetStep);
   };
   handle.addEventListener("pointerup", release);
   handle.addEventListener("pointercancel", release);
