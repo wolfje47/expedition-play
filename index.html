@@ -2303,15 +2303,18 @@ h1, h2, h3 { font-weight: normal; }
   /* MORE ABOUT IT is a peek of the info card: its photo, title and first line, and a +. */
   .burst-more:not(.hidden) { display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.5rem 0.75rem 0.5rem 0.5rem; border: 1px solid var(--glass-line); border-radius: 12px; background: rgba(255, 255, 255, 0.05); color: var(--text); text-align: left; }
   .burst-more::after { content: "+"; flex: none; font: 12px var(--font-display); color: var(--accent); }
-  .is-info-open .burst-more::after { content: "−"; }
   .burst-more-thumb { flex: none; width: 56px; height: 56px; border-radius: 8px; object-fit: cover; }
   .burst-more-thumb.is-flag { height: 38px; border-radius: 4px; }
   .burst-more-text { display: grid; gap: 3px; flex: 1; min-width: 0; }
   .burst-more-kicker { font: 9px var(--font-display); letter-spacing: var(--ls-pixel); color: var(--accent); }
   .burst-more-text b { overflow: hidden; font: 600 14px/1.25 var(--font-body); white-space: nowrap; text-overflow: ellipsis; }
   .burst-more-teaser { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: var(--muted); font: 12px/1.35 var(--font-body); }
-  /* Open, the card shows it all, so the button only says how to close it. */
-  .is-info-open .burst-more :is(.burst-more-thumb, .burst-more-text b, .burst-more-teaser) { display: none; }
+  /* Open, the info card takes the button's place (no title and text twice); a tap on
+     the card folds it back into the button. */
+  .score-burst-card.is-info-open .burst-more { display: none; }
+  .score-burst-card.is-info-open .burst-info { cursor: pointer; }
+  .score-burst-card.is-info-open .burst-info h3 { display: flex; justify-content: space-between; gap: 0.5rem; }
+  .score-burst-card.is-info-open .burst-info h3::after { content: "−"; color: var(--accent); }
 
   /* Full-screen screens are solid on a phone (no glass over the menu behind them). */
   .modal { background: rgb(10, 15, 30); backdrop-filter: none; -webkit-backdrop-filter: none; }
@@ -16430,11 +16433,18 @@ document.getElementById("copyResultBtn").addEventListener("click", () => { sound
 document.getElementById("backToResultsButton").addEventListener("click", () => { sounds.playClick(); showFinalModal(); });
 document.getElementById("roundIntro").addEventListener("click", hideRoundIntro);
 document.getElementById("scoreBurstNext").addEventListener("click", () => { sounds.playClick(); endScoreBurst?.(); });
-document.getElementById("scoreBurstMore").addEventListener("click", () => {
+function setBurstInfoOpen(open) {
   sounds.playClick();
+  const more = document.getElementById("scoreBurstMore");
+  document.querySelector(".score-burst-card").classList.toggle("is-info-open", open);
+  more.setAttribute("aria-expanded", String(open));
+  if (!open) more.focus({ preventScroll: true });
+}
+document.getElementById("scoreBurstMore").addEventListener("click", () => setBurstInfoOpen(true));
+// Phones: the open info card stands in for MORE ABOUT IT; a tap on it folds it back.
+document.getElementById("scoreBurstInfo").addEventListener("click", event => {
   const card = document.querySelector(".score-burst-card");
-  const open = card.classList.toggle("is-info-open");
-  document.getElementById("scoreBurstMore").setAttribute("aria-expanded", String(open));
+  if (card.classList.contains("is-info-open") && !event.target.closest("a")) setBurstInfoOpen(false);
 });
 ["howToMenuButton", "closeHowToButton"].forEach(id => document.getElementById(id).addEventListener("click", closeGameIntro));
 document.addEventListener("keydown", event => {
