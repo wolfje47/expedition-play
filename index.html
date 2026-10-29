@@ -2300,9 +2300,18 @@ h1, h2, h3 { font-weight: normal; }
   .score-burst-points { font-size: clamp(3rem, 16vw, 4.2rem); }
   .score-burst-climb svg { max-height: 120px; }
   .score-burst-card:not(.is-info-open) .burst-info { display: none; }
-  .burst-more:not(.hidden) { display: flex; justify-content: center; gap: 0.5rem; width: 100%; padding: 0.6rem; border: 1px solid var(--glass-line); border-radius: 12px; background: rgba(255, 255, 255, 0.05); color: var(--text); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
-  .burst-more::after { content: "+"; }
+  /* MORE ABOUT IT is a peek of the info card: its photo, title and first line, and a +. */
+  .burst-more:not(.hidden) { display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.5rem 0.75rem 0.5rem 0.5rem; border: 1px solid var(--glass-line); border-radius: 12px; background: rgba(255, 255, 255, 0.05); color: var(--text); text-align: left; }
+  .burst-more::after { content: "+"; flex: none; font: 12px var(--font-display); color: var(--accent); }
   .is-info-open .burst-more::after { content: "−"; }
+  .burst-more-thumb { flex: none; width: 56px; height: 56px; border-radius: 8px; object-fit: cover; }
+  .burst-more-thumb.is-flag { height: 38px; border-radius: 4px; }
+  .burst-more-text { display: grid; gap: 3px; flex: 1; min-width: 0; }
+  .burst-more-kicker { font: 9px var(--font-display); letter-spacing: var(--ls-pixel); color: var(--accent); }
+  .burst-more-text b { overflow: hidden; font: 600 14px/1.25 var(--font-body); white-space: nowrap; text-overflow: ellipsis; }
+  .burst-more-teaser { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: var(--muted); font: 12px/1.35 var(--font-body); }
+  /* Open, the card shows it all, so the button only says how to close it. */
+  .is-info-open .burst-more :is(.burst-more-thumb, .burst-more-text b, .burst-more-teaser) { display: none; }
 
   /* Full-screen screens are solid on a phone (no glass over the menu behind them). */
   .modal { background: rgb(10, 15, 30); backdrop-filter: none; -webkit-backdrop-filter: none; }
@@ -2374,12 +2383,12 @@ h1, h2, h3 { font-weight: normal; }
 
 /* ---------- Phones: the end screen on one screen ---------- */
 @media (max-width: 760px) {
-  /* The two pages side by side, swiped (scroll snap); the second peeks in at the edge so
-     it's clear there's more. HOME and ARCHIVE stay at the bottom. */
+  /* The two pages side by side, swiped (scroll snap), one at a time; the dots and
+     ROUNDS › show there's a second. HOME and ARCHIVE stay at the bottom. */
   .end-screen { display: flex; flex-direction: column; height: 100dvh; gap: 0.6rem; overflow: hidden; }
-  .end-screen .end-grid { display: flex; flex: 1; gap: 12px; min-height: 0; margin: 0 -1.25rem; padding: 0 1.25rem; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-padding: 0 1.25rem; scrollbar-width: none; }
+  .end-screen .end-grid { display: flex; flex: 1; gap: 0; min-height: 0; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; }
   .end-screen .end-grid::-webkit-scrollbar { display: none; }
-  .end-screen .end-page { flex: 0 0 calc(100% - 22px); align-content: start; gap: 0.5rem; overflow-y: auto; scroll-snap-align: start; }
+  .end-screen .end-page { flex: 0 0 100%; align-content: start; gap: 0.5rem; overflow-y: auto; scroll-snap-align: start; }
   .end-screen .end-score .score-display { font-size: 2.6rem; }
   .end-screen .end-percent { font-size: 2rem; }
   .end-screen .end-climb-chart svg { max-height: 150px; }
@@ -2440,6 +2449,45 @@ h1, h2, h3 { font-weight: normal; }
   /* The round numbers sit dead centre in their squares. */
   .side-left .round-row { display: flex; align-items: center; justify-content: center; }
   .side-left .round-row-number { display: block; line-height: 1; text-align: center; }
+}
+
+/* ---------- Phones: round five (from iPhone testing) ---------- */
+@media (max-width: 760px) {
+  /* Typing an answer: the sheet moves to the top with the question and the answer box
+     first, so the keyboard covers only the globe (engine.js adds .is-typing). */
+  .game-view.is-typing .side-left,
+  .game-view.is-typing .stage-chip { visibility: hidden; }
+  .game-view.is-typing .side-right { top: calc(env(safe-area-inset-top, 0px) + 8px); bottom: auto; max-height: calc(100dvh - 16px); border-bottom: 1px solid var(--glass-line); border-radius: 22px; }
+  .game-view.is-typing .sheet-handle { display: none; }
+  .game-view.is-typing .side-right { padding-top: 12px; }
+  .game-view.is-typing .side-right .round-view > .guess-entry { position: static; box-shadow: none; }
+  .game-view.is-typing .clue-earlier,
+  .game-view.is-typing .clue-locked { display: none; }
+
+  /* Turning the globe: the bars over it fade, so more of it shows. */
+  .game-view .side-left,
+  .game-view .stage-chip { transition: transform 0.38s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.25s ease; }
+  .game-view.is-globe-active .side-left,
+  .game-view.is-globe-active .stage-chip { opacity: 0.15; }
+
+  /* Rank 'Em: a smaller sheet (more globe), with SUBMIT as a small button beside the topic. */
+  .game-view[data-round="rank"] .side-right { max-height: 58dvh; }
+  .side-right .round-view[data-round="rank"] { position: relative; }
+  .side-right .round-view[data-round="rank"] .rank-board-head { padding-right: 104px; }
+  .side-right .round-view[data-round="rank"] .rank-actions { position: absolute; top: 10px; right: 10px; bottom: auto; z-index: 2; display: grid; align-content: start; gap: 4px; width: 92px; padding: 0; background: none; box-shadow: none; }
+  .side-right .round-view[data-round="rank"] .rank-board-head h3 { font-size: 15px; }
+  .side-right .round-view[data-round="rank"] .rank-board-detail { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: 12px; }
+  .side-right .round-view[data-round="rank"] .rank-actions .btn { min-height: 38px; padding: 0 0.4rem; font-size: 9px; white-space: normal; line-height: 1.3; }
+  .side-right .rank-item { padding: 0.2rem 0.5rem; }
+
+  /* The Play menu fits one screen (BACK in view): a smaller title block while it's open. */
+  .main-menu:has(#menuPlayOptions:not(.hidden)) .menu-marquee { gap: 0.4rem; padding: 0.7rem; }
+  .main-menu:has(#menuPlayOptions:not(.hidden)) .menu-logo { width: 32px; height: 32px; }
+  .main-menu:has(#menuPlayOptions:not(.hidden)) .menu-tagline { display: none; }
+  .main-menu:has(#menuPlayOptions:not(.hidden)) .menu-cabinet { gap: 0.8rem; }
+  .play-tile { grid-template-columns: 64px 1fr; gap: 0.8rem; padding: 0.6rem; }
+  .play-tile-art { height: 64px; }
+  .play-tile-art svg { width: 46px; height: 46px; }
 }
 
 </style>
@@ -6269,6 +6317,8 @@ class PixelGlobe {
     this.movingFrames = [];
     this.stats = { renders: 0, pixelRatio: 1 };
     this.onGlobeClick = () => {};
+    // Called with true when a finger or the mouse starts turning the globe, false when it lets go.
+    this.onDragChange = () => {};
     this.init();
   }
 
@@ -6933,10 +6983,11 @@ class PixelGlobe {
 
     dom.addEventListener("pointerdown", event => {
       if (event.pointerType === "mouse" && event.button !== 0) return;
-      dom.setPointerCapture(event.pointerId);
+      try { dom.setPointerCapture(event.pointerId); } catch { /* still turns, just without capture */ }
       pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
       if (pointers.size === 1) {
         this.isDragging = true;
+        this.onDragChange(true);
         this.previousMousePosition = { x: event.clientX, y: event.clientY };
         this.pressStart = { x: event.clientX, y: event.clientY };
       } else {
@@ -6979,6 +7030,7 @@ class PixelGlobe {
       }
       if (pointers.size) return;
       this.isDragging = false;
+      this.onDragChange(false);
       pinch = null;
       // A press that barely moved is a click on the globe rather than a drag (a finger
       // gets a little more leeway than a mouse).
@@ -11812,7 +11864,7 @@ const AUTHORED = {
     aliases: entry.aliases || {},
     info: entry.info || null
   }),
-  paint: entry => ({ question: entry.question, answers: entry.answers, view: entry.view || null, highlight: entry.highlight || null }),
+  paint: entry => ({ question: entry.question, answers: entry.answers, view: entry.view || null, highlight: entry.highlight || null, subject: entry.picture || null }),
   rank: entry => ({ ...buildRankTopic(entry), reroll: entry.reroll ? buildRankTopic(entry.reroll) : null })
 };
 
@@ -14402,6 +14454,33 @@ globe.renderer.domElement.addEventListener("mousemove", () => {
   });
 }, true);
 globe.onGlobeClick = handleGlobeClick;
+// Phones: while you turn the globe, the bars over it fade, so you see more of it.
+let globeFadeTimer = null;
+globe.onDragChange = active => {
+  clearTimeout(globeFadeTimer);
+  const view = document.getElementById("gameView");
+  if (active) view.classList.add("is-globe-active");
+  else globeFadeTimer = setTimeout(() => view.classList.remove("is-globe-active"), 700);
+};
+
+// Phones: while you type an answer the keyboard takes half the screen, so the round's
+// sheet moves to the top (question and answer box first) until you're done typing.
+{
+  const view = document.getElementById("gameView");
+  let typingTimer = null;
+  document.querySelectorAll("#countryInput, #deepcutInput").forEach(field => {
+    field.addEventListener("focus", () => {
+      clearTimeout(typingTimer);
+      if (window.matchMedia("(max-width: 760px)").matches) view.classList.add("is-typing");
+    });
+    // A little later, so a tap on GUESS still lands where the button was.
+    field.addEventListener("blur", () => {
+      typingTimer = setTimeout(() => {
+        if (!document.activeElement?.matches?.("#countryInput, #deepcutInput")) view.classList.remove("is-typing");
+      }, 300);
+    });
+  });
+}
 
 // Add ?fps to the address for a small counter: frames per second of the page, how often
 // the globe was actually drawn, and its sharpness (pixel ratio).
@@ -14683,9 +14762,11 @@ function getRoundInfo(round) {
       const countries = round.answers.map(getCountry);
       const largest = countries.reduce((best, country) => country.area > best.area ? country : best);
       const smallest = countries.reduce((best, country) => country.area < best.area ? country : best);
+      const count = countries.length === 1 ? "The country" : `The ${countries.length} countries`;
+      // Named after what the round was about (its photo's subject), if it has one.
       return {
-        title: `The ${countries.length === 1 ? "country" : `${countries.length} countries`}`,
-        text: `${countries.map(country => country.name).join(", ")}.`,
+        title: round.subject || count,
+        text: `${round.subject ? `${count}: ` : ""}${countries.map(country => country.name).join(", ")}.`,
         facts: [["Countries", String(countries.length)], ["Largest", largest.name], ["Smallest", smallest.name]],
         picture: photo
       };
@@ -14720,6 +14801,26 @@ function getRoundInfo(round) {
     default:
       return null;
   }
+}
+
+// Phones: MORE ABOUT IT shows a peek of the info card (its photo, title and first line),
+// so you can tell whether it's worth opening.
+function renderBurstMore(info) {
+  const button = document.getElementById("scoreBurstMore");
+  const parts = [];
+  if (info.picture) {
+    const thumb = Object.assign(document.createElement("img"), { className: `burst-more-thumb${info.picture.isFlag ? " is-flag" : ""}`, src: info.picture.src, alt: "" });
+    if (info.picture.remote) thumb.addEventListener("error", () => { thumb.src = info.picture.remote; }, { once: true });
+    parts.push(thumb);
+  }
+  const text = Object.assign(document.createElement("span"), { className: "burst-more-text" });
+  text.append(
+    Object.assign(document.createElement("span"), { className: "burst-more-kicker", textContent: "MORE ABOUT IT" }),
+    Object.assign(document.createElement("b"), { textContent: info.title }),
+    Object.assign(document.createElement("span"), { className: "burst-more-teaser", textContent: info.text })
+  );
+  parts.push(text);
+  button.replaceChildren(...parts);
 }
 
 // A country's flag as the info card's picture (flags are in the public domain).
@@ -14871,6 +14972,7 @@ function showScoreBurst(index, { keepCardsOut = false } = {}) {
   // Phones fold the info card away behind MORE ABOUT IT, so the points come first.
   document.querySelector(".score-burst-card").classList.remove("is-info-open");
   document.getElementById("scoreBurstMore").classList.toggle("hidden", !info);
+  if (info) renderBurstMore(info);
   // Deep Cut's long answer list gets the left column; its journey moves under the info.
   document.querySelector(".score-burst-card").classList.toggle("is-deepcut", plan[index].type === "deepcut");
   // A missed round's card puts the answer first, in gold. Every card waits for its
@@ -15740,7 +15842,6 @@ function submitDeepCut(text = document.getElementById("deepcutInput").value.trim
   deepcutSuggestion = null;
   if (match.answer) {
     state.answer = match.answer.text;
-    sounds.playGuess();
     commit();
     return;
   }
@@ -15797,7 +15898,8 @@ function confirmPaint() {
   const isRight = round.answers.includes(country.iso);
   if (isRight) {
     state.found.push(country.iso);
-    sounds.playGuess();
+    // The last country ends the round, which plays its own sound; one at a time.
+    if (state.found.length < round.answers.length) sounds.playGuess();
   } else {
     state.wrong.push(country.iso);
   }
