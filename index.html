@@ -2336,7 +2336,7 @@ h1, h2, h3 { font-weight: normal; }
 @media (max-width: 760px) {
   /* The sheet's three heights (engine.js setSheetStep): peek, half (default) and full.
      It sits above the keyboard while you type (--keyboard). */
-  .side-right { bottom: var(--keyboard, 0px); transition: max-height 0.3s ease, bottom 0.2s ease; }
+  .side-right { transition: max-height 0.3s ease; }
   .side-right.is-peek { max-height: 26dvh; }
   .game-view[data-round="rank"] .side-right.is-peek { max-height: 26dvh; }
   .game-view[data-round="rank"] .side-right.is-expanded { max-height: 84dvh; }
@@ -2426,6 +2426,21 @@ h1, h2, h3 { font-weight: normal; }
 
 /* Paint the Map's score card: the question as a readable sentence. */
 .score-burst-card .burst-answer-note { color: var(--text); font-size: 14px; text-align: center; }
+
+/* ---------- Fixes from iPhone testing, round four ---------- */
+/* No chip under the globe until there's something to show. */
+.stage-current.is-empty { display: none; }
+/* The picked country's name is cut short rather than running under its button. */
+.pinpoint-pick-country .pick-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Casual How to play: the speed bonus crossed out (it's competitive only). */
+.how-to-play-modal.is-game-intro[data-mode="casual"] .sum-chip.is-fast b,
+.how-to-play-modal.is-game-intro[data-mode="casual"] .sum-chip.is-fast small { text-decoration: line-through; text-decoration-thickness: 2px; opacity: 0.45; }
+.how-to-play-modal.is-game-intro[data-mode="casual"] .sum-chip.is-fast .sum-tag { opacity: 1; }
+@media (max-width: 760px) {
+  /* The round numbers sit dead centre in their squares. */
+  .side-left .round-row { display: flex; align-items: center; justify-content: center; }
+  .side-left .round-row-number { display: block; line-height: 1; text-align: center; }
+}
 
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -2709,7 +2724,7 @@ h1, h2, h3 { font-weight: normal; }
           <section class="pinpoint-pick" aria-live="polite">
             <span class="field-label">YOUR SELECTION</span>
             <div class="pinpoint-pick-country" id="pinpointSelection">Click a country</div>
-            <button class="btn btn-primary" id="pinpointConfirm" type="button" disabled>GUESS THIS COUNTRY</button>
+            <button class="btn btn-primary" id="pinpointConfirm" type="button" disabled>GUESS</button>
           </section>
           <button class="give-up" id="pinpointGiveUp" type="button">Give up and show me</button>
           <section class="panel guesses-panel" aria-label="Your clicks">
@@ -8054,6 +8069,13 @@ return { ROUND_PICTURES };
 
 // ---- audio.js
 __modules["audio.js"] = (() => {
+// The game's sounds, made in the browser (no sound files). A mix of soft, natural sounds
+// (a wooden tick, a marimba, a bell chord, a whoosh) and a few of the original 8-bit
+// beeps the player liked. Everything goes through one master volume and a gentle
+// compressor, so loud and quiet sounds end up at about the same level; the marimba and
+// bells also get a short room echo.
+const MASTER_VOLUME = 1;
+
 class SoundEngine {
   constructor() {
     this.ctx = null;
@@ -8061,120 +8083,164 @@ class SoundEngine {
   }
 
   init() {
-    if (!this.ctx) {
-      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (this.ctx) {
+      if (this.ctx.state === "suspended") this.ctx.resume();
+      return;
     }
+    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const compressor = this.ctx.createDynamicsCompressor();
+    compressor.threshold.value = -18;
+    compressor.ratio.value = 4;
+    this.master = this.ctx.createGain();
+    this.master.gain.value = MASTER_VOLUME;
+    this.master.connect(compressor);
+    compressor.connect(this.ctx.destination);
+    // The echo: a second of fading noise as a room's impulse, mixed in quietly.
+    const length = this.ctx.sampleRate * 1.2;
+    const impulse = this.ctx.createBuffer(2, length, this.ctx.sampleRate);
+    for (let channel = 0; channel < 2; channel += 1) {
+      const data = impulse.getChannelData(channel);
+      for (let index = 0; index < length; index += 1) data[index] = (Math.random() * 2 - 1) * (1 - index / length) ** 3;
+    }
+    this.reverb = this.ctx.createConvolver();
+    this.reverb.buffer = impulse;
+    const wet = this.ctx.createGain();
+    wet.gain.value = 0.22;
+    this.reverb.connect(wet);
+    wet.connect(this.master);
   }
 
+  // A sound starting soon, or null when sound is off.
+  start() {
+    if (!this.enabled) return null;
+    this.init();
+    return this.ctx.currentTime + 0.01;
+  }
+
+  send(node, echo) {
+    node.connect(this.master);
+    if (echo) node.connect(this.reverb);
+  }
+
+  // A soft tone: quick fade in, smooth fade out (optionally gliding to another pitch).
+  tone(frequency, at, duration, { type = "sine", volume = 0.1, to = null, attack = 0.005, echo = false } = {}) {
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(frequency, at);
+    if (to) osc.frequency.exponentialRampToValueAtTime(to, at + duration);
+    gain.gain.setValueAtTime(0.0001, at);
+    gain.gain.exponentialRampToValueAtTime(volume, at + attack);
+    gain.gain.exponentialRampToValueAtTime(0.0001, at + duration);
+    osc.connect(gain);
+    this.send(gain, echo);
+    osc.start(at);
+    osc.stop(at + duration + 0.05);
+  }
+
+  // A retro beep: straight on, fading out in a line (the original 8-bit sounds).
+  beep(frequency, at, duration, { type = "square", volume = 0.05, to = null } = {}) {
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(frequency, at);
+    if (to) osc.frequency.exponentialRampToValueAtTime(to, at + duration);
+    gain.gain.setValueAtTime(volume, at);
+    gain.gain.linearRampToValueAtTime(0.0001, at + duration);
+    osc.connect(gain);
+    this.send(gain, false);
+    osc.start(at);
+    osc.stop(at + duration);
+  }
+
+  // A marimba note: the tone and two quick overtones of a struck wooden bar.
+  marimba(frequency, at, volume = 0.16, echo = true) {
+    this.tone(frequency, at, 0.9, { volume, echo });
+    this.tone(frequency * 4, at, 0.18, { volume: volume * 0.25, echo });
+    this.tone(frequency * 10, at, 0.05, { volume: volume * 0.08, echo });
+  }
+
+  // Filtered noise: ticks, knocks and whooshes.
+  noise(at, duration, { filter = "bandpass", frequency = 1000, to = null, q = 1, volume = 0.2, attack = 0.003, echo = false } = {}) {
+    const length = Math.ceil(this.ctx.sampleRate * duration);
+    const buffer = this.ctx.createBuffer(1, length, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let index = 0; index < length; index += 1) data[index] = Math.random() * 2 - 1;
+    const source = this.ctx.createBufferSource();
+    source.buffer = buffer;
+    const shape = this.ctx.createBiquadFilter();
+    shape.type = filter;
+    shape.frequency.setValueAtTime(frequency, at);
+    if (to) shape.frequency.exponentialRampToValueAtTime(to, at + duration);
+    shape.Q.value = q;
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, at);
+    gain.gain.exponentialRampToValueAtTime(volume, at + attack);
+    gain.gain.exponentialRampToValueAtTime(0.0001, at + duration);
+    source.connect(shape);
+    shape.connect(gain);
+    this.send(gain, echo);
+    source.start(at);
+    source.stop(at + duration);
+  }
+
+  // Buttons: a soft wooden tick.
   playClick() {
-    if (!this.enabled) return;
-    this.init();
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = "square";
-    osc.frequency.setValueAtTime(400, this.ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(120, this.ctx.currentTime + 0.05);
-    gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-    osc.start();
-    osc.stop(this.ctx.currentTime + 0.05);
+    const at = this.start();
+    if (at === null) return;
+    this.noise(at, 0.03, { frequency: 2600, q: 6, volume: 2.2 });
+    this.tone(1800, at, 0.03, { volume: 0.2 });
   }
 
+  // A guess card flying in: an airy whoosh.
   playFlyTo() {
-    if (!this.enabled) return;
-    this.init();
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = "triangle";
-    osc.frequency.setValueAtTime(200, this.ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.4);
-    gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-    osc.start();
-    osc.stop(this.ctx.currentTime + 0.4);
+    const at = this.start();
+    if (at === null) return;
+    this.noise(at, 0.35, { frequency: 500, to: 2400, q: 1.5, volume: 0.8, attack: 0.12, echo: true });
   }
 
+  // A right answer that doesn't end the round (Deep Cut, painting a country): the
+  // original quick 8-bit arpeggio.
   playGuess() {
-    if (!this.enabled) return;
-    this.init();
-    const notes = [261.63, 329.63, 392.00];
-    notes.forEach((freq, idx) => {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = "square";
-      osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.06);
-      gain.gain.setValueAtTime(0.08, this.ctx.currentTime + idx * 0.06);
-      gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + idx * 0.06 + 0.08);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start(this.ctx.currentTime + idx * 0.06);
-      osc.stop(this.ctx.currentTime + idx * 0.06 + 0.08);
-    });
+    const at = this.start();
+    if (at === null) return;
+    [261.63, 329.63, 392].forEach((frequency, index) => this.beep(frequency, at + index * 0.06, 0.08, { volume: 0.18 }));
   }
 
+  // The right answer: a warm bell chord, C–E–G and the octave, with a little echo.
   playVictory() {
-    if (!this.enabled) return;
-    this.init();
-    const melody = [523.25, 659.25, 783.99, 1046.50];
-    melody.forEach((freq, idx) => {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = "square";
-      osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.12);
-      gain.gain.setValueAtTime(0.12, this.ctx.currentTime + idx * 0.12);
-      gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + idx * 0.12 + 0.18);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start(this.ctx.currentTime + idx * 0.12);
-      osc.stop(this.ctx.currentTime + idx * 0.12 + 0.18);
-    });
+    const at = this.start();
+    if (at === null) return;
+    [523.25, 659.25, 783.99].forEach((frequency, index) => this.marimba(frequency, at + index * 0.09, 0.28));
+    this.marimba(1046.5, at + 0.3, 0.3);
+    this.tone(2093, at + 0.3, 1.2, { volume: 0.05, attack: 0.02, echo: true });
   }
 
+  // A wrong answer: two soft low marimba notes, falling.
   playError() {
-    if (!this.enabled) return;
-    this.init();
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = "sawtooth";
-    osc.frequency.setValueAtTime(150, this.ctx.currentTime);
-    osc.frequency.setValueAtTime(110, this.ctx.currentTime + 0.08);
-    gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-    osc.start();
-    osc.stop(this.ctx.currentTime + 0.2);
+    const at = this.start();
+    if (at === null) return;
+    this.marimba(220, at, 0.32);
+    this.marimba(174.61, at + 0.16, 0.32);
   }
 
-  // One hint turning over on the guess card: a bright chime for a match (higher with
-  // each match in a row), a soft blip for a pointer, a low knock for a no.
+  // One hint turning over on the guess card: a bright chime for a match (higher with each
+  // match in a row), a soft blip for a pointer, a muted wooden knock for a no.
   playReveal(status, streak = 0) {
-    if (!this.enabled) return;
-    this.init();
-    const now = this.ctx.currentTime;
-    const notes = status === "match" ? [660 * 2 ** (streak / 6), 990 * 2 ** (streak / 6)] : status === "hint" ? [520] : [180];
-    notes.forEach((frequency, index) => {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      const start = now + index * 0.07;
-      osc.type = status === "miss" ? "triangle" : "sine";
-      osc.frequency.setValueAtTime(frequency, start);
-      gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(status === "match" ? 0.12 : 0.07, start + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + (status === "match" ? 0.35 : 0.15));
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start(start);
-      osc.stop(start + 0.4);
-    });
+    const at = this.start();
+    if (at === null) return;
+    if (status === "miss") {
+      this.tone(160, at, 0.18, { volume: 0.8, to: 90 });
+      this.noise(at, 0.04, { filter: "lowpass", frequency: 500, volume: 0.35 });
+      return;
+    }
+    const notes = status === "match" ? [660 * 2 ** (streak / 6), 990 * 2 ** (streak / 6)] : [520];
+    notes.forEach((frequency, index) => this.tone(frequency, at + index * 0.07, status === "match" ? 0.35 : 0.15, { volume: status === "match" ? 0.31 : 0.6, attack: 0.01 }));
   }
 }
 
 const sounds = new SoundEngine();
+
 return { sounds };
 })();
 
@@ -12006,7 +12072,8 @@ function getRoundProgress(round, state) {
 }
 
 // Perfect rounds in a row build a streak: the 2nd scores ×1.1, the 3rd ×1.2 and so on.
-// Any non-perfect round scores ×1.0 and resets the streak. A solved competitive round
+// In Deep Cut any right answer counts (it scores by how niche it is, so 1,000 is rare).
+// Any other round scores ×1.0 and resets the streak. A solved competitive round
 // also scores its speed (locked in `speed` when it ended).
 function getDayScore(plan, states) {
   let streak = 0;
@@ -12014,10 +12081,11 @@ function getDayScore(plan, states) {
     const progress = getRoundProgress(round, states[index]);
     if (!progress.done) return { ...progress, multiplier: 1, speed: 1, points: 0 };
     const isPerfect = progress.score === MAX_ROUND_SCORE;
-    const multiplier = isPerfect ? 1 + STREAK_STEP * streak : 1;
+    const keepsStreak = isPerfect || (round.type === "deepcut" && progress.solved);
+    const multiplier = keepsStreak ? 1 + STREAK_STEP * streak : 1;
     const speed = progress.solved && states[index].speed > 1 ? states[index].speed : 1;
-    streak = isPerfect ? streak + 1 : 0;
-    return { ...progress, isPerfect, multiplier, speed, points: Math.round(progress.score * multiplier * speed) };
+    streak = keepsStreak ? streak + 1 : 0;
+    return { ...progress, isPerfect, keepsStreak, multiplier, speed, points: Math.round(progress.score * multiplier * speed) };
   });
   return {
     rounds,
@@ -12980,7 +13048,8 @@ function playRevealCard({ card, steps, nextLabel, land, sound = () => {}, onTurn
     step.element.classList.add("is-turned", `is-${step.status}`);
     streak = step.status === "match" ? streak + 1 : 0;
     onTurn(step);
-    if (!quiet) sound(step.status === "clue" ? "hint" : step.status, streak - 1);
+    // The verdict (right or wrong) has its own sound, played by onVerdict.
+    if (!quiet && !step.verdict) sound(step.status === "clue" ? "hint" : step.status, streak - 1);
   };
   const complete = () => {
     card.classList.add("is-complete");
@@ -13069,7 +13138,9 @@ function createClueStep({ label, text }) {
 
 // Mystery and Pinpoint: a guess as a pack-style card. Flag, name and outline show at once;
 // hot/cold, each hint and any newly unlocked clue turn over one by one.
-function playGuessReveal(guess, { land, sound, nextLabel = "NEXT GUESS", outline = null, newClue = null, autoContinue = 0 }) {
+// onVerdict(isRight) plays the moment the temperature tile turns over, so the "right" or
+// "wrong" sound comes with the reveal, not after the card is closed.
+function playGuessReveal(guess, { land, sound, nextLabel = "NEXT GUESS", outline = null, newClue = null, autoContinue = 0, onVerdict = () => {} }) {
   const card = document.createElement("div");
   // The card's edge takes the hot/cold colour only when that badge turns over.
   card.style.setProperty("--temp", "var(--glass-line)");
@@ -13083,7 +13154,7 @@ function playGuessReveal(guess, { land, sound, nextLabel = "NEXT GUESS", outline
   const shape = drawCountryOutline(outline, guess.country.name);
   if (shape) head.appendChild(Object.assign(document.createElement("div"), { className: "guess-reveal-outline" })).appendChild(shape);
   const facts = Object.assign(document.createElement("div"), { className: "guess-facts" });
-  const steps = [{ element: temperature, status: guess.isCorrect ? "match" : "hint" }];
+  const steps = [{ element: temperature, status: guess.isCorrect ? "match" : "hint", verdict: true }];
   getGuessFacts(guess).forEach(({ label, status, indicator }) => {
     const fact = Object.assign(document.createElement("span"), { className: `fact fact-${status}` });
     if (indicator) fact.appendChild(Object.assign(document.createElement("b"), { textContent: indicator }));
@@ -13099,14 +13170,18 @@ function playGuessReveal(guess, { land, sound, nextLabel = "NEXT GUESS", outline
   }
   return playRevealCard({
     card, steps, nextLabel, land, sound, autoContinue,
-    onTurn: step => { if (step.element === temperature) card.style.setProperty("--temp", guess.color); }
+    onTurn: step => {
+      if (step.element !== temperature) return;
+      card.style.setProperty("--temp", guess.color);
+      onVerdict(guess.isCorrect);
+    }
   });
 }
 
 // Rank 'Em: a try as a pack-style card, Mastermind style. The order you tried is shown,
 // then a counter ticks up to how many are in the right place (never which ones), and
 // finally any hint the try unlocked.
-function playRankReveal({ tryNumber, order, right, hint = null, land, sound, nextLabel = "NEXT TRY", autoContinue = 0 }) {
+function playRankReveal({ tryNumber, order, right, hint = null, land, sound, nextLabel = "NEXT TRY", autoContinue = 0, onVerdict = () => {} }) {
   const card = document.createElement("div");
   card.style.setProperty("--temp", "var(--glass-line)");
   const head = Object.assign(document.createElement("div"), { className: "rank-reveal-head" });
@@ -13130,7 +13205,7 @@ function playRankReveal({ tryNumber, order, right, hint = null, land, sound, nex
   const tick = value => ({ element: Object.assign(document.createElement("i"), { className: "rank-tick" }), status: "match", value });
   const steps = Array.from({ length: right }, (_, index) => tick(index + 1));
   const allRight = right === order.length;
-  steps.push({ ...tick(right), status: allRight ? "match" : "miss", final: true });
+  steps.push({ ...tick(right), status: allRight ? "match" : "miss", final: true, verdict: true });
   card.append(head, count, caption, ...steps.map(step => step.element));
   if (hint) {
     const chip = Object.assign(document.createElement("span"), { className: "fact fact-hint rank-reveal-hint", textContent: `Hint: ${hint}` });
@@ -13150,6 +13225,7 @@ function playRankReveal({ tryNumber, order, right, hint = null, land, sound, nex
         count.classList.remove("is-counting");
         count.classList.add(allRight ? "is-right" : "is-wrong");
         card.style.setProperty("--temp", allRight ? "var(--t-correct)" : "var(--danger)");
+        onVerdict(allRight);
       }
     }
   });
@@ -13407,7 +13483,7 @@ function initializeMainMenu({ onPlay, onHome, describeMode = () => "" }) {
     document.getElementById("victoryModal").classList.add("hidden");
     document.getElementById("statsModal").classList.add("hidden");
     document.getElementById("archiveModal").classList.add("hidden");
-    document.getElementById("leaderboardModal").classList.add("hidden");
+    document.getElementById("communityModal")?.classList.add("hidden");
     onHome();
   }
 
@@ -14284,9 +14360,11 @@ const LAUNCH_DATE = "2026-10-01";
 const PRELOADED_DAYS = 30;
 // One colour per Rank 'Em country, on the board and on the globe.
 const RANK_COLORS = ["#45e3ff", "#ffd45c", "#ff8a3d", "#c58cff", "#5cf28a"];
-// Competitive: how long a guess's card stays once it has turned over, before it goes on
-// by itself (casual waits for a click).
+// Competitive: Pinpoint's guess cards go on by themselves once they've turned over (a
+// right guess quickly, a new clue after time to read it). Mystery Country and Rank 'Em
+// cards wait for a click, like every card in casual; the clock is stopped meanwhile.
 const AUTO_CONTINUE_MS = 1300;
+const AUTO_CONTINUE_CLUE_MS = 3500;
 
 const today = toUtcDateKey(new Date());
 // The day being played: today, or an unplayed past day opened from the archive, in one
@@ -14498,6 +14576,18 @@ function hideRoundIntro() {
   }, 320);
 }
 
+// Set when a guess card has just played its "right" sound, so it isn't played again.
+let verdictPlayed = false;
+// The sound for a guess's verdict, as its card shows it.
+function playVerdict(isRight) {
+  if (isRight) {
+    sounds.playVictory();
+    verdictPlayed = true;
+  } else {
+    sounds.playError();
+  }
+}
+
 // Called after every change to a round's state.
 function commit({ animateGlobe = true } = {}) {
   const progress = progressOf(viewIndex);
@@ -14508,7 +14598,9 @@ function commit({ animateGlobe = true } = {}) {
   }
   saveDay();
   render({ animateGlobe });
-  if (progress.done && progress.solved) sounds.playVictory();
+  // A guess card already played its verdict as it turned over; other rounds play it here.
+  if (progress.done && progress.solved && !verdictPlayed) sounds.playVictory();
+  verdictPlayed = false;
   // The moment a round ends, its score takes centre stage, and then the game moves on
   // to the next round by itself (the day's summary follows the last one).
   const index = viewIndex;
@@ -15023,14 +15115,15 @@ function renderScoreTile(dayScore) {
   tileClimb = journeyIn(tileClimb, "scoreTileClimb");
   tileClimb.draw(dayScore.total, { stretches: getStretches(dayScore), stops: stops.slice(0, -1) });
 
-  // Perfect rounds just before this one set the multiplier a perfect round would get.
+  // The streak just before this round sets the multiplier it would get (perfect, or in
+  // Deep Cut any right answer).
   let streak = 0;
-  for (let index = viewIndex - 1; index >= 0 && dayScore.rounds[index].isPerfect; index -= 1) streak += 1;
+  for (let index = viewIndex - 1; index >= 0 && dayScore.rounds[index].keepsStreak; index -= 1) streak += 1;
   const multiplier = 1 + STREAK_STEP * streak;
   const result = dayScore.rounds[viewIndex];
   const streakChip = document.getElementById("scoreTileStreak");
   streakChip.classList.toggle("hidden", result.done || streak === 0);
-  streakChip.textContent = `×${multiplier.toFixed(1)} IF PERFECT`;
+  streakChip.textContent = `×${multiplier.toFixed(1)} IF ${plan[viewIndex].type === "deepcut" ? "RIGHT" : "PERFECT"}`;
 
   if (result.done) {
     setText("scoreTileRoundLabel", `Round ${viewIndex + 1} scored`);
@@ -15162,7 +15255,9 @@ function renderKnownStrip(facts) {
   }));
 }
 
+// The chip under the globe; with nothing to show (no guess yet) it stays out of the way.
 function setStageChip(label, country, text = null) {
+  document.querySelector(".stage-current").classList.toggle("is-empty", !country && !text);
   setText("stageChipLabel", label);
   setText("currentGuessLabel", text || country?.name || "NONE");
   const flag = document.getElementById("currentGuessFlag");
@@ -15240,7 +15335,7 @@ const ROUND_RENDERERS = {
     const selection = document.getElementById("pinpointSelection");
     selection.classList.toggle("is-chosen", Boolean(selected));
     selection.replaceChildren(...(selected
-      ? [createFlagImage(selected, "pinpoint-pick-flag"), selected.name]
+      ? [createFlagImage(selected, "pinpoint-pick-flag"), Object.assign(document.createElement("span"), { className: "pick-name", textContent: selected.name })]
       : [progress.done ? "Round finished" : tapWords("Click a country")]));
     document.getElementById("pinpointConfirm").disabled = !selected || progress.done;
 
@@ -15323,7 +15418,7 @@ const ROUND_RENDERERS = {
     const selection = document.getElementById("paintSelection");
     selection.classList.toggle("is-chosen", Boolean(selected));
     selection.replaceChildren(...(selected
-      ? [createFlagImage(selected, "pinpoint-pick-flag"), selected.name]
+      ? [createFlagImage(selected, "pinpoint-pick-flag"), Object.assign(document.createElement("span"), { className: "pick-name", textContent: selected.name })]
       : [progress.done ? "Round finished" : tapWords("Click a country on the globe")]));
     document.getElementById("paintConfirm").disabled = !selected || progress.done;
 
@@ -15528,14 +15623,14 @@ function revealGuess(guess, target, rowSelector, { commitOptions = {}, newClue =
   return playGuessReveal(guess, {
     sound: (status, streak) => sounds.playReveal(status, streak),
     nextLabel: guess.isCorrect ? "CONTINUE" : "NEXT GUESS",
-    autoContinue: activeMode === "competitive" ? AUTO_CONTINUE_MS : 0,
+    autoContinue: activeMode === "competitive" && plan[viewIndex].type === "pinpoint" ? (guess.isCorrect ? AUTO_CONTINUE_MS : AUTO_CONTINUE_CLUE_MS) : 0,
     outline: globe.outlineOf(guess.country),
     newClue,
+    onVerdict: playVerdict,
     land: () => {
       isAnimating = false;
       commit(commitOptions);
       if (guess.isCorrect) return null;
-      sounds.playError();
       flashMiss(target);
       return [...document.querySelectorAll(rowSelector)].at(-1) || null;
     }
@@ -15596,7 +15691,8 @@ function handleGlobeClick({ ccn3 }) {
     mysterySelection = country.iso;
     const field = document.getElementById("countryInput");
     field.value = country.name;
-    field.focus();
+    // On a touch screen this would open the keyboard and move everything; GUESS is enough.
+    if (!onTouch) field.focus();
     sounds.playClick();
     render({ animateGlobe: false });
     return;
@@ -15779,13 +15875,12 @@ function submitRankOrder() {
     right,
     hint: hint ? `${getCountry(hint.iso).name}, ${metric.format(metric.value(getCountry(hint.iso)))}` : null,
     nextLabel: isRight ? "CONTINUE" : "NEXT TRY",
-    autoContinue: activeMode === "competitive" ? AUTO_CONTINUE_MS : 0,
     sound: (status, streak) => sounds.playReveal(status, streak),
+    onVerdict: playVerdict,
     land: () => {
       isAnimating = false;
       commit();
       if (isRight) return null;
-      sounds.playError();
       flashMiss(document.getElementById("rankBoard"));
       return [...document.querySelectorAll("#rankAttempts .attempt.is-wrong")].at(-1) || null;
     }
@@ -16507,15 +16602,7 @@ function setSheetStep(step) {
   handle.addEventListener("pointercancel", release);
 }
 
-// Phones: the keyboard covers the bottom of the screen, so the sheet moves up above it.
-if (window.visualViewport) {
-  const liftForKeyboard = () => {
-    const keyboard = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
-    document.getElementById("gameView").style.setProperty("--keyboard", `${Math.round(keyboard)}px`);
-  };
-  window.visualViewport.addEventListener("resize", liftForKeyboard);
-  window.visualViewport.addEventListener("scroll", liftForKeyboard);
-}
+
 
 const archive = initializeHistoryScreens({
   getDays: getAllPuzzleDays,
