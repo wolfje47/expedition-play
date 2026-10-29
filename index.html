@@ -2477,6 +2477,8 @@ h1, h2, h3 { font-weight: normal; }
   .game-view[data-round="rank"] .side-right { max-height: 58dvh; }
   .side-right .round-view[data-round="rank"] { position: relative; }
   .side-right .round-view[data-round="rank"] .rank-board-head { padding-right: 104px; }
+  /* With NEW TOPIC under SUBMIT, the head grows to fit both, so they don't cover the first row. */
+  .side-right .round-view[data-round="rank"]:has(#rankReroll:not(.hidden)) .rank-board-head { min-height: 84px; }
   .side-right .round-view[data-round="rank"] .rank-actions { position: absolute; top: 10px; right: 10px; bottom: auto; z-index: 2; display: grid; align-content: start; gap: 4px; width: 92px; padding: 0; background: none; box-shadow: none; }
   .side-right .round-view[data-round="rank"] .rank-board-head h3 { font-size: 15px; }
   .side-right .round-view[data-round="rank"] .rank-board-detail { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: 12px; }
@@ -2546,7 +2548,7 @@ h1, h2, h3 { font-weight: normal; }
           <span class="play-tile-art" data-art="competitive" aria-hidden="true"></span>
           <span class="play-tile-text">
             <strong>COMPETITIVE</strong>
-            <span>30 seconds a round. Answer fast for up to ×1.5.</span>
+            <span>30 seconds a round, 45 for Rank 'Em. Answer fast for up to ×1.5.</span>
             <small id="menuCompetitiveStatus"></small>
           </span>
         </button>
@@ -2909,7 +2911,7 @@ h1, h2, h3 { font-weight: normal; }
           <span class="how-to-now">NOW PLAYING</span>
           <span class="how-to-art" data-art="competitive" aria-hidden="true"></span>
           <b>COMPETITIVE</b>
-          <span>⏱ 30 s a round · earns badges</span>
+          <span>⏱ 30–45 s a round · earns badges</span>
           <span class="how-to-mode-badges" id="howToModeBadges" aria-hidden="true"></span>
         </div>
         <div style="--tile: var(--gold)" data-mode="casual">
@@ -3342,13 +3344,13 @@ const CLUES = {
   ],
   AT: [
     "The Habsburg dynasty ruled a vast empire from here until 1918.",
-    "Mozart was born here, and its capital is famous for grand coffee houses and the waltz.",
+    "Mozart was born here, and its grand coffee houses and waltzes are famous around the world.",
     "The Alps cover about two-thirds of its land, crowned by the Grossglockner peak.",
     "Landlocked in central Europe, it borders eight countries, including Germany, Italy, Switzerland and Hungary.",
     "Its capital is Vienna; its flag has red, white and red horizontal bands."
   ],
   BA: [
-    "The 1914 assassination of Archduke Franz Ferdinand in its capital sparked the First World War.",
+    "The 1914 assassination of Archduke Franz Ferdinand here sparked the First World War.",
     "Grilled ćevapi and strong coffee served in a copper pot are everyday favourites.",
     "The rebuilt Ottoman bridge at Mostar, famous for its high divers, spans the emerald Neretva river.",
     "Almost landlocked, with only about 20 km of Adriatic coast, it borders Croatia, Serbia and Montenegro.",
@@ -3383,7 +3385,7 @@ const CLUES = {
     "Its capital is Bern; its square flag is red with a white cross."
   ],
   CY: [
-    "Since 1974 it has been divided, with a UN buffer zone called the Green Line running through its capital.",
+    "Since 1974 it has been divided, with a UN buffer zone called the Green Line running right across it.",
     "Halloumi cheese comes from here, and legend says Aphrodite rose from the sea off its coast.",
     "Copper mined here in ancient times may have given the metal its name.",
     "The third-largest island in the Mediterranean, at its eastern end, with no land borders.",
@@ -3392,7 +3394,7 @@ const CLUES = {
   CZ: [
     "The 1989 Velvet Revolution ended communist rule here without bloodshed.",
     "Its people drink more beer per person than anyone else, and Pilsner lager was first brewed here.",
-    "The Charles Bridge and an astronomical clock from 1410 are icons of its capital.",
+    "Its forests, castles and spa towns like Karlovy Vary draw visitors from around the world.",
     "Landlocked in central Europe, it borders Germany, Poland, Slovakia and Austria.",
     "Its capital is Prague; its flag is white over red with a blue triangle at the hoist."
   ],
@@ -3406,7 +3408,7 @@ const CLUES = {
   DK: [
     "Viking raiders sailed from here, and its king Harald Bluetooth gave his name to wireless technology.",
     "LEGO bricks were invented here, and hygge is its word for cosy contentment.",
-    "The Little Mermaid statue gazes over the harbour of its capital.",
+    "It is so flat and windy that wind turbines make about half of its electricity.",
     "Made up of the Jutland peninsula and hundreds of islands, it borders only Germany.",
     "Its capital is Copenhagen; its flag is red with a white Nordic cross."
   ],
@@ -3434,7 +3436,7 @@ const CLUES = {
   FR: [
     "The storming of the Bastille on 14 July 1789 launched its revolution.",
     "Baguettes, hundreds of cheeses and champagne are among its culinary icons.",
-    "The Eiffel Tower and the Louvre, the world's most visited museum, stand in its capital.",
+    "Mont-Saint-Michel, an abbey on a tidal island, and the castles of the Loire Valley are among its famous sights.",
     "It borders Spain, Italy, Germany, Belgium and Switzerland in Europe, and Brazil and Suriname in South America.",
     "Its capital is Paris; its flag has blue, white and red vertical bands."
   ],
@@ -3462,7 +3464,7 @@ const CLUES = {
   HU: [
     "In 1956 its people rose up against Soviet rule before the revolt was crushed.",
     "Paprika, goulash and the Rubik's Cube all come from here.",
-    "Lake Balaton is central Europe's largest lake, and its capital has dozens of thermal baths.",
+    "Lake Balaton is central Europe's largest lake, and more than a thousand hot springs bubble up here.",
     "Landlocked in the Carpathian Basin, it borders seven countries, including Austria, Romania, Serbia and Ukraine.",
     "Its capital is Budapest; its flag has red, white and green horizontal bands."
   ],
@@ -3481,7 +3483,7 @@ const CLUES = {
     "Its capital is Reykjavik; its flag is blue with a red Nordic cross outlined in white."
   ],
   IT: [
-    "The Roman Empire was ruled from its capital, and the Renaissance began in Florence.",
+    "The Roman Empire grew from here, and the Renaissance began in Florence.",
     "Pizza, pasta, espresso and opera all have their home here.",
     "Venice is built on more than a hundred small islands in a lagoon.",
     "Shaped like a boot, it borders France, Switzerland, Austria and Slovenia, and surrounds San Marino and Vatican City.",
@@ -3504,14 +3506,14 @@ const CLUES = {
   LU: [
     "It is a founding member of the EU, and the Schengen Agreement was signed in one of its villages.",
     "It is the world's only grand duchy, and in 2020 it made all public transport free.",
-    "Its capital is perched on cliffs above deep river gorges, guarded by old fortifications.",
+    "The forested hills and castles of the Ardennes cover its north.",
     "A small landlocked state, it borders Belgium, France and Germany.",
     "Its capital has the same name as the country; its flag has red, white and light blue horizontal bands."
   ],
   LV: [
     "In 1989 it formed the middle link of the Baltic Way, a human chain for independence.",
     "Its midsummer festival, Jāņi, is celebrated with flower crowns, bonfires and caraway cheese.",
-    "Its capital has one of the world's largest collections of Art Nouveau buildings.",
+    "Pine forests cover about half of it, and its Baltic coast has long sandy beaches.",
     "The middle Baltic state, it borders Estonia, Lithuania, Belarus and Russia.",
     "Its capital is Riga; its flag is dark red with a narrow white horizontal band."
   ],
@@ -3538,7 +3540,7 @@ const CLUES = {
   ],
   MK: [
     "It changed its name in 2019 to settle a long dispute with its southern neighbour.",
-    "Mother Teresa was born in its capital in 1910.",
+    "Mother Teresa was born here in 1910.",
     "Lake Ohrid, one of Europe's oldest lakes, is lined with Byzantine churches.",
     "Landlocked in the Balkans, it borders Serbia, Bulgaria, Greece and Albania.",
     "Its capital is Skopje; its flag is red with a yellow sun sending out eight rays."
@@ -3572,7 +3574,7 @@ const CLUES = {
     "Its capital is Warsaw; its flag is white over red."
   ],
   PT: [
-    "A 1755 earthquake levelled its capital and shook European philosophy.",
+    "A huge earthquake in 1755 destroyed much of it and shook European philosophy.",
     "Fado, sung of longing and the sea, is its soulful national music.",
     "Its Algarve coast is lined with golden sea cliffs and grottoes.",
     "It shares its only land border with Spain, on the Iberian Peninsula.",
@@ -3586,7 +3588,7 @@ const CLUES = {
     "Its capital is Bucharest; its flag has blue, yellow and red vertical bands."
   ],
   RS: [
-    "It was the heart of Yugoslavia, and its capital has been destroyed and rebuilt dozens of times.",
+    "It was the biggest republic of Yugoslavia, which was ruled from here.",
     "Tennis champion Novak Djokovic is from here, and the EXIT music festival is held in a fortress at Novi Sad.",
     "The Danube cuts through the dramatic Iron Gates gorge on its eastern border.",
     "Landlocked in the Balkans, it borders seven countries, including Hungary, Romania, Bulgaria and Croatia.",
@@ -3713,7 +3715,7 @@ const CLUES = {
     "Its capital is Roseau; its green flag has a cross of yellow, black and white and a red disc with a parrot."
   ],
   DO: [
-    "The oldest cathedral in the Americas, completed in 1541, stands in its capital.",
+    "The oldest cathedral in the Americas, completed in 1541, stands here.",
     "Merengue and bachata music were born here, and baseball is the national passion.",
     "Pico Duarte is the highest peak in the Caribbean.",
     "It shares the island of Hispaniola with Haiti, its only neighbour.",
@@ -3776,7 +3778,7 @@ const CLUES = {
     "Its capital is Kingston; its flag has a gold diagonal cross with green and black triangles."
   ],
   MX: [
-    "The Aztec capital Tenochtitlan was built on a lake where its capital stands today.",
+    "The Aztecs built their great city of Tenochtitlan on an island in a lake here.",
     "Tacos, mariachi music and the Day of the Dead are part of its culture.",
     "The stepped pyramid of Chichén Itzá rises on the Yucatán Peninsula.",
     "It borders the United States to the north, and Guatemala and Belize to the south.",
@@ -3868,7 +3870,7 @@ const CLUES = {
   ],
   AR: [
     "Its 1982 war with Britain over the Falkland Islands lasted ten weeks.",
-    "The tango was born in the dance halls of its capital, and the asado barbecue is a national ritual.",
+    "The tango was born in its port-city dance halls, and the asado barbecue is a national ritual.",
     "The Perito Moreno Glacier and Iguazú Falls are among its natural wonders.",
     "The second-largest country in South America, it borders Chile, Bolivia, Paraguay, Brazil and Uruguay.",
     "Its capital is Buenos Aires; its flag is light blue and white with a golden Sun of May."
@@ -3919,7 +3921,7 @@ const CLUES = {
   ],
   BF: [
     "Its revolutionary leader Thomas Sankara gave it its current name in 1984.",
-    "Its capital hosts FESPACO, Africa's largest film festival.",
+    "It hosts FESPACO, Africa's largest film festival.",
     "The Sindou Peaks are a row of tall, eroded sandstone needles.",
     "Landlocked in West Africa, it borders Mali, Niger, Benin, Togo, Ghana and Ivory Coast.",
     "Its capital is Ouagadougou; its flag is red over green with a yellow star."
@@ -3967,7 +3969,7 @@ const CLUES = {
     "Its capital is Moroni; its flag has yellow, white, red and blue bands with a green triangle, a crescent and four stars."
   ],
   CG: [
-    "Its capital served as the capital of Free France during the Second World War.",
+    "During the Second World War, one of its cities served as the capital of Free France.",
     "Its sapeurs, dandies in designer suits, have turned elegance into a way of life.",
     "Odzala-Kokoua National Park protects western lowland gorillas.",
     "Straddling the equator, it borders Gabon, Cameroon, the Central African Republic, the DR Congo and Angola.",
@@ -3997,20 +3999,20 @@ const CLUES = {
   EG: [
     "Cleopatra was the last active ruler of its Ptolemaic kingdom.",
     "Koshari, a mix of rice, lentils and pasta, is its national dish.",
-    "The pyramids of Giza and the Sphinx stand on the edge of its capital.",
+    "The pyramids of Giza and the Sphinx stand here, at the edge of the desert.",
     "In north-east Africa, with the Sinai Peninsula in Asia, it borders Libya, Sudan, Israel and Palestine's Gaza Strip.",
     "Its capital is Cairo; its flag has red, white and black bands with a golden eagle."
   ],
   GQ: [
     "It is the only African country with Spanish as an official language.",
     "The Bubi people of Bioko island keep their own language and traditions.",
-    "Its capital stands on Bioko, a volcanic island in the Gulf of Guinea.",
+    "Part of it is Bioko, a volcanic island in the Gulf of Guinea.",
     "Made up of a mainland and islands, it borders Cameroon and Gabon.",
     "Its capital is Malabo; its flag has green, white and red bands with a blue triangle and a tree on its coat of arms."
   ],
   ER: [
     "It won independence in 1993 after a 30-year war.",
-    "Its capital is full of Italian-era Art Deco buildings, and cappuccino is served everywhere.",
+    "Italian-era Art Deco buildings line its streets, and cappuccino is served everywhere.",
     "The Dahlak Archipelago lies off its Red Sea coast.",
     "On the Red Sea, it borders Sudan, Ethiopia and Djibouti.",
     "Its capital is Asmara; its flag has green and blue triangles split by a red triangle with a gold olive wreath."
@@ -4158,7 +4160,7 @@ const CLUES = {
   NG: [
     "The Kingdom of Benin, famous for its bronze sculptures, ruled part of it.",
     "Its film industry, Nollywood, releases more films than Hollywood, and Afrobeats is a global hit.",
-    "Zuma Rock, a giant granite monolith, stands near its capital.",
+    "Zuma Rock, a giant granite monolith, rises about 300 metres above the plains here.",
     "The most populous country in Africa, it borders Benin, Niger, Chad and Cameroon.",
     "Its capital is Abuja; its flag has green, white and green vertical bands."
   ],
@@ -4191,7 +4193,7 @@ const CLUES = {
     "Its capital is Victoria; its flag has five bands fanning out: blue, yellow, red, white and green."
   ],
   SL: [
-    "Its capital was founded in 1792 as a settlement for freed enslaved people.",
+    "A settlement for freed enslaved people was founded here in 1792.",
     "Krio, an English-based Creole, is spoken across the country.",
     "Tiwai Island is home to pygmy hippos and many species of monkey.",
     "On the Atlantic coast of West Africa, it borders Guinea and Liberia.",
@@ -4221,7 +4223,7 @@ const CLUES = {
   SD: [
     "Its ancient Kingdom of Kush built more pyramids than Egypt.",
     "Whirling Sufi dervishes gather at Omdurman every Friday.",
-    "The Blue Nile and the White Nile meet in its capital.",
+    "The Blue Nile and the White Nile meet here.",
     "On the Red Sea, it borders Egypt, Libya, Chad, the Central African Republic, Ethiopia, Eritrea and its southern namesake.",
     "Its capital is Khartoum; its flag has red, white and black bands with a green triangle."
   ],
@@ -4234,7 +4236,7 @@ const CLUES = {
   ],
   TG: [
     "It was a German colony and was later split between Britain and France.",
-    "A huge voodoo fetish market in its capital sells charms and remedies.",
+    "A huge voodoo fetish market here sells charms and remedies.",
     "The Koutammakou landscape is known for its mud tower houses.",
     "A narrow strip of land on the Gulf of Guinea, it borders Ghana, Burkina Faso and Benin.",
     "Its capital is Lomé; its flag has green and yellow stripes with a white star on a red square."
@@ -4278,12 +4280,12 @@ const CLUES = {
   AM: [
     "In 301 AD it became the first country to adopt Christianity as its state religion.",
     "Lavash flatbread and the haunting duduk flute are both listed by UNESCO.",
-    "Biblical Mount Ararat, just across the border, towers over its capital.",
+    "Biblical Mount Ararat, just across the border, towers over its plains.",
     "Landlocked in the South Caucasus, it borders Georgia, Azerbaijan, Iran and Turkey.",
     "Its capital is Yerevan; its flag has red, blue and orange horizontal bands."
   ],
   AZ: [
-    "Oil wells near its capital produced about half of the world's oil around 1900.",
+    "Oil wells here produced about half of the world's oil around 1900.",
     "Mugham, an improvised classical music, is at the heart of its culture.",
     "At Yanar Dag, a hillside has been burning with natural gas for centuries.",
     "On the Caspian Sea, it borders Russia, Georgia, Armenia, Iran and Turkey.",
@@ -4397,7 +4399,7 @@ const CLUES = {
   KW: [
     "Iraq invaded it in 1990, triggering the Gulf War.",
     "Diwaniyas, evening gatherings in each other's homes, are central to social life.",
-    "Its capital's landmark water towers, topped with blue-green spheres, overlook the Gulf.",
+    "Its landmark water towers, topped with blue-green spheres, overlook the Gulf.",
     "At the head of the Gulf, it borders Iraq and Saudi Arabia.",
     "Its capital is Kuwait City; its flag has green, white and red bands with a black trapezoid."
   ],
@@ -4528,7 +4530,7 @@ const CLUES = {
     "Its largest city and commercial capital is Colombo, while parliament sits in Sri Jayawardenepura Kotte; its flag shows a golden lion holding a sword."
   ],
   SY: [
-    "Its capital is often called the oldest continuously inhabited city in the world.",
+    "One of its cities is often called the oldest continuously inhabited city in the world.",
     "Aleppo soap, made from olive and laurel oil, has been produced for centuries.",
     "Krak des Chevaliers is one of the best-preserved Crusader castles anywhere.",
     "On the eastern Mediterranean, it borders Turkey, Iraq, Jordan, Israel and Lebanon.",
@@ -7925,7 +7927,7 @@ const ROUND_PICTURES = {
   "2026-10-03": {
     mystery: {"src":"pictures/2026-10-03-mystery.webp","width":640,"height":425,"credit":"Eduardo Ruggieri","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:PALACIO_LEGISLATIVO_01.JPG","article":"Montevideo","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/59/PALACIO_LEGISLATIVO_01.JPG/960px-PALACIO_LEGISLATIVO_01.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     pinpoint: {"src":"pictures/2026-10-03-pinpoint.webp","width":640,"height":262,"credit":"Deensel","license":"CC BY 2.0","link":"https://commons.wikimedia.org/wiki/File:Puerto_Madero,_Buenos_Aires_(40689219792)_(cropped).jpg","article":"Buenos Aires","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Puerto_Madero%2C_Buenos_Aires_%2840689219792%29_%28cropped%29.jpg/960px-Puerto_Madero%2C_Buenos_Aires_%2840689219792%29_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    deepcut: {"src":"pictures/2026-10-03-deepcut.webp","width":640,"height":306,"credit":"Arturdiasr","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Planalto_Central_(cropped).jpg","article":"Brasília","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/Planalto_Central_%28cropped%29.jpg/960px-Planalto_Central_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    deepcut: {"src":"pictures/2026-10-03-deepcut.webp","width":640,"height":427,"credit":"Arne Müseler","license":"CC BY-SA 3.0 de","link":"https://commons.wikimedia.org/wiki/File:Maracana_2022.jpg","article":"Maracanã Stadium","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Maracana_2022.jpg/960px-Maracana_2022.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     paint: {"src":"pictures/2026-10-03-paint.webp","width":640,"height":867,"credit":"Djuradj Vujcic","license":"CC BY 2.0","link":"https://commons.wikimedia.org/wiki/File:FIFA_World_Cup_Trophy_photo_by_Djuradj_Vujcic.jpg","article":"FIFA World Cup Trophy","remote":"https://upload.wikimedia.org/wikipedia/commons/c/ce/FIFA_World_Cup_Trophy_photo_by_Djuradj_Vujcic.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"},
     rank: {"src":"pictures/2026-10-03-rank.webp","width":640,"height":427,"credit":"Marcelo Campi","license":"CC BY-SA 2.0","link":"https://commons.wikimedia.org/wiki/File:Estadio_Centenario_2021.jpg","article":"Estadio Centenario","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/98/Estadio_Centenario_2021.jpg/960px-Estadio_Centenario_2021.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
@@ -7946,7 +7948,7 @@ const ROUND_PICTURES = {
   "2026-10-06": {
     pinpoint: {"src":"pictures/2026-10-06-pinpoint.webp","width":640,"height":413,"credit":"Boubacar Amadou Cisse","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Ankara_from_bus_station.jpg","article":"Ankara","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Ankara_from_bus_station.jpg/960px-Ankara_from_bus_station.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     deepcut: {"src":"pictures/2026-10-06-deepcut.webp","width":640,"height":427,"credit":"Mapuia Hnamte","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Embossed_Figures_Kawtchhuah_Ropui_Vangchhia_Mapuia_Hnamte_(1).JPG","article":"Mizoram","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Embossed_Figures_Kawtchhuah_Ropui_Vangchhia_Mapuia_Hnamte_%281%29.JPG/960px-Embossed_Figures_Kawtchhuah_Ropui_Vangchhia_Mapuia_Hnamte_%281%29.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    paint: {"src":"pictures/2026-10-06-paint.webp","width":640,"height":480,"credit":"Registan_-_Gusjer.jpg: Gustavo Jeronimo from Aranjuez, Spain derivative work: MrPanyGoff","license":"CC BY 2.0","link":"https://commons.wikimedia.org/wiki/File:RegistanSquare_Samarkand.jpg","article":"Registan","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/RegistanSquare_Samarkand.jpg/960px-RegistanSquare_Samarkand.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    paint: {"src":"pictures/2026-10-06-paint.webp","width":640,"height":640,"credit":"Difference engine","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Longjing_tea_steeping_in_gaiwan.jpg","article":"Tea plantation","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Longjing_tea_steeping_in_gaiwan.jpg/960px-Longjing_tea_steeping_in_gaiwan.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     rank: {"src":"pictures/2026-10-06-rank.webp","width":640,"height":424,"credit":"xiquinhosilva","license":"CC BY 2.0","link":"https://commons.wikimedia.org/wiki/File:City_wall_of_Xi%27an_51550-Xian_(27959363326).jpg","article":"Xi'an","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/City_wall_of_Xi%27an_51550-Xian_%2827959363326%29.jpg/960px-City_wall_of_Xi%27an_51550-Xian_%2827959363326%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
   "2026-10-07": {
@@ -7954,7 +7956,7 @@ const ROUND_PICTURES = {
     pinpoint: {"src":"pictures/2026-10-07-pinpoint.webp","width":640,"height":341,"credit":"Morio","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Skyscrapers_of_Shinjuku_2009_January.jpg","article":"Tokyo","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/Skyscrapers_of_Shinjuku_2009_January.jpg/960px-Skyscrapers_of_Shinjuku_2009_January.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     deepcut: {"src":"pictures/2026-10-07-deepcut.webp","width":640,"height":1125,"credit":"Workshop of Hans Holbein the Younger","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:After_Hans_Holbein_the_Younger_-_Portrait_of_Henry_VIII_-_Google_Art_Project.jpg","article":"Henry VIII","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/After_Hans_Holbein_the_Younger_-_Portrait_of_Henry_VIII_-_Google_Art_Project.jpg/960px-After_Hans_Holbein_the_Younger_-_Portrait_of_Henry_VIII_-_Google_Art_Project.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     paint: {"src":"pictures/2026-10-07-paint.webp","width":640,"height":505,"credit":"Original: Peeperman New version: Carnby","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:European_monarchies.svg","article":"Monarchies in Europe","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c2/European_monarchies.svg/960px-European_monarchies.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    rank: {"src":"pictures/2026-10-07-rank.webp","width":640,"height":345,"credit":"Pangalau","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Aerial_view_of_Brunei_23_September_2024_11.jpg","article":"Istana Nurul Iman","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/Aerial_view_of_Brunei_23_September_2024_11.jpg/960px-Aerial_view_of_Brunei_23_September_2024_11.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
+    rank: {"src":"pictures/2026-10-07-rank.webp","width":640,"height":380,"credit":"Godot13","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:RUS-2016-Aerial-SPB-Winter_Palace_(crop).jpg","article":"Winter Palace","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/RUS-2016-Aerial-SPB-Winter_Palace_%28crop%29.jpg/960px-RUS-2016-Aerial-SPB-Winter_Palace_%28crop%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
   "2026-10-08": {
     mystery: {"src":"pictures/2026-10-08-mystery.webp","width":640,"height":427,"credit":"MediaMOF","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Abuja_heritages_30.jpg","article":"Abuja","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Abuja_heritages_30.jpg/960px-Abuja_heritages_30.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
@@ -7975,7 +7977,7 @@ const ROUND_PICTURES = {
     pinpoint: {"src":"pictures/2026-10-10-pinpoint.webp","width":640,"height":420,"credit":"USACE HQ , JIM GORDAN, CIV, USACE","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:5628442718_b10fc2c47f_o.jpg","article":"Baghdad","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/5628442718_b10fc2c47f_o.jpg/960px-5628442718_b10fc2c47f_o.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     deepcut: {"src":"pictures/2026-10-10-deepcut.webp","width":640,"height":360,"credit":"Douwe C. van der Zee","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Great_Pyramid_of_Giza_-_Pyramid_of_Khufu.jpg","article":"Great Pyramid of Giza","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Great_Pyramid_of_Giza_-_Pyramid_of_Khufu.jpg/960px-Great_Pyramid_of_Giza_-_Pyramid_of_Khufu.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     paint: {"src":"pictures/2026-10-10-paint.webp","width":640,"height":1056,"credit":"The original uploader was Mark22 at English Wikipedia.","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:SevenWondersOfTheWorld.png","article":"Seven Wonders of the Ancient World","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/SevenWondersOfTheWorld.png/960px-SevenWondersOfTheWorld.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    rank: {"src":"pictures/2026-10-10-rank.webp","width":640,"height":853,"credit":"Rantemario","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Kalender_Indonesia.jpg","article":"Calendar","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Kalender_Indonesia.jpg/960px-Kalender_Indonesia.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
+    rank: {"src":"pictures/2026-10-10-rank.webp","width":640,"height":394,"credit":"Carsten Steger","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Aerial_image_of_Pompeii_and_Mount_Vesuvius_(view_from_the_southeast).jpg","article":"Pompeii","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Aerial_image_of_Pompeii_and_Mount_Vesuvius_%28view_from_the_southeast%29.jpg/960px-Aerial_image_of_Pompeii_and_Mount_Vesuvius_%28view_from_the_southeast%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
   "2026-10-11": {
     mystery: {"src":"pictures/2026-10-11-mystery.webp","width":640,"height":373,"credit":"File:Museumsinsel Berlin Juli 2021 1 (cropped).jpg: Kasa Fue derivative work: Georgfotoart","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Museumsinsel_Berlin_Juli_2021_1_(cropped)_b.jpg","article":"Berlin","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Museumsinsel_Berlin_Juli_2021_1_%28cropped%29_b.jpg/960px-Museumsinsel_Berlin_Juli_2021_1_%28cropped%29_b.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
@@ -7994,16 +7996,16 @@ const ROUND_PICTURES = {
   "2026-10-13": {
     mystery: {"src":"pictures/2026-10-13-mystery.webp","width":640,"height":360,"credit":"瑞丽江的河水","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Dublin_-_aerial_-_2025-07-07_01.jpg","article":"Dublin","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Dublin_-_aerial_-_2025-07-07_01.jpg/960px-Dublin_-_aerial_-_2025-07-07_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     pinpoint: {"src":"pictures/2026-10-13-pinpoint.webp","width":640,"height":427,"credit":"N509FZ","license":"CC BY 4.0","link":"https://commons.wikimedia.org/wiki/File:Skyline_of_Beijing_CBD_with_B-5906_approaching_(20211016171955)_(1).jpg","article":"Beijing","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/Skyline_of_Beijing_CBD_with_B-5906_approaching_%2820211016171955%29_%281%29.jpg/960px-Skyline_of_Beijing_CBD_with_B-5906_approaching_%2820211016171955%29_%281%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    deepcut: {"src":"pictures/2026-10-13-deepcut.webp","width":640,"height":801,"credit":"Sswonk","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Ireland_trad_counties_named.svg","article":"Counties of Ireland","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Ireland_trad_counties_named.svg/960px-Ireland_trad_counties_named.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    paint: {"src":"pictures/2026-10-13-paint.webp","width":640,"height":400,"credit":"Unknown author","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Gulf_of_Guinea_(English).jpg","article":"Gulf of Guinea","remote":"https://upload.wikimedia.org/wikipedia/commons/a/a6/Gulf_of_Guinea_%28English%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"},
-    rank: {"src":"pictures/2026-10-13-rank.webp","width":640,"height":505,"credit":"Berthold Werner","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Telefon_BW_2012-02-18_13-44-32.JPG","article":"Telephone","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Telefon_BW_2012-02-18_13-44-32.JPG/960px-Telefon_BW_2012-02-18_13-44-32.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
+    deepcut: {"src":"pictures/2026-10-13-deepcut.webp","width":640,"height":480,"credit":"Tauʻolunga","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Ecliptic_path.jpg","article":"Zodiac","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Ecliptic_path.jpg/960px-Ecliptic_path.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    paint: {"src":"pictures/2026-10-13-paint.webp","width":640,"height":933,"credit":"Charlie","license":"CC BY 2.0","link":"https://commons.wikimedia.org/wiki/File:Webb_Ellis_Cup,_2013_(cropped)_(cropped).jpg","article":"Webb Ellis Cup","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Webb_Ellis_Cup%2C_2013_%28cropped%29_%28cropped%29.jpg/960px-Webb_Ellis_Cup%2C_2013_%28cropped%29_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    rank: {"src":"pictures/2026-10-13-rank.webp","width":640,"height":425,"credit":"Severin.stalder","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:The_Great_Wall_of_China_at_Jinshanling-edit.jpg","article":"Great Wall of China","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/The_Great_Wall_of_China_at_Jinshanling-edit.jpg/960px-The_Great_Wall_of_China_at_Jinshanling-edit.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
   "2026-10-14": {
     mystery: {"src":"pictures/2026-10-14-mystery.webp","width":640,"height":480,"credit":"Christopher J. Fynn","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Tashich%C3%B6dzong_Thimphu-2008-01-23.jpg","article":"Thimphu","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Tashich%C3%B6dzong_Thimphu-2008-01-23.jpg/960px-Tashich%C3%B6dzong_Thimphu-2008-01-23.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     pinpoint: {"src":"pictures/2026-10-14-pinpoint.webp","width":640,"height":480,"credit":"Andrew Milligan Sumo","license":"CC BY 2.0","link":"https://commons.wikimedia.org/wiki/File:Ljubljana_Old_Town,_Slovenia_(Old_Camera)_(33286165680).jpg","article":"Ljubljana","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Ljubljana_Old_Town%2C_Slovenia_%28Old_Camera%29_%2833286165680%29.jpg/960px-Ljubljana_Old_Town%2C_Slovenia_%28Old_Camera%29_%2833286165680%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    deepcut: {"src":"pictures/2026-10-14-deepcut.webp","width":640,"height":722,"credit":"TUBS","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Flevoland_in_the_Netherlands.svg","article":"Flevoland","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b6/Flevoland_in_the_Netherlands.svg/960px-Flevoland_in_the_Netherlands.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    deepcut: {"src":"pictures/2026-10-14-deepcut.webp","width":640,"height":442,"credit":"C.Stadler/Bwag","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Hallstatt_-_Zentrum_.JPG","article":"Hallstatt","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Hallstatt_-_Zentrum_.JPG/960px-Hallstatt_-_Zentrum_.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     paint: {"src":"pictures/2026-10-14-paint.webp","width":640,"height":429,"credit":"Ramirez","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Mostar_Old_Town_Panorama_2007.jpg","article":"Stari Most","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Mostar_Old_Town_Panorama_2007.jpg/960px-Mostar_Old_Town_Panorama_2007.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    rank: {"src":"pictures/2026-10-14-rank.webp","width":640,"height":426,"credit":"Cayambe","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Luxembourg_Grand_Ducal_Palace_01.jpg","article":"Luxembourg City","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Luxembourg_Grand_Ducal_Palace_01.jpg/960px-Luxembourg_Grand_Ducal_Palace_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
+    rank: {"src":"pictures/2026-10-14-rank.webp","width":640,"height":338,"credit":"Benh LIEU SONG","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Luxembourg_City_Night_Wikimedia_Commons.jpg","article":"Luxembourg City","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Luxembourg_City_Night_Wikimedia_Commons.jpg/960px-Luxembourg_City_Night_Wikimedia_Commons.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
   "2026-10-15": {
     mystery: {"src":"pictures/2026-10-15-mystery.webp","width":640,"height":381,"credit":"Moyan Brenn from Italy","license":"CC BY 2.0","link":"https://commons.wikimedia.org/wiki/File:Prague_(6365119737).jpg","article":"Prague","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a7/Prague_%286365119737%29.jpg/960px-Prague_%286365119737%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
@@ -8036,7 +8038,7 @@ const ROUND_PICTURES = {
   "2026-10-19": {
     mystery: {"src":"pictures/2026-10-19-mystery.webp","width":640,"height":360,"credit":"Ramzik1999","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:New_Abdali_2024.png","article":"Amman","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/New_Abdali_2024.png/960px-New_Abdali_2024.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     pinpoint: {"src":"pictures/2026-10-19-pinpoint.webp","width":640,"height":360,"credit":"Christoph Strässler","license":"CC BY-SA 2.0","link":"https://commons.wikimedia.org/wiki/File:Christ_Church_in_Windhoek,_Namibia.jpg","article":"Windhoek","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Christ_Church_in_Windhoek%2C_Namibia.jpg/960px-Christ_Church_in_Windhoek%2C_Namibia.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    deepcut: {"src":"pictures/2026-10-19-deepcut.webp","width":640,"height":425,"credit":"Cataclasite","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Sierra.madre.occidental.volcanics.JPG","article":"Chihuahua (state)","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Sierra.madre.occidental.volcanics.JPG/960px-Sierra.madre.occidental.volcanics.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    deepcut: {"src":"pictures/2026-10-19-deepcut.webp","width":640,"height":358,"credit":"Nepenthes","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Rub_al_Khali_002.JPG","article":"Rub' al Khali","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/34/Rub_al_Khali_002.JPG/960px-Rub_al_Khali_002.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     paint: {"src":"pictures/2026-10-19-paint.webp","width":640,"height":346,"credit":"Project Apollo Archive","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:Sahara_real_color.jpg","article":"Sahara","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4a/Sahara_real_color.jpg/960px-Sahara_real_color.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     rank: {"src":"pictures/2026-10-19-rank.webp","width":640,"height":480,"credit":"Unknown author","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Oilfield_Installation.jpeg","article":"Ghawar Field","remote":"https://upload.wikimedia.org/wikipedia/commons/d/df/Oilfield_Installation.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"}
   },
@@ -8057,7 +8059,7 @@ const ROUND_PICTURES = {
   "2026-10-22": {
     mystery: {"src":"pictures/2026-10-22-mystery.webp","width":640,"height":372,"credit":"Emptywords","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Aleja_Niepdleglosci_Warsaw_2022_aerial_(cropped).jpg","article":"Warsaw","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/Aleja_Niepdleglosci_Warsaw_2022_aerial_%28cropped%29.jpg/960px-Aleja_Niepdleglosci_Warsaw_2022_aerial_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     pinpoint: {"src":"pictures/2026-10-22-pinpoint.webp","width":640,"height":396,"credit":"Gerd Eichmann","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Kathmandu-Durbar_Square-06-Mahavishnu-Kuh-Vishnu-Pratapamalla-Jagannath-2007-gje.jpg","article":"Kathmandu","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/Kathmandu-Durbar_Square-06-Mahavishnu-Kuh-Vishnu-Pratapamalla-Jagannath-2007-gje.jpg/960px-Kathmandu-Durbar_Square-06-Mahavishnu-Kuh-Vishnu-Pratapamalla-Jagannath-2007-gje.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    deepcut: {"src":"pictures/2026-10-22-deepcut.webp","width":640,"height":427,"credit":"jynus","license":"CC BY 2.5","link":"https://commons.wikimedia.org/wiki/File:Flag_of_La_Rioja_(with_coat_of_arms).svg","article":"La Rioja (Spain)","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Flag_of_La_Rioja_%28with_coat_of_arms%29.svg/960px-Flag_of_La_Rioja_%28with_coat_of_arms%29.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    deepcut: {"src":"pictures/2026-10-22-deepcut.webp","width":640,"height":296,"credit":"Original author: Pierre de Coubertin (1863-1937)","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:Olympic_rings_without_rims.svg","article":"Olympic symbols","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Olympic_rings_without_rims.svg/960px-Olympic_rings_without_rims.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     paint: {"src":"pictures/2026-10-22-paint.webp","width":640,"height":427,"credit":"NASA Landsat image","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:Himalayas_and_allied_ranges_NASA_Landsat_showing_the_eight_thousanders,_annotated_with_major_rivers.jpg","article":"Himalayas","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c8/Himalayas_and_allied_ranges_NASA_Landsat_showing_the_eight_thousanders%2C_annotated_with_major_rivers.jpg/960px-Himalayas_and_allied_ranges_NASA_Landsat_showing_the_eight_thousanders%2C_annotated_with_major_rivers.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     rank: {"src":"pictures/2026-10-22-rank.webp","width":640,"height":320,"credit":"MapGrid (old version SKopp, Zscout370 and Ranking Update)","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:Flag_of_Malaysia.svg","article":"Flag of Malaysia","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Flag_of_Malaysia.svg/960px-Flag_of_Malaysia.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
@@ -8085,7 +8087,7 @@ const ROUND_PICTURES = {
   "2026-10-26": {
     mystery: {"src":"pictures/2026-10-26-mystery.webp","width":640,"height":427,"credit":"Dauren Nabijan","license":"CC0","link":"https://commons.wikimedia.org/wiki/File:Astana_Esil_view.jpg","article":"Astana","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/34/Astana_Esil_view.jpg/960px-Astana_Esil_view.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     pinpoint: {"src":"pictures/2026-10-26-pinpoint.webp","width":640,"height":427,"credit":"Miguel hernandez","license":"CC BY-SA 2.0","link":"https://commons.wikimedia.org/wiki/File:Palacio_de_La_Moneda_-_miguelreflex.jpg","article":"Santiago","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/21/Palacio_de_La_Moneda_-_miguelreflex.jpg/960px-Palacio_de_La_Moneda_-_miguelreflex.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    deepcut: {"src":"pictures/2026-10-26-deepcut.webp","width":640,"height":647,"credit":"Neil A. Armstrong","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:A_Man_on_the_Moon,_AS11-40-5903_(cropped).jpg","article":"Apollo 11","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/A_Man_on_the_Moon%2C_AS11-40-5903_%28cropped%29.jpg/960px-A_Man_on_the_Moon%2C_AS11-40-5903_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    deepcut: {"src":"pictures/2026-10-26-deepcut.webp","width":640,"height":966,"credit":"Pline","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Luna_9_Musee_du_Bourget_P1010505.JPG","article":"Luna 9","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Luna_9_Musee_du_Bourget_P1010505.JPG/960px-Luna_9_Musee_du_Bourget_P1010505.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     paint: {"src":"pictures/2026-10-26-paint.webp","width":640,"height":454,"credit":"Government of India","license":"GODL-India","link":"https://commons.wikimedia.org/wiki/File:18%C2%AA_BRICS_Summit_2026,_New_Delhi,_India.png","article":"BRICS","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/18%C2%AA_BRICS_Summit_2026%2C_New_Delhi%2C_India.png/960px-18%C2%AA_BRICS_Summit_2026%2C_New_Delhi%2C_India.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     rank: {"src":"pictures/2026-10-26-rank.webp","width":640,"height":960,"credit":"Dyor","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Yang_Liwei.jpg","article":"Yang Liwei","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/79/Yang_Liwei.jpg/960px-Yang_Liwei.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
@@ -8099,7 +8101,7 @@ const ROUND_PICTURES = {
   "2026-10-28": {
     mystery: {"src":"pictures/2026-10-28-mystery.webp","width":640,"height":400,"credit":"Yann Caradec from Paris, France","license":"CC BY-SA 2.0","link":"https://commons.wikimedia.org/wiki/File:La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques,_Paris_ao%C3%BBt_2014_(2).jpg","article":"Paris","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg/960px-La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     pinpoint: {"src":"pictures/2026-10-28-pinpoint.webp","width":640,"height":410,"credit":"Vitor Oliveira from Torres Vedras, PORTUGAL","license":"CC BY-SA 2.0","link":"https://commons.wikimedia.org/wiki/File:Lisboa_-_Portugal_(52597836992).jpg","article":"Lisbon","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Lisboa_-_Portugal_%2852597836992%29.jpg/960px-Lisboa_-_Portugal_%2852597836992%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    deepcut: {"src":"pictures/2026-10-28-deepcut.webp","width":640,"height":360,"credit":"Amaustan","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Mont-Saint-Michel_vu_du_ciel.jpg","article":"Mont-Saint-Michel","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/Mont-Saint-Michel_vu_du_ciel.jpg/960px-Mont-Saint-Michel_vu_du_ciel.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    deepcut: {"src":"pictures/2026-10-28-deepcut.webp","width":400,"height":300,"credit":"The original uploader was Nhamblen at English Wikipedia.","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Central_pyrenees.jpg","article":"Pyrenees","remote":"https://upload.wikimedia.org/wikipedia/commons/0/01/Central_pyrenees.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"},
     paint: {"src":"pictures/2026-10-28-paint.webp","width":640,"height":427,"credit":"Terabass","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:New_york_times_square-terabass.jpg","article":"Tourism","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/New_york_times_square-terabass.jpg/960px-New_york_times_square-terabass.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     rank: {"src":"pictures/2026-10-28-rank.webp","width":640,"height":427,"credit":"muneaki","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Mont_Ventoux_090927.jpg","article":"Mont Ventoux","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Mont_Ventoux_090927.jpg/960px-Mont_Ventoux_090927.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
@@ -8668,26 +8670,25 @@ const DAYS = {
       answer: "AR",
       clues: [
         "Its national team lifted the World Cup in Qatar in 2022.",
-        "The tango was born in the port districts of its capital.",
+        "The tango was born in the dance halls of its port cities.",
         "Pope Francis was born here."
       ]
     },
     deepcut: {
-      countries: ["BR"],
-      question: "Name a state of Brazil.",
+      question: "Name a country in South America.",
       answers: {
-        1000: ["Acre", "Amapá", "Roraima", "Rondônia", "Tocantins", "Sergipe", "Piauí"],
-        800: ["Goiás", "Mato Grosso", "Mato Grosso do Sul", "Espírito Santo", "Maranhão", "Paraíba", "Rio Grande do Norte", "Alagoas", "Federal District"],
-        600: ["Paraná", "Pernambuco", "Ceará", "Rio Grande do Sul", "Santa Catarina", "Pará"],
-        400: ["Bahia", "Amazonas", "Minas Gerais"],
-        200: ["Rio de Janeiro", "São Paulo"]
+        1000: ["Guyana", "Suriname"],
+        800: ["Paraguay", "Bolivia"],
+        600: ["Ecuador", "Venezuela", "Uruguay"],
+        400: ["Chile", "Colombia", "Peru"],
+        200: ["Brazil", "Argentina"]
       },
-      aliases: { "Federal District": ["Distrito Federal", "Brasília"] },
+      aliases: {},
       info: {
-        title: "Brazil's states",
-        text: "Brazil is made up of 26 states plus the Federal District, home to Brasília, a capital built from scratch and opened in 1960. The biggest state, Amazonas, is larger than Peru.",
-        facts: [["States", "26 + Federal District"], ["Biggest", "Amazonas"], ["Capital since", "1960"]],
-        picture: "Brasília"
+        title: "South America",
+        text: "South America has 12 independent countries. Brazil alone covers almost half of the continent, and every other country except Chile and Ecuador shares a border with it.",
+        facts: [["Countries", "12"], ["Biggest", "Brazil"], ["Smallest", "Suriname"]],
+        picture: "Maracanã Stadium"
       }
     },
     paint: {
@@ -8860,10 +8861,9 @@ const DAYS = {
       }
     },
     paint: {
-      question: "Click every country whose name ends in \"-stan\".",
-      answers: ["AF", "KZ", "KG", "PK", "TJ", "TM", "UZ"],
-      view: [40, 65],
-      picture: "Registan"
+      question: "Click the five biggest tea producers.",
+      answers: ["CN", "IN", "KE", "LK", "TR"],
+      picture: "Tea plantation"
     },
     rank: {
       topic: "Distance from Xi'an, where the Silk Road began",
@@ -8920,16 +8920,17 @@ const DAYS = {
       picture: "Monarchies in Europe"
     },
     rank: {
-      topic: "Year the current monarch came to the throne",
-      values: { JP: 2019, SE: 1973, MA: 1999, BN: 1967, NO: 1991 },
+      topic: "Year the monarchy was abolished",
+      values: { IT: 1946, PT: 1910, NP: 2008, RU: 1917, EG: 1953 },
       years: true,
-      note: "Brunei's Sultan Hassanal Bolkiah has reigned since 1967, longer than any other living monarch.",
-      picture: "Istana Nurul Iman",
+      note: "Portugal in 1910, Russia in 1917, Italy by referendum in 1946, Egypt in 1953 and Nepal in 2008.",
+      picture: "Winter Palace",
       reroll: {
-        topic: "Year the monarchy was abolished",
-        values: { IT: 1946, PT: 1910, NP: 2008, RU: 1917, EG: 1953 },
-        years: true,
-        note: "Portugal in 1910, Russia in 1917, Italy by referendum in 1946, Egypt in 1953 and Nepal in 2008."
+        topic: "Population of five kingdoms",
+        values: { JP: 123.4, MA: 38.4, SE: 10.6, NO: 5.6, BN: 0.5 },
+        decimals: 1,
+        unit: " million",
+        note: "Japan is the biggest monarchy by population; Brunei, ruled by a sultan, has under half a million people. From the game's country data."
       }
     }
   },
@@ -9090,14 +9091,12 @@ const DAYS = {
       picture: "Seven Wonders of the Ancient World"
     },
     rank: {
-      topic: "The year in the country's traditional calendar",
-      detail: "On 10 October 2026.",
-      values: { ET: 2019, IL: 5787, IR: 1405, TH: 2569, NP: 2083 },
-      top: "HIGHEST",
-      bottom: "LOWEST",
-      plain: true,
-      note: "The Hebrew, Thai Buddhist, Nepali (Bikram Sambat), Ethiopian and Iranian solar calendars, each counting from a different start.",
-      picture: "Calendar",
+      topic: "Year the lost treasure was found",
+      detail: "Pompeii, Machu Picchu, Tutankhamun's tomb, the Lascaux cave paintings and the Terracotta Army.",
+      values: { IT: 1748, PE: 1911, EG: 1922, FR: 1940, CN: 1974 },
+      years: true,
+      note: "Digging at Pompeii began in 1748; Hiram Bingham reached Machu Picchu in 1911; Howard Carter opened Tutankhamun's tomb in 1922; four teenagers found the Lascaux paintings in 1940; farmers digging a well found the Terracotta Army in 1974.",
+      picture: "Pompeii",
       reroll: {
         topic: "Age of its most famous ancient monument",
         detail: "The Great Pyramid, the Parthenon, the Colosseum, Angkor Wat and Machu Picchu.",
@@ -9241,37 +9240,36 @@ const DAYS = {
       ]
     },
     deepcut: {
-      countries: ["IE", "GB"],
-      question: "Name a county on the island of Ireland.",
+      question: "Name a sign of the zodiac.",
       answers: {
-        1000: ["Longford", "Leitrim", "Roscommon"],
-        800: ["Louth", "Westmeath", "Offaly", "Laois", "Carlow", "Tyrone", "Fermanagh", "Cavan", "Monaghan"],
-        600: ["Kildare", "Meath", "Waterford", "Wexford", "Kilkenny", "Sligo", "Tipperary", "Derry", "Armagh"],
-        400: ["Limerick", "Donegal", "Antrim", "Wicklow", "Mayo", "Clare", "Down"],
-        200: ["Dublin", "Cork", "Galway", "Kerry"]
+        1000: ["Capricorn", "Aquarius"],
+        800: ["Libra", "Sagittarius"],
+        600: ["Cancer", "Pisces"],
+        400: ["Taurus", "Virgo", "Aries"],
+        200: ["Leo", "Scorpio", "Gemini"]
       },
-      aliases: { "Derry": ["Londonderry"], "Laois": ["Laoighis", "Leix"] },
+      aliases: {},
       info: {
-        title: "Ireland's counties",
-        text: "The island of Ireland has 32 traditional counties: 26 in the Republic of Ireland and 6 in Northern Ireland, which is part of the UK. The smallest, Louth, is nicknamed the Wee County.",
-        facts: [["Counties", "32"], ["In the Republic", "26"], ["In Northern Ireland", "6"]],
-        picture: "Counties of Ireland"
+        title: "The zodiac",
+        text: "The twelve signs go back to astronomers in ancient Babylon, in today's Iraq, who split the Sun's yearly path across the sky into twelve equal parts about 2,500 years ago.",
+        facts: [["Signs", "12"], ["First sign", "Aries"], ["Started in", "Babylon"]],
+        picture: "Zodiac"
       }
     },
     paint: {
-      question: "Click every country with \"Guinea\" in its name.",
-      answers: ["GN", "GW", "GQ", "PG"],
-      view: [5, 40],
-      picture: "Gulf of Guinea"
+      question: "Click every country that has won the men's Rugby World Cup. (England counts as the UK.)",
+      answers: ["NZ", "ZA", "AU", "GB"],
+      picture: "Webb Ellis Cup"
     },
     rank: {
-      topic: "Phone country code",
-      values: { CN: 86, IT: 39, IE: 353, GB: 44, JP: 81 },
-      prefix: "+",
-      top: "HIGHEST",
-      bottom: "LOWEST",
-      note: "The first digit is the region: 3 and 4 are Europe, 8 is East Asia. The US and Canada share +1.",
-      picture: "Telephone",
+      topic: "Area",
+      detail: "Land and water, in km².",
+      values: { CN: 9706961, JP: 377930, IT: 301336, GB: 242900, IE: 70273 },
+      unit: " km²",
+      top: "BIGGEST",
+      bottom: "SMALLEST",
+      note: "Japan's islands add up to more than Italy or the UK, and China is about 138 times the size of Ireland. From the game's country data.",
+      picture: "Great Wall of China",
       reroll: {
         topic: "People per square kilometre",
         values: { MN: 2.3, NL: 537.2, AU: 3.6, BD: 1349.7, US: 37.4 },
@@ -9295,24 +9293,21 @@ const DAYS = {
       ]
     },
     deepcut: {
-      countries: ["NL"],
-      question: "Name a province of the Netherlands.",
+      countries: ["AT"],
+      question: "Name a country that borders Austria.",
       answers: {
-        1000: ["Flevoland", "Drenthe"],
-        800: ["Overijssel", "Groningen"],
-        600: ["Friesland", "Gelderland", "Limburg"],
-        400: ["Utrecht", "Zeeland", "North Brabant"],
-        200: ["North Holland", "South Holland"]
+        1000: ["Liechtenstein"],
+        800: ["Slovenia", "Slovakia"],
+        600: ["Czech Republic"],
+        400: ["Italy", "Hungary"],
+        200: ["Germany", "Switzerland"]
       },
-      aliases: {
-        "Friesland": ["Fryslân"], "North Brabant": ["Noord-Brabant", "Brabant"], "North Holland": ["Noord-Holland"],
-        "South Holland": ["Zuid-Holland"]
-      },
+      aliases: { "Czech Republic": ["Czechia"] },
       info: {
-        title: "Dutch provinces",
-        text: "The Netherlands has 12 provinces. The newest, Flevoland, is land won back from the sea: it became a province in 1986, and its capital, Lelystad, stands on what was seabed in the 1950s.",
-        facts: [["Provinces", "12"], ["Newest", "Flevoland, 1986"], ["Below sea level", "about a quarter"]],
-        picture: "Flevoland"
+        title: "Austria's neighbours",
+        text: "Landlocked Austria touches eight countries, from Germany, its longest border, to tiny Liechtenstein, one of only two countries in the world that are surrounded by landlocked countries.",
+        facts: [["Neighbours", "8"], ["Longest border", "Germany"], ["Shortest", "Liechtenstein"]],
+        picture: "Hallstatt"
       }
     },
     paint: {
@@ -9347,7 +9342,7 @@ const DAYS = {
       answer: "DE",
       clues: [
         "The printing press with movable metal type was invented here.",
-        "For 28 years a wall split its capital in two.",
+        "For 28 years a wall split one of its biggest cities in two.",
         "Long stretches of its motorways have no speed limit at all."
       ]
     },
@@ -9503,11 +9498,12 @@ const DAYS = {
       note: "Mozart (Austria), Chopin (Poland), Grieg (Norway), Sibelius (Finland) and Bob Marley (Jamaica).",
       picture: "Wolfgang Amadeus Mozart",
       reroll: {
-        topic: "Year its famous music festival began",
-        detail: "Tomorrowland, Glastonbury, Coachella, Rock in Rio and Sziget.",
-        values: { BE: 2005, GB: 1970, US: 1999, BR: 1985, HU: 1993 },
-        years: true,
-        note: "Glastonbury (1970), Rock in Rio (1985), Sziget (1993), Coachella (1999) and Tomorrowland (2005)."
+        topic: "Population of five festival countries",
+        detail: "The homes of Coachella, Rock in Rio, Glastonbury, Tomorrowland and Sziget.",
+        values: { US: 341.8, BR: 212.8, GB: 69.5, BE: 11.9, HU: 9.5 },
+        decimals: 1,
+        unit: " million",
+        note: "From the game's country data (World Bank and UN figures)."
       }
     }
   },
@@ -9580,25 +9576,21 @@ const DAYS = {
       ]
     },
     deepcut: {
-      countries: ["MX"],
-      question: "Name a state of Mexico (or its capital, Mexico City).",
+      countries: ["SA"],
+      question: "Name a country on the Arabian Peninsula.",
       answers: {
-        1000: ["Tlaxcala", "Colima", "Aguascalientes", "Nayarit", "Campeche", "Zacatecas", "Querétaro", "Hidalgo", "Morelos", "Tabasco"],
-        800: ["Durango", "San Luis Potosí", "Sinaloa", "Tamaulipas", "Coahuila", "Guerrero", "Michoacán", "Guanajuato", "Puebla"],
-        600: ["Sonora", "Chiapas", "Veracruz", "Nuevo León", "Jalisco", "Oaxaca", "Baja California Sur", "State of Mexico"],
-        400: ["Chihuahua", "Yucatán", "Quintana Roo"],
-        200: ["Baja California", "Mexico City"]
+        1000: ["Bahrain"],
+        800: ["Kuwait"],
+        600: ["Oman", "Yemen"],
+        400: ["Qatar"],
+        200: ["Saudi Arabia", "United Arab Emirates"]
       },
-      aliases: {
-        "Querétaro": ["Queretaro"], "San Luis Potosí": ["San Luis Potosi"], "Michoacán": ["Michoacan"],
-        "Nuevo León": ["Nuevo Leon"], "Yucatán": ["Yucatan"], "State of Mexico": ["México", "Estado de México"],
-        "Mexico City": ["CDMX", "Ciudad de México"]
-      },
+      aliases: { "United Arab Emirates": ["UAE", "Emirates"] },
       info: {
-        title: "Mexico's states",
-        text: "Mexico has 31 states plus Mexico City, which became a state-like entity of its own in 2016. The largest state, Chihuahua, is bigger than the United Kingdom.",
-        facts: [["States", "31 + Mexico City"], ["Largest", "Chihuahua"], ["Smallest", "Tlaxcala"]],
-        picture: "Chihuahua (state)"
+        title: "The Arabian Peninsula",
+        text: "The world's biggest peninsula is mostly desert, including the Rub' al Khali, or Empty Quarter, the largest continuous sand desert on Earth. Saudi Arabia covers about four-fifths of it.",
+        facts: [["Countries", "7"], ["Area", "about 3.2 million km²"], ["Biggest desert", "Rub' al Khali"]],
+        picture: "Rub' al Khali"
       }
     },
     paint: {
@@ -9748,25 +9740,20 @@ const DAYS = {
       ]
     },
     deepcut: {
-      countries: ["ES"],
-      question: "Name an autonomous community of Spain.",
+      question: "Name the colour of one of the five Olympic rings.",
       answers: {
-        1000: ["La Rioja"],
-        800: ["Extremadura", "Navarre", "Cantabria"],
-        600: ["Castile and León", "Castilla-La Mancha", "Aragon", "Murcia", "Asturias"],
-        400: ["Basque Country", "Valencian Community", "Galicia", "Canary Islands", "Balearic Islands"],
-        200: ["Catalonia", "Andalusia", "Community of Madrid"]
+        1000: ["Black"],
+        800: ["Green"],
+        600: ["Yellow"],
+        400: ["Blue"],
+        200: ["Red"]
       },
-      aliases: {
-        "Navarre": ["Navarra"], "Castile and León": ["Castilla y León"], "Aragon": ["Aragón"], "Basque Country": ["País Vasco", "Euskadi"],
-        "Valencian Community": ["Valencia"], "Canary Islands": ["Canarias", "Canaries"], "Balearic Islands": ["Baleares", "Balearics"],
-        "Catalonia": ["Cataluña", "Catalunya"], "Andalusia": ["Andalucía"], "Community of Madrid": ["Madrid"]
-      },
+      aliases: {},
       info: {
-        title: "Spain's communities",
-        text: "Spain has 17 autonomous communities, plus two autonomous cities on the North African coast, Ceuta and Melilla. La Rioja, the smallest community on the mainland, gives its name to one of Spain's best-known wines.",
-        facts: [["Communities", "17"], ["Autonomous cities", "2"], ["Biggest", "Castile and León"]],
-        picture: "La Rioja (Spain)"
+        title: "The Olympic rings",
+        text: "Pierre de Coubertin drew the five rings in 1913. Together with the white background, he said, their colours could make the flag of every nation taking part at the time.",
+        facts: [["Rings", "5"], ["Drawn in", "1913"], ["Designer", "Pierre de Coubertin"]],
+        picture: "Olympic symbols"
       }
     },
     paint: {
@@ -9858,24 +9845,19 @@ const DAYS = {
       ]
     },
     deepcut: {
-      countries: ["NO", "SE", "MM", "AT", "PE", "EG", "GH", "KR", "PT"],
-      question: "Name a Secretary-General of the United Nations.",
+      question: "Name one of the six official languages of the United Nations.",
       answers: {
-        1000: ["Trygve Lie"],
-        800: ["Dag Hammarskjöld"],
-        600: ["Kurt Waldheim", "Javier Pérez de Cuéllar", "U Thant"],
-        400: ["Boutros Boutros-Ghali"],
-        200: ["Kofi Annan", "Ban Ki-moon", "António Guterres"]
+        1000: ["Arabic"],
+        800: ["Russian"],
+        600: ["Chinese"],
+        400: ["French", "Spanish"],
+        200: ["English"]
       },
-      aliases: {
-        "Trygve Lie": ["Lie"], "Dag Hammarskjöld": ["Hammarskjold", "Hammarskjöld"], "Kurt Waldheim": ["Waldheim"],
-        "Javier Pérez de Cuéllar": ["Perez de Cuellar", "Pérez de Cuéllar"], "Boutros Boutros-Ghali": ["Boutros-Ghali"],
-        "Kofi Annan": ["Annan"], "Ban Ki-moon": ["Ban"], "António Guterres": ["Guterres", "Antonio Guterres"]
-      },
+      aliases: { "Chinese": ["Mandarin"] },
       info: {
-        title: "Secretaries-General",
-        text: "Since 1946 there have been nine Secretaries-General, from nine different countries, and none from the five permanent members of the Security Council. So far, none has been a woman.",
-        facts: [["Secretaries-General", "9"], ["First", "Trygve Lie, 1946"], ["Term", "5 years"]],
+        title: "The UN's languages",
+        text: "Every main UN document comes out in Arabic, Chinese, English, French, Russian and Spanish. English and French are the working languages of its staff; Arabic was the last to be added, in 1973.",
+        facts: [["Languages", "6"], ["Newest", "Arabic, 1973"], ["Headquarters", "New York"]],
         picture: "Headquarters of the United Nations"
       }
     },
@@ -9968,25 +9950,20 @@ const DAYS = {
       ]
     },
     deepcut: {
-      countries: ["US"],
-      question: "Name one of the twelve astronauts who walked on the Moon.",
+      question: "Name a country that has made a soft landing on the Moon.",
       answers: {
-        1000: ["Alan Bean", "Edgar Mitchell", "David Scott", "James Irwin", "John Young", "Charles Duke", "Harrison Schmitt"],
-        800: ["Pete Conrad", "Eugene Cernan"],
-        600: ["Alan Shepard"],
-        200: ["Neil Armstrong", "Buzz Aldrin"]
+        1000: ["Japan"],
+        800: ["India"],
+        600: ["China"],
+        400: ["Russia"],
+        200: ["United States"]
       },
-      aliases: {
-        "Alan Bean": ["Bean"], "Edgar Mitchell": ["Mitchell"], "David Scott": ["Dave Scott"], "James Irwin": ["Jim Irwin", "Irwin"],
-        "John Young": ["Young"], "Charles Duke": ["Charlie Duke", "Duke"], "Harrison Schmitt": ["Jack Schmitt", "Schmitt"],
-        "Pete Conrad": ["Conrad"], "Eugene Cernan": ["Gene Cernan", "Cernan"], "Alan Shepard": ["Shepard"],
-        "Neil Armstrong": ["Armstrong"], "Buzz Aldrin": ["Aldrin", "Edwin Aldrin"]
-      },
+      aliases: { "Russia": ["Soviet Union", "USSR"], "United States": ["USA", "America"] },
       info: {
-        title: "Walking on the Moon",
-        text: "Twelve astronauts walked on the Moon between 1969 and 1972, on six Apollo missions. Eugene Cernan of Apollo 17 was the last to step off it, in December 1972.",
-        facts: [["Moonwalkers", "12"], ["Missions", "6"], ["Last steps", "December 1972"]],
-        picture: "Apollo 11"
+        title: "Landing on the Moon",
+        text: "The Soviet Union's Luna 9 made the first soft landing in February 1966, four months before America's Surveyor 1. China followed in 2013, India in 2023 and Japan in 2024.",
+        facts: [["Countries", "5"], ["First", "Soviet Union, 1966"], ["People on the Moon", "1969–1972"]],
+        picture: "Luna 9"
       }
     },
     paint: {
@@ -10075,30 +10052,26 @@ const DAYS = {
       answer: "PT",
       clues: [
         "Cristiano Ronaldo was born here, on the island of Madeira.",
-        "Pastéis de nata, little custard tarts, were first made by monks in its capital.",
+        "Pastéis de nata, little custard tarts, were first made by monks here.",
         "It is the westernmost country of mainland Europe."
       ]
     },
     deepcut: {
       countries: ["FR"],
-      question: "Name a region of mainland France or Corsica.",
+      question: "Name a country that borders France.",
       answers: {
-        1000: ["Centre-Val de Loire", "Bourgogne-Franche-Comté"],
-        800: ["Pays de la Loire", "Grand Est", "Hauts-de-France"],
-        600: ["Occitanie", "Nouvelle-Aquitaine", "Auvergne-Rhône-Alpes"],
-        400: ["Île-de-France", "Corsica"],
-        200: ["Brittany", "Normandy", "Provence-Alpes-Côte d'Azur"]
+        1000: ["Brazil", "Suriname"],
+        800: ["Monaco", "Andorra"],
+        600: ["Luxembourg"],
+        400: ["Belgium", "Switzerland"],
+        200: ["Spain", "Germany", "Italy"]
       },
-      aliases: {
-        "Centre-Val de Loire": ["Centre"], "Bourgogne-Franche-Comté": ["Burgundy-Franche-Comte", "Bourgogne"],
-        "Occitanie": ["Occitania"], "Île-de-France": ["Ile de France"], "Corsica": ["Corse"], "Brittany": ["Bretagne"],
-        "Normandy": ["Normandie"], "Provence-Alpes-Côte d'Azur": ["Provence", "PACA"]
-      },
+      aliases: {},
       info: {
-        title: "France's regions",
-        text: "In 2016 France cut its mainland regions from 22 to 13, merging many into big new ones such as Nouvelle-Aquitaine, the largest. Corsica has a special status of its own.",
-        facts: [["Regions", "13"], ["Before 2016", "22"], ["Largest", "Nouvelle-Aquitaine"]],
-        picture: "Mont-Saint-Michel"
+        title: "France's neighbours",
+        text: "Mainland France touches eight countries, from Spain to tiny Monaco. Through French Guiana, on the north coast of South America, it also borders Brazil and Suriname.",
+        facts: [["Neighbours", "10"], ["In Europe", "8"], ["In South America", "2"]],
+        picture: "Pyrenees"
       }
     },
     paint: {
@@ -10561,11 +10534,14 @@ const CASUAL_DAYS = {
       answers: ["CN", "MX", "FR", "GB", "CO"]
     },
     rank: {
-      topic: "Year the film festival was first held",
-      detail: "Venice, Cannes, Berlin, Sundance and Busan.",
-      values: { FR: 1946, KR: 1996, IT: 1932, US: 1978, DE: 1951 },
-      years: true,
-      note: "Venice is the oldest film festival in the world. Sundance began in 1978 as the Utah/US Film Festival."
+      topic: "Population of five film countries",
+      detail: "The homes of Hollywood, Cannes, Venice, Berlin and Busan's film festivals.",
+      values: { US: 341.8, DE: 83.5, FR: 68.7, IT: 58.9, KR: 51.7 },
+      decimals: 1,
+      unit: " million",
+      top: "MOST",
+      bottom: "FEWEST",
+      note: "From the game's country data (World Bank and UN figures)."
     }
   },
 
@@ -10651,11 +10627,13 @@ const CASUAL_DAYS = {
       answers: ["DK", "SE", "NO", "FI", "IS"]
     },
     rank: {
-      topic: "Year the flag was officially adopted",
-      detail: "The flag as it is today.",
-      values: { CA: 1965, JP: 1999, GB: 1801, ZA: 1994, US: 1960 },
-      years: true,
-      note: "The Union Flag got its St Patrick's cross in 1801; the US flag got its 50th star in 1960; Canada's Maple Leaf flew from 1965; Japan's flag was made official by law in 1999."
+      topic: "Area of five flag countries",
+      detail: "Land and water, in km².",
+      values: { CA: 9984670, US: 9372610, ZA: 1221037, JP: 377930, GB: 242900 },
+      unit: " km²",
+      top: "BIGGEST",
+      bottom: "SMALLEST",
+      note: "Canada is a little bigger than the United States, and only Russia is bigger than Canada."
     }
   },
 
@@ -10760,7 +10738,7 @@ const CASUAL_DAYS = {
     pinpoint: {
       answer: "CH",
       clues: [
-        "Toblerone, the triangle-shaped chocolate bar, was invented in its capital, Bern.",
+        "Toblerone, the triangle-shaped chocolate bar, was invented here.",
         "Milk chocolate was first made here, in 1875.",
         "Its flag is a white cross on a square red background."
       ]
@@ -10960,10 +10938,14 @@ const CASUAL_DAYS = {
       answers: ["DE", "ES", "IN", "MX", "TH"]
     },
     rank: {
-      topic: "Year the festival was first held",
-      detail: "Oktoberfest, La Tomatina, Glastonbury, Burning Man and Tomorrowland.",
-      values: { GB: 1970, BE: 2005, DE: 1810, US: 1986, ES: 1945 },
-      years: true
+      topic: "Population of five party countries",
+      detail: "The homes of Burning Man, Oktoberfest, Glastonbury, La Tomatina and Tomorrowland.",
+      values: { US: 341.8, DE: 83.5, GB: 69.5, ES: 49.4, BE: 11.9 },
+      decimals: 1,
+      unit: " million",
+      top: "MOST",
+      bottom: "FEWEST",
+      note: "From the game's country data (World Bank and UN figures)."
     }
   },
 
@@ -10981,23 +10963,19 @@ const CASUAL_DAYS = {
       ]
     },
     deepcut: {
-      countries: ["NL"],
-      question: "Name one of the twelve provinces of the Netherlands.",
+      question: "Name a colour of the rainbow.",
       answers: {
-        1000: ["Drenthe", "Flevoland", "Overijssel"],
-        800: ["Groningen", "Friesland", "Zeeland"],
-        600: ["Gelderland", "Limburg", "North Brabant"],
-        400: ["Utrecht"],
-        200: ["North Holland", "South Holland"]
+        1000: ["Indigo"],
+        800: ["Violet"],
+        600: ["Orange"],
+        400: ["Green", "Yellow"],
+        200: ["Red", "Blue"]
       },
-      aliases: {
-        "North Holland": ["Noord-Holland"], "South Holland": ["Zuid-Holland"],
-        "North Brabant": ["Noord-Brabant", "Brabant"], Friesland: ["Fryslan"]
-      },
+      aliases: { "Violet": ["Purple"] },
       info: {
-        title: "The Dutch provinces",
-        text: "The Netherlands has twelve provinces. The newest, Flevoland, is almost all land won back from the sea, and only became a province in 1986.",
-        facts: [["Provinces", "12"], ["Newest", "Flevoland, 1986"], ["Most people", "South Holland"]]
+        title: "The rainbow",
+        text: "Isaac Newton split sunlight into its colours with a glass prism and named seven of them, partly so they would match the seven notes of a musical scale.",
+        facts: [["Colours", "7"], ["Named by", "Isaac Newton"], ["Shortcut", "ROY G BIV"]]
       }
     },
     paint: {
@@ -11256,13 +11234,14 @@ const CASUAL_DAYS = {
       answers: ["IT", "JP", "MX", "BR", "ZA"]
     },
     rank: {
-      topic: "Height of the highest peak",
-      detail: "Five coffee-growing countries.",
-      values: { ET: 4550, JM: 2256, CO: 5730, VN: 3147, ID: 4884 },
-      approx: true,
-      unit: " m",
-      top: "HIGHEST",
-      bottom: "LOWEST"
+      topic: "Population of five coffee countries",
+      detail: "Five countries that grow coffee.",
+      values: { ID: 285.7, ET: 135.5, VN: 101.6, CO: 53.4, JM: 2.8 },
+      decimals: 1,
+      unit: " million",
+      top: "MOST",
+      bottom: "FEWEST",
+      note: "Indonesia has the fourth-biggest population in the world. Jamaica is small, but its Blue Mountain coffee is among the most expensive."
     }
   },
 
@@ -11389,10 +11368,13 @@ const CASUAL_DAYS = {
       answers: ["BZ", "GT", "HN", "NI", "CR", "PA"]
     },
     rank: {
-      topic: "Year it became independent",
-      values: { CU: 1902, BS: 1973, HT: 1804, JM: 1962, DO: 1844 },
-      years: true,
-      note: "Haiti from France (1804), the Dominican Republic from Haiti (1844), Cuba as a republic after Spanish rule (1902), Jamaica and the Bahamas from Britain."
+      topic: "Area of five Caribbean countries",
+      detail: "Land and water, in km².",
+      values: { CU: 109884, DO: 48671, HT: 27750, BS: 13943, JM: 10991 },
+      unit: " km²",
+      top: "BIGGEST",
+      bottom: "SMALLEST",
+      note: "Cuba is the biggest island in the Caribbean. The Dominican Republic and Haiti share the island of Hispaniola."
     }
   },
 
@@ -11475,10 +11457,14 @@ const CASUAL_DAYS = {
       answers: ["BR", "DE", "ES", "FI", "GB"]
     },
     rank: {
-      topic: "Year the first motorway opened",
-      values: { GB: 1958, IT: 1924, JP: 1963, DE: 1932, US: 1940 },
-      years: true,
-      note: "Italy's Autostrada dei Laghi (1924), Cologne to Bonn (1932), the Pennsylvania Turnpike (1940), the Preston bypass (1958) and the Meishin Expressway (1963)."
+      topic: "Population of five racing countries",
+      detail: "Home countries of famous Formula One teams and drivers.",
+      values: { US: 341.8, JP: 123.4, DE: 83.5, GB: 69.5, IT: 58.9 },
+      decimals: 1,
+      unit: " million",
+      top: "MOST",
+      bottom: "FEWEST",
+      note: "From the game's country data (World Bank and UN figures)."
     }
   },
 
@@ -11608,13 +11594,15 @@ const STREAK_STEP = 0.1;
 const MAX_DAILY_SCORE = ROUND_TYPES.reduce((sum, _, index) => sum + MAX_ROUND_SCORE * (1 + STREAK_STEP * index), 0);
 
 // Competitive rounds are timed: a round solved straight away scores ×1.5, falling evenly
-// to ×1.0 when the 30-second bar runs out. After that you can still answer, without the
-// bonus. The clock stops while a guess is being revealed. A round that isn't solved
-// gets no speed bonus.
+// to ×1.0 when the bar runs out (30 seconds, 45 for Rank 'Em, which has five countries
+// to put in order). After that you can still answer, without the bonus. The clock stops
+// while a guess is being revealed. A round that isn't solved gets no speed bonus.
 const SPEED_WINDOW_MS = 30000;
+const SPEED_WINDOWS_MS = { rank: 45000 };
+const getSpeedWindow = type => SPEED_WINDOWS_MS[type] || SPEED_WINDOW_MS;
 const MAX_SPEED_BONUS = 0.5;
-function getSpeedMultiplier(elapsedMs) {
-  const left = Math.max(0, 1 - (elapsedMs || 0) / SPEED_WINDOW_MS);
+function getSpeedMultiplier(elapsedMs, type) {
+  const left = Math.max(0, 1 - (elapsedMs || 0) / getSpeedWindow(type));
   return Math.round((1 + MAX_SPEED_BONUS * left) * 100) / 100;
 }
 // The highest score a day can reach: 9,000 in competitive (a perfect day, every round
@@ -12149,7 +12137,7 @@ function getDayScore(plan, states) {
   };
 }
 
-return { MODES, MODE_INFO, ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, SPEED_WINDOW_MS, MAX_SPEED_BONUS, getSpeedMultiplier, getMaxScore, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, resolveRound, resolvePlan, getDayInfo, getDailyPlan, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
+return { MODES, MODE_INFO, ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, SPEED_WINDOW_MS, getSpeedWindow, MAX_SPEED_BONUS, getSpeedMultiplier, getMaxScore, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, resolveRound, resolvePlan, getDayInfo, getDailyPlan, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
 })();
 
 // ---- community.js
@@ -14392,7 +14380,7 @@ const { initializeCommunity } = __modules["social.js"];
 const { createBadge } = __modules["badges.js"];
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
-const { MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MODES, MODE_INFO, SPEED_WINDOW_MS, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
+const { MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MODES, MODE_INFO, getSpeedWindow, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
 const { createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, initializeStatsModal, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playRankReveal, getMysteryClue, redactCountryName, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
 
 // v3: Deep Cut and Paint the Map replaced Capital Call and Border Patrol (October 2026).
@@ -14676,7 +14664,7 @@ function commit({ animateGlobe = true } = {}) {
   // A competitive round's speed is locked in the moment it ends (no bonus unless solved).
   const state = day.rounds[viewIndex];
   if (activeMode === "competitive" && progress.done && state.speed === null) {
-    state.speed = progress.solved ? getSpeedMultiplier(state.elapsed) : 1;
+    state.speed = progress.solved ? getSpeedMultiplier(state.elapsed, plan[viewIndex].type) : 1;
   }
   saveDay();
   render({ animateGlobe });
@@ -15078,7 +15066,7 @@ function tickClock(now) {
 }
 requestAnimationFrame(tickClock);
 
-// The 30-second bar on the round card: it drains while the clock runs, next to the
+// The round's time bar on the round card (30 seconds, 45 for Rank 'Em): it drains while the clock runs, next to the
 // multiplier a right answer would get now. Once the round is over, the speed it scored.
 let shownSpeedBar = "";
 function renderSpeedBar() {
@@ -15088,11 +15076,12 @@ function renderSpeedBar() {
   if (!competitive) return;
   const state = day.rounds[viewIndex];
   const progress = progressOf(viewIndex);
-  const left = Math.max(0, 1 - (state.elapsed || 0) / SPEED_WINDOW_MS);
-  const speed = progress.done ? (progress.solved && state.speed > 1 ? state.speed : 1) : getSpeedMultiplier(state.elapsed);
+  const windowMs = getSpeedWindow(plan[viewIndex].type);
+  const left = Math.max(0, 1 - (state.elapsed || 0) / windowMs);
+  const speed = progress.done ? (progress.solved && state.speed > 1 ? state.speed : 1) : getSpeedMultiplier(state.elapsed, plan[viewIndex].type);
   const running = isClockRunning();
   const label = speed > 1 ? `⚡ ×${speed.toFixed(2)}` : "NO BONUS";
-  const time = progress.done ? (speed > 1 ? "SPEED" : "") : left > 0 ? `${Math.ceil(left * SPEED_WINDOW_MS / 1000)}s` : "0s";
+  const time = progress.done ? (speed > 1 ? "SPEED" : "") : left > 0 ? `${Math.ceil(left * windowMs / 1000)}s` : "0s";
   const fill = progress.done ? (speed - 1) / MAX_SPEED_BONUS : left;
   const key = [fill.toFixed(3), label, time, running, progress.done].join("|");
   if (key === shownSpeedBar) return;
@@ -15373,7 +15362,7 @@ const ROUND_RENDERERS = {
   mystery(round, state, progress, options) {
     const answer = { ...getCountry(round.answer), ...round.clues };
     const guesses = state.guesses.map(iso => evaluateGuess(getCountry(iso), answer));
-    renderProgressiveHints(answer, progress.wrong + clueHeadStart(round));
+    renderProgressiveHints(answer, progress.wrong);
     renderGuessHistory(guesses, (index, active) => globe.setMarkerHighlight(index, active), MAX_GUESSES);
     renderKnownStrip(progress.done ? [] : getGuessSummary(guesses));
     // Phones: your guesses as small chips right under the answer box.
@@ -15647,9 +15636,6 @@ const ROUND_RENDERERS = {
   }
 };
 
-// Casual Mystery Country opens with two clues instead of one.
-const clueHeadStart = round => round.mode === "casual" ? 1 : 0;
-
 // Casual Paint the Map: one clue per wrong click, each about a country not found yet (its
 // hand-written location clue, with its name taken out).
 function getPaintClues(round, state) {
@@ -15773,7 +15759,7 @@ function submitMysteryGuess(value, selectedCountry) {
   const answer = { ...getCountry(round.answer), ...round.clues };
   // A wrong guess unlocks the next clue, shown last on the guess card.
   const progress = progressOf(viewIndex);
-  const newClue = progress.done ? null : getMysteryClue(answer, progress.wrong + clueHeadStart(round));
+  const newClue = progress.done ? null : getMysteryClue(answer, progress.wrong);
   revealGuess(evaluateGuess(country, answer), answerBox("countryInput"), "#history .guess-row", { newClue });
   return { status: "submitted" };
 }
