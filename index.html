@@ -1399,6 +1399,13 @@ h1, h2, h3 { font-weight: normal; }
 .reveal-clue .slot-cover { position: absolute; inset: 0; display: grid; place-items: center; font: 12px var(--font-display); letter-spacing: var(--ls-pixel); }
 .reveal-slot:not(.is-turned) .slot-cover { color: var(--muted) !important; }
 .reveal-clue.reveal-slot:not(.is-turned) > :not(.slot-cover) { visibility: hidden; }
+/* A clue on its own card (playClueCard): bigger, so it reads like the round's question. Its
+   spot in the clue list stays empty until the card lands there. */
+.clue-reveal-card { width: min(440px, calc(100vw - 32px)); }
+.clue-reveal-card .reveal-clue { min-height: 120px; padding: 1rem 1.1rem; }
+.clue-reveal-card .reveal-clue p { font-size: 20px; font-weight: 600; line-height: 1.35; }
+.clue-reveal-card .reveal-clue .slot-cover { font-size: 14px; }
+.is-clue-incoming { visibility: hidden; }
 .reveal-slot.is-turned .slot-cover { display: none; }
 
 /* Rank 'Em's counter: "0/5" ticks up for each country in the right place, then glows
@@ -2494,6 +2501,9 @@ h1, h2, h3 { font-weight: normal; }
   .play-tile-art { height: 64px; }
   .play-tile-art svg { width: 46px; height: 46px; }
 }
+.paint-clues li.is-found { opacity: 0.55; }
+/* Rank 'Em: what each country stands for in the day's topic (a book, a band…). */
+.rank-label { display: block; color: var(--muted); font: 500 12px/1.3 var(--font-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -8597,6 +8607,7 @@ const DAYS = {
         topic: "Year its oldest university opened",
         detail: "The oldest university still running: Bologna, Salamanca, Prague, Harvard and Sydney.",
         values: { US: 1636, IT: 1088, AU: 1850, CZ: 1348, ES: 1218 },
+        labels: { US: "Harvard", IT: "Bologna", AU: "Sydney", CZ: "Charles University", ES: "Salamanca" },
         years: true,
         note: "Bologna (1088), Salamanca (1218), Charles University in Prague (1348), Harvard (1636) and the University of Sydney (1850)."
       }
@@ -8694,6 +8705,7 @@ const DAYS = {
     paint: {
       question: "Click every country that has won the men's football World Cup. (England counts as the UK.)",
       answers: ["BR", "DE", "IT", "AR", "FR", "UY", "GB", "ES"],
+      labels: { BR: "5 titles", DE: "4 titles", IT: "4 titles", AR: "3 titles", FR: "2 titles", UY: "2 titles", GB: "1966 (England)", ES: "2010" },
       view: [20, -20],
       picture: "FIFA World Cup Trophy"
     },
@@ -8813,6 +8825,7 @@ const DAYS = {
     rank: {
       topic: "How far south the capital lies",
       values: { PE: 12.05, ZA: 25.75, NZ: 41.29, MG: 18.91, AU: 35.28 },
+      labels: { PE: "Lima", ZA: "Pretoria", NZ: "Wellington", MG: "Antananarivo", AU: "Canberra" },
       decimals: 1,
       unit: "° S",
       top: "FURTHEST SOUTH",
@@ -8869,6 +8882,7 @@ const DAYS = {
       topic: "Distance from Xi'an, where the Silk Road began",
       detail: "As the crow flies, to each country's capital.",
       values: { TR: 6565, PK: 3290, IR: 5166, AF: 3623, TM: 4502 },
+      labels: { TR: "Ankara", PK: "Islamabad", IR: "Tehran", AF: "Kabul", TM: "Ashgabat" },
       unit: " km",
       top: "FURTHEST",
       bottom: "CLOSEST",
@@ -9034,6 +9048,7 @@ const DAYS = {
     rank: {
       topic: "Height of the highest mountain",
       values: { CH: 4634, AR: 6961, NP: 8849, TZ: 5895, KG: 7439 },
+      labels: { CH: "Dufourspitze", AR: "Aconcagua", NP: "Everest", TZ: "Kilimanjaro", KG: "Jengish Chokusu" },
       unit: " m",
       top: "HIGHEST",
       bottom: "LOWEST",
@@ -9043,6 +9058,7 @@ const DAYS = {
         topic: "Height of the capital",
         detail: "Metres above sea level: Bern, Quito, Amsterdam, Addis Ababa and Kathmandu.",
         values: { CH: 540, EC: 2850, NL: 0, ET: 2355, NP: 1400 },
+        labels: { CH: "Bern", EC: "Quito", NL: "Amsterdam", ET: "Addis Ababa", NP: "Kathmandu" },
         approx: true,
         unit: " m",
         note: "Quito is the highest official capital on this list; Amsterdam lies around sea level."
@@ -9088,12 +9104,14 @@ const DAYS = {
     paint: {
       question: "Click every country that was home to one of the Seven Wonders of the Ancient World.",
       answers: ["EG", "IQ", "GR", "TR"],
+      labels: { EG: "Great Pyramid · Lighthouse of Alexandria", IQ: "Hanging Gardens of Babylon", GR: "Statue of Zeus · Colossus of Rhodes", TR: "Temple of Artemis · Mausoleum" },
       picture: "Seven Wonders of the Ancient World"
     },
     rank: {
       topic: "Year the lost treasure was found",
       detail: "Pompeii, Machu Picchu, Tutankhamun's tomb, the Lascaux cave paintings and the Terracotta Army.",
       values: { IT: 1748, PE: 1911, EG: 1922, FR: 1940, CN: 1974 },
+      labels: { IT: "Pompeii", PE: "Machu Picchu", EG: "Tutankhamun's tomb", FR: "Lascaux caves", CN: "Terracotta Army" },
       years: true,
       note: "Digging at Pompeii began in 1748; Hiram Bingham reached Machu Picchu in 1911; Howard Carter opened Tutankhamun's tomb in 1922; four teenagers found the Lascaux paintings in 1940; farmers digging a well found the Terracotta Army in 1974.",
       picture: "Pompeii",
@@ -9101,6 +9119,7 @@ const DAYS = {
         topic: "Age of its most famous ancient monument",
         detail: "The Great Pyramid, the Parthenon, the Colosseum, Angkor Wat and Machu Picchu.",
         values: { KH: 876, EG: 4586, PE: 576, GR: 2458, IT: 1946 },
+        labels: { KH: "Angkor Wat", EG: "Great Pyramid", PE: "Machu Picchu", GR: "Parthenon", IT: "Colosseum" },
         approx: true,
         unit: " years",
         note: "The Great Pyramid was finished around 2560 BC, the Parthenon in 432 BC, the Colosseum in AD 80, Angkor Wat around 1150 and Machu Picchu around 1450."
@@ -9259,6 +9278,7 @@ const DAYS = {
     paint: {
       question: "Click every country that has won the men's Rugby World Cup. (England counts as the UK.)",
       answers: ["NZ", "ZA", "AU", "GB"],
+      labels: { NZ: "1987, 2011, 2015", ZA: "1995, 2007, 2019, 2023", AU: "1991, 1999", GB: "2003 (England)" },
       picture: "Webb Ellis Cup"
     },
     rank: {
@@ -9488,12 +9508,14 @@ const DAYS = {
     paint: {
       question: "Click every country that has won Eurovision since 2014.",
       answers: ["AT", "SE", "UA", "PT", "IL", "NL", "IT", "CH"],
+      labels: { AT: "2014", SE: "2015, 2023", UA: "2016, 2022", PT: "2017", IL: "2018", NL: "2019", IT: "2021", CH: "2024" },
       picture: "St. Jakobshalle"
     },
     rank: {
       topic: "Birth year of the country's music legend",
       detail: "Mozart, Chopin, Grieg, Sibelius and Bob Marley.",
       values: { FI: 1865, JM: 1945, PL: 1810, AT: 1756, NO: 1843 },
+      labels: { FI: "Sibelius", JM: "Bob Marley", PL: "Chopin", AT: "Mozart", NO: "Grieg" },
       years: true,
       note: "Mozart (Austria), Chopin (Poland), Grieg (Norway), Sibelius (Finland) and Bob Marley (Jamaica).",
       picture: "Wolfgang Amadeus Mozart",
@@ -9660,6 +9682,7 @@ const DAYS = {
       topic: "Year the foreign intelligence service was founded",
       detail: "MI6, the CIA, Mossad, ASIS and the BND.",
       values: { DE: 1956, US: 1947, AU: 1952, GB: 1909, IL: 1949 },
+      labels: { DE: "BND", US: "CIA", AU: "ASIS", GB: "MI6", IL: "Mossad" },
       years: true,
       note: "Britain's MI6 (1909), the CIA (1947), Israel's Mossad (1949), Australia's ASIS (1952) and Germany's BND (1956).",
       picture: "SIS Building",
@@ -9720,6 +9743,7 @@ const DAYS = {
         topic: "Height of its highest volcano",
         detail: "Ojos del Salado, Kilimanjaro, Mount Fuji, Ruapehu and Öræfajökull.",
         values: { JP: 3776, CL: 6893, IS: 2110, TZ: 5895, NZ: 2797 },
+        labels: { JP: "Mount Fuji", CL: "Ojos del Salado", IS: "Öræfajökull", TZ: "Kilimanjaro", NZ: "Ruapehu" },
         unit: " m",
         note: "Ojos del Salado, on the border with Argentina, is the highest volcano on Earth."
       }
@@ -9825,6 +9849,7 @@ const DAYS = {
         topic: "Year its best-known brewery was founded",
         detail: "Heineken, Weihenstephan, Grupo Modelo (Corona), Guinness and Asahi.",
         values: { NL: 1864, DE: 1040, MX: 1925, IE: 1759, JP: 1889 },
+        labels: { NL: "Heineken", DE: "Weihenstephan", MX: "Grupo Modelo", IE: "Guinness", JP: "Asahi" },
         years: true,
         note: "Weihenstephan in Bavaria says it is the oldest working brewery in the world."
       }
@@ -9930,6 +9955,7 @@ const DAYS = {
         topic: "Year its best-known car maker was founded",
         detail: "Toyota, Ford, Hyundai, Citroën and Volvo.",
         values: { JP: 1937, US: 1903, KR: 1967, FR: 1919, SE: 1927 },
+        labels: { JP: "Toyota", US: "Ford", KR: "Hyundai", FR: "Citroën", SE: "Volvo" },
         years: true,
         note: "Ford (1903), Citroën (1919), Volvo (1927), Toyota (1937) and Hyundai Motor (1967)."
       }
@@ -9975,6 +10001,7 @@ const DAYS = {
     rank: {
       topic: "Year the first citizen went to space",
       values: { CN: 2003, US: 1961, KR: 2008, FR: 1982, JP: 1990 },
+      labels: { CN: "Yang Liwei", US: "Alan Shepard", KR: "Yi So-yeon", FR: "Jean-Loup Chrétien", JP: "Toyohiro Akiyama" },
       years: true,
       note: "Alan Shepard (US), Jean-Loup Chrétien (France), Toyohiro Akiyama (Japan), Yang Liwei (China) and Yi So-yeon (South Korea).",
       picture: "Yang Liwei",
@@ -10030,6 +10057,7 @@ const DAYS = {
     rank: {
       topic: "Year the first national park was founded",
       values: { ZA: 1926, US: 1872, KE: 1946, AU: 1879, CA: 1885 },
+      labels: { ZA: "Kruger", US: "Yellowstone", KE: "Nairobi", AU: "Royal National Park", CA: "Banff" },
       years: true,
       note: "Yellowstone (1872), the Royal National Park near Sydney (1879), Banff (1885), Kruger (1926) and Nairobi National Park (1946).",
       picture: "Kruger National Park",
@@ -10037,6 +10065,7 @@ const DAYS = {
         topic: "Year its oldest zoo opened",
         detail: "Vienna, London, Philadelphia, Pretoria and Singapore.",
         values: { SG: 1973, AT: 1752, ZA: 1899, GB: 1828, US: 1874 },
+        labels: { SG: "Singapore Zoo", AT: "Schönbrunn", ZA: "Pretoria", GB: "London Zoo", US: "Philadelphia" },
         years: true,
         note: "Vienna's Tiergarten Schönbrunn (1752) is the oldest zoo still open."
       }
@@ -10090,6 +10119,7 @@ const DAYS = {
       reroll: {
         topic: "Year the capital got a metro",
         values: { RU: 1935, GB: 1863, CN: 1969, FR: 1900, HU: 1896 },
+        labels: { RU: "Moscow", GB: "London", CN: "Beijing", FR: "Paris", HU: "Budapest" },
         years: true,
         note: "London (1863), Budapest (1896), Paris (1900), Moscow (1935) and Beijing (1969)."
       }
@@ -10192,6 +10222,7 @@ const DAYS = {
       topic: "Hours of darkness on Halloween",
       detail: "From sunset to sunrise in the capital.",
       values: { EG: 13.1, IS: 16.2, NZ: 10, RO: 13.9, FI: 15.5 },
+      labels: { EG: "Cairo", IS: "Reykjavík", NZ: "Wellington", RO: "Bucharest", FI: "Helsinki" },
       decimals: 1,
       unit: " hours",
       top: "MOST",
@@ -10262,12 +10293,14 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the countries where these stand: the Eiffel Tower, the Statue of Liberty, the Sydney Opera House, the Colosseum and the Great Wall.",
-      answers: ["FR", "US", "AU", "IT", "CN"]
+      answers: ["FR", "US", "AU", "IT", "CN"],
+      labels: { FR: "Eiffel Tower", US: "Statue of Liberty", AU: "Sydney Opera House", IT: "Colosseum", CN: "Great Wall" },
     },
     rank: {
       topic: "Height of a famous landmark",
       detail: "The Burj Khalifa, the Eiffel Tower, the London Eye, the Statue of Liberty and Christ the Redeemer (both with their pedestals).",
       values: { FR: 330, US: 93, AE: 828, BR: 38, GB: 135 },
+      labels: { FR: "Eiffel Tower", US: "Statue of Liberty", AE: "Burj Khalifa", BR: "Christ the Redeemer", GB: "London Eye" },
       unit: " m",
       top: "TALLEST",
       bottom: "SHORTEST",
@@ -10307,7 +10340,8 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the countries these dishes come from: pizza, tacos, paella, kimchi and crêpes.",
-      answers: ["IT", "MX", "ES", "KR", "FR"]
+      answers: ["IT", "MX", "ES", "KR", "FR"],
+      labels: { IT: "Pizza", MX: "Tacos", ES: "Paella", KR: "Kimchi", FR: "Crêpes" },
     },
     rank: {
       topic: "Population",
@@ -10351,7 +10385,8 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click every country that has hosted the Summer Olympics since 2000.",
-      answers: ["AU", "GR", "CN", "GB", "BR", "JP", "FR"]
+      answers: ["AU", "GR", "CN", "GB", "BR", "JP", "FR"],
+      labels: { AU: "Sydney 2000", GR: "Athens 2004", CN: "Beijing 2008", GB: "London 2012", BR: "Rio 2016", JP: "Tokyo 2020", FR: "Paris 2024" },
     },
     rank: {
       topic: "Medals won at the Paris 2024 Olympics",
@@ -10394,7 +10429,8 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click every country that has hosted the Winter Olympics since 1990.",
-      answers: ["FR", "NO", "JP", "US", "IT", "CA", "RU", "KR", "CN"]
+      answers: ["FR", "NO", "JP", "US", "IT", "CA", "RU", "KR", "CN"],
+      labels: { FR: "Albertville 1992", NO: "Lillehammer 1994", JP: "Nagano 1998", US: "Salt Lake City 2002", IT: "Turin 2006", CA: "Vancouver 2010", RU: "Sochi 2014", KR: "Pyeongchang 2018", CN: "Beijing 2022" },
     },
     rank: {
       topic: "Size",
@@ -10442,7 +10478,8 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the countries where these animals live in the wild: the kiwi, the koala, the ring-tailed lemur and the Komodo dragon.",
-      answers: ["NZ", "AU", "MG", "ID"]
+      answers: ["NZ", "AU", "MG", "ID"],
+      labels: { NZ: "Kiwi", AU: "Koala", MG: "Ring-tailed lemur", ID: "Komodo dragon" },
     },
     rank: {
       topic: "Share of the land covered by forest",
@@ -10488,12 +10525,14 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the home countries of these stars: Shakira, Taylor Swift, Ed Sheeran, BTS and Céline Dion.",
-      answers: ["CO", "US", "GB", "KR", "CA"]
+      answers: ["CO", "US", "GB", "KR", "CA"],
+      labels: { CO: "Shakira", US: "Taylor Swift", GB: "Ed Sheeran", KR: "BTS", CA: "Céline Dion" },
     },
     rank: {
       topic: "Year the band's first album came out",
       detail: "The Beatles, ABBA, U2, Nirvana and BTS.",
       values: { US: 1989, GB: 1963, KR: 2013, SE: 1973, IE: 1980 },
+      labels: { US: "Nirvana", GB: "The Beatles", KR: "BTS", SE: "ABBA", IE: "U2" },
       years: true,
       note: "Please Please Me (1963), Ring Ring (1973), Boy (1980), Bleach (1989) and 2 Cool 4 Skool (2013)."
     }
@@ -10531,7 +10570,8 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the countries where these Disney films are set: Mulan, Coco, Ratatouille, Brave and Encanto.",
-      answers: ["CN", "MX", "FR", "GB", "CO"]
+      answers: ["CN", "MX", "FR", "GB", "CO"],
+      labels: { CN: "Mulan", MX: "Coco", FR: "Ratatouille", GB: "Brave", CO: "Encanto" },
     },
     rank: {
       topic: "Population of five film countries",
@@ -10668,12 +10708,14 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the countries with these capitals: Ottawa, Canberra, Brasília, Pretoria and Wellington.",
-      answers: ["CA", "AU", "BR", "ZA", "NZ"]
+      answers: ["CA", "AU", "BR", "ZA", "NZ"],
+      labels: { CA: "Ottawa", AU: "Canberra", BR: "Brasília", ZA: "Pretoria", NZ: "Wellington" },
     },
     rank: {
       topic: "Height of the capital above sea level",
       detail: "Quito, Mexico City, Nairobi, Kathmandu and London.",
       values: { NP: 1400, GB: 11, EC: 2850, KE: 1795, MX: 2240 },
+      labels: { NP: "Kathmandu", GB: "London", EC: "Quito", KE: "Nairobi", MX: "Mexico City" },
       approx: true,
       unit: " m",
       top: "HIGHEST",
@@ -10724,6 +10766,7 @@ const CASUAL_DAYS = {
       topic: "Height of the country's tallest building",
       detail: "The Burj Khalifa, the Shanghai Tower, One World Trade Center, the Shard and Zalmhaven.",
       values: { GB: 310, AE: 828, NL: 215, CN: 632, US: 541 },
+      labels: { GB: "The Shard", AE: "Burj Khalifa", NL: "Zalmhaven", CN: "Shanghai Tower", US: "One World Trade Center" },
       unit: " m",
       top: "TALLEST",
       bottom: "SHORTEST"
@@ -10765,12 +10808,14 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the countries these sweet things come from: churros, mochi, gulab jamun, pastéis de nata and maple syrup.",
-      answers: ["ES", "JP", "IN", "PT", "CA"]
+      answers: ["ES", "JP", "IN", "PT", "CA"],
+      labels: { ES: "Churros", JP: "Mochi", IN: "Gulab jamun", PT: "Pastéis de nata", CA: "Maple syrup" },
     },
     rank: {
       topic: "Year the famous chocolate first went on sale",
       detail: "Côte d'Or, the Hershey bar, Toblerone, the Mars bar and Nutella.",
       values: { CH: 1908, IT: 1964, BE: 1883, GB: 1932, US: 1900 },
+      labels: { CH: "Toblerone", IT: "Nutella", BE: "Côte d'Or", GB: "Mars bar", US: "Hershey bar" },
       years: true
     }
   },
@@ -10806,12 +10851,14 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the home countries of these car brands: Toyota, Volvo, Hyundai, Ford and Renault.",
-      answers: ["JP", "SE", "KR", "US", "FR"]
+      answers: ["JP", "SE", "KR", "US", "FR"],
+      labels: { JP: "Toyota", SE: "Volvo", KR: "Hyundai", US: "Ford", FR: "Renault" },
     },
     rank: {
       topic: "Year the car company was founded",
       detail: "Ford, BMW, Volvo, Toyota and Hyundai.",
       values: { SE: 1927, KR: 1967, US: 1903, JP: 1937, DE: 1916 },
+      labels: { SE: "Volvo", KR: "Hyundai", US: "Ford", JP: "Toyota", DE: "BMW" },
       years: true
     }
   },
@@ -10851,7 +10898,8 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click every country on the islands of Borneo and Hispaniola.",
-      answers: ["ID", "MY", "BN", "HT", "DO"]
+      answers: ["ID", "MY", "BN", "HT", "DO"],
+      labels: { ID: "Borneo", MY: "Borneo", BN: "Borneo", HT: "Hispaniola", DO: "Hispaniola" },
     },
     rank: {
       topic: "Size of the island country",
@@ -10893,12 +10941,14 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the home countries of these storytellers: the Brothers Grimm, Charles Perrault, Aesop, Lewis Carroll and Astrid Lindgren.",
-      answers: ["DE", "FR", "GR", "GB", "SE"]
+      answers: ["DE", "FR", "GR", "GB", "SE"],
+      labels: { DE: "The Brothers Grimm", FR: "Charles Perrault", GR: "Aesop", GB: "Lewis Carroll", SE: "Astrid Lindgren" },
     },
     rank: {
       topic: "Year the story was first published",
       detail: "Cinderella (Perrault), Snow White (the Grimms), The Little Mermaid (Andersen), Alice in Wonderland (Carroll) and Pippi Longstocking (Lindgren).",
       values: { DK: 1837, SE: 1945, FR: 1697, GB: 1865, DE: 1812 },
+      labels: { DK: "The Little Mermaid", SE: "Pippi Longstocking", FR: "Cinderella", GB: "Alice in Wonderland", DE: "Snow White" },
       years: true
     }
   },
@@ -10935,7 +10985,8 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the countries famous for these festivals: Oktoberfest, La Tomatina, Holi, the Day of the Dead and Songkran.",
-      answers: ["DE", "ES", "IN", "MX", "TH"]
+      answers: ["DE", "ES", "IN", "MX", "TH"],
+      labels: { DE: "Oktoberfest", ES: "La Tomatina", IN: "Holi", MX: "Day of the Dead", TH: "Songkran" },
     },
     rank: {
       topic: "Population of five party countries",
@@ -11023,12 +11074,14 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the home countries of these companies: LEGO, Samsung, Nokia, Sony and IKEA.",
-      answers: ["DK", "KR", "FI", "JP", "SE"]
+      answers: ["DK", "KR", "FI", "JP", "SE"],
+      labels: { DK: "LEGO", KR: "Samsung", FI: "Nokia", JP: "Sony", SE: "IKEA" },
     },
     rank: {
       topic: "Year of the invention",
       detail: "Paper (China), the printing press (Germany), the telephone (United States), television (United Kingdom) and the World Wide Web (Switzerland, at CERN).",
       values: { DE: 1440, CH: 1989, CN: 105, GB: 1926, US: 1876 },
+      labels: { DE: "Printing press", CH: "World Wide Web", CN: "Paper", GB: "Television", US: "Telephone" },
       years: true,
       approx: true
     }
@@ -11065,12 +11118,14 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the home countries of these astronauts: Neil Armstrong, Yang Liwei, Tim Peake, Chris Hadfield and Thomas Pesquet.",
-      answers: ["US", "CN", "GB", "CA", "FR"]
+      answers: ["US", "CN", "GB", "CA", "FR"],
+      labels: { US: "Neil Armstrong", CN: "Yang Liwei", GB: "Tim Peake", CA: "Chris Hadfield", FR: "Thomas Pesquet" },
     },
     rank: {
       topic: "Year the space agency was founded",
       detail: "NASA, ISRO (India), the CNSA (China), JAXA (Japan) and the UAE Space Agency.",
       values: { JP: 2003, US: 1958, AE: 2014, IN: 1969, CN: 1993 },
+      labels: { JP: "JAXA", US: "NASA", AE: "UAE Space Agency", IN: "ISRO", CN: "CNSA" },
       years: true
     }
   },
@@ -11106,7 +11161,8 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the countries of these deserts: the Atacama, the Mojave, the Taklamakan and the Simpson Desert.",
-      answers: ["CL", "US", "CN", "AU"]
+      answers: ["CL", "US", "CN", "AU"],
+      labels: { CL: "Atacama", US: "Mojave", CN: "Taklamakan", AU: "Simpson Desert" },
     },
     rank: {
       topic: "Life expectancy",
@@ -11189,11 +11245,13 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the countries of these famous train journeys: the Trans-Siberian, the Ghan, the Glacier Express, the Rocky Mountaineer and the Blue Train.",
-      answers: ["RU", "AU", "CH", "CA", "ZA"]
+      answers: ["RU", "AU", "CH", "CA", "ZA"],
+      labels: { RU: "Trans-Siberian", AU: "The Ghan", CH: "Glacier Express", CA: "Rocky Mountaineer", ZA: "Blue Train" },
     },
     rank: {
       topic: "Year the first railway opened",
       values: { JP: 1872, GB: 1825, TH: 1893, DE: 1835, IN: 1853 },
+      labels: { JP: "Tokyo–Yokohama", GB: "Stockton–Darlington", TH: "Bangkok–Paknam", DE: "Nuremberg–Fürth", IN: "Bombay–Thane" },
       years: true,
       note: "Stockton and Darlington (1825), Nuremberg to Fürth (1835), Bombay to Thane (1853), Tokyo to Yokohama (1872) and Bangkok to Paknam (1893)."
     }
@@ -11231,7 +11289,8 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the homes of these drinks: espresso, sake, tequila, the caipirinha and rooibos tea.",
-      answers: ["IT", "JP", "MX", "BR", "ZA"]
+      answers: ["IT", "JP", "MX", "BR", "ZA"],
+      labels: { IT: "Espresso", JP: "Sake", MX: "Tequila", BR: "Caipirinha", ZA: "Rooibos tea" },
     },
     rank: {
       topic: "Population of five coffee countries",
@@ -11276,12 +11335,14 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the home countries of these footballers: Mohamed Salah, Kylian Mbappé, Neymar, Erling Haaland and Son Heung-min.",
-      answers: ["EG", "FR", "BR", "NO", "KR"]
+      answers: ["EG", "FR", "BR", "NO", "KR"],
+      labels: { EG: "Mohamed Salah", FR: "Kylian Mbappé", BR: "Neymar", NO: "Erling Haaland", KR: "Son Heung-min" },
     },
     rank: {
       topic: "Year the famous person was born",
       detail: "William Shakespeare, Mahatma Gandhi, Bob Marley, Diego Maradona and Cristiano Ronaldo.",
       values: { IN: 1869, PT: 1985, GB: 1564, AR: 1960, JM: 1945 },
+      labels: { IN: "Mahatma Gandhi", PT: "Cristiano Ronaldo", GB: "William Shakespeare", AR: "Diego Maradona", JM: "Bob Marley" },
       years: true
     }
   },
@@ -11323,6 +11384,7 @@ const CASUAL_DAYS = {
       topic: "Distance from the capital to the Equator",
       detail: "Quito, Jakarta, Lima, Brasília and Mexico City.",
       values: { PE: 1340, MX: 2161, EC: 20, BR: 1756, ID: 690 },
+      labels: { PE: "Lima", MX: "Mexico City", EC: "Quito", BR: "Brasília", ID: "Jakarta" },
       order: "lowest",
       approx: true,
       unit: " km",
@@ -11410,12 +11472,14 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the countries where these famous fossils were found: Lucy, Archaeopteryx, Sue the T. rex, Spinosaurus and Argentinosaurus.",
-      answers: ["ET", "DE", "US", "EG", "AR"]
+      answers: ["ET", "DE", "US", "EG", "AR"],
+      labels: { ET: "Lucy", DE: "Archaeopteryx", US: "Sue the T. rex", EG: "Spinosaurus", AR: "Argentinosaurus" },
     },
     rank: {
       topic: "Year the capital's metro opened",
       detail: "London, Paris, Tokyo, Moscow and Seoul.",
       values: { RU: 1935, GB: 1863, KR: 1974, FR: 1900, JP: 1927 },
+      labels: { RU: "Moscow", GB: "London", KR: "Seoul", FR: "Paris", JP: "Tokyo" },
       years: true
     }
   },
@@ -11454,7 +11518,8 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the home countries of these racing legends: Ayrton Senna, Michael Schumacher, Fernando Alonso, Kimi Räikkönen and Lewis Hamilton.",
-      answers: ["BR", "DE", "ES", "FI", "GB"]
+      answers: ["BR", "DE", "ES", "FI", "GB"],
+      labels: { BR: "Ayrton Senna", DE: "Michael Schumacher", ES: "Fernando Alonso", FI: "Kimi Räikkönen", GB: "Lewis Hamilton" },
     },
     rank: {
       topic: "Population of five racing countries",
@@ -11500,7 +11565,8 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the countries of these holiday islands: Bali, Phuket, Sicily, Mallorca and Zanzibar.",
-      answers: ["ID", "TH", "IT", "ES", "TZ"]
+      answers: ["ID", "TH", "IT", "ES", "TZ"],
+      labels: { ID: "Bali", TH: "Phuket", IT: "Sicily", ES: "Mallorca", TZ: "Zanzibar" },
     },
     rank: {
       topic: "Year it joined the European Union",
@@ -11544,12 +11610,14 @@ const CASUAL_DAYS = {
     },
     paint: {
       question: "Click the countries these legends come from: Dracula, the Loch Ness Monster, the Yeti, Bigfoot and the Golem of Prague.",
-      answers: ["RO", "GB", "NP", "US", "CZ"]
+      answers: ["RO", "GB", "NP", "US", "CZ"],
+      labels: { RO: "Dracula", GB: "Loch Ness Monster", NP: "Yeti", US: "Bigfoot", CZ: "Golem of Prague" },
     },
     rank: {
       topic: "Year the horror classic came out",
       detail: "Frankenstein (novel), Dracula (novel, by the Irish writer Bram Stoker), Nosferatu (film), The Exorcist (film) and Ringu (film).",
       values: { DE: 1922, JP: 1998, GB: 1818, US: 1973, IE: 1897 },
+      labels: { DE: "Nosferatu", JP: "Ringu", GB: "Frankenstein", US: "The Exorcist", IE: "Dracula" },
       years: true
     }
   }
@@ -11672,6 +11740,8 @@ function getRankMetric(round) {
   return {
     label: topic.topic,
     detail: topic.detail || "",
+    // What each country stands for, when the topic is about a thing per country (a book, a band…).
+    labels: topic.labels || null,
     note: topic.note || "",
     years: Boolean(topic.years),
     lowestFirst,
@@ -11855,7 +11925,7 @@ const AUTHORED = {
     aliases: entry.aliases || {},
     info: entry.info || null
   }),
-  paint: entry => ({ question: entry.question, answers: entry.answers, view: entry.view || null, highlight: entry.highlight || null, subject: entry.picture || null }),
+  paint: entry => ({ question: entry.question, answers: entry.answers, view: entry.view || null, highlight: entry.highlight || null, subject: entry.picture || null, labels: entry.labels || null }),
   rank: entry => ({ ...buildRankTopic(entry), reroll: entry.reroll ? buildRankTopic(entry.reroll) : null })
 };
 
@@ -12057,7 +12127,9 @@ function createRoundState(type) {
     case "mystery":
     case "pinpoint": return { guesses: [], gaveUp: false, ...clock };
     case "deepcut": return { tries: [], answer: null, gaveUp: false, ...clock };
-    case "paint": return { found: [], wrong: [], finished: false, ...clock };
+    // clues: which country each casual clue is about, saved when given (null: worked out
+    // from the misses, as in days saved before clues were stored).
+    case "paint": return { found: [], wrong: [], clues: null, finished: false, ...clock };
     case "rank": return { submissions: [], order: null, rerolled: false, ...clock };
     default: throw new Error(`Unknown round type ${type}`);
   }
@@ -13221,6 +13293,17 @@ function playGuessReveal(guess, { land, sound, nextLabel = "NEXT GUESS", outline
   });
 }
 
+// A clue arriving on its own card: it appears in the middle of the screen, turns over, and
+// flies into the clue list once you go on (land() returns where it goes). Used for the
+// first clue as a round starts and for every clue a wrong answer unlocks.
+function playClueCard({ label, text, cover = "🔓 NEW CLUE", land, sound, nextLabel = "GOT IT", autoContinue = 0 }) {
+  const card = Object.assign(document.createElement("div"), { className: "clue-reveal-card" });
+  const clue = createClueStep({ label, text });
+  clue.element.querySelector(".slot-cover").textContent = cover;
+  card.appendChild(clue.element);
+  return playRevealCard({ card, steps: [clue], nextLabel, land, sound, autoContinue });
+}
+
 // Rank 'Em: a try as a pack-style card, Mastermind style. The order you tried is shown,
 // then a counter ticks up to how many are in the right place (never which ones), and
 // finally any hint the try unlocked.
@@ -13917,7 +14000,7 @@ function initializeStatsModal(getStats) {
   });
 }
 
-return { redactCountryName, showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, playGuessReveal, playRankReveal, getMysteryClue, renderProgressiveHints, renderGlobeMarkerTooltip, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight, initializeStatsModal };
+return { redactCountryName, showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, renderProgressiveHints, renderGlobeMarkerTooltip, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight, initializeStatsModal };
 })();
 
 // ---- social.js
@@ -14381,7 +14464,7 @@ const { createBadge } = __modules["badges.js"];
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
 const { MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MODES, MODE_INFO, getSpeedWindow, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
-const { createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, initializeStatsModal, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playRankReveal, getMysteryClue, redactCountryName, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
+const { createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, initializeStatsModal, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, redactCountryName, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
 
 // v3: Deep Cut and Paint the Map replaced Capital Call and Border Patrol (October 2026).
 const DAY_STORAGE_PREFIX = "daily-geography:day:v3:";
@@ -14408,6 +14491,8 @@ const RANK_COLORS = ["#45e3ff", "#ffd45c", "#ff8a3d", "#c58cff", "#5cf28a"];
 // cards wait for a click, like every card in casual; the clock is stopped meanwhile.
 const AUTO_CONTINUE_MS = 1300;
 const AUTO_CONTINUE_CLUE_MS = 3500;
+// A wrong Pinpoint guess: time to read hot/cold before its new clue arrives on its own card.
+const AUTO_CONTINUE_WRONG_MS = 2000;
 
 const today = toUtcDateKey(new Date());
 // The day being played: today, or an unplayed past day opened from the archive, in one
@@ -14643,7 +14728,43 @@ function hideRoundIntro() {
     // Put the cursor in the round's text box, if it has one.
     const field = { mystery: "countryInput", deepcut: "deepcutInput" }[plan[viewIndex].type];
     if (field && !onTouch && !document.getElementById(field).disabled) document.getElementById(field).focus();
+    revealFirstClue();
   }, 320);
+}
+
+// Clues arrive on their own card (playClueCard), which then flies into the clue list: the
+// first one as the round starts, and each one a wrong answer unlocks. The clock waits.
+const flownClues = new Set();
+function revealClue({ label, text, cover, target }) {
+  const key = `${dayRef()}:${viewIndex}:${label}`;
+  const element = document.querySelector(target);
+  if (flownClues.has(key) || !element || !isGameViewVisible) return Promise.resolve();
+  flownClues.add(key);
+  isAnimating = true;
+  element.classList.add("is-clue-incoming");
+  sounds.playFlyTo();
+  return playClueCard({
+    label, text, cover,
+    sound: status => sounds.playReveal(status),
+    autoContinue: activeMode === "competitive" && plan[viewIndex].type === "pinpoint" ? AUTO_CONTINUE_CLUE_MS : 0,
+    land: () => {
+      isAnimating = false;
+      return document.querySelector(target);
+    }
+  }).then(() => document.querySelectorAll(".is-clue-incoming").forEach(item => item.classList.remove("is-clue-incoming")));
+}
+
+// The round's first clue, once its title card is gone (Mystery Country, Pinpoint).
+function revealFirstClue() {
+  const round = plan[viewIndex];
+  const state = day.rounds[viewIndex];
+  if (viewIndex !== getActiveRoundIndex() || progressOf(viewIndex).done || state.guesses?.length) return;
+  if (round.type === "mystery") {
+    const answer = { ...getCountry(round.answer), ...round.clues };
+    revealClue({ ...getMysteryClue(answer, 0), cover: "🔎 FIRST CLUE", target: ".clue-current" });
+  } else if (round.type === "pinpoint" && round.funClues?.length) {
+    revealClue({ label: "CLUE 1", text: round.funClues[0], cover: "🔎 FIRST CLUE", target: "#pinpointClues li.is-latest" });
+  }
 }
 
 // Set when a guess card has just played its "right" sound, so it isn't played again.
@@ -14757,7 +14878,7 @@ function getRoundInfo(round) {
       // Named after what the round was about (its photo's subject), if it has one.
       return {
         title: round.subject || count,
-        text: `${round.subject ? `${count}: ` : ""}${countries.map(country => country.name).join(", ")}.`,
+        text: `${round.subject ? `${count}: ` : ""}${countries.map(country => round.labels?.[country.iso] ? `${country.name} (${round.labels[country.iso]})` : country.name).join(", ")}.`,
         facts: [["Countries", String(countries.length)], ["Largest", largest.name], ["Smallest", smallest.name]],
         picture: photo
       };
@@ -14766,7 +14887,7 @@ function getRoundInfo(round) {
       const metric = getRankMetric(round);
       const bars = round.answer.map(iso => {
         const country = getCountry(iso);
-        return { label: country.name, value: metric.value(country), display: metric.format(metric.value(country)) };
+        return { label: metric.labels?.[iso] ? `${country.name} (${metric.labels[iso]})` : country.name, value: metric.value(country), display: metric.format(metric.value(country)) };
       });
       const first = bars[0].value;
       const last = bars.at(-1).value;
@@ -14922,13 +15043,14 @@ function renderBurstAnswer(round, result) {
     // The question as a normal sentence (in capitals it was hard to read), over the result.
     const found = new Set(day.rounds[plan.indexOf(round)].found);
     kicker = `YOU PAINTED ${found.size} OF ${round.answers.length}`;
-    items = round.answers.map(iso => listItem(getCountry(iso), getCountry(iso).name, found.has(iso) ? "is-found" : "is-missed"));
+    // With labels (Dracula, the Yeti…), each country says what it stood for.
+    items = round.answers.map(iso => listItem(getCountry(iso), round.labels?.[iso] ? `${getCountry(iso).name} · ${round.labels[iso]}` : getCountry(iso).name, found.has(iso) ? "is-found" : "is-missed"));
     note = tapWords(round.question);
   } else if (round.type === "rank") {
     const metric = getRankMetric(round);
     kicker = `THE RIGHT ORDER · ${metric.label.toUpperCase()}`;
     name = "";
-    items = round.answer.map((iso, position) => listItem(getCountry(iso), `${position + 1}. ${getCountry(iso).name} · ${metric.format(metric.value(getCountry(iso)))}`));
+    items = round.answer.map((iso, position) => listItem(getCountry(iso), `${position + 1}. ${getCountry(iso).name}${metric.labels?.[iso] ? ` (${metric.labels[iso]})` : ""} · ${metric.format(metric.value(getCountry(iso)))}`));
   }
   setText("scoreBurstAnswerKicker", kicker);
   setText("scoreBurstAnswerName", name);
@@ -15499,9 +15621,9 @@ const ROUND_RENDERERS = {
     const clues = round.mode === "casual" ? getPaintClues(round, state) : [];
     const clueList = document.getElementById("paintClues");
     clueList.classList.toggle("hidden", !clues.length || progress.done);
-    clueList.replaceChildren(...clues.map((text, index) => Object.assign(document.createElement("li"), {
-      className: index === clues.length - 1 ? "is-open is-latest" : "is-open",
-      textContent: text
+    clueList.replaceChildren(...clues.map((clue, index) => Object.assign(document.createElement("li"), {
+      className: `is-open${index === clues.length - 1 ? " is-latest" : ""}${clue.found ? " is-found" : ""}`,
+      textContent: clue.found ? `✓ ${clue.text}` : clue.text
     })));
     setText("paintCount", `${state.found.length} / ${total}`);
     document.getElementById("paintDone").disabled = progress.done;
@@ -15576,6 +15698,9 @@ const ROUND_RENDERERS = {
       const handle = Object.assign(document.createElement("span"), { className: "rank-handle", textContent: "⋮⋮" });
       const number = Object.assign(document.createElement("span"), { className: "rank-position", textContent: String(position + 1) });
       const name = Object.assign(document.createElement("span"), { className: "rank-name", textContent: country.name });
+      // What the country stands for in this topic (Frankenstein, ABBA…), so you only guess
+      // the order, not which thing belongs to which country.
+      if (metric.labels?.[iso]) name.appendChild(Object.assign(document.createElement("small"), { className: "rank-label", textContent: metric.labels[iso] }));
       // A value revealed as a hint stays visible under the country's name.
       if (!progress.done && hintedIsos.has(iso)) {
         name.appendChild(Object.assign(document.createElement("small"), { className: "rank-hint", textContent: metric.format(metric.value(country)) }));
@@ -15637,12 +15762,27 @@ const ROUND_RENDERERS = {
 };
 
 // Casual Paint the Map: one clue per wrong click, each about a country not found yet (its
-// hand-written location clue, with its name taken out).
+// hand-written location clue, with its name taken out). Which country each clue is about
+// is saved when it's given (state.clues), so a clue stays put once you paint its country.
+function getPaintClueCountries(round, state) {
+  // Days saved before clues were stored: the clues as they were worked out then.
+  return state.clues || round.answers.filter(iso => !state.found.includes(iso)).slice(0, state.wrong.length);
+}
+
 function getPaintClues(round, state) {
-  return round.answers
-    .filter(iso => !state.found.includes(iso))
-    .slice(0, state.wrong.length)
-    .map(iso => redactCountryName(CLUES[iso]?.[3] || getCountry(iso).trivia, getCountry(iso)));
+  return getPaintClueCountries(round, state).map(iso => ({
+    iso,
+    found: state.found.includes(iso),
+    text: redactCountryName(CLUES[iso]?.[3] || getCountry(iso).trivia, getCountry(iso))
+  }));
+}
+
+// A wrong click: the next clue is about the first country not found and not yet clued.
+function addPaintClue(round, state) {
+  const clued = getPaintClueCountries(round, state).slice();
+  const next = round.answers.find(iso => !state.found.includes(iso) && !clued.includes(iso));
+  state.clues = next ? [...clued, next] : clued;
+  return next;
 }
 
 // Average position of some countries on the sphere, so the globe can face all of them.
@@ -15708,15 +15848,14 @@ function showMiss(target, rowSelector) {
 // Mystery and Pinpoint: a guess first shows as a card with its hints (playGuessReveal),
 // then lands as its row once you go on. A miss flashes where you answered, as in every
 // round. You can type the next guess meanwhile; it can be sent once the card has landed.
-function revealGuess(guess, target, rowSelector, { commitOptions = {}, newClue = null } = {}) {
+function revealGuess(guess, target, rowSelector, { commitOptions = {}, newClue = null, clueTarget = null } = {}) {
   isAnimating = true;
   sounds.playFlyTo();
   return playGuessReveal(guess, {
     sound: (status, streak) => sounds.playReveal(status, streak),
-    nextLabel: guess.isCorrect ? "CONTINUE" : "NEXT GUESS",
-    autoContinue: activeMode === "competitive" && plan[viewIndex].type === "pinpoint" ? (guess.isCorrect ? AUTO_CONTINUE_MS : AUTO_CONTINUE_CLUE_MS) : 0,
+    nextLabel: guess.isCorrect ? "CONTINUE" : newClue ? "SEE NEW CLUE" : "NEXT GUESS",
+    autoContinue: activeMode === "competitive" && plan[viewIndex].type === "pinpoint" ? (guess.isCorrect ? AUTO_CONTINUE_MS : AUTO_CONTINUE_WRONG_MS) : 0,
     outline: globe.outlineOf(guess.country),
-    newClue,
     onVerdict: playVerdict,
     land: () => {
       isAnimating = false;
@@ -15725,7 +15864,7 @@ function revealGuess(guess, target, rowSelector, { commitOptions = {}, newClue =
       flashMiss(target);
       return [...document.querySelectorAll(rowSelector)].at(-1) || null;
     }
-  });
+  }).then(() => newClue && clueTarget ? revealClue({ ...newClue, target: clueTarget }) : null);
 }
 
 // Something that isn't an answer (an unknown name, a repeat): the same flash, and a note.
@@ -15760,7 +15899,7 @@ function submitMysteryGuess(value, selectedCountry) {
   // A wrong guess unlocks the next clue, shown last on the guess card.
   const progress = progressOf(viewIndex);
   const newClue = progress.done ? null : getMysteryClue(answer, progress.wrong);
-  revealGuess(evaluateGuess(country, answer), answerBox("countryInput"), "#history .guess-row", { newClue });
+  revealGuess(evaluateGuess(country, answer), answerBox("countryInput"), "#history .guess-row", { newClue, clueTarget: ".clue-current" });
   return { status: "submitted" };
 }
 
@@ -15816,7 +15955,7 @@ function confirmPinpointGuess() {
   const clues = getPinpointClues(target, state.guesses, funClues);
   const index = progress.wrong + (funClues.length ? 1 : 0) - 1;
   const newClue = progress.done || index < 0 || index >= clues.length ? null : { label: `CLUE ${index + 1}`, text: clues[index] };
-  revealGuess(evaluateGuess(country, target), pickCard("pinpoint"), "#pinpointGuesses .guess-row", { commitOptions: { animateGlobe: false }, newClue });
+  revealGuess(evaluateGuess(country, target), pickCard("pinpoint"), "#pinpointGuesses .guess-row", { commitOptions: { animateGlobe: false }, newClue, clueTarget: "#pinpointClues li.is-latest" });
 }
 
 // Deep Cut: the first answer on the list ends the round; anything else just says so,
@@ -15891,9 +16030,14 @@ function confirmPaint() {
     if (state.found.length < round.answers.length) sounds.playGuess();
   } else {
     state.wrong.push(country.iso);
+    if (round.mode === "casual") addPaintClue(round, state);
   }
   commit({ animateGlobe: false });
-  if (!isRight) showMiss(pickCard("paint"), "#paintWrong .attempt.is-wrong");
+  if (isRight) return;
+  showMiss(pickCard("paint"), "#paintWrong .attempt.is-wrong");
+  // Casual: the clue that miss unlocked flies in on its own card.
+  const clues = round.mode === "casual" && !progressOf(viewIndex).done ? getPaintClues(round, state) : [];
+  if (clues.length) setTimeout(() => revealClue({ label: `CLUE ${clues.length}`, text: clues.at(-1).text, target: "#paintClues li.is-latest" }), 450);
 }
 
 function moveRankItem(from, to) {
