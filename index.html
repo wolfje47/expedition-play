@@ -2549,6 +2549,149 @@ h1, h2, h3 { font-weight: normal; }
 .burst-answer-list li.is-pick span { color: var(--gold); font-weight: 600; }
 .burst-answer-list li.is-far { opacity: 0.65; }
 
+/* Highs & Lows: the tour after locking in. A card at the bottom names each stop on the
+   globe; its pin slides along the pecking order (hot #1 to cold last). */
+.extreme-tour {
+  position: fixed;
+  right: 0;
+  bottom: calc(var(--gutter) + 12px);
+  left: 0;
+  z-index: 60;
+  display: grid;
+  gap: 0.5rem;
+  width: min(460px, calc(100% - 32px));
+  margin-inline: auto;
+  padding: 0.9rem 1.1rem 0.8rem;
+  border: 1px solid var(--glass-line);
+  border-radius: 20px;
+  background: var(--glass-strong);
+  box-shadow: var(--glass-shine), var(--glass-shadow), inset 4px 0 0 var(--heat, var(--accent));
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+.extreme-tour.is-popping { animation: tour-pop 0.42s cubic-bezier(0.2, 1.4, 0.4, 1); }
+@keyframes tour-pop { from { transform: translateY(8px) scale(0.97); opacity: 0.4; } }
+.extreme-tour.is-pick { border-color: rgba(255, 212, 92, 0.6); }
+.tour-head { display: flex; justify-content: space-between; gap: 0.8rem; }
+.tour-kicker { color: var(--heat, var(--accent)); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.extreme-tour.is-pick .tour-kicker { color: var(--gold); }
+.tour-rank { color: var(--muted); font: 700 12px var(--font-mono); white-space: nowrap; }
+.tour-country { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+.tour-flag:empty { display: none; }
+.tour-flag-image { display: block; width: 36px; height: 24px; border-radius: 4px; object-fit: cover; }
+.tour-country strong { overflow: hidden; font-size: 20px; font-weight: 700; white-space: nowrap; text-overflow: ellipsis; }
+.tour-value { margin-left: auto; color: var(--gold); font: 700 16px var(--font-mono); white-space: nowrap; }
+.tour-line { margin: 0; color: var(--text); font-size: 14px; line-height: 1.4; }
+.tour-skip { justify-self: end; margin-top: -0.2rem; padding: 0.3rem 0.5rem; border: 0; background: none; color: var(--faint); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
+.tour-skip:hover { color: var(--text); }
+
+/* The pecking order as one bar, with pins (#1, YOU, the tour's current stop). A pin's box
+   shifts by its own share, so it stays inside the bar at both ends; its tick sits at --at. */
+.pecking { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: end; gap: 0.5rem; color: var(--faint); font: 8px var(--font-display); letter-spacing: var(--ls-pixel); }
+.pecking-end { padding-bottom: 1px; white-space: nowrap; }
+.pecking-track { position: relative; height: 30px; }
+.pecking-track::before { content: ""; position: absolute; right: 0; bottom: 0; left: 0; height: 8px; border-radius: 99px; background: linear-gradient(90deg, #ff4f9a, #ffd45c 18%, #45e3ff 50%, #23348c); }
+.pecking-pin {
+  position: absolute;
+  bottom: 12px;
+  left: var(--at);
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: var(--text);
+  color: #0a0f1e;
+  font: 700 10px var(--font-mono);
+  white-space: nowrap;
+  transform: translateX(calc(var(--at) * -1));
+  transition: left 0.9s cubic-bezier(0.65, 0, 0.35, 1), transform 0.9s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.pecking-pin::after { content: ""; position: absolute; top: 100%; left: var(--at); width: 2px; height: 12px; margin-left: -1px; background: inherit; }
+.pecking-pin.is-pick { background: var(--gold); }
+.pecking-pin.is-answer { background: #ff4f9a; color: #fff; }
+.pecking-pin.is-stop { z-index: 1; }
+
+/* The score card's info: the ladder around the top, your pick and the other end. */
+.burst-info .pecking { margin: 0.2rem 0 0.1rem; }
+.ladder { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.ladder-row { display: grid; grid-template-columns: 3rem 24px minmax(0, 1fr) auto auto; align-items: center; gap: 0.5rem; padding: 3px 8px; border-radius: 7px; box-shadow: inset 3px 0 0 var(--heat); font-size: 14px; }
+.ladder-rank { color: var(--muted); font: 700 12px var(--font-mono); }
+.ladder-flag { width: 24px; height: 16px; border-radius: 3px; object-fit: cover; }
+.ladder-name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ladder-value { grid-column: 5; color: var(--muted); font: 700 12px var(--font-mono); white-space: nowrap; }
+.ladder-you { padding: 2px 5px; border-radius: 4px; background: var(--gold); color: #0a0f1e; font: 8px var(--font-display); letter-spacing: var(--ls-pixel); }
+.ladder-row.is-answer { background: rgba(255, 79, 154, 0.12); }
+.ladder-row.is-answer .ladder-rank, .ladder-row.is-answer .ladder-value { color: #ff7fb0; }
+.ladder-row.is-pick { background: rgba(255, 212, 92, 0.12); outline: 1.5px solid var(--gold); outline-offset: -1.5px; }
+.ladder-row.is-pick .ladder-name, .ladder-row.is-pick .ladder-rank, .ladder-row.is-pick .ladder-value { color: var(--gold); font-weight: 600; }
+.ladder-gap { padding: 0 8px 0 calc(3rem + 8px); color: var(--faint); font: 12px var(--font-body); line-height: 1.3; }
+.burst-answer-list li.is-answer { box-shadow: inset 0 0 0 1px rgba(255, 79, 154, 0.7); }
+
+@media (max-width: 760px) {
+  .extreme-tour { bottom: calc(env(safe-area-inset-bottom) + 12px); width: calc(100% - 16px); padding: 0.8rem 0.9rem 0.6rem; }
+  .tour-country strong { font-size: 16px; }
+}
+
+/* Highs & Lows: the climb. The ranking creeps up through a five-row window (the middle
+   row framed) until it lands on your pick; then your points. */
+.extreme-climb {
+  position: fixed;
+  inset: 0;
+  z-index: 270;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.25) 20%, rgba(0, 0, 0, 0.6) 100%);
+  cursor: pointer;
+}
+.climb-card {
+  display: grid;
+  justify-items: center;
+  gap: 0.55rem;
+  width: min(100%, 420px);
+  padding: 1.4rem 1.4rem 1rem;
+  border: 1px solid var(--glass-line);
+  border-radius: 26px;
+  background: var(--glass-strong);
+  box-shadow: var(--glass-shine), var(--glass-shadow), 0 0 60px rgba(255, 107, 157, 0.14);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  animation: climb-in 0.45s cubic-bezier(0.2, 1.3, 0.4, 1);
+}
+@keyframes climb-in { from { transform: scale(0.9) translateY(14px); opacity: 0; } }
+.climb-kicker { color: #ff6b9d; font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.climb-stat { color: var(--muted); font-size: 14px; text-align: center; }
+.climb-counter { display: flex; align-items: baseline; gap: 0.5rem; }
+.climb-counter strong { font: 700 48px/1 var(--font-mono); transition: color 0.15s; }
+.climb-counter span { color: var(--faint); font: 700 14px var(--font-mono); }
+.climb-window {
+  position: relative;
+  width: 100%;
+  height: calc(5 * 44px);
+  overflow: hidden;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.25);
+  -webkit-mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent);
+  mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent);
+}
+/* The frame round the middle row: where the climb lands. */
+.climb-window::after { content: ""; position: absolute; top: 88px; right: 4px; left: 4px; height: 44px; border: 1.5px solid rgba(255, 255, 255, 0.35); border-radius: 10px; pointer-events: none; transition: border-color 0.2s, box-shadow 0.2s; }
+.extreme-climb.is-landed .climb-window::after { border-color: var(--gold); box-shadow: 0 0 24px rgba(255, 212, 92, 0.45); }
+.extreme-climb.is-perfect .climb-window::after { border-color: #ff4f9a; box-shadow: 0 0 32px rgba(255, 79, 154, 0.6); }
+.climb-list { margin: 0; padding: 0; list-style: none; will-change: transform; }
+.climb-row { display: grid; grid-template-columns: 3.4rem 26px minmax(0, 1fr) auto; align-items: center; gap: 0.6rem; height: 44px; padding: 0 14px; box-shadow: inset 4px 0 0 var(--heat); font-size: 16px; }
+.climb-row-rank { color: var(--muted); font: 700 13px var(--font-mono); }
+.climb-row-flag { width: 26px; height: 17px; border-radius: 3px; object-fit: cover; }
+.climb-row-name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.climb-row-value { color: var(--muted); font: 700 13px var(--font-mono); }
+.climb-row.is-you { background: rgba(255, 212, 92, 0.16); animation: climb-you 0.5s cubic-bezier(0.2, 1.5, 0.4, 1); }
+.climb-row.is-you .climb-row-name, .climb-row.is-you .climb-row-rank, .climb-row.is-you .climb-row-value { color: var(--gold); font-weight: 700; }
+@keyframes climb-you { 40% { transform: scale(1.06); } }
+.climb-result { display: grid; justify-items: center; gap: 0.2rem; animation: climb-in 0.4s cubic-bezier(0.2, 1.4, 0.4, 1); }
+.climb-result.is-waiting { visibility: hidden; animation: none; }
+.climb-points { color: var(--gold); font: 700 40px/1 var(--font-mono); text-shadow: 0 0 22px rgba(255, 212, 92, 0.4); }
+.climb-line { margin: 0; color: var(--text); font-size: 14px; text-align: center; }
+.climb-hint { color: var(--faint); font-size: 12px; }
+.extreme-climb.is-landed .climb-hint { visibility: hidden; }
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -2655,6 +2798,21 @@ h1, h2, h3 { font-weight: normal; }
           <strong id="currentGuessLabel">NONE</strong>
         </div>
         <div class="stage-hint" id="stageHint">Drag to rotate · hover a marker for details</div>
+        <!-- Highs & Lows: the guided tour of the heat map after locking in. -->
+        <div id="extremeTour" class="extreme-tour hidden" role="status" aria-live="polite">
+          <div class="tour-head">
+            <span class="tour-kicker" id="tourKicker"></span>
+            <span class="tour-rank" id="tourRank"></span>
+          </div>
+          <div class="tour-country" id="tourCountry">
+            <span class="tour-flag" id="tourFlag"></span>
+            <strong id="tourName"></strong>
+            <span class="tour-value" id="tourValue"></span>
+          </div>
+          <p class="tour-line" id="tourLine"></p>
+          <div class="pecking" id="tourPecking"></div>
+          <button type="button" class="tour-skip" id="tourSkip">SKIP ›</button>
+        </div>
       </section>
 
       <!-- Left: the game itself. Home, the day, its rounds, your score and the menus. -->
@@ -2945,6 +3103,20 @@ h1, h2, h3 { font-weight: normal; }
     </main>
 
     <!-- The round's score, big over the globe, the moment a round ends. -->
+    <!-- Highs & Lows: the ranking climbs from last place to your pick. -->
+    <div id="extremeClimb" class="extreme-climb hidden" role="status" aria-live="polite">
+      <div class="climb-card">
+        <span class="climb-kicker" id="climbKicker">WHERE DID YOU LAND?</span>
+        <span class="climb-stat" id="climbStat"></span>
+        <div class="climb-counter"><strong id="climbRank">#1</strong><span id="climbOf"></span></div>
+        <div class="climb-window"><ol class="climb-list" id="climbList"></ol></div>
+        <div class="climb-result is-waiting" id="climbResult">
+          <strong class="climb-points" id="climbPoints">+0</strong>
+          <p class="climb-line" id="climbLine"></p>
+        </div>
+        <span class="climb-hint">Click to skip</span>
+      </div>
+    </div>
     <div id="scoreBurst" class="score-burst hidden" role="status" aria-live="assertive">
       <div class="score-burst-card">
         <!-- The answer, big and first, so there's no doubt what it was. -->
@@ -7364,10 +7536,16 @@ class PixelGlobe {
     requestAnimationFrame(animateRotation);
   }
 
+  // How far the camera is, as a share of the usual distance (1.2 = a little further out).
+  zoomTo(factor) {
+    this.targetCameraDistance = DEFAULT_CAMERA_DISTANCE * factor;
+    this.requestRender();
+  }
+
   // The globe mode's reveal: zoom far out and make one full turn around the world (so
-  // every side of the heat map passes by), then slow down and zoom back in to end facing
-  // lat/lon. The tilt eases to a gentle angle mid-turn, then to the answer's latitude.
-  revealSpin(lat, lon, duration = 3600) {
+  // every side of the heat map passes by), then slow down and zoom back in (to endZoom) to
+  // end facing lat/lon. The tilt eases to a gentle angle mid-turn, then to the answer's latitude.
+  revealSpin(lat, lon, duration = 3600, endZoom = 1) {
     if (this.mode !== "game") { this.rotateTo(lat, lon); return; }
     const token = ++this.rotationToken;
     this.targetCameraDistance = DEFAULT_CAMERA_DISTANCE * 1.45;
@@ -7388,7 +7566,7 @@ class PixelGlobe {
       this.globeGroup.rotation.x = progress < 0.5
         ? startX + (midX - startX) * Math.min(1, progress * 3)
         : midX + (targetX - midX) * ((progress - 0.5) * 2) ** 2;
-      if (progress > 0.7) this.targetCameraDistance = DEFAULT_CAMERA_DISTANCE;
+      if (progress > 0.7) this.targetCameraDistance = DEFAULT_CAMERA_DISTANCE * endZoom;
       this.requestRender();
       if (progress < 1) requestAnimationFrame(animate);
     };
@@ -8433,6 +8611,14 @@ class SoundEngine {
     if (at === null) return;
     this.marimba(220, at, 0.32);
     this.marimba(174.61, at + 0.16, 0.32);
+  }
+
+  // One country passing by as the globe mode's ranking climbs: a short wooden tick,
+  // rising in pitch as it nears the top (progress 0 → 1).
+  playTick(progress = 0) {
+    const at = this.start();
+    if (at === null) return;
+    this.tone(700 + progress * 700, at, 0.035, { type: "triangle", volume: 0.12, attack: 0.002 });
   }
 
   // One hint turning over on the guess card: a bright chime for a match (higher with each
@@ -11799,7 +11985,7 @@ const EXTREME_DAYS = {
       ["chocolate", "highest", "Which country eats the most cocoa and chocolate per person?"],
       ["honey", "highest", "Where do people eat the most honey?"],
       ["fruit", "highest", "Nature's candy: which country eats the most fruit per person?"],
-      ["calories", "highest", "Where is the most food energy available per person each day?"],
+      ["calories", "highest", "Where do people have the most calories to eat each day?"],
       ["sugar", "lowest", "And where is the least sugar eaten per person?"]
     ]
   },
@@ -11932,7 +12118,7 @@ const EXTREME_DAYS = {
       ["rice", "lowest", "Where is the least rice eaten per person?"],
       ["wheat", "lowest", "And where is the least wheat eaten per person?"],
       ["pulses", "highest", "Beans, lentils and peas: who eats the most?"],
-      ["calories", "lowest", "Where is the least food energy available per person each day?"]
+      ["calories", "lowest", "Where do people have the fewest calories to eat each day?"]
     ]
   },
   "2026-10-14": {
@@ -12001,9 +12187,9 @@ const EXTREME_DAYS = {
     rounds: [
       ["fruit", "lowest", "Where is the least fruit eaten per person?"],
       ["vegetables", "average", "Which country is the most average for vegetables?"],
-      ["protein", "highest", "Where is the most protein available per person each day?"],
+      ["protein", "highest", "Where do people get the most protein from their food?"],
       ["protein", "lowest", "And the least protein?"],
-      ["fat", "highest", "Where is the most fat available per person each day?"],
+      ["fat", "highest", "Where do people get the most fat from their food?"],
       ["fat", "lowest", "And the least fat?"]
     ]
   },
@@ -12274,7 +12460,126 @@ const EXTREME_MAX_DAY = EXTREME_ROUNDS * EXTREME_MAX_ROUND;
 const MODE_NAME = "Highs & Lows"; // working title
 const RANK_FLOOR = [[1, 1000], [2, 850], [3, 750], [5, 650], [10, 500], [20, 300], [40, 150]];
 
-const getStat = id => STATS[id];
+// How each stat is named and asked, in plain words. Food figures are FAO food supply
+// (what reaches shops and kitchens), close enough to "eaten" for a game. Generated days
+// ask with `highest`/`lowest`; hand-made days write their own question.
+const eat = (thing, title) => ({ name: `${title} eaten per person`, highest: `Where do people eat the most ${thing}?`, lowest: `Where do people eat the least ${thing}?` });
+const drink = (thing, title) => ({ name: `${title} drunk per person`, highest: `Where do people drink the most ${thing}?`, lowest: `Where do people drink the least ${thing}?` });
+const use = (thing, title) => ({ name: `${title} used per person`, highest: `Where do people cook with the most ${thing}?`, lowest: `Where do people cook with the least ${thing}?` });
+const ask = (name, highest, lowest) => ({ name, highest, lowest });
+const STAT_WORDS = {
+  coffee: drink("coffee", "Coffee"),
+  tea: drink("tea", "Tea"),
+  chocolate: eat("chocolate", "Chocolate"),
+  wine: drink("wine", "Wine"),
+  beer: drink("beer", "Beer"),
+  alcohol: drink("alcohol", "Alcohol"),
+  honey: eat("honey", "Honey"),
+  sugar: eat("sugar", "Sugar"),
+  apples: eat("apples", "Apples"),
+  oranges: eat("oranges and mandarins", "Oranges"),
+  lemons: eat("lemons and limes", "Lemons and limes"),
+  grapefruit: eat("grapefruit", "Grapefruit"),
+  grapes: eat("grapes (not counting wine)", "Grapes"),
+  pineapples: eat("pineapple", "Pineapple"),
+  fruit: eat("fruit", "Fruit"),
+  vegetables: eat("vegetables", "Vegetables"),
+  tomatoes: eat("tomatoes", "Tomatoes"),
+  potatoes: eat("potatoes", "Potatoes"),
+  rice: eat("rice", "Rice"),
+  wheat: eat("wheat, as bread, pasta and the like", "Wheat"),
+  oats: eat("oats", "Oats"),
+  pulses: eat("beans, lentils and peas", "Beans and lentils"),
+  nuts: eat("nuts", "Nuts"),
+  peanuts: eat("peanuts", "Peanuts"),
+  oliveoil: use("olive oil", "Olive oil"),
+  olives: eat("olives", "Olives"),
+  coconuts: eat("coconut", "Coconut"),
+  vegoil: use("vegetable oil", "Vegetable oil"),
+  spices: eat("spices", "Spices"),
+  pepper: eat("pepper", "Pepper"),
+  butter: eat("butter and ghee", "Butter"),
+  eggs: eat("eggs", "Eggs"),
+  milk: ask("Milk and dairy per person", "Where do people have the most milk and dairy?", "Where do people have the least milk and dairy?"),
+  meat: eat("meat", "Meat"),
+  beef: eat("beef", "Beef"),
+  pork: eat("pork", "Pork"),
+  poultry: eat("chicken and other poultry", "Chicken"),
+  lamb: eat("lamb and goat", "Lamb and goat"),
+  offal: eat("offal, like liver and kidneys", "Offal"),
+  fish: eat("fish and seafood", "Fish and seafood"),
+  freshwaterfish: eat("freshwater fish", "Freshwater fish"),
+  soybeans: eat("soy, as tofu, soy milk and the like", "Soy"),
+  animalfat: eat("animal fat, like lard", "Animal fat"),
+  calories: ask("Food per person, in calories", "Where do people have the most calories to eat each day?", "Where do people have the fewest calories to eat each day?"),
+  protein: ask("Protein per person", "Where do people get the most protein from their food?", "Where do people get the least protein from their food?"),
+  fat: ask("Fat per person", "Where do people get the most fat from their food?", "Where do people get the least fat from their food?"),
+  foodwaste: ask("Food thrown away at home", "Where do households throw away the most food?", "Where do households throw away the least food?"),
+  drinkers: ask("Adults who drink alcohol", "Where did the largest share of adults drink alcohol last year?", "Where did the smallest share of adults drink alcohol last year?"),
+  chickens: ask("Chickens per person", "Where are there the most chickens per person?", "Where are there the fewest chickens per person?"),
+  cattle: ask("Cows per person", "Where are there the most cows per person?", "Where are there the fewest cows per person?"),
+  population: ask("Population", "Which country has the most people?", "Which country has the fewest people?"),
+  density: ask("People per km²", "Which country is the most crowded?", "Which country is the emptiest?"),
+  urban: ask("People living in cities", "Where does the largest share of people live in cities?", "Where does the smallest share of people live in cities?"),
+  growth: ask("Population growth", "Whose population is growing the fastest?", "Whose population is growing the slowest (or shrinking)?"),
+  lifeexp: ask("Life expectancy", "Where do people live the longest?", "Where are lives the shortest?"),
+  lifeexpwomen: ask("Life expectancy of women", "Where do women live the longest?", "Where are women's lives the shortest?"),
+  lifeexpmen: ask("Life expectancy of men", "Where do men live the longest?", "Where are men's lives the shortest?"),
+  lifegap: ask("How much longer women live", "Where do women outlive men by the most years?", "Where do women outlive men by the fewest years?"),
+  fertility: ask("Children per woman", "Where do women have the most children?", "Where do women have the fewest children?"),
+  births: ask("Babies born", "Where are the most babies born, for the number of people?", "Where are the fewest babies born, for the number of people?"),
+  over65: ask("People aged 65 or older", "Which country has the largest share of people aged 65 or older?", "Which country has the smallest share of people aged 65 or older?"),
+  under15: ask("Children under 15", "Which country has the largest share of children under 15?", "Which country has the smallest share of children under 15?"),
+  medianage: ask("Median age", "Which country has the oldest population?", "Which country has the youngest population?"),
+  motherage: ask("Age of mothers giving birth", "Where are mothers the oldest when they have a baby?", "Where are mothers the youngest when they have a baby?"),
+  women: ask("Women in the population", "Which country has the largest share of women?", "Which country has the smallest share of women?"),
+  migrants: ask("People born abroad", "Where was the largest share of people born in another country?", "Where was the smallest share of people born in another country?"),
+  schoolyears: ask("Years at school", "Where do children spend the most years at school?", "Where do children spend the fewest years at school?"),
+  obesity: ask("Adults with obesity", "Where do the most adults have obesity?", "Where do the fewest adults have obesity?"),
+  diabetes: ask("Adults with diabetes", "Where do the most adults have diabetes?", "Where do the fewest adults have diabetes?"),
+  doctors: ask("Doctors per person", "Which country has the most doctors for its people?", "Which country has the fewest doctors for its people?"),
+  prison: ask("People in prison", "Which country puts the most people in prison, for its size?", "Which country puts the fewest people in prison, for its size?"),
+  parliament: ask("Women in parliament", "Where do women hold the largest share of seats in parliament?", "Where do women hold the smallest share of seats in parliament?"),
+  gdppc: ask("Income per person", "Which country is the richest per person?", "Which country is the poorest per person?"),
+  gdp: ask("Size of the economy", "Which country has the biggest economy?", "Which country has the smallest economy?"),
+  healthspend: ask("Health spending per person", "Where is the most spent on health per person?", "Where is the least spent on health per person?"),
+  farmeconomy: ask("Farming in the economy", "Where is farming the biggest part of the economy?", "Where is farming the smallest part of the economy?"),
+  hdi: ask("Human Development Index", "Which country scores highest on the Human Development Index?", "Which country scores lowest on the Human Development Index?"),
+  internet: ask("People online", "Where does the largest share of people use the internet?", "Where does the smallest share of people use the internet?"),
+  mobile: ask("Mobile phones per person", "Where are there the most mobile phone subscriptions per person?", "Where are there the fewest mobile phone subscriptions per person?"),
+  broadband: ask("Home broadband", "Where do the most people have broadband at home?", "Where do the fewest people have broadband at home?"),
+  electricity: ask("People with electricity", "Where does the largest share of people have electricity?", "Where does the smallest share of people have electricity?"),
+  renewables: ask("Energy from renewables", "Which country gets the largest share of its energy from renewables?", "Which country gets the smallest share of its energy from renewables?"),
+  greenpower: ask("Green electricity", "Which country makes the largest share of its electricity from renewables?", "Which country makes the smallest share of its electricity from renewables?"),
+  co2: ask("CO₂ per person", "Where does each person emit the most CO₂?", "Where does each person emit the least CO₂?"),
+  airpollution: ask("Air pollution", "Where is the air the most polluted?", "Where is the air the cleanest?"),
+  area: ask("Area", "Which country is the biggest?", "Which country is the smallest?"),
+  forest: ask("Land covered by forest", "Which country is most covered by forest?", "Which country is least covered by forest?"),
+  farmland: ask("Land used for farming", "Where is the largest share of land used for farming?", "Where is the smallest share of land used for farming?"),
+  arable: ask("Land used for crops", "Where is the largest share of land used for crops?", "Where is the smallest share of land used for crops?"),
+  protected: ask("Protected land and sea", "Which country protects the largest share of its land and sea?", "Which country protects the smallest share of its land and sea?"),
+  farmlandpp: ask("Farmland per person", "Where is there the most farmland per person?", "Where is there the least farmland per person?"),
+  fertilizer: ask("Fertiliser on cropland", "Where do farmers use the most fertiliser?", "Where do farmers use the least fertiliser?"),
+  neighbours: ask("Land neighbours", "Which country has the most land neighbours?", "Which country has the fewest land neighbours?"),
+  languages: ask("Official languages", "Which country has the most official languages?", "Which country has the fewest official languages?"),
+  north: ask("How far north", "The middle of which country lies furthest north?", "The middle of which country lies furthest south?"),
+  equator: ask("Distance from the equator", "Which country lies furthest from the equator?", "Which country lies closest to the equator?"),
+  east: ask("How far east", "The middle of which country lies furthest east?", "The middle of which country lies furthest west?"),
+  namelength: ask("Letters in the name", "Which country has the longest name?", "Which country has the shortest name?")
+};
+const WORDED = Object.fromEntries(Object.entries(STATS).map(([id, stat]) => {
+  const words = STAT_WORDS[id] || {};
+  return [id, { ...stat, name: words.name || stat.name, ask: { highest: words.highest, lowest: words.lowest } }];
+}));
+
+const getStat = id => WORDED[id];
+const STAT_IDS = Object.keys(WORDED);
+
+// A plain question for a stat and direction (for days without a hand-written one).
+function askQuestion(statId, find) {
+  const stat = WORDED[statId];
+  return stat.ask[find] || `Which country is the most average for ${stat.name.toLowerCase()}?`;
+}
 
 // The middle country's value (with an even count, the lower of the two in the middle), so
 // "most average" always has one country exactly on it.
@@ -12289,7 +12594,7 @@ const cache = new Map();
 function getStandings(statId, find) {
   const key = `${statId}:${find}`;
   if (cache.has(key)) return cache.get(key);
-  const stat = STATS[statId];
+  const stat = WORDED[statId];
   const entries = Object.entries(stat.values);
   const values = entries.map(([, value]) => value);
   const target = find === "highest" ? Math.max(...values) : find === "lowest" ? Math.min(...values) : median(values);
@@ -12323,7 +12628,7 @@ function scorePick(statId, find, iso) {
 
 // Why a country can't be picked: no figure in the stat's source (since when, if known).
 function missingReason(statId, iso, countryName) {
-  const stat = STATS[statId];
+  const stat = WORDED[statId];
   if (!(iso in stat.missing)) return null;
   const year = stat.missing[iso];
   return year ? `Not enough data for ${countryName}: ${stat.source} last measured it in ${year}.` : `Not enough data for ${countryName}: ${stat.source} has no figure for it.`;
@@ -12343,7 +12648,7 @@ function formatValue(stat, value, { unit = true } = {}) {
 
 const FIND_LABELS = { highest: "HIGHEST", lowest: "LOWEST", average: "MOST AVERAGE" };
 
-return { EXTREME_ROUNDS, EXTREME_MAX_ROUND, EXTREME_MAX_DAY, MODE_NAME, getStat, getStandings, rankFloor, scorePick, missingReason, formatValue, FIND_LABELS };
+return { EXTREME_ROUNDS, EXTREME_MAX_ROUND, EXTREME_MAX_DAY, MODE_NAME, getStat, STAT_IDS, askQuestion, getStandings, rankFloor, scorePick, missingReason, formatValue, FIND_LABELS };
 })();
 
 // ---- daily.js
@@ -12359,7 +12664,7 @@ const { SHAPES } = __modules["shape-data.js"];
 const { DAYS } = __modules["days.js"];
 const { CASUAL_DAYS } = __modules["casual-days.js"];
 const { EXTREME_DAYS } = __modules["extremes-days.js"];
-const { EXTREME_ROUNDS, EXTREME_MAX_DAY, MODE_NAME, getStandings, scorePick } = __modules["extremes.js"];
+const { EXTREME_ROUNDS, EXTREME_MAX_DAY, MODE_NAME, askQuestion, getStandings, scorePick } = __modules["extremes.js"];
 const { STATS } = __modules["stats-data.js"];
 
 const MODES = ["competitive", "casual", "extremes"];
@@ -12720,8 +13025,7 @@ function getExtremePlan(dateKey) {
       if (rounds.length === EXTREME_ROUNDS) break;
       const find = random() < 0.7 ? "highest" : "lowest";
       if (getStandings(statId, find).sorted.filter(entry => entry.rank === 1).length > 1) continue;
-      const stat = STATS[statId];
-      rounds.push([statId, find, `Which country has the ${find} figure for: ${stat.name.toLowerCase()}?`]);
+      rounds.push([statId, find, askQuestion(statId, find)]);
     }
   }
   return rounds.map(([stat, find, question], index) => ({ type: "extreme", index, difficulty: 1, mode: "extremes", stat, find, question }));
@@ -15282,8 +15586,12 @@ const RANK_COLORS = ["#45e3ff", "#ffd45c", "#ff8a3d", "#c58cff", "#5cf28a"];
 const AUTO_CONTINUE_MS = 1300;
 // The globe mode: the heat map's turn around the world, and how long it all shows before
 // the score card (the turn, then a moment on the answer).
-const EXTREME_SPIN_MS = 3600;
-const EXTREME_REVEAL_MS = 5000;
+// The globe mode's tour after locking in: one slow turn around the heat map, then a stop
+// at each highlight (the other end, your pick, the runner-up, the answer).
+const TOUR_SPIN_MS = 5200;
+const TOUR_MOVE_MS = 1600;
+const TOUR_HOLD_MS = 3000;
+const TOUR_ZOOM = 1.18;
 const PHONE_SHIFT_MS = 600;
 const AUTO_CONTINUE_CLUE_MS = 3500;
 // A wrong Pinpoint guess: time to read hot/cold before its new clue arrives on its own card.
@@ -15611,10 +15919,10 @@ function commit({ animateGlobe = true } = {}) {
   const index = viewIndex;
   const movesOn = progress.done && !isDayComplete() && index < plan.length - 1;
   // When the next round follows, the cards stay aside until its title has been shown.
-  // The globe mode first shows the world as a heat map for a moment.
-  const revealMs = plan[index].type === "extreme" && progress.done && !celebratedRounds.has(`${dayRef()}:${index}`) ? EXTREME_REVEAL_MS : 0;
-  const scoreShown = !progress.done ? null : revealMs
-    ? new Promise(resolve => setTimeout(() => resolve(showScoreBurst(index, { keepCardsOut: movesOn })), revealMs))
+  // The globe mode first tours the world's heat map.
+  const tour = plan[index].type === "extreme" && progress.done ? extremeTour?.done : null;
+  const scoreShown = !progress.done ? null : tour
+    ? tour.then(() => showScoreBurst(index, { keepCardsOut: movesOn }))
     : showScoreBurst(index, { keepCardsOut: movesOn });
   if (!hasFinishedDay && isDayComplete()) {
     hasFinishedDay = true;
@@ -15729,20 +16037,27 @@ function getRoundInfo(round) {
       };
     }
     case "extreme": {
-      // The top five as bars, plus where your pick stood.
+      // The pecking order: a bar from top to bottom with you on it, and the ladder around
+      // the top, your pick and the other end. No big flag: it read as your own pick.
       const standings = getStandings(round.stat, round.find);
       const stat = standings.stat;
       const state = day.rounds[plan.indexOf(round)];
       const pick = standings.ranks[state?.pick];
       const winner = getCountry(standings.sorted[0].iso);
-      const bars = standings.sorted.slice(0, 5).map(entry => ({ label: getCountry(entry.iso).name, value: Math.abs(entry.value), display: formatValue(stat, entry.value, { unit: false }) }));
-      const label = { highest: "Highest", lowest: "Lowest", average: "Most average" }[round.find];
+      const [near] = extremeEnds(round.find);
+      const above = { highest: "Higher than you", lowest: "Lower than you", average: "Closer than you" }[round.find];
       return {
         title: stat.name,
-        text: `${round.find === "average" ? "Closest to the middle of all countries" : `The five ${round.find}`}${stat.unit ? `, in ${stat.unit}` : ""}. Source: ${stat.source}${stat.year ? `, ${stat.year}` : ""}.`,
-        bars: round.find === "average" ? null : bars,
-        facts: [[label, winner.name], ["Your pick", pick ? `#${pick.rank} of ${standings.count}` : "–"], ["Countries with data", String(standings.count)]],
-        picture: flagPicture(winner)
+        text: `The pecking order${stat.unit ? `, in ${stat.unit}` : ""}. Source: ${stat.source}${stat.year ? `, ${stat.year}` : ""}.`,
+        extra: () => [
+          renderPeckingBar(Object.assign(document.createElement("div"), { className: "pecking" }), standings, [
+            { rank: 1, label: "#1", kind: "answer" },
+            ...(pick && pick.rank > 1 ? [{ rank: pick.rank, label: `YOU #${pick.rank}`, kind: "pick" }] : [])
+          ]),
+          createLadder(standings, state?.pick)
+        ],
+        facts: [[near.charAt(0) + near.slice(1).toLowerCase(), winner.name], ["Your pick", pick ? `#${pick.rank} of ${standings.count}` : "–"], [above, pick ? `${pick.rank - 1} ${pick.rank === 2 ? "country" : "countries"}` : "–"]],
+        picture: null
       };
     }
     default:
@@ -15821,6 +16136,7 @@ function renderInfoCard(container, info) {
     });
     text.appendChild(bars);
   }
+  if (info.extra) text.append(...info.extra());
   const facts = Object.assign(document.createElement("dl"), { className: "info-facts" });
   info.facts.forEach(([label, value]) => {
     const fact = document.createElement("div");
@@ -15889,26 +16205,25 @@ function renderBurstAnswer(round, result) {
     name = "";
     items = round.answer.map((iso, position) => listItem(getCountry(iso), `${position + 1}. ${getCountry(iso).name}${metric.labels?.[iso] ? ` (${metric.labels[iso]})` : ""} · ${metric.format(metric.value(getCountry(iso)))}`));
   } else if (round.type === "extreme") {
-    // The answer, your pick (its rank and how far off), the next best, and the other end.
+    // Your pick up top (with its rank), then the answer, the runner-up and the other end,
+    // each with its place in the pecking order.
     const state = day.rounds[plan.indexOf(round)];
     const standings = getStandings(round.stat, round.find);
     const stat = standings.stat;
-    const winner = standings.sorted[0];
     const pick = result.result;
     const pickCountry = getCountry(state.pick);
-    kicker = pick.perfect ? `SPOT ON · ${FIND_LABELS[round.find]}` : `THE ${FIND_LABELS[round.find]} WAS`;
-    name = getCountry(winner.iso).name;
-    countryOverride = getCountry(winner.iso);
-    // The unit once, under the answer; the list just has the numbers.
-    note = formatValue(stat, winner.value);
+    const [near, farEnd] = extremeEnds(round.find);
+    kicker = pick.perfect ? `SPOT ON · YOU FOUND THE ${near}` : `YOUR PICK · #${pick.rank} OF ${standings.count}`;
+    name = pickCountry.name;
+    countryOverride = pickCountry;
+    const off = pick.offBy === null || pick.perfect ? "" : ` · ${Math.round(pick.offBy * 100)}% off`;
+    note = `${formatValue(stat, pick.value)}${off}`;
     const bare = value => formatValue(stat, value, { unit: false });
-    const off = pick.offBy === null ? "" : ` · ${Math.round(pick.offBy * 100)}% off`;
     const far = standings.sorted.at(-1);
     items = [
-      ...(pick.perfect ? [] : [listItem(pickCountry, `You: ${pickCountry.name} · #${pick.rank} · ${bare(pick.value)}${off}`, "is-pick")]),
-      ...standings.sorted.slice(1, 3).filter(entry => entry.iso !== state.pick)
-        .map(entry => listItem(getCountry(entry.iso), `#${entry.rank} ${getCountry(entry.iso).name} · ${bare(entry.value)}`)),
-      listItem(getCountry(far.iso), `${round.find === "average" ? "Furthest off" : "Other end"}: ${getCountry(far.iso).name} · ${bare(far.value)}`, "is-far")
+      ...standings.sorted.slice(0, pick.perfect ? 3 : 2).filter(entry => entry.iso !== state.pick)
+        .map(entry => listItem(getCountry(entry.iso), `#${entry.rank} ${getCountry(entry.iso).name} · ${bare(entry.value)}${entry.rank === 1 ? ` · ${near.toLowerCase()}` : ""}`, entry.rank === 1 ? "is-answer" : "")),
+      ...(far.iso === state.pick ? [] : [listItem(getCountry(far.iso), `#${far.rank} ${getCountry(far.iso).name} · ${bare(far.value)} · ${farEnd.toLowerCase()}`, "is-far")])
     ];
   }
   setText("scoreBurstAnswerKicker", kicker);
@@ -16018,6 +16333,64 @@ function heatColor(rank, count) {
   const mix = toAt === fromAt ? 0 : (t - fromAt) / (toAt - fromAt);
   const [r, g, b] = from.map((value, index) => Math.round(value + (to[index] - value) * mix));
   return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+}
+
+// The two ends of a round's pecking order: "HIGHEST" and "LOWEST" (for "most average",
+// the middle and the furthest off).
+function extremeEnds(find) {
+  return find === "average" ? ["MOST AVERAGE", "FURTHEST OFF"] : find === "highest" ? ["HIGHEST", "LOWEST"] : ["LOWEST", "HIGHEST"];
+}
+
+// The pecking order as one bar, hot (#1) to cold (last), with a pin per mark
+// ({ rank, label, kind: "stop" | "pick" | "answer" }), to show how far up or down it came.
+function renderPeckingBar(container, standings, marks) {
+  const [near, far] = extremeEnds(standings.find);
+  const track = Object.assign(document.createElement("div"), { className: "pecking-track" });
+  marks.forEach(mark => track.appendChild(createPeckingPin(mark, standings.count)));
+  container.replaceChildren(
+    Object.assign(document.createElement("span"), { className: "pecking-end", textContent: near }),
+    track,
+    Object.assign(document.createElement("span"), { className: "pecking-end", textContent: far })
+  );
+  return container;
+}
+
+function createPeckingPin(mark, count) {
+  const pin = Object.assign(document.createElement("span"), { className: `pecking-pin is-${mark.kind}` });
+  movePeckingPin(pin, mark, count);
+  return pin;
+}
+
+function movePeckingPin(pin, { rank, label }, count) {
+  pin.style.setProperty("--at", `${count > 1 ? (rank - 1) / (count - 1) * 100 : 0}%`);
+  pin.textContent = label;
+}
+
+// The pecking order around the answer and your pick: the top three, your pick with the
+// countries either side of it, and the other end, with the gaps between them counted.
+function createLadder(standings, pickIso) {
+  const { sorted, count, stat } = standings;
+  const pickIndex = sorted.findIndex(entry => entry.iso === pickIso);
+  const shown = [...new Set([0, 1, 2, pickIndex - 1, pickIndex, pickIndex + 1, count - 1])].filter(index => index >= 0 && index < count).sort((a, b) => a - b);
+  const ladder = Object.assign(document.createElement("ol"), { className: "ladder" });
+  let previous = -1;
+  shown.forEach(index => {
+    if (index > previous + 1) ladder.appendChild(Object.assign(document.createElement("li"), { className: "ladder-gap", textContent: `⋮ ${index - previous - 1} more` }));
+    previous = index;
+    const entry = sorted[index];
+    const country = getCountry(entry.iso);
+    const row = Object.assign(document.createElement("li"), { className: `ladder-row${entry.rank === 1 ? " is-answer" : ""}${entry.iso === pickIso ? " is-pick" : ""}` });
+    row.style.setProperty("--heat", heatColor(entry.rank, count));
+    row.append(
+      Object.assign(document.createElement("span"), { className: "ladder-rank", textContent: `#${entry.rank}` }),
+      createFlagImage(country, "ladder-flag"),
+      Object.assign(document.createElement("span"), { className: "ladder-name", textContent: country.name }),
+      ...(entry.iso === pickIso ? [Object.assign(document.createElement("span"), { className: "ladder-you", textContent: "YOU" })] : []),
+      Object.assign(document.createElement("span"), { className: "ladder-value", textContent: formatValue(stat, entry.value, { unit: false }) })
+    );
+    ladder.appendChild(row);
+  });
+  return ladder;
 }
 
 function describeBoosts(result) {
@@ -16611,14 +16984,20 @@ const ROUND_RENDERERS = {
       { country: winner, color: 0xffffff, pulse: true, focus: true },
       ...(state.pick !== winner.iso ? [{ country: selected, color: 0xffd45c, pulse: false, focus: true }] : [])
     ]);
-    // Markers: the answer as 1, your pick with its rank.
-    globe.addMarker(winner.lat, winner.lon, "#ff4f9a", winner.name, 1);
-    if (state.pick !== winner.iso) globe.addMarker(selected.lat, selected.lon, "#ffd45c", `${selected.name} (you)`, result.rank);
-    // Right after locking in, the globe zooms out and turns once around the world before
-    // settling on the answer; revisiting the round just turns to it.
+    // Markers with their place in the pecking order: the top three, your pick and the
+    // other end.
+    // While the reveal runs, your pick's rank stays hidden (the climb shows it).
+    const marked = [...standings.sorted.slice(0, 3), standings.ranks[state.pick], standings.sorted.at(-1)];
+    [...new Set(marked)].filter(entry => !extremeRevealPending || entry.iso !== state.pick).forEach(entry => {
+      const country = getCountry(entry.iso);
+      const isPick = entry.iso === state.pick;
+      globe.addMarker(country.lat, country.lon, isPick ? "#ffd45c" : heatColor(entry.rank, standings.count), isPick ? `${country.name} (you)` : country.name, entry.rank);
+    });
+    // Right after locking in, the globe gives a tour of the heat map; revisiting the round
+    // just turns to the answer.
     if (extremeRevealPending) {
       extremeRevealPending = false;
-      globe.revealSpin(winner.lat, winner.lon, EXTREME_SPIN_MS);
+      playExtremeTour(round, state);
     } else if (options.animateGlobe) {
       globe.rotateTo(winner.lat, winner.lon, 1100);
     }
@@ -16987,8 +17366,7 @@ function editDistance(left, right) {
 }
 
 // The globe mode: the selected country is the round's one pick. The cards slide aside and
-// the globe spins once with the world's heat map before landing on the answer; then the
-// score card (commit waits EXTREME_REVEAL_MS for it).
+// the globe tours the world's heat map (playExtremeTour); then the score card.
 function confirmExtremePick() {
   if (!isPlaying("extreme") || !extremeSelection) return;
   const state = day.rounds[viewIndex];
@@ -16996,16 +17374,272 @@ function confirmExtremePick() {
   extremeSelection = null;
   extremeRevealPending = true;
   slideCardsOut();
-  // Names would only flicker past while the globe spins; they come back when it lands.
-  const view = document.getElementById("gameView");
-  view.classList.add("is-spinning");
-  setTimeout(() => view.classList.remove("is-spinning"), EXTREME_SPIN_MS);
   sounds.playFlyTo();
-  const result = progressOf(viewIndex).result;
-  // The right country has its fanfare in commit; a close one a cheerful blip, a far one a thud.
-  if (!result.perfect) setTimeout(() => (result.points >= 500 ? sounds.playGuess() : sounds.playError()), 350);
+  // How it went stays a secret until the climb lands (no fanfare in commit).
+  verdictPlayed = true;
   commit();
 }
+
+// The reveal after locking in (the globe mode), in two parts, like opening a pack:
+//  1. The tour: the globe zooms out and turns slowly once around the heat map, then stops
+//     at the other end, the runner-up and the answer. A card at the bottom names each stop
+//     with a fun line, and a pin slides along the pecking order (hot #1 to cold last).
+//  2. The climb (playExtremeClimb): the whole ranking creeps up from the last place,
+//     ticking faster and then slower, until it lands on your pick; then your points.
+// Neither gives away your rank early. SKIP (or Enter) skips the current part.
+let extremeTour = null;
+function playExtremeTour(round, state) {
+  stopExtremeTour({ all: true });
+  const standings = getStandings(round.stat, round.find);
+  const { stat, sorted, count, find } = standings;
+  const [near, farEnd] = extremeEnds(find);
+  const winner = sorted[0];
+  const second = sorted[1];
+  const far = sorted.at(-1);
+  const pick = standings.ranks[state.pick];
+  const nameOf = entry => getCountry(entry.iso).name;
+  const fmt = value => formatValue(stat, value);
+  const ratioText = ratio => `${ratio < 10 ? ratio.toFixed(1).replace(/\.0$/, "") : Math.round(ratio)}×`;
+
+  const farLine = () => {
+    if (find === "average") return `The furthest from the middle value of ${fmt(standings.target)}.`;
+    const [big, small] = find === "highest" ? [winner.value, far.value] : [far.value, winner.value];
+    if (big > 0 && small > 0 && big / small >= 2) return `${nameOf(winner)}'s figure is ${ratioText(big / small)} ${find === "highest" ? "this" : "smaller"}.`;
+    return `${fmt(Math.abs(winner.value - far.value))} away from ${nameOf(winner)}.`;
+  };
+  const secondLine = () => find === "average"
+    ? `${fmt(second.distance)} from the middle. So close.`
+    : `Just ${fmt(Math.abs(winner.value - second.value))} short of the top spot.`;
+  const winnerLine = () => find === "average"
+    ? "Right in the middle: half the world is above, half below."
+    : `The ${near.toLowerCase()} of all ${count} countries with data.`;
+  const stops = [
+    { entry: far, kicker: `THE ${farEnd}`, line: farLine() },
+    { entry: second, kicker: "THE RUNNER-UP", line: secondLine() },
+    { entry: winner, kicker: `THE ${near}`, line: winnerLine() }
+  ];
+
+  const view = document.getElementById("gameView");
+  const card = document.getElementById("extremeTour");
+  const pecking = renderPeckingBar(document.getElementById("tourPecking"), standings, [{ rank: 1, label: "", kind: "stop" }]);
+  const stopPin = pecking.querySelector(".pecking-pin.is-stop");
+  const pickCountry = getCountry(pick.iso);
+  const highlight = (country, white = true) => globe.setHighlights([
+    ...(country ? [{ country, color: 0xffffff, pulse: true, focus: true }] : []),
+    ...(country?.iso === pick.iso ? [] : [{ country: pickCountry, color: 0xffd45c, pulse: !country, focus: true }])
+  ]);
+  const showStop = stop => {
+    const country = stop.entry && getCountry(stop.entry.iso);
+    card.classList.toggle("is-intro", !stop.entry);
+    card.style.setProperty("--heat", stop.entry ? heatColor(stop.entry.rank, count) : "var(--accent)");
+    setText("tourKicker", stop.kicker);
+    setText("tourRank", stop.entry ? `#${stop.entry.rank} OF ${count}` : `${count} COUNTRIES`);
+    document.getElementById("tourFlag").replaceChildren(...(stop.entry ? [createFlagImage(country, "tour-flag-image")] : []));
+    setText("tourName", stop.entry ? country.name : stat.name);
+    setText("tourValue", stop.entry ? fmt(stop.entry.value) : "");
+    setText("tourLine", stop.line);
+    stopPin.classList.toggle("hidden", !stop.entry);
+    if (stop.entry) movePeckingPin(stopPin, { rank: stop.entry.rank, label: `#${stop.entry.rank}` }, count);
+    // The card pops each time it changes.
+    card.classList.remove("is-popping");
+    void card.offsetWidth;
+    card.classList.add("is-popping");
+    if (stop.entry) {
+      highlight(country);
+      sounds.playReveal(stop.entry.rank === 1 ? "match" : "near", stop.entry.rank === 1 ? 3 : 0);
+    }
+  };
+
+  const tour = { cancelled: false, aborted: false, timer: 0, wake: null, startedAt: performance.now(), skipPhase: null };
+  const wait = ms => new Promise(resolve => {
+    tour.wake = resolve;
+    tour.timer = setTimeout(resolve, ms);
+  });
+  tour.skipPhase = () => {
+    tour.cancelled = true;
+    clearTimeout(tour.timer);
+    tour.wake?.();
+  };
+  tour.done = (async () => {
+    // Names would only flicker past while the globe turns; they come back after the tour.
+    view.classList.add("is-spinning");
+    card.classList.remove("hidden");
+    // Lift the globe so the card doesn't cover its bottom.
+    globe.setViewShiftY(-Math.round((card.offsetHeight + 24) / 2), PHONE_SHIFT_MS);
+    highlight(null);
+    showStop({ kicker: "THE WHOLE WORLD, RANKED", line: find === "average" ? "Hot: close to the middle. Cold: far from it." : `Hot: near the ${near.toLowerCase()}. Cold: the ${farEnd.toLowerCase()} end.` });
+    const first = getCountry(stops[0].entry.iso);
+    globe.revealSpin(first.lat, first.lon, TOUR_SPIN_MS, TOUR_ZOOM);
+    await wait(TOUR_SPIN_MS - 300);
+    for (const [index, stop] of stops.entries()) {
+      if (tour.cancelled) break;
+      if (index) {
+        const country = getCountry(stop.entry.iso);
+        globe.rotateTo(country.lat, country.lon, TOUR_MOVE_MS);
+        await wait(TOUR_MOVE_MS * 0.7);
+        if (tour.cancelled) break;
+      }
+      showStop(stop);
+      await wait(TOUR_HOLD_MS);
+    }
+    // Settle on your pick, behind the climb.
+    globe.rotateTo(pickCountry.lat, pickCountry.lon, 900);
+    globe.zoomTo(1);
+    card.classList.add("hidden");
+    updatePhoneFrame(PHONE_SHIFT_MS);
+    if (!tour.aborted) {
+      tour.cancelled = false;
+      await playExtremeClimb(standings, pick, state, tour);
+    }
+    globe.addMarker(pickCountry.lat, pickCountry.lon, "#ffd45c", `${pickCountry.name} (you)`, pick.rank);
+    const answer = getCountry(winner.iso);
+    globe.rotateTo(answer.lat, answer.lon, 700);
+    globe.setHighlights([
+      { country: answer, color: 0xffffff, pulse: true, focus: true },
+      ...(pick.iso === winner.iso ? [] : [{ country: pickCountry, color: 0xffd45c, pulse: false, focus: true }])
+    ]);
+    view.classList.remove("is-spinning");
+    if (extremeTour === tour) extremeTour = null;
+  })();
+  extremeTour = tour;
+}
+
+// The climb: the ranking from last to first in a window, creeping upwards (fast, then
+// slower and slower) with a tick per country, until it lands on your pick. Then your
+// row lights up, your points count up, and a click or a moment later the score card.
+const CLIMB_ROW = 44;
+function playExtremeClimb(standings, pick, state, tour) {
+  const { sorted, count, stat } = standings;
+  const overlay = document.getElementById("extremeClimb");
+  const list = document.getElementById("climbList");
+  const rankText = document.getElementById("climbRank");
+  const result = document.getElementById("climbResult");
+  const [near] = extremeEnds(standings.find);
+  setText("climbKicker", "WHERE DID YOU LAND?");
+  setText("climbStat", stat.name);
+  setText("climbOf", `OF ${count}`);
+  result.classList.add("is-waiting");
+  overlay.classList.remove("is-landed", "is-perfect");
+  const rows = sorted.map(entry => {
+    const country = getCountry(entry.iso);
+    const row = Object.assign(document.createElement("li"), { className: "climb-row" });
+    row.style.setProperty("--heat", heatColor(entry.rank, count));
+    row.append(
+      Object.assign(document.createElement("span"), { className: "climb-row-rank", textContent: `#${entry.rank}` }),
+      createFlagImage(country, "climb-row-flag"),
+      Object.assign(document.createElement("span"), { className: "climb-row-name", textContent: country.name }),
+      Object.assign(document.createElement("span"), { className: "climb-row-value", textContent: formatValue(stat, entry.value, { unit: false }) })
+    );
+    return row;
+  });
+  list.replaceChildren(...rows);
+  const target = sorted.findIndex(entry => entry.iso === pick.iso);
+  const start = count - 1;
+  // Two rows above the middle of the five-row window.
+  const place = index => { list.style.transform = `translateY(${(2 - index) * CLIMB_ROW}px)`; };
+  const showRank = index => {
+    rankText.textContent = `#${sorted[index].rank}`;
+    rankText.style.color = heatColor(sorted[index].rank, count);
+  };
+  place(start);
+  showRank(start);
+  overlay.classList.remove("hidden");
+
+  return new Promise(resolve => {
+    const distance = start - target;
+    const duration = Math.min(5200, Math.max(2400, 1600 + distance * 22));
+    let shown = start;
+    let lastTick = 0;
+    let frame = 0;
+    let finished = false;
+    let leaveTimer = 0;
+    const startTime = performance.now() + 500;
+    const land = () => {
+      cancelAnimationFrame(frame);
+      place(target);
+      showRank(target);
+      rows[target].classList.add("is-you");
+      overlay.classList.add("is-landed");
+      overlay.classList.toggle("is-perfect", pick.rank === 1);
+      const points = scoreOf(state, pick);
+      if (pick.rank === 1) sounds.playVictory();
+      else if (points >= 650) sounds.playReveal("match", 4);
+      else if (points >= 300) sounds.playGuess();
+      else sounds.playReveal("miss");
+      // Your points, counting up.
+      const country = getCountry(pick.iso);
+      const continentBest = sorted.find(entry => getCountry(entry.iso).continent === country.continent);
+      setText("climbLine", pick.rank === 1
+        ? `Spot on: ${country.name} is the ${near.toLowerCase()}!`
+        : `${pick.rank - 1} ${pick.rank === 2 ? "country" : "countries"} beat ${country.name}. ${continentBest.iso === pick.iso ? `Best in ${country.continent}!` : `Best in ${country.continent}: ${getCountry(continentBest.iso).name} (#${continentBest.rank}).`}`);
+      const pointsText = document.getElementById("climbPoints");
+      pointsText.textContent = "+0";
+      result.classList.remove("is-waiting");
+      const countStart = performance.now() + 250;
+      const countUp = now => {
+        const progress = Math.min(1, Math.max(0, (now - countStart) / 900));
+        pointsText.textContent = `+${Math.round(points * (1 - (1 - progress) ** 3)).toLocaleString()}`;
+        if (progress < 1 && !finished) requestAnimationFrame(countUp);
+      };
+      requestAnimationFrame(countUp);
+      leaveTimer = setTimeout(finish, 2600);
+    };
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(leaveTimer);
+      cancelAnimationFrame(frame);
+      overlay.classList.add("hidden");
+      tour.skipPhase = null;
+      resolve();
+    };
+    // A click (or Enter) lands at once; once landed, it goes on to the score card.
+    tour.skipPhase = () => (tour.aborted || overlay.classList.contains("is-landed") ? finish() : land());
+    if (tour.aborted) { finish(); return; }
+    const step = now => {
+      const progress = Math.min(1, Math.max(0, (now - startTime) / duration));
+      // Fast at first, then slower and slower as it nears your place.
+      const eased = 1 - (1 - progress) ** 4;
+      const position = start - distance * eased;
+      list.style.transform = `translateY(${(2 - position) * CLIMB_ROW}px)`;
+      const index = Math.round(position);
+      if (index !== shown) {
+        shown = index;
+        showRank(index);
+        if (now - lastTick > 40) {
+          lastTick = now;
+          sounds.playTick(1 - index / Math.max(1, start));
+        }
+      }
+      if (progress < 1) frame = requestAnimationFrame(step);
+      else setTimeout(() => !finished && !overlay.classList.contains("is-landed") && land(), 380);
+    };
+    frame = requestAnimationFrame(step);
+  });
+}
+
+// A round's points for its pick (the score card shows the same).
+function scoreOf(state, pick) {
+  return getDayScore(plan, day.rounds).rounds[day.rounds.indexOf(state)]?.points ?? 0;
+}
+
+// { all: true } (leaving the game) stops the whole reveal; otherwise only its current part.
+function stopExtremeTour({ all = false } = {}) {
+  const tour = extremeTour;
+  if (!tour) return;
+  if (all) tour.aborted = true;
+  tour.skipPhase?.();
+}
+
+document.getElementById("tourSkip").addEventListener("click", () => { sounds.playClick(); stopExtremeTour(); });
+document.getElementById("extremeClimb").addEventListener("click", () => stopExtremeTour());
+document.addEventListener("keydown", event => {
+  // (Not the Enter that locked the pick in.)
+  if (extremeTour && (event.key === "Enter" || event.key === "Escape" || event.key === " ") && performance.now() - extremeTour.startedAt > 400) {
+    event.preventDefault();
+    stopExtremeTour();
+  }
+});
 
 // Paint the Map: paint the selected country, right (green) or wrong (red, -200).
 function confirmPaint() {
@@ -17604,6 +18238,7 @@ function describeMode(mode) {
 initializeMainMenu({
   onPlay: mode => enterGameView(today, mode),
   onHome: () => {
+    stopExtremeTour({ all: true });
     isGameViewVisible = false;
     showMenuGlobe();
   },
@@ -17784,7 +18419,7 @@ const phoneLayout = window.matchMedia("(max-width: 760px)");
 function updatePhoneFrame(duration = 0) {
   const view = document.getElementById("gameView");
   if (!phoneLayout.matches || view.classList.contains("hidden")) {
-    globe.setViewShiftY(0);
+    globe.setViewShiftY(0, duration);
     return;
   }
   const top = document.querySelector(".side-left").getBoundingClientRect().bottom;
@@ -17801,7 +18436,7 @@ phoneFrameObserver.observe(document.querySelector(".side-right"));
 phoneLayout.addEventListener("change", updatePhoneFrame);
 window.addEventListener("resize", updatePhoneFrame);
 // The few "Click" texts written in the page itself.
-if (onTouch) document.querySelectorAll("#pinpointSelection, #paintSelection, .round-intro-start").forEach(node => { node.textContent = tapWords(node.textContent); });
+if (onTouch) document.querySelectorAll("#pinpointSelection, #paintSelection, .round-intro-start, .climb-hint").forEach(node => { node.textContent = tapWords(node.textContent); });
 
 // The round's sheet on a phone has two heights: the round (the default, after every new
 // round) and the globe (the sheet tucked down). Swipe the handle, or tap it, to switch.
