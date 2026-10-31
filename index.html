@@ -331,11 +331,10 @@ h1, h2, h3 { font-weight: normal; }
 .game-buttons .icon-btn:hover { background: rgba(255, 255, 255, 0.1); }
 .game-buttons .icon-btn svg { width: 18px; height: 18px; }
 
-/* Highs & Lows on a computer: the rounds as a row of numbers, as on a phone, at the top
-   of the column (right under the day's name). */
+/* Highs & Lows on a computer: the rounds as a row of numbers, as on a phone. On a wide
+   screen just a small "ROUND 1 / 6" pill at the top centre, above the globe; narrower,
+   the numbers stay in the column. */
 @media (min-width: 761px) {
-  .game-view[data-mode="extremes"] .side-left .rounds-card { order: -1; }
-  .game-view[data-mode="extremes"] .side-left .game-card { order: -2; }
   .game-view[data-mode="extremes"] .round-list { display: flex; gap: 6px; padding: 4px 10px 8px; }
   .game-view[data-mode="extremes"] .round-row { display: grid; flex: 1; place-items: center; height: 40px; padding: 0; border-radius: 10px; background: rgba(255, 255, 255, 0.05); }
   .game-view[data-mode="extremes"] .round-row-name,
@@ -344,6 +343,20 @@ h1, h2, h3 { font-weight: normal; }
   .game-view[data-mode="extremes"] .round-row.is-perfect { background: rgba(92, 242, 138, 0.18); }
   .game-view[data-mode="extremes"] .round-row.is-partial { background: rgba(255, 212, 92, 0.18); }
   .game-view[data-mode="extremes"] .round-row.is-failed { background: rgba(255, 92, 92, 0.18); }
+}
+@media (min-width: 981px) {
+  .game-view[data-mode="extremes"] .side-left .rounds-card {
+    position: fixed;
+    top: var(--gutter);
+    left: 50%;
+    width: max-content;
+    padding: 0;
+    border-radius: 999px;
+    transform: translateX(-50%);
+  }
+  .game-view[data-mode="extremes"] .rounds-card .panel-head { gap: 0.7rem; padding: 7px 16px; border: 0; }
+  .game-view[data-mode="extremes"] .rounds-card .panel-count { font-size: 13px; }
+  .game-view[data-mode="extremes"] .rounds-card .round-list { display: none; }
 }
 
 /* The day's rounds: open a finished one to look back at it. */
