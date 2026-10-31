@@ -16986,13 +16986,8 @@ const ROUND_RENDERERS = {
     ]);
     // Markers with their place in the pecking order: the top three, your pick and the
     // other end.
-    // While the reveal runs, your pick's rank stays hidden (the climb shows it).
-    const marked = [...standings.sorted.slice(0, 3), standings.ranks[state.pick], standings.sorted.at(-1)];
-    [...new Set(marked)].filter(entry => !extremeRevealPending || entry.iso !== state.pick).forEach(entry => {
-      const country = getCountry(entry.iso);
-      const isPick = entry.iso === state.pick;
-      globe.addMarker(country.lat, country.lon, isPick ? "#ffd45c" : heatColor(entry.rank, standings.count), isPick ? `${country.name} (you)` : country.name, entry.rank);
-    });
+    // During the reveal they appear one by one, as the tour gets to them.
+    if (!extremeRevealPending) extremeMarkerEntries(standings, state.pick).forEach(entry => addExtremeMarker(entry, standings, state.pick));
     // Right after locking in, the globe gives a tour of the heat map; revisiting the round
     // just turns to the answer.
     if (extremeRevealPending) {
@@ -17428,6 +17423,13 @@ function playExtremeTour(round, state) {
     ...(country ? [{ country, color: 0xffffff, pulse: true, focus: true }] : []),
     ...(country?.iso === pick.iso ? [] : [{ country: pickCountry, color: 0xffd45c, pulse: !country, focus: true }])
   ]);
+  // Markers only appear once the tour has been there (and the rest after the climb).
+  const marked = new Set();
+  const markStop = entry => {
+    if (marked.has(entry.iso)) return;
+    marked.add(entry.iso);
+    addExtremeMarker(entry, standings, pick.iso);
+  };
   const showStop = stop => {
     const country = stop.entry && getCountry(stop.entry.iso);
     card.classList.toggle("is-intro", !stop.entry);
@@ -17445,6 +17447,7 @@ function playExtremeTour(round, state) {
     void card.offsetWidth;
     card.classList.add("is-popping");
     if (stop.entry) {
+      markStop(stop.entry);
       highlight(country);
       sounds.playReveal(stop.entry.rank === 1 ? "match" : "near", stop.entry.rank === 1 ? 3 : 0);
     }
@@ -17491,7 +17494,7 @@ function playExtremeTour(round, state) {
       tour.cancelled = false;
       await playExtremeClimb(standings, pick, state, tour);
     }
-    globe.addMarker(pickCountry.lat, pickCountry.lon, "#ffd45c", `${pickCountry.name} (you)`, pick.rank);
+    extremeMarkerEntries(standings, pick.iso).forEach(markStop);
     const answer = getCountry(winner.iso);
     globe.rotateTo(answer.lat, answer.lon, 700);
     globe.setHighlights([
@@ -17502,6 +17505,17 @@ function playExtremeTour(round, state) {
     if (extremeTour === tour) extremeTour = null;
   })();
   extremeTour = tour;
+}
+
+// The countries the globe marks with their rank: the top three, your pick and the last.
+function extremeMarkerEntries(standings, pickIso) {
+  return [...new Set([...standings.sorted.slice(0, 3), standings.ranks[pickIso], standings.sorted.at(-1)])];
+}
+
+function addExtremeMarker(entry, standings, pickIso) {
+  const country = getCountry(entry.iso);
+  const isPick = entry.iso === pickIso;
+  globe.addMarker(country.lat, country.lon, isPick ? "#ffd45c" : heatColor(entry.rank, standings.count), isPick ? `${country.name} (you)` : country.name, entry.rank);
 }
 
 // The climb: the ranking from last to first in a window, creeping upwards (fast, then
