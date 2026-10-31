@@ -331,6 +331,21 @@ h1, h2, h3 { font-weight: normal; }
 .game-buttons .icon-btn:hover { background: rgba(255, 255, 255, 0.1); }
 .game-buttons .icon-btn svg { width: 18px; height: 18px; }
 
+/* Highs & Lows on a computer: the rounds as a row of numbers, as on a phone, at the top
+   of the column (right under the day's name). */
+@media (min-width: 761px) {
+  .game-view[data-mode="extremes"] .side-left .rounds-card { order: -1; }
+  .game-view[data-mode="extremes"] .side-left .game-card { order: -2; }
+  .game-view[data-mode="extremes"] .round-list { display: flex; gap: 6px; padding: 4px 10px 8px; }
+  .game-view[data-mode="extremes"] .round-row { display: grid; flex: 1; place-items: center; height: 40px; padding: 0; border-radius: 10px; background: rgba(255, 255, 255, 0.05); }
+  .game-view[data-mode="extremes"] .round-row-name,
+  .game-view[data-mode="extremes"] .round-row-status { display: none; }
+  .game-view[data-mode="extremes"] .round-row-number { font-size: 14px; }
+  .game-view[data-mode="extremes"] .round-row.is-perfect { background: rgba(92, 242, 138, 0.18); }
+  .game-view[data-mode="extremes"] .round-row.is-partial { background: rgba(255, 212, 92, 0.18); }
+  .game-view[data-mode="extremes"] .round-row.is-failed { background: rgba(255, 92, 92, 0.18); }
+}
+
 /* The day's rounds: open a finished one to look back at it. */
 .rounds-card { padding-bottom: 6px; }
 .round-list { display: grid; gap: 2px; padding: 6px; list-style: none; }
@@ -1174,6 +1189,11 @@ h1, h2, h3 { font-weight: normal; }
 .game-view.is-switching .side-left { transform: translateX(calc(-100% - 2 * var(--gutter))); opacity: 0; }
 .game-view.is-switching .side-right { transform: translateX(calc(100% + 2 * var(--gutter))); opacity: 0; }
 .game-view.is-switching .stage-chip { opacity: 0; }
+/* Highs & Lows while its result is revealed: only the round's card goes aside, so the
+   score stays in view. */
+.game-view.is-revealing .side-right { transform: translateX(calc(100% + 2 * var(--gutter))); opacity: 0; }
+.game-view.is-revealing .stage-chip,
+.game-view.is-revealing .stage-hint { opacity: 0; }
 
 .round-intro {
   position: fixed;
@@ -2639,7 +2659,7 @@ h1, h2, h3 { font-weight: normal; }
   display: grid;
   place-items: center;
   padding: 1rem;
-  background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.25) 20%, rgba(0, 0, 0, 0.6) 100%);
+  background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.3) 25%, transparent 75%);
   cursor: pointer;
 }
 .climb-card {
@@ -2691,6 +2711,26 @@ h1, h2, h3 { font-weight: normal; }
 .climb-line { margin: 0; color: var(--text); font-size: 14px; text-align: center; }
 .climb-hint { color: var(--faint); font-size: 12px; }
 .extreme-climb.is-landed .climb-hint { visibility: hidden; }
+
+/* Highs & Lows score card: the pecking order gets room to breathe. On a computer the
+   ladder already shows #1, #2 and the other end, so the left side keeps just your pick,
+   and the facts row (the same again) goes. */
+@media (min-width: 761px) {
+  .score-burst-card.is-extreme .burst-answer-list { display: none; }
+  .score-burst-card.is-extreme .info-facts { display: none; }
+  .score-burst-card.is-extreme .burst-info .info-text { gap: 0.9rem; }
+  .score-burst-card.is-extreme .burst-info h3 { font-size: 12px; }
+  .score-burst-card.is-extreme .burst-info p { color: var(--muted); font-size: 12px; }
+  .score-burst-card.is-extreme .pecking { margin: 0.4rem 0 0.2rem; }
+  .score-burst-card.is-extreme .pecking-track { height: 34px; }
+  .score-burst-card.is-extreme .pecking-pin { font-size: 11px; padding: 3px 6px; }
+  .score-burst-card.is-extreme .ladder { gap: 5px; }
+  .score-burst-card.is-extreme .ladder-row { grid-template-columns: 3.2rem 28px minmax(0, 1fr) auto auto; gap: 0.7rem; padding: 7px 12px; border-radius: 10px; background: rgba(255, 255, 255, 0.03); font-size: 15px; }
+  .score-burst-card.is-extreme .ladder-flag { width: 28px; height: 19px; }
+  .score-burst-card.is-extreme .ladder-rank,
+  .score-burst-card.is-extreme .ladder-value { font-size: 13px; }
+  .score-burst-card.is-extreme .ladder-gap { padding: 1px 12px 1px calc(3.2rem + 12px); }
+}
 
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -2884,7 +2924,7 @@ h1, h2, h3 { font-weight: normal; }
 
         <section class="panel rounds-card" aria-label="Rounds">
           <div class="panel-head">
-            <h2>ROUNDS</h2>
+            <h2 id="roundsHeading">ROUNDS</h2>
             <span class="panel-count" id="roundCount">1 / 5</span>
           </div>
           <ol class="round-list" id="roundDots"></ol>
@@ -15619,6 +15659,9 @@ let paintSelection = null;
 // has to make its reveal turn (right after locking in).
 let extremeSelection = null;
 let extremeRevealPending = false;
+// The globe mode's round whose result is still being revealed: the score tile and the
+// round list show the day as it was before it, until the climb lands.
+let extremeHeldRound = null;
 // Deep Cut's near miss: the wrong try it belongs to and the answer it was probably meant to be.
 let deepcutSuggestion = null;
 // Set once today's last round is finished, so stats are saved only once.
@@ -16050,10 +16093,8 @@ function getRoundInfo(round) {
         title: stat.name,
         text: `The pecking order${stat.unit ? `, in ${stat.unit}` : ""}. Source: ${stat.source}${stat.year ? `, ${stat.year}` : ""}.`,
         extra: () => [
-          renderPeckingBar(Object.assign(document.createElement("div"), { className: "pecking" }), standings, [
-            { rank: 1, label: "#1", kind: "answer" },
-            ...(pick && pick.rank > 1 ? [{ rank: pick.rank, label: `YOU #${pick.rank}`, kind: "pick" }] : [])
-          ]),
+          // Just you on the bar (its end label and the ladder mark #1).
+          renderPeckingBar(Object.assign(document.createElement("div"), { className: "pecking" }), standings, pick ? [{ rank: pick.rank, label: `YOU #${pick.rank}`, kind: "pick" }] : []),
           createLadder(standings, state?.pick)
         ],
         facts: [[near.charAt(0) + near.slice(1).toLowerCase(), winner.name], ["Your pick", pick ? `#${pick.rank} of ${standings.count}` : "–"], [above, pick ? `${pick.rank - 1} ${pick.rank === 2 ? "country" : "countries"}` : "–"]],
@@ -16263,6 +16304,8 @@ function showScoreBurst(index, { keepCardsOut = false } = {}) {
   if (info) renderBurstMore(info);
   // Deep Cut's long answer list gets the left column; its journey moves under the info.
   document.querySelector(".score-burst-card").classList.toggle("is-deepcut", plan[index].type === "deepcut");
+  // Highs & Lows: the pecking order gets the room (see style.css).
+  document.querySelector(".score-burst-card").classList.toggle("is-extreme", plan[index].type === "extreme");
   // A missed round's card puts the answer first, in gold. Every card waits for its
   // button (or Enter), so there's time to read it.
   overlay.classList.toggle("is-missed", !result.solved);
@@ -16483,8 +16526,9 @@ function render({ animateGlobe = true } = {}) {
   const round = plan[viewIndex];
   const state = day.rounds[viewIndex];
   const progress = progressOf(viewIndex);
-  const dayScore = getDayScore(plan, day.rounds);
-  const activeIndex = getActiveRoundIndex();
+  const held = extremeHeldRound;
+  const dayScore = getDayScore(plan, held === null ? day.rounds : day.rounds.map((roundState, index) => index === held ? { ...roundState, pick: null } : roundState));
+  const activeIndex = held === null ? getActiveRoundIndex() : held;
 
   setText("dailyBadge", `DAY ${getPuzzleNumber(activeDate)}`);
   setText("modeChip", MODE_INFO[activeMode].short);
@@ -16493,6 +16537,8 @@ function render({ animateGlobe = true } = {}) {
   document.getElementById("gameView").dataset.round = round.type;
   setText("puzzleDate", activeDate === today ? "Today" : activeDate < today ? "Archive" : "Upcoming");
   setText("roundCount", `${viewIndex + 1} / ${plan.length}`);
+  // Highs & Lows shows its rounds as a row of numbers, so the heading is "ROUND 1 / 6".
+  setText("roundsHeading", activeMode === "extremes" ? "ROUND" : "ROUNDS");
   const dayInfo = getDayInfo(activeDate, activeMode);
   document.getElementById("dayName").classList.toggle("hidden", !dayInfo);
   setText("dayName", dayInfo?.name || "");
@@ -17368,7 +17414,10 @@ function confirmExtremePick() {
   state.pick = extremeSelection;
   extremeSelection = null;
   extremeRevealPending = true;
-  slideCardsOut();
+  extremeHeldRound = viewIndex;
+  // Only the round's card goes aside: the score stays in view (on a phone, the top bar).
+  document.getElementById("gameView").classList.add("is-revealing");
+  updatePhoneFrame(PHONE_SHIFT_MS);
   sounds.playFlyTo();
   // How it went stays a secret until the climb lands (no fanfare in commit).
   verdictPlayed = true;
@@ -17467,8 +17516,10 @@ function playExtremeTour(round, state) {
     // Names would only flicker past while the globe turns; they come back after the tour.
     view.classList.add("is-spinning");
     card.classList.remove("hidden");
-    // Lift the globe so the card doesn't cover its bottom.
-    globe.setViewShiftY(-Math.round((card.offsetHeight + 24) / 2), PHONE_SHIFT_MS);
+    // Centre the globe between the top (on a phone, the top bar) and the card.
+    const top = phoneLayout.matches ? document.querySelector(".side-left").getBoundingClientRect().bottom : 0;
+    const cardTop = window.innerHeight - card.offsetHeight - (parseFloat(getComputedStyle(card).bottom) || 0);
+    globe.setViewShiftY(Math.round((top + cardTop) / 2 - window.innerHeight / 2), PHONE_SHIFT_MS);
     highlight(null);
     showStop({ kicker: "THE WHOLE WORLD, RANKED", line: find === "average" ? "Hot: close to the middle. Cold: far from it." : `Hot: near the ${near.toLowerCase()}. Cold: the ${farEnd.toLowerCase()} end.` });
     const first = getCountry(stops[0].entry.iso);
@@ -17501,7 +17552,8 @@ function playExtremeTour(round, state) {
       { country: answer, color: 0xffffff, pulse: true, focus: true },
       ...(pick.iso === winner.iso ? [] : [{ country: pickCountry, color: 0xffd45c, pulse: false, focus: true }])
     ]);
-    view.classList.remove("is-spinning");
+    view.classList.remove("is-spinning", "is-revealing");
+    releaseHeldScore();
     if (extremeTour === tour) extremeTour = null;
   })();
   extremeTour = tour;
@@ -17575,6 +17627,7 @@ function playExtremeClimb(standings, pick, state, tour) {
       rows[target].classList.add("is-you");
       overlay.classList.add("is-landed");
       overlay.classList.toggle("is-perfect", pick.rank === 1);
+      releaseHeldScore();
       const points = scoreOf(state, pick);
       if (pick.rank === 1) sounds.playVictory();
       else if (points >= 650) sounds.playReveal("match", 4);
@@ -17630,6 +17683,16 @@ function playExtremeClimb(standings, pick, state, tour) {
     };
     frame = requestAnimationFrame(step);
   });
+}
+
+// The climb has landed: the score tile counts up to the day's real total.
+function releaseHeldScore() {
+  if (extremeHeldRound === null) return;
+  const before = getDayScore(plan, day.rounds.map((roundState, index) => index === extremeHeldRound ? { ...roundState, pick: null } : roundState)).total;
+  extremeHeldRound = null;
+  const dayScore = getDayScore(plan, day.rounds);
+  renderScoreTile(dayScore);
+  countUp(document.getElementById("dailyTotalScore"), dayScore.total, { from: before, duration: 1100 });
 }
 
 // A round's points for its pick (the score card shows the same).
@@ -18253,6 +18316,8 @@ initializeMainMenu({
   onPlay: mode => enterGameView(today, mode),
   onHome: () => {
     stopExtremeTour({ all: true });
+    extremeHeldRound = null;
+    document.getElementById("gameView").classList.remove("is-revealing");
     isGameViewVisible = false;
     showMenuGlobe();
   },
@@ -18440,8 +18505,11 @@ function updatePhoneFrame(duration = 0) {
   const sheetTop = document.querySelector(".side-right").getBoundingClientRect().top;
   view.style.setProperty("--phone-top", `${Math.round(top)}px`);
   view.style.setProperty("--phone-sheet", `${Math.round(window.innerHeight - sheetTop)}px`);
-  // The cards slide sideways, so their heights still count while they're away.
-  const shift = view.classList.contains("is-switching") ? 0 : Math.round((top + sheetTop) / 2 - window.innerHeight / 2);
+  // The cards slide sideways, so their heights still count while they're away. While a
+  // globe-mode result is revealed, only the sheet is away.
+  const away = view.classList.contains("is-switching");
+  const sheetAway = away || view.classList.contains("is-revealing");
+  const shift = Math.round(((away ? 0 : top) + (sheetAway ? window.innerHeight : sheetTop)) / 2 - window.innerHeight / 2);
   globe.setViewShiftY(shift, duration);
 }
 const phoneFrameObserver = new ResizeObserver(() => updatePhoneFrame());
