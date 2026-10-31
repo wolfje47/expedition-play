@@ -1209,7 +1209,8 @@ h1, h2, h3 { font-weight: normal; }
 .round-intro-clock { color: var(--accent); font: 14px var(--font-body); }
 /* Country names on the globe (casual) stay out of the round's title card. */
 .game-view:has(#roundIntro:not(.hidden)) .globe-labels,
-.game-view:has(#scoreBurst:not(.hidden)) .globe-labels { opacity: 0; }
+.game-view:has(#scoreBurst:not(.hidden)) .globe-labels,
+.game-view.is-spinning .globe-labels { opacity: 0; }
 .round-intro-start { margin-top: 0.2rem; color: var(--faint); font: 12px var(--font-body); }
 
 .round-intro.is-showing .round-intro-card { animation: intro-in 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.1) both; }
@@ -6396,6 +6397,7 @@ class PixelGlobe {
     this.pendingRotation = null;
     this.viewShift = 0;
     this.viewShiftY = 0;
+    this.viewShiftToken = 0;
     this.borderLines = [];
     this.labels = [];
     this.labelLayer = null;
@@ -6884,10 +6886,18 @@ class PixelGlobe {
     // Shifting the view moves the globe sideways (e.g. to make room for a panel), or up
     // and down (on a phone, between the top bar and the round's sheet). On the menu it is
     // pushed down instead, so its top edge forms a horizon across the screen.
+    this.updateViewOffset();
+  }
+
+  updateViewOffset() {
+    if (this.mode === "transition") return;
+    const width = this.container.clientWidth || 500;
+    const height = this.container.clientHeight || 240;
     const shiftY = this.mode === "menu" ? this.getHorizonShift(height) : this.mode === "game" ? this.viewShiftY : 0;
     if (this.viewShift || shiftY) this.camera.setViewOffset(width, height, -this.viewShift, -shiftY, width, height);
     else this.camera.clearViewOffset();
     this.camera.updateProjectionMatrix();
+    this.requestRender();
   }
 
   // Pixels to push the globe down so its top edge lands at MENU_HORIZON.
@@ -7062,10 +7072,26 @@ class PixelGlobe {
   }
 
   // Moves the globe down by `pixels` (up if negative) while playing.
-  setViewShiftY(pixels) {
+  // duration > 0 glides there (e.g. to the middle of the screen while a phone's bars are away).
+  setViewShiftY(pixels, duration = 0) {
+    const token = ++this.viewShiftToken;
     if (this.viewShiftY === pixels) return;
-    this.viewShiftY = pixels;
-    this.resize();
+    if (!duration) {
+      this.viewShiftY = pixels;
+      this.resize();
+      return;
+    }
+    const start = this.viewShiftY;
+    const startTime = performance.now();
+    const animate = now => {
+      if (token !== this.viewShiftToken) return;
+      const progress = Math.min((now - startTime) / duration, 1);
+      const ease = 1 - (1 - progress) ** 3;
+      this.viewShiftY = Math.round(start + (pixels - start) * ease);
+      this.updateViewOffset();
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
   }
 
   // Mouse, pen and touch alike: drag to turn, a short press to click, scroll or pinch to zoom.
@@ -7336,6 +7362,37 @@ class PixelGlobe {
     };
 
     requestAnimationFrame(animateRotation);
+  }
+
+  // The globe mode's reveal: zoom far out and make one full turn around the world (so
+  // every side of the heat map passes by), then slow down and zoom back in to end facing
+  // lat/lon. The tilt eases to a gentle angle mid-turn, then to the answer's latitude.
+  revealSpin(lat, lon, duration = 3600) {
+    if (this.mode !== "game") { this.rotateTo(lat, lon); return; }
+    const token = ++this.rotationToken;
+    this.targetCameraDistance = DEFAULT_CAMERA_DISTANCE * 1.45;
+    const startX = this.globeGroup.rotation.x;
+    const startY = this.globeGroup.rotation.y;
+    const targetX = lat * Math.PI / 180;
+    let targetY = -(lon * Math.PI / 180) - Math.PI / 2;
+    // The short way to the answer, plus one whole turn.
+    targetY += Math.round((startY - targetY) / (Math.PI * 2)) * Math.PI * 2 - Math.PI * 2;
+    const midX = THREE.MathUtils.degToRad(15);
+    const startTime = performance.now();
+    const animate = now => {
+      if (token !== this.rotationToken) return;
+      const progress = Math.min((now - startTime) / duration, 1);
+      // Ease in and out, so the turn starts gently and settles on the answer.
+      const ease = progress < 0.5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2;
+      this.globeGroup.rotation.y = startY + (targetY - startY) * ease;
+      this.globeGroup.rotation.x = progress < 0.5
+        ? startX + (midX - startX) * Math.min(1, progress * 3)
+        : midX + (targetX - midX) * ((progress - 0.5) * 2) ** 2;
+      if (progress > 0.7) this.targetCameraDistance = DEFAULT_CAMERA_DISTANCE;
+      this.requestRender();
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
   }
 
   // A gentle turn by `degrees` of longitude, keeping the current tilt (between rounds).
@@ -15223,8 +15280,11 @@ const RANK_COLORS = ["#45e3ff", "#ffd45c", "#ff8a3d", "#c58cff", "#5cf28a"];
 // right guess quickly, a new clue after time to read it). Mystery Country and Rank 'Em
 // cards wait for a click, like every card in casual; the clock is stopped meanwhile.
 const AUTO_CONTINUE_MS = 1300;
-// The globe mode: how long the world's heat map shows before the score card.
-const EXTREME_REVEAL_MS = 2600;
+// The globe mode: the heat map's turn around the world, and how long it all shows before
+// the score card (the turn, then a moment on the answer).
+const EXTREME_SPIN_MS = 3600;
+const EXTREME_REVEAL_MS = 5000;
+const PHONE_SHIFT_MS = 600;
 const AUTO_CONTINUE_CLUE_MS = 3500;
 // A wrong Pinpoint guess: time to read hot/cold before its new clue arrives on its own card.
 const AUTO_CONTINUE_WRONG_MS = 2000;
@@ -15247,8 +15307,10 @@ let pinpointSelection = null;
 let mysterySelection = null;
 // The country clicked in Paint the Map, waiting to be painted.
 let paintSelection = null;
-// The globe mode: the country clicked, waiting to be locked in.
+// The globe mode: the country clicked, waiting to be locked in, and whether the globe still
+// has to make its reveal turn (right after locking in).
 let extremeSelection = null;
+let extremeRevealPending = false;
 // Deep Cut's near miss: the wrong try it belongs to and the answer it was probably meant to be.
 let deepcutSuggestion = null;
 // Set once today's last round is finished, so stats are saved only once.
@@ -15442,8 +15504,9 @@ function goToRound(index) {
 
 // The side cards slide off to the screen edges (see .is-switching in the stylesheet).
 const CARD_SLIDE_MS = 380;
-function slideCardsOut() { document.getElementById("gameView").classList.add("is-switching"); }
-function slideCardsIn() { document.getElementById("gameView").classList.remove("is-switching"); }
+// On a phone the globe glides to the middle of the screen while the bars are away.
+function slideCardsOut() { document.getElementById("gameView").classList.add("is-switching"); updatePhoneFrame(PHONE_SHIFT_MS); }
+function slideCardsIn() { document.getElementById("gameView").classList.remove("is-switching"); updatePhoneFrame(PHONE_SHIFT_MS); }
 
 // Title shown over the globe when a round starts (once per round per visit), with the
 // cards slid out of the way. It waits for a click or Enter, so there's time to read it.
@@ -16485,6 +16548,7 @@ const ROUND_RENDERERS = {
   // with the standings (the right end, your pick, the other end).
   extreme(round, state, progress, options) {
     globe.clearMarkers();
+    markerGuesses = [];
     const stat = getStat(round.stat);
     const standings = getStandings(round.stat, round.find);
     const find = document.getElementById("extremeFind");
@@ -16547,7 +16611,17 @@ const ROUND_RENDERERS = {
       { country: winner, color: 0xffffff, pulse: true, focus: true },
       ...(state.pick !== winner.iso ? [{ country: selected, color: 0xffd45c, pulse: false, focus: true }] : [])
     ]);
-    if (options.animateGlobe) globe.rotateTo(winner.lat, winner.lon, 1100);
+    // Markers: the answer as 1, your pick with its rank.
+    globe.addMarker(winner.lat, winner.lon, "#ff4f9a", winner.name, 1);
+    if (state.pick !== winner.iso) globe.addMarker(selected.lat, selected.lon, "#ffd45c", `${selected.name} (you)`, result.rank);
+    // Right after locking in, the globe zooms out and turns once around the world before
+    // settling on the answer; revisiting the round just turns to it.
+    if (extremeRevealPending) {
+      extremeRevealPending = false;
+      globe.revealSpin(winner.lat, winner.lon, EXTREME_SPIN_MS);
+    } else if (options.animateGlobe) {
+      globe.rotateTo(winner.lat, winner.lon, 1100);
+    }
   },
 
   rank(round, state, progress, { animateGlobe }) {
@@ -16912,13 +16986,20 @@ function editDistance(left, right) {
   return previous[right.length];
 }
 
-// The globe mode: the selected country is the round's one pick. The world's heat map
-// shows, then the score card (commit waits EXTREME_REVEAL_MS for it).
+// The globe mode: the selected country is the round's one pick. The cards slide aside and
+// the globe spins once with the world's heat map before landing on the answer; then the
+// score card (commit waits EXTREME_REVEAL_MS for it).
 function confirmExtremePick() {
   if (!isPlaying("extreme") || !extremeSelection) return;
   const state = day.rounds[viewIndex];
   state.pick = extremeSelection;
   extremeSelection = null;
+  extremeRevealPending = true;
+  slideCardsOut();
+  // Names would only flicker past while the globe spins; they come back when it lands.
+  const view = document.getElementById("gameView");
+  view.classList.add("is-spinning");
+  setTimeout(() => view.classList.remove("is-spinning"), EXTREME_SPIN_MS);
   sounds.playFlyTo();
   const result = progressOf(viewIndex).result;
   // The right country has its fanfare in commit; a close one a cheerful blip, a far one a thud.
@@ -17700,7 +17781,7 @@ initAuth(account => {
 // Phones: the globe sits in the gap between the top bar and the round's sheet, so it's
 // moved to the middle of that gap, and the chips around it follow (see style.css).
 const phoneLayout = window.matchMedia("(max-width: 760px)");
-function updatePhoneFrame() {
+function updatePhoneFrame(duration = 0) {
   const view = document.getElementById("gameView");
   if (!phoneLayout.matches || view.classList.contains("hidden")) {
     globe.setViewShiftY(0);
@@ -17710,7 +17791,9 @@ function updatePhoneFrame() {
   const sheetTop = document.querySelector(".side-right").getBoundingClientRect().top;
   view.style.setProperty("--phone-top", `${Math.round(top)}px`);
   view.style.setProperty("--phone-sheet", `${Math.round(window.innerHeight - sheetTop)}px`);
-  globe.setViewShiftY(Math.round((top + sheetTop) / 2 - window.innerHeight / 2));
+  // The cards slide sideways, so their heights still count while they're away.
+  const shift = view.classList.contains("is-switching") ? 0 : Math.round((top + sheetTop) / 2 - window.innerHeight / 2);
+  globe.setViewShiftY(shift, duration);
 }
 const phoneFrameObserver = new ResizeObserver(() => updatePhoneFrame());
 phoneFrameObserver.observe(document.querySelector(".side-left"));
