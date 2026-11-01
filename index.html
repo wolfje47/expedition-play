@@ -14351,8 +14351,7 @@ const { SHAPES } = __modules["shape-data.js"];
 const { DAYS } = __modules["days.js"];
 const { CASUAL_DAYS } = __modules["casual-days.js"];
 const { EXTREME_DAYS } = __modules["extremes-days.js"];
-const { EXTREME_ROUNDS, EXTREME_MAX_DAY, MODE_NAME, askQuestion, getStandings, scorePick } = __modules["extremes.js"];
-const { STATS } = __modules["stats-data.js"];
+const { EXTREME_MAX_DAY, MODE_NAME, scorePick } = __modules["extremes.js"];
 
 const MODES = ["competitive", "casual", "extremes"];
 const MODE_INFO = {
@@ -14700,21 +14699,12 @@ function getDailyPlan(dateKey, mode = "competitive") {
   });
 }
 
-// The globe mode's six rounds: from extremes-days.js, or else six stats picked by the date
-// (each a highest or lowest with a single country at the answer).
+// The globe mode's six rounds, only from extremes-days.js: every day there has been through
+// the team's review (see CLAUDE.md), so a date without one has no game (no generated days).
+const hasExtremeDay = dateKey => Boolean(EXTREME_DAYS[dateKey]);
+
 function getExtremePlan(dateKey) {
-  const authored = EXTREME_DAYS[dateKey];
-  const rounds = authored ? authored.rounds : [];
-  if (!authored) {
-    const random = seededRandom(`extremes:${dateKey}`);
-    const ids = shuffle(Object.keys(STATS), random);
-    for (const statId of ids) {
-      if (rounds.length === EXTREME_ROUNDS) break;
-      const find = random() < 0.7 ? "highest" : "lowest";
-      if (getStandings(statId, find).sorted.filter(entry => entry.rank === 1).length > 1) continue;
-      rounds.push([statId, find, askQuestion(statId, find)]);
-    }
-  }
+  const rounds = EXTREME_DAYS[dateKey]?.rounds || [];
   return rounds.map(([stat, find, question], index) => ({ type: "extreme", index, difficulty: 1, mode: "extremes", stat, find, question }));
 }
 
@@ -14955,7 +14945,7 @@ function getDayScore(plan, states) {
   };
 }
 
-return { MODES, MODE_INFO, ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, SPEED_WINDOW_MS, getSpeedWindow, MAX_SPEED_BONUS, getSpeedMultiplier, getMaxScore, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, resolveRound, resolvePlan, getDayInfo, getDailyPlan, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
+return { MODES, MODE_INFO, ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, SPEED_WINDOW_MS, getSpeedWindow, MAX_SPEED_BONUS, getSpeedMultiplier, getMaxScore, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, resolveRound, resolvePlan, getDayInfo, getDailyPlan, hasExtremeDay, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
 })();
 
 // ---- community.js
@@ -16298,7 +16288,7 @@ function createPixelArt(rows, colors) {
 
 // onPlay(mode) starts today's game in a mode; describeMode(mode) says how it stands
 // ("Played · 4,210", "Round 3 of 5", ...), shown under each game in PLAY.
-function initializeMainMenu({ onPlay, onHome, describeMode = () => "" }) {
+function initializeMainMenu({ onPlay, onHome, describeMode = () => "", isModeAvailable = () => true }) {
   const menu = document.getElementById("mainMenu");
   const menuOptions = menu.querySelector(".menu-options");
   const menuButtons = [...menuOptions.querySelectorAll(".menu-option")];
@@ -16361,6 +16351,8 @@ function initializeMainMenu({ onPlay, onHome, describeMode = () => "" }) {
       document.getElementById("menuCompetitiveStatus").textContent = describeMode("competitive");
       document.getElementById("menuCasualStatus").textContent = describeMode("casual");
       document.getElementById("menuExtremesStatus").textContent = describeMode("extremes");
+      // Highs & Lows only has the days the team has reviewed.
+      document.getElementById("menuExtremesButton").disabled = !isModeAvailable("extremes");
       document.getElementById("menuCompetitiveButton").focus();
     } else {
       playButton.focus();
@@ -17242,7 +17234,7 @@ const { FIND_LABELS, formatValue, getStandings, getStat, missingReason } = __mod
 const { createBadge } = __modules["badges.js"];
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
-const { MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MODES, MODE_INFO, getSpeedWindow, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
+const { hasExtremeDay, MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MODES, MODE_INFO, getSpeedWindow, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
 const { createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, initializeStatsModal, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, redactCountryName, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
 
 // v3: Deep Cut and Paint the Map replaced Capital Call and Border Patrol (October 2026).
@@ -20023,6 +20015,7 @@ document.getElementById("soundToggle").addEventListener("click", () => {
 
 // Under each game in PLAY: how today's game stands.
 function describeMode(mode) {
+  if (mode === "extremes" && !hasExtremeDay(today)) return "No reviewed day for today yet";
   const record = getDayRecord(today, mode);
   if (record.completed) return `Played · ${record.score.toLocaleString()} · ${formatTopPercent(getTopPercent(getDayStats(today, mode), record.score))}`;
   if (record.started) return `Round ${record.rounds.filter(round => round.done).length + 1} of ${record.rounds.length} · continue`;
@@ -20038,7 +20031,8 @@ initializeMainMenu({
     isGameViewVisible = false;
     showMenuGlobe();
   },
-  describeMode
+  describeMode,
+  isModeAvailable: mode => mode !== "extremes" || hasExtremeDay(today)
 });
 initializeStatsModal(() => {
   const stats = getStats();
