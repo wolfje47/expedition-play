@@ -275,6 +275,14 @@ h1, h2, h3 { font-weight: normal; }
 .play-tile-text span { color: var(--text); font-size: 12px; }
 .play-tile-text small { color: var(--muted); font: 12px var(--font-body); }
 .play-tile:disabled { cursor: not-allowed; filter: grayscale(0.6); opacity: 0.55; }
+/* The main game: first, a size up, glowing, with a MAIN GAME ribbon. */
+.play-tile.is-main { position: relative; grid-template-columns: 104px 1fr; padding: 1.1rem 1rem; border-width: 2px; border-color: var(--tile); background: linear-gradient(110deg, color-mix(in srgb, var(--tile) 30%, transparent), color-mix(in srgb, var(--tile) 6%, transparent) 75%); box-shadow: 0 0 34px color-mix(in srgb, var(--tile) 35%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.18); animation: main-tile-glow 2.6s ease-in-out infinite; }
+.play-tile.is-main:disabled { animation: none; box-shadow: none; }
+.play-tile.is-main .play-tile-text strong { font-size: 16px; }
+.play-tile.is-main .play-tile-text span { font-size: 14px; }
+.play-tile-ribbon { position: absolute; top: -10px; right: 14px; padding: 4px 9px; border-radius: 6px; background: var(--tile); color: #0a0f1e; font: 9px var(--font-display); letter-spacing: var(--ls-pixel); box-shadow: 0 4px 14px color-mix(in srgb, var(--tile) 45%, transparent); }
+@keyframes main-tile-glow { 50% { box-shadow: 0 0 48px color-mix(in srgb, var(--tile) 50%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.18); } }
+@media (prefers-reduced-motion: reduce) { .play-tile.is-main { animation: none; } }
 .menu-back { min-height: 44px; background: transparent; }
 .menu-play-options:not(.hidden) { animation: ui-arrive 0.25s ease-out both; }
 
@@ -1652,7 +1660,8 @@ h1, h2, h3 { font-weight: normal; }
 .how-to-badge small { margin-top: -6px; padding: 1px 4px; border-radius: 5px; background: var(--glass-strong); color: var(--text); font: 700 12px var(--font-mono); white-space: nowrap; box-shadow: inset 0 0 0 1px var(--glass-line); }
 /* Short laptop screens: a little less air, so it still fits without scrolling. */
 @media (max-height: 760px) and (min-width: 761px) {
-  .how-to-play-modal { gap: 0.45rem; padding: 1rem 1.2rem; }
+  .how-to-play-modal { gap: 0.35rem; padding: 0.9rem 1.2rem; }
+  .how-to-play-modal > .btn-block { min-height: 0; padding-block: 0.6rem; }
   .how-to-box { padding: 0.45rem 0.55rem; gap: 0.35rem; }
   .how-to-modes > div { padding: 0.4rem; }
   .how-to-art { height: 48px; }
@@ -2765,6 +2774,22 @@ h1, h2, h3 { font-weight: normal; }
 .source-links { display: grid; gap: 0.2rem; margin: 0; padding-left: 1rem; }
 .source-links a { color: var(--accent); }
 
+/* `hidden` always wins over a display rule (the reserve modes, their tabs and How to play bits). */
+[hidden] { display: none !important; }
+
+/* How to play: Highs & Lows in brief, with the points by place. */
+.how-to-text { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+.how-to-floors { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.how-to-floors li { display: flex; align-items: baseline; gap: 5px; padding: 2px 7px; border-radius: 7px; background: rgba(255, 107, 157, 0.1); color: var(--text); font: 700 12px var(--font-mono); }
+.how-to-floors b { color: #ff6b9d; font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+/* At the start of a game, How to play shows only that game's part. */
+.how-to-play-modal.is-game-intro[data-mode="extremes"] .how-to-modes > :not([data-mode="extremes"]),
+.how-to-play-modal.is-game-intro[data-mode="extremes"] [data-for="casual"],
+.how-to-play-modal.is-game-intro[data-mode="casual"] .how-to-modes > :not([data-mode="casual"]),
+.how-to-play-modal.is-game-intro[data-mode="casual"] [data-for="extremes"] { display: none; }
+.how-to-play-modal.is-game-intro[data-mode="extremes"] { --accent: #ff6b9d; --accent-hover: #ff8db4; --accent-soft: rgba(255, 107, 157, 0.14); }
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -2814,12 +2839,14 @@ h1, h2, h3 { font-weight: normal; }
       </nav>
       <!-- PLAY opens the day's games in place of the main options. -->
       <nav class="menu-options menu-play-options hidden" id="menuPlayOptions" aria-label="Play">
-        <button class="play-tile menu-mode" id="menuCompetitiveButton" type="button" data-mode="competitive" style="--tile: var(--accent)">
-          <span class="play-tile-art" data-art="competitive" aria-hidden="true"></span>
+        <!-- The main game, made unmistakable: first, bigger, glowing, marked MAIN GAME. -->
+        <button class="play-tile menu-mode is-main" id="menuExtremesButton" type="button" data-mode="extremes" style="--tile: #ff6b9d">
+          <span class="play-tile-ribbon">MAIN GAME</span>
+          <span class="play-tile-art" data-art="extremes" aria-hidden="true"></span>
           <span class="play-tile-text">
-            <strong>COMPETITIVE</strong>
-            <span>30 seconds a round, 45 for Rank 'Em. Answer fast for up to ×1.5.</span>
-            <small id="menuCompetitiveStatus"></small>
+            <strong>HIGHS &amp; LOWS</strong>
+            <span>Six stats, one click each: find the top, the bottom or the middle. Earns badges.</span>
+            <small id="menuExtremesStatus"></small>
           </span>
         </button>
         <button class="play-tile menu-mode" id="menuCasualButton" type="button" data-mode="casual" style="--tile: var(--gold)">
@@ -2830,15 +2857,16 @@ h1, h2, h3 { font-weight: normal; }
             <small id="menuCasualStatus"></small>
           </span>
         </button>
-        <button class="play-tile menu-mode" id="menuExtremesButton" type="button" data-mode="extremes" style="--tile: #ff6b9d">
-          <span class="play-tile-art" data-art="extremes" aria-hidden="true"></span>
+        <!-- Competitive and Puzzles are kept in reserve, out of sight. -->
+        <button class="play-tile menu-mode" id="menuCompetitiveButton" hidden type="button" data-mode="competitive" style="--tile: var(--accent)">
+          <span class="play-tile-art" data-art="competitive" aria-hidden="true"></span>
           <span class="play-tile-text">
-            <strong>HIGHS &amp; LOWS</strong>
-            <span>Six stats, one click each: find the top, the bottom or the middle.</span>
-            <small id="menuExtremesStatus"></small>
+            <strong>COMPETITIVE</strong>
+            <span>30 seconds a round, 45 for Rank 'Em. Answer fast for up to ×1.5.</span>
+            <small id="menuCompetitiveStatus"></small>
           </span>
         </button>
-        <button class="play-tile menu-mode" id="menuPuzzlesButton" type="button" disabled style="--tile: #c58cff">
+        <button class="play-tile menu-mode" id="menuPuzzlesButton" hidden type="button" disabled style="--tile: #c58cff">
           <span class="play-tile-art" data-art="puzzles" aria-hidden="true"></span>
           <span class="play-tile-text">
             <strong>PUZZLES</strong>
@@ -3237,12 +3265,18 @@ h1, h2, h3 { font-weight: normal; }
         <button class="modal-close" id="closeHowToButton" type="button" aria-label="Close instructions">×</button>
       </div>
       <div class="how-to-modes">
-        <div style="--tile: var(--accent)" data-mode="competitive">
+        <div style="--tile: #ff6b9d" data-mode="extremes">
+          <span class="how-to-now">NOW PLAYING</span>
+          <span class="how-to-art" data-art="extremes" aria-hidden="true"></span>
+          <b>HIGHS &amp; LOWS</b>
+          <span>The main game · earns badges</span>
+          <span class="how-to-mode-badges" id="howToModeBadges" aria-hidden="true"></span>
+        </div>
+        <div style="--tile: var(--accent)" data-mode="competitive" hidden>
           <span class="how-to-now">NOW PLAYING</span>
           <span class="how-to-art" data-art="competitive" aria-hidden="true"></span>
           <b>COMPETITIVE</b>
-          <span>⏱ 30–45 s a round · earns badges</span>
-          <span class="how-to-mode-badges" id="howToModeBadges" aria-hidden="true"></span>
+          <span>⏱ 30–45 s a round</span>
         </div>
         <div style="--tile: var(--gold)" data-mode="casual">
           <span class="how-to-now">NOW PLAYING</span>
@@ -3252,21 +3286,29 @@ h1, h2, h3 { font-weight: normal; }
           <span>Just for fun</span>
         </div>
       </div>
+      <!-- Highs & Lows in brief: what a round asks and how a pick scores. -->
+      <section class="how-to-box how-to-extremes" data-for="extremes">
+        <h3 class="how-to-heading">HIGHS &amp; LOWS <span class="how-to-goal">Six stats a day, one click each</span></h3>
+        <p class="how-to-text">Find the highest, lowest or most average country. Right: 1,000. Close: by how near, or at least by place:</p>
+        <ol class="how-to-floors" aria-label="Points by place">
+          <li><b>#2</b>850</li><li><b>#3</b>750</li><li><b>#4–5</b>650</li><li><b>#6–10</b>500</li><li><b>#11–20</b>300</li><li><b>#21–40</b>150</li>
+        </ol>
+      </section>
       <!-- Points as a sum: the round's 1,000, minus mistakes, times both multipliers. -->
-      <section class="how-to-box">
-        <h3 class="how-to-heading">SCORING RULES <span class="how-to-goal">Score as many points as you can</span></h3>
+      <section class="how-to-box" data-for="casual">
+        <h3 class="how-to-heading">SCORING RULES <i class="sum-tag">CASUAL</i> <span class="how-to-goal">Score as many points as you can</span></h3>
         <div class="how-to-sum" role="img" aria-label="Each round: 1,000 points, minus 200 per mistake, times the streak multiplier, times the speed multiplier">
           <span class="sum-chip"><b>1,000</b><small>a round</small></span>
           <span class="sum-op">−</span>
           <span class="sum-chip is-bad"><b data-op="−">200</b><small>a mistake</small></span>
           <span class="sum-op">×</span>
           <span class="sum-chip is-streak"><b data-op="×">🔥 1.1 · 1.2…</b><small>perfect in a row</small></span>
-          <span class="sum-op">×</span>
-          <span class="sum-chip is-fast"><b data-op="×">⚡ 1.5</b><small>fast answer</small><i class="sum-tag">COMPETITIVE ONLY</i></span>
+          <span class="sum-op" data-for="competitive" hidden>×</span>
+          <span class="sum-chip is-fast" data-for="competitive" hidden><b data-op="×">⚡ 1.5</b><small>fast answer</small><i class="sum-tag">COMPETITIVE ONLY</i></span>
         </div>
       </section>
-      <section class="how-to-box">
-        <h3 class="how-to-heading">FIVE ROUNDS A DAY</h3>
+      <section class="how-to-box" data-for="casual">
+        <h3 class="how-to-heading">FIVE ROUNDS A DAY <i class="sum-tag">CASUAL</i></h3>
         <ol class="how-to-rounds">
           <li>Mystery Country</li>
           <li>Pinpoint</li>
@@ -3276,8 +3318,8 @@ h1, h2, h3 { font-weight: normal; }
         </ol>
       </section>
       <!-- One scale from hot to cold, so it doesn't read as a colour per round. -->
-      <section class="how-to-box">
-        <h3 class="how-to-heading">🌡 HOW CLOSE A GUESS IS</h3>
+      <section class="how-to-box" data-for="casual">
+        <h3 class="how-to-heading">🌡 HOW CLOSE A GUESS IS <i class="sum-tag">CASUAL</i></h3>
         <ol class="how-to-temps" aria-label="How close a guess is">
           <li style="--temp: var(--t-very-hot)"><b>VERY HOT</b><span>&lt; 1,000 km</span></li>
           <li style="--temp: var(--t-hot)"><b>HOT</b><span>&lt; 2,500 km</span></li>
@@ -3290,10 +3332,10 @@ h1, h2, h3 { font-weight: normal; }
         <section class="how-to-box">
           <h3 class="how-to-heading">YOUR TOP %</h3>
           <span class="how-to-top">TOP 12%</span>
-          <small>Your rank in the world, after every game</small>
+          <small>Your world rank, every game</small>
         </section>
         <section class="how-to-box">
-          <h3 class="how-to-heading">MONTHLY BADGES <i class="sum-tag">COMPETITIVE ONLY</i></h3>
+          <h3 class="how-to-heading">MONTHLY BADGES <i class="sum-tag">HIGHS &amp; LOWS ONLY</i></h3>
           <div class="how-to-badges" id="howToBadges"></div>
         </section>
       </div>
@@ -3421,9 +3463,9 @@ h1, h2, h3 { font-weight: normal; }
         <div class="archive-head">
           <h2 id="archiveTitle">ARCHIVE</h2>
           <div class="overview-tabs archive-mode-tabs" id="archiveModeTabs" role="tablist" aria-label="Mode">
-            <button class="overview-tab" type="button" role="tab" data-mode="competitive" aria-selected="true">COMPETITIVE</button>
+            <button class="overview-tab" type="button" role="tab" data-mode="extremes" aria-selected="true">HIGHS &amp; LOWS</button>
             <button class="overview-tab" type="button" role="tab" data-mode="casual" aria-selected="false">CASUAL</button>
-            <button class="overview-tab" type="button" role="tab" data-mode="extremes" aria-selected="false">HIGHS &amp; LOWS</button>
+            <button class="overview-tab" type="button" role="tab" data-mode="competitive" aria-selected="false" hidden>COMPETITIVE</button>
           </div>
         </div>
         <button class="modal-close" id="closeArchiveButton" type="button" aria-label="Close archive">×</button>
@@ -14396,6 +14438,9 @@ const { EXTREME_DAYS } = __modules["extremes-days.js"];
 const { EXTREME_MAX_DAY, MODE_NAME, scorePick } = __modules["extremes.js"];
 
 const MODES = ["competitive", "casual", "extremes"];
+// The main game: the one that earns badges and counts for the statistics, Community and
+// the account's score. Highs & Lows since November 2026; competitive is kept in reserve.
+const MAIN_MODE = "extremes";
 const MODE_INFO = {
   competitive: { name: "Competitive", short: "COMPETITIVE" },
   casual: { name: "Casual", short: "CASUAL" },
@@ -14987,7 +15032,7 @@ function getDayScore(plan, states) {
   };
 }
 
-return { MODES, MODE_INFO, ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, SPEED_WINDOW_MS, getSpeedWindow, MAX_SPEED_BONUS, getSpeedMultiplier, getMaxScore, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, resolveRound, resolvePlan, getDayInfo, getDailyPlan, hasExtremeDay, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
+return { MODES, MAIN_MODE, MODE_INFO, ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, SPEED_WINDOW_MS, getSpeedWindow, MAX_SPEED_BONUS, getSpeedMultiplier, getMaxScore, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, resolveRound, resolvePlan, getDayInfo, getDailyPlan, hasExtremeDay, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
 })();
 
 // ---- community.js
@@ -14998,7 +15043,7 @@ __modules["community.js"] = (() => {
 // getDayStats with real figures later; the rest can stay as is.
 
 const { COUNTRIES } = __modules["countries.js"];
-const { MAX_DAILY_SCORE, getCountry, getMaxScore } = __modules["daily.js"];
+const { MAIN_MODE, MAX_DAILY_SCORE, getCountry, getMaxScore } = __modules["daily.js"];
 const { getStandings } = __modules["extremes.js"];
 
 const SCORE_BUCKET_COUNT = 10;
@@ -15033,7 +15078,7 @@ function createSeededRandom(seedText) {
 
 // A day's scores in one mode, in ten buckets from 0 to that mode's maximum (9,000 in
 // competitive, 6,000 in casual).
-function getDayStats(dateKey, mode = "competitive") {
+function getDayStats(dateKey, mode = MAIN_MODE) {
   const random = createSeededRandom(mode === "competitive" ? `community:${dateKey}` : `community:${mode}:${dateKey}`);
   const maxScore = getMaxScore(mode);
   const bucketSize = maxScore / SCORE_BUCKET_COUNT;
@@ -15279,7 +15324,7 @@ return { createBadge, MEDALS, getGroupMedal, createMedal };
 __modules["screens.js"] = (() => {
 const { sounds } = __modules["audio.js"];
 const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getRoundStats, getScoreBucket, getTopPercent } = __modules["community.js"];
-const { MAX_DAILY_SCORE, MODE_INFO } = __modules["daily.js"];
+const { MAIN_MODE, MAX_DAILY_SCORE, MODE_INFO } = __modules["daily.js"];
 const { createBadge } = __modules["badges.js"];
 
 const SAMPLE_NOTE = "Player numbers and ranks are sample data until the game has real players.";
@@ -15357,7 +15402,7 @@ function createDayCell(day, { isSelected, onSelect }) {
 }
 
 // A month's header: days played, your average top % that month, and "FULL MONTH" once
-// every day of the month in the archive is played. Badges are for competitive days only.
+// every day of the month in the archive is played. Badges are for the main game (MAIN_MODE) only.
 function createMonthHead(month, weeks, mode) {
   const days = weeks.flatMap(week => week.cells).filter(day => day && day.dateKey.startsWith(month));
   const played = days.filter(day => day.completed);
@@ -15369,8 +15414,8 @@ function createMonthHead(month, weeks, mode) {
   if (played.length) {
     const average = played.reduce((sum, day) => sum + day.topPercent, 0) / played.length;
     summary.appendChild(element("span", "calendar-month-top", `avg. ${formatTopPercent(average).toLowerCase()}`));
-    // The badge earned that month.
-    if (mode === "competitive") {
+    // The badge earned that month (the main game only).
+    if (mode === MAIN_MODE) {
       const badge = getMonthBadge(days, month);
       const earned = element("span", "calendar-month-badge");
       earned.append(createBadge(badge.tier, 20), badge.tier.name);
@@ -15427,13 +15472,13 @@ function createCalendar(days, { selected, onSelect, mode }) {
   const weeks = groupByWeek(days);
   const calendar = element("div", "calendar");
   const todayKey = days.find(day => day.isToday)?.dateKey || days.at(-1).dateKey;
-  // Your badge comes from competitive days; casual has just the calendar.
-  if (mode === "competitive") {
+  // Your badge comes from the main game's days; the other modes have just the calendar.
+  if (mode === MAIN_MODE) {
     const thisMonth = getMonthBadge(days, todayKey.slice(0, 7));
     calendar.append(createMonthBadgeCard(thisMonth, todayKey.slice(0, 7)), createBadgeLadder(thisMonth.tier));
   } else {
-    calendar.appendChild(element("p", "calendar-mode-note", mode === "extremes"
-      ? "Six stats a day, one click each: find the highest, the lowest or the most average country. No badges here: just for fun."
+    calendar.appendChild(element("p", "calendar-mode-note", mode === "competitive"
+      ? "Five rounds against the clock. No badges here: just for fun."
       : "No clock, names on the globe and extra clues. No badges here: just for fun."));
   }
   [...new Set(weeks.map(week => week.month))].forEach(month => {
@@ -15695,8 +15740,8 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay }) {
   const archiveGrid = document.getElementById("archiveListContainer");
   const overview = document.getElementById("dayOverview");
 
-  // Competitive days by default (badges, the leaderboard and groups use those).
-  function loadDays(mode = "competitive") {
+  // The main game's days by default (badges and groups use those).
+  function loadDays(mode = MAIN_MODE) {
     return getDays().map(dateKey => withCommunity(getDayRecord(dateKey, mode)));
   }
 
@@ -15710,7 +15755,7 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay }) {
 
   // The archive has a tab per mode, each with its own calendar; the selected day stays
   // selected when switching.
-  let archiveMode = "competitive";
+  let archiveMode = MAIN_MODE;
   let currentSelection = null;
   const modeTabs = [...document.querySelectorAll("#archiveModeTabs button")];
   modeTabs.forEach(tab => tab.addEventListener("click", () => {
@@ -16395,7 +16440,8 @@ function initializeMainMenu({ onPlay, onHome, describeMode = () => "", isModeAva
       document.getElementById("menuExtremesStatus").textContent = describeMode("extremes");
       // Highs & Lows only has the days the team has reviewed.
       document.getElementById("menuExtremesButton").disabled = !isModeAvailable("extremes");
-      document.getElementById("menuCompetitiveButton").focus();
+      // The main game first.
+      document.getElementById("menuExtremesButton").focus();
     } else {
       playButton.focus();
     }
@@ -17276,7 +17322,7 @@ const { FIND_LABELS, formatValue, getStandings, getStat, missingReason } = __mod
 const { createBadge } = __modules["badges.js"];
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
-const { hasExtremeDay, MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MODES, MODE_INFO, getSpeedWindow, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
+const { hasExtremeDay, MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MAIN_MODE, MODES, MODE_INFO, getSpeedWindow, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
 const { createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, initializeStatsModal, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, redactCountryName, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
 
 // v3: Deep Cut and Paint the Map replaced Capital Call and Border Patrol (October 2026).
@@ -19727,10 +19773,10 @@ function getStats() {
   return valid ? { ...getDefaultStats(), ...stats } : getDefaultStats();
 }
 
-// Only today's competitive puzzle counts towards games played and the streak; archive
-// and casual days don't.
+// Only today's main game (MAIN_MODE) counts towards games played and the streak; archive
+// days and the other modes don't.
 function saveStats() {
-  if (activeDate !== today || activeMode !== "competitive") return;
+  if (activeDate !== today || activeMode !== MAIN_MODE) return;
   const stats = getStats();
   if (stats.completedDates.includes(today)) return;
   const dayScore = getDayScore(plan, day.rounds);
@@ -19894,8 +19940,7 @@ let afterGameIntro = null;
 function showGameIntro(then) {
   let hidden = false;
   try { hidden = localStorage.getItem(HIDE_INTRO_KEY) === "1"; } catch { /* storage blocked: just show it */ }
-  // The globe mode has no How to play page yet: its round title cards explain it.
-  if (hidden || activeMode === "extremes") { then(); return; }
+  if (hidden) { then(); return; }
   afterGameIntro = then;
   // At the start of a game it shows only the mode being played, and it closes with GOT IT.
   const modal = document.querySelector(".how-to-play-modal");
@@ -20095,32 +20140,36 @@ initializeStatsModal(() => {
 function getSaveProgress(state) {
   return (state?.rounds || []).reduce((sum, round) => sum
     + ["guesses", "tries", "found", "wrong", "submissions"].reduce((count, key) => count + (round?.[key]?.length || 0), 0)
-    + (round?.gaveUp ? 1 : 0) + (round?.finished ? 1 : 0) + (round?.answer ? 1 : 0), 0);
+    + (round?.gaveUp ? 1 : 0) + (round?.finished ? 1 : 0) + (round?.answer ? 1 : 0) + (round?.pick ? 1 : 0), 0);
 }
 
 // Sends a day's progress to the account, if someone is signed in. The account keeps one
-// row per day: the competitive day, with the casual day inside it (`casual`). The row's
-// score is the competitive one, the only one that counts for groups.
+// row per day: the competitive day, with the casual and Highs & Lows days inside it
+// (`casual`, `extremes`). The row's score is the main game's (MAIN_MODE): the one that
+// counts for groups.
 function syncDayToAccount(dateKey) {
   if (!getUser()) return Promise.resolve(false);
   const competitive = readDayState(dateKey, "competitive");
   const casual = readDayState(dateKey, "casual");
-  if (!competitive && !casual) return Promise.resolve(true);
+  const extremes = readDayState(dateKey, "extremes");
+  if (!competitive && !casual && !extremes) return Promise.resolve(true);
   const rounds = competitive?.rounds || ROUND_TYPES.map(createRoundState);
-  const dayScore = getDayScore(resolvePlan(getDailyPlan(dateKey), rounds), rounds);
-  const state = { ...(competitive || { version: 2, rounds }), ...(casual ? { casual } : {}) };
+  const main = readDayState(dateKey, MAIN_MODE);
+  const mainRounds = main?.rounds || roundTypesOf(dateKey, MAIN_MODE).map(createRoundState);
+  const dayScore = main ? getDayScore(resolvePlan(getDailyPlan(dateKey, MAIN_MODE), mainRounds), mainRounds) : { completed: false };
+  const state = { ...(competitive || { version: 2, rounds }), ...(casual ? { casual } : {}), ...(extremes ? { extremes } : {}) };
   return pushDay(dateKey, state, { score: dayScore.completed ? dayScore.total : null, completed: dayScore.completed });
 }
 
-// An account row's state as { competitive, casual }.
+// An account row's state as { competitive, casual, extremes }.
 function splitAccountDay(state) {
-  const { casual = null, ...competitive } = state || {};
-  return { competitive: state ? competitive : null, casual };
+  const { casual = null, extremes = null, ...competitive } = state || {};
+  return { competitive: state ? competitive : null, casual, extremes };
 }
 
-// Every date this browser has a day for, in either mode.
+// Every date this browser has a day for, in any mode.
 const getLocalDayDates = () => [...new Set(Object.keys(localStorage).flatMap(key =>
-  [DAY_STORAGE_PREFIX, CASUAL_STORAGE_PREFIX].filter(prefix => key.startsWith(prefix)).map(prefix => key.slice(prefix.length))))];
+  [DAY_STORAGE_PREFIX, CASUAL_STORAGE_PREFIX, EXTREMES_STORAGE_PREFIX].filter(prefix => key.startsWith(prefix)).map(prefix => key.slice(prefix.length))))];
 
 function clearLocalDays() {
   getLocalDayDates().forEach(dateKey => MODES.forEach(mode => localStorage.removeItem(`${storagePrefix(mode)}${dateKey}`)));
