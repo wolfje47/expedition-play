@@ -2564,7 +2564,7 @@ h1, h2, h3 { font-weight: normal; }
 /* After the pick: the world, from the right end to the other end. */
 .extreme-legend { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem 0.2rem; color: var(--faint); font: 8px var(--font-display); letter-spacing: var(--ls-pixel); }
 .extreme-legend i { height: 8px; border-radius: 99px; background: linear-gradient(90deg, #23348c, #45e3ff 50%, #ffd45c 82%, #ff4f9a); }
-.extreme-list { display: grid; gap: 3px; margin: 0; padding: 0.5rem 0.7rem 0.4rem; list-style: none; overflow-y: auto; }
+.extreme-list { position: relative; display: grid; gap: 3px; margin: 0; padding: 0.5rem 0.7rem 0.4rem; list-style: none; overflow-y: auto; }
 .extreme-row { display: grid; grid-template-columns: 2.6rem 26px minmax(0, 1fr) auto; align-items: center; gap: 0.55rem; padding: 0.42rem 0.6rem; border-radius: 9px; background: rgba(255, 255, 255, 0.03); box-shadow: inset 3px 0 0 var(--heat); font-size: 14px; }
 .extreme-row-rank { color: var(--muted); font: 700 12px var(--font-mono); }
 .extreme-row-flag { width: 26px; height: 17px; border-radius: 3px; object-fit: cover; }
@@ -2621,7 +2621,11 @@ h1, h2, h3 { font-weight: normal; }
 /* The pecking order as one bar, with pins (#1, YOU, the tour's current stop). A pin's box
    shifts by its own share, so it stays inside the bar at both ends; its tick sits at --at. */
 .pecking { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: end; gap: 0.5rem; color: var(--faint); font: 8px var(--font-display); letter-spacing: var(--ls-pixel); }
-.pecking-end { padding-bottom: 1px; white-space: nowrap; }
+.pecking-end { display: grid; gap: 3px; padding-bottom: 1px; white-space: nowrap; }
+.pecking-end b { font-weight: 400; }
+.pecking-end.is-near { color: #ff6b9d; }
+.pecking-end.is-far { color: #5aa8ff; text-align: right; }
+.pecking-end small { color: var(--muted); font: 700 11px var(--font-mono); letter-spacing: 0; }
 .pecking-track { position: relative; height: 30px; }
 .pecking-track::before { content: ""; position: absolute; right: 0; bottom: 0; left: 0; height: 8px; border-radius: 99px; background: linear-gradient(90deg, #ff4f9a, #ffd45c 18%, #45e3ff 50%, #23348c); }
 .pecking-pin {
@@ -2743,6 +2747,12 @@ h1, h2, h3 { font-weight: normal; }
   .score-burst-card.is-extreme .ladder-rank,
   .score-burst-card.is-extreme .ladder-value { font-size: 13px; }
   .score-burst-card.is-extreme .ladder-gap { padding: 1px 12px 1px calc(3.2rem + 12px); }
+}
+
+/* The full pecking order on the score card: every country, scrolling inside. */
+.ladder.is-full { position: relative; max-height: 300px; overflow-y: auto; padding-right: 4px; overscroll-behavior: contain; scrollbar-width: thin; }
+@media (min-width: 761px) and (max-height: 760px) {
+  .ladder.is-full { max-height: 250px; }
 }
 
 </style>
@@ -12039,7 +12049,7 @@ const EXTREME_DAYS = {
       ["honey", "highest", "Where do people eat the most honey?"],
       ["fruit", "highest", "Nature's candy: which country eats the most fruit per person?"],
       ["calories", "highest", "Where do people have the most calories to eat each day?"],
-      ["sugar", "lowest", "And where is the least sugar eaten per person?"]
+      ["diabetes", "highest", "Sugar's sour side: where do the most adults have diabetes?"]
     ]
   },
   "2026-10-03": {
@@ -12050,7 +12060,7 @@ const EXTREME_DAYS = {
       ["wine", "highest", "Where is the most wine drunk per person?"],
       ["alcohol", "highest", "Counting every alcoholic drink: who drinks the most per person?"],
       ["drinkers", "highest", "Where did the largest share of adults drink alcohol in the past year?"],
-      ["drinkers", "lowest", "And where did the smallest share of adults drink at all?"],
+      ["coffee", "highest", "The morning after: where do people drink the most coffee?"],
       ["peanuts", "highest", "Bar snacks: which country eats the most peanuts per person?"]
     ]
   },
@@ -12061,9 +12071,9 @@ const EXTREME_DAYS = {
       ["area", "lowest", "Which country is the smallest of all?"],
       ["population", "lowest", "Which country has the fewest people?"],
       ["density", "highest", "Where are people packed in most tightly?"],
-      ["density", "lowest", "And where do people have the most room?"],
-      ["area", "average", "Which country is the most average in size (closest to the world's middle)?"],
-      ["population", "average", "Which country has the most average number of people?"]
+      ["prison", "highest", "Which country puts the most people in prison, for its size?"],
+      ["gdp", "lowest", "Which country has the smallest economy?"],
+      ["farmlandpp", "lowest", "Where is there the least farmland per person?"]
     ]
   },
   "2026-10-05": {
@@ -12071,9 +12081,9 @@ const EXTREME_DAYS = {
     theme: "North, south, east and west.",
     rounds: [
       ["north", "highest", "The middle of which country lies furthest north?"],
-      ["north", "lowest", "The middle of which country lies furthest south?"],
+      ["airpollution", "average", "Where is the air pollution the most average?"],
       ["east", "highest", "Which country's middle lies furthest east (closest to 180°)?"],
-      ["east", "lowest", "And which country's middle lies furthest west?"],
+      ["density", "lowest", "Which country is the emptiest, with the fewest people per km²?"],
       ["equator", "lowest", "The middle of which country lies closest to the equator?"],
       ["area", "highest", "Which country is the biggest of all?"]
     ]
@@ -12095,11 +12105,11 @@ const EXTREME_DAYS = {
     theme: "Old countries and young countries.",
     rounds: [
       ["medianage", "highest", "Which country has the oldest population (highest median age)?"],
-      ["medianage", "lowest", "Which country has the youngest population?"],
+      ["lifeexpmen", "highest", "Where do men live the longest?"],
       ["over65", "highest", "Where are the most people aged 65 or older?"],
       ["under15", "highest", "Where are the most people younger than 15?"],
       ["motherage", "highest", "Where are mothers the oldest when they give birth?"],
-      ["motherage", "lowest", "And where are they the youngest?"]
+      ["fertility", "lowest", "Where do women have the fewest children?"]
     ]
   },
   "2026-10-08": {
@@ -12107,7 +12117,7 @@ const EXTREME_DAYS = {
     theme: "How long people live.",
     rounds: [
       ["lifeexp", "highest", "Where can a baby born today expect to live the longest?"],
-      ["lifeexp", "lowest", "And where is life expectancy the shortest?"],
+      ["obesity", "lowest", "Where do the fewest adults have obesity?"],
       ["lifeexpwomen", "highest", "Where do women live the longest?"],
       ["lifeexpmen", "lowest", "Where is men's life expectancy the shortest?"],
       ["lifegap", "highest", "Where do women outlive men by the most years?"],
@@ -12119,9 +12129,9 @@ const EXTREME_DAYS = {
     theme: "Rich, poor and everything in between.",
     rounds: [
       ["gdppc", "highest", "Which country has the highest income per person?"],
-      ["gdppc", "lowest", "Which country has the lowest income per person?"],
+      ["hdi", "lowest", "Which country scores lowest on the Human Development Index?"],
       ["gdp", "highest", "Which country has the biggest economy?"],
-      ["gdp", "average", "Which country's economy is the most average in size?"],
+      ["obesity", "average", "Where is the share of adults with obesity the most average?"],
       ["healthspend", "highest", "Where is the most spent on health care per person?"],
       ["farmeconomy", "highest", "Where does farming make up the biggest share of the economy?"]
     ]
@@ -12159,7 +12169,7 @@ const EXTREME_DAYS = {
       ["potatoes", "highest", "Which country eats the most potatoes per person?"],
       ["apples", "highest", "An apple a day: where are the most apples eaten per person?"],
       ["grapes", "highest", "Who eats the most grapes (not counting wine)?"],
-      ["vegetables", "lowest", "And where are the fewest vegetables eaten per person?"]
+      ["soybeans", "highest", "From the vegetable patch: where do people eat the most soy?"]
     ]
   },
   "2026-10-13": {
@@ -12168,8 +12178,8 @@ const EXTREME_DAYS = {
     rounds: [
       ["rice", "highest", "Which country eats the most rice per person?"],
       ["wheat", "highest", "Bread, pasta, couscous: where is the most wheat eaten per person?"],
-      ["rice", "lowest", "Where is the least rice eaten per person?"],
-      ["wheat", "lowest", "And where is the least wheat eaten per person?"],
+      ["potatoes", "average", "Where do people eat the most average amount of potatoes?"],
+      ["foodwaste", "lowest", "Not a crumb wasted: where do households throw away the least food?"],
       ["pulses", "highest", "Beans, lentils and peas: who eats the most?"],
       ["calories", "lowest", "Where do people have the fewest calories to eat each day?"]
     ]
@@ -12181,8 +12191,8 @@ const EXTREME_DAYS = {
       ["internet", "lowest", "Where does the smallest share of people use the internet?"],
       ["mobile", "highest", "Which country has the most mobile phone subscriptions per person?"],
       ["broadband", "highest", "Where are the most home broadband connections per person?"],
-      ["mobile", "lowest", "And where are the fewest mobile subscriptions per person?"],
-      ["internet", "average", "Which country is the most average for internet use?"],
+      ["coffee", "average", "Wired on caffeine: where do people drink the most average amount of coffee?"],
+      ["greenpower", "average", "Which country makes the most average share of its electricity from renewables?"],
       ["electricity", "lowest", "Where does the smallest share of people have electricity?"]
     ]
   },
@@ -12191,9 +12201,9 @@ const EXTREME_DAYS = {
     theme: "Births, babies and big families.",
     rounds: [
       ["fertility", "highest", "Where do women have the most children?"],
-      ["fertility", "lowest", "Where do women have the fewest children?"],
+      ["doctors", "lowest", "Which country has the fewest doctors for its people?"],
       ["births", "highest", "Which country has the most babies born per person each year?"],
-      ["births", "lowest", "And the fewest babies born per person?"],
+      ["healthspend", "lowest", "Where is the least spent on health per person?"],
       ["under15", "lowest", "Where is the smallest share of people younger than 15?"],
       ["motherage", "average", "Where is the average age of mothers the most typical?"]
     ]
@@ -12215,10 +12225,10 @@ const EXTREME_DAYS = {
     theme: "Room to roam, cities and countryside.",
     rounds: [
       ["farmlandpp", "highest", "Which country has the most farmland per person?"],
-      ["farmlandpp", "lowest", "And the least farmland per person?"],
+      ["cattle", "average", "Ranch country: where is the number of cows per person the most average?"],
       ["forest", "average", "Which country is the most average for forest cover?"],
       ["urban", "lowest", "Where does the smallest share of people live in cities?"],
-      ["urban", "average", "Which country is the most average for city living?"],
+      ["farmland", "average", "Which country uses the most average share of its land for farming?"],
       ["population", "highest", "Which country has the most people?"]
     ]
   },
@@ -12227,10 +12237,10 @@ const EXTREME_DAYS = {
     theme: "Where people come from and who lives where.",
     rounds: [
       ["migrants", "highest", "Where were the largest share of people born in another country?"],
-      ["migrants", "lowest", "And where were the fewest born abroad?"],
+      ["rice", "average", "Where do people eat the most average amount of rice?"],
       ["languages", "highest", "Which country has the most official languages?"],
       ["women", "highest", "Where do women make up the largest share of the population?"],
-      ["women", "lowest", "And where is the share of women the smallest?"],
+      ["medianage", "lowest", "Which country has the youngest population?"],
       ["growth", "highest", "Which country's population is growing the fastest?"]
     ]
   },
@@ -12241,9 +12251,9 @@ const EXTREME_DAYS = {
       ["fruit", "lowest", "Where is the least fruit eaten per person?"],
       ["vegetables", "average", "Which country is the most average for vegetables?"],
       ["protein", "highest", "Where do people get the most protein from their food?"],
-      ["protein", "lowest", "And the least protein?"],
+      ["pulses", "lowest", "Where do people eat the fewest beans, lentils and peas?"],
       ["fat", "highest", "Where do people get the most fat from their food?"],
-      ["fat", "lowest", "And the least fat?"]
+      ["vegoil", "lowest", "Where do people cook with the least vegetable oil?"]
     ]
   },
   "2026-10-20": {
@@ -12251,7 +12261,7 @@ const EXTREME_DAYS = {
     theme: "Waste, pollution and what we leave behind.",
     rounds: [
       ["foodwaste", "highest", "Where is the most food thrown away at home per person?"],
-      ["foodwaste", "lowest", "And where is the least food thrown away?"],
+      ["meat", "average", "Where do people eat the most average amount of meat?"],
       ["fertilizer", "highest", "Which country uses the most fertiliser on its cropland?"],
       ["co2", "average", "Which country is the most average for CO₂ per person?"],
       ["airpollution", "lowest", "Where is the air the cleanest (least fine dust)?"],
@@ -12277,9 +12287,9 @@ const EXTREME_DAYS = {
       ["parliament", "highest", "Where do women hold the largest share of seats in parliament?"],
       ["lifeexpwomen", "lowest", "Where is women's life expectancy the shortest?"],
       ["women", "average", "Which country is the most average for its share of women?"],
-      ["parliament", "average", "Which country is the most average for women in parliament?"],
+      ["lifegap", "lowest", "Where do women outlive men by the fewest years?"],
       ["schoolyears", "highest", "Where can children expect the most years at school?"],
-      ["schoolyears", "lowest", "And the fewest years at school?"]
+      ["hdi", "average", "Which country scores the most average on the Human Development Index?"]
     ]
   },
   "2026-10-23": {
@@ -12290,7 +12300,7 @@ const EXTREME_DAYS = {
       ["equator", "average", "The middle of which country lies at the most average distance from the equator?"],
       ["north", "average", "Which country's middle lies closest to the world's average latitude?"],
       ["farmlandpp", "average", "Which country is the most average for farmland per person?"],
-      ["equator", "highest", "The middle of which country lies furthest from the equator?"],
+      ["east", "lowest", "The middle of which country lies furthest west?"],
       ["density", "average", "Which country is the most average for people per km²?"]
     ]
   },
@@ -12325,7 +12335,7 @@ const EXTREME_DAYS = {
       ["co2", "highest", "Who emits the most CO₂ per person?"],
       ["renewables", "average", "Which country is the most average for renewable energy?"],
       ["airpollution", "highest", "Where is the air the most polluted with fine dust?"],
-      ["airpollution", "average", "Which country is the most average for air pollution?"],
+      ["mobile", "average", "Where is the number of mobile phone subscriptions per person the most average?"],
       ["broadband", "average", "Which country is the most average for home broadband?"],
       ["fertilizer", "average", "Which country is the most average for fertiliser use?"]
     ]
@@ -12336,10 +12346,10 @@ const EXTREME_DAYS = {
     rounds: [
       ["schoolyears", "average", "Which country is the most average for years at school?"],
       ["hdi", "highest", "Which country scores highest on the Human Development Index?"],
-      ["hdi", "lowest", "And which scores lowest?"],
-      ["hdi", "average", "Which country is the most average on the Human Development Index?"],
+      ["mobile", "lowest", "Where are there the fewest mobile phone subscriptions per person?"],
+      ["internet", "average", "Which country has the most average share of people online?"],
       ["growth", "lowest", "Which country's population is shrinking the fastest?"],
-      ["growth", "average", "Which country's population growth is the most average?"]
+      ["broadband", "lowest", "Where do the fewest people have broadband at home?"]
     ]
   },
   "2026-10-28": {
@@ -12348,8 +12358,8 @@ const EXTREME_DAYS = {
     rounds: [
       ["fish", "lowest", "Where is the least fish and seafood eaten per person?"],
       ["freshwaterfish", "highest", "Lakes and rivers: where is the most freshwater fish eaten?"],
-      ["freshwaterfish", "lowest", "And the least freshwater fish?"],
-      ["fish", "average", "Which country is the most average for fish and seafood?"],
+      ["cattle", "lowest", "Where are there the fewest cows per person?"],
+      ["beef", "average", "Where do people eat the most average amount of beef?"],
       ["arable", "average", "Which country is the most average for land used for crops?"],
       ["farmland", "highest", "Where is the largest share of land used for farming?"]
     ]
@@ -15641,9 +15651,9 @@ const AUTO_CONTINUE_MS = 1300;
 // the score card (the turn, then a moment on the answer).
 // The globe mode's tour after locking in: one slow turn around the heat map, then a stop
 // at each highlight (the other end, your pick, the runner-up, the answer).
-const TOUR_SPIN_MS = 5200;
-const TOUR_MOVE_MS = 1600;
-const TOUR_HOLD_MS = 3000;
+const TOUR_SPIN_MS = 8000;
+const TOUR_MOVE_MS = 2200;
+const TOUR_HOLD_MS = 3200;
 const TOUR_ZOOM = 1.18;
 const PHONE_SHIFT_MS = 600;
 const AUTO_CONTINUE_CLUE_MS = 3500;
@@ -16108,7 +16118,7 @@ function getRoundInfo(round) {
         extra: () => [
           // Just you on the bar (its end label and the ladder mark #1).
           renderPeckingBar(Object.assign(document.createElement("div"), { className: "pecking" }), standings, pick ? [{ rank: pick.rank, label: `YOU #${pick.rank}`, kind: "pick" }] : []),
-          createLadder(standings, state?.pick)
+          createLadder(standings, state?.pick, { full: true })
         ],
         facts: [[near.charAt(0) + near.slice(1).toLowerCase(), winner.name], ["Your pick", pick ? `#${pick.rank} of ${standings.count}` : "–"], [above, pick ? `${pick.rank - 1} ${pick.rank === 2 ? "country" : "countries"}` : "–"]],
         picture: null
@@ -16399,14 +16409,21 @@ function extremeEnds(find) {
 
 // The pecking order as one bar, hot (#1) to cold (last), with a pin per mark
 // ({ rank, label, kind: "stop" | "pick" | "answer" }), to show how far up or down it came.
+// Each end says what its colour means, with the figure there ("HIGHEST · $288,002").
 function renderPeckingBar(container, standings, marks) {
   const [near, far] = extremeEnds(standings.find);
+  const { stat, sorted } = standings;
+  const end = (label, value, side) => {
+    const element = Object.assign(document.createElement("span"), { className: `pecking-end is-${side}` });
+    element.append(Object.assign(document.createElement("b"), { textContent: label }), Object.assign(document.createElement("small"), { textContent: value }));
+    return element;
+  };
   const track = Object.assign(document.createElement("div"), { className: "pecking-track" });
   marks.forEach(mark => track.appendChild(createPeckingPin(mark, standings.count)));
   container.replaceChildren(
-    Object.assign(document.createElement("span"), { className: "pecking-end", textContent: near }),
+    end(near, formatValue(stat, standings.find === "average" ? standings.target : sorted[0].value, { unit: false }), "near"),
     track,
-    Object.assign(document.createElement("span"), { className: "pecking-end", textContent: far })
+    end(far, formatValue(stat, sorted.at(-1).value, { unit: false }), "far")
   );
   return container;
 }
@@ -16422,13 +16439,15 @@ function movePeckingPin(pin, { rank, label }, count) {
   pin.textContent = label;
 }
 
-// The pecking order around the answer and your pick: the top three, your pick with the
-// countries either side of it, and the other end, with the gaps between them counted.
-function createLadder(standings, pickIso) {
+// The pecking order: every country, scrolling, opened at your pick ({ full: true }), or
+// just the top three, your pick with the countries either side of it and the other end,
+// with the gaps between them counted.
+function createLadder(standings, pickIso, { full = false } = {}) {
   const { sorted, count, stat } = standings;
   const pickIndex = sorted.findIndex(entry => entry.iso === pickIso);
-  const shown = [...new Set([0, 1, 2, pickIndex - 1, pickIndex, pickIndex + 1, count - 1])].filter(index => index >= 0 && index < count).sort((a, b) => a - b);
-  const ladder = Object.assign(document.createElement("ol"), { className: "ladder" });
+  const shown = full ? sorted.map((entry, index) => index)
+    : [...new Set([0, 1, 2, pickIndex - 1, pickIndex, pickIndex + 1, count - 1])].filter(index => index >= 0 && index < count).sort((a, b) => a - b);
+  const ladder = Object.assign(document.createElement("ol"), { className: `ladder${full ? " is-full" : ""}` });
   let previous = -1;
   shown.forEach(index => {
     if (index > previous + 1) ladder.appendChild(Object.assign(document.createElement("li"), { className: "ladder-gap", textContent: `⋮ ${index - previous - 1} more` }));
@@ -16446,7 +16465,21 @@ function createLadder(standings, pickIso) {
     );
     ladder.appendChild(row);
   });
+  if (full) scrollToPick(ladder, ladder.querySelector(".is-pick"));
   return ladder;
+}
+
+// Scroll a list so your pick's row sits in its middle, once the list is on screen (it may
+// still be hidden, as behind a phone's MORE ABOUT IT).
+function scrollToPick(list, row) {
+  if (!row) return;
+  const observer = new ResizeObserver(() => {
+    if (!list.clientHeight) return;
+    observer.disconnect();
+    // (Offsets, not screen positions: the score card may still be zooming in.)
+    list.scrollTop = row.offsetTop - (list.clientHeight - row.offsetHeight) / 2;
+  });
+  observer.observe(list);
 }
 
 function describeBoosts(result) {
@@ -17025,15 +17058,10 @@ const ROUND_RENDERERS = {
       );
       return item;
     };
-    const gap = text => Object.assign(document.createElement("li"), { className: "extreme-gap", textContent: text });
-    const top = standings.sorted.slice(0, 5);
-    const pick = standings.ranks[state.pick];
-    const farEnd = standings.sorted.slice(-3).filter(entry => !top.includes(entry) && entry !== pick);
-    document.getElementById("extremeList").replaceChildren(
-      ...top.map(entry => row(entry)),
-      ...(top.includes(pick) ? [] : [gap("…"), row(pick)]),
-      ...(farEnd.length ? [gap(round.find === "average" ? "Furthest from the middle" : "At the other end"), ...farEnd.map(entry => row(entry, " is-far"))] : [])
-    );
+    // Every country, to scroll through, opened at your pick.
+    const list = document.getElementById("extremeList");
+    list.replaceChildren(...standings.sorted.map(entry => row(entry)));
+    scrollToPick(list, list.querySelector(".is-pick"));
     setText("extremeSource", `${stat.source}${stat.year ? `, ${stat.year}` : ""} · ${standings.count} countries with data`);
 
     // The world as a heat map: the closer to the answer, the hotter the colour.
@@ -17451,7 +17479,6 @@ function playExtremeTour(round, state) {
   const { stat, sorted, count, find } = standings;
   const [near, farEnd] = extremeEnds(find);
   const winner = sorted[0];
-  const second = sorted[1];
   const far = sorted.at(-1);
   const pick = standings.ranks[state.pick];
   const nameOf = entry => getCountry(entry.iso).name;
@@ -17464,15 +17491,14 @@ function playExtremeTour(round, state) {
     if (big > 0 && small > 0 && big / small >= 2) return `${nameOf(winner)}'s figure is ${ratioText(big / small)} ${find === "highest" ? "this" : "smaller"}.`;
     return `${fmt(Math.abs(winner.value - far.value))} away from ${nameOf(winner)}.`;
   };
-  const secondLine = () => find === "average"
-    ? `${fmt(second.distance)} from the middle. So close.`
-    : `Just ${fmt(Math.abs(winner.value - second.value))} short of the top spot.`;
   const winnerLine = () => find === "average"
     ? "Right in the middle: half the world is above, half below."
     : `The ${near.toLowerCase()} of all ${count} countries with data.`;
+  // First your pick (its figure, but not yet its rank), then the worst and the best.
+  const pickLine = () => `${nameOf(pick)}: ${fmt(pick.value)}. How does that compare?`;
   const stops = [
-    { entry: far, kicker: `THE ${farEnd}`, line: farLine() },
-    { entry: second, kicker: "THE RUNNER-UP", line: secondLine() },
+    ...(pick.iso === winner.iso ? [] : [{ entry: pick, kicker: "YOUR PICK", line: pickLine(), hideRank: true }]),
+    ...(far.iso === pick.iso ? [] : [{ entry: far, kicker: `THE ${farEnd}`, line: farLine() }]),
     { entry: winner, kicker: `THE ${near}`, line: winnerLine() }
   ];
 
@@ -17497,19 +17523,19 @@ function playExtremeTour(round, state) {
     card.classList.toggle("is-intro", !stop.entry);
     card.style.setProperty("--heat", stop.entry ? heatColor(stop.entry.rank, count) : "var(--accent)");
     setText("tourKicker", stop.kicker);
-    setText("tourRank", stop.entry ? `#${stop.entry.rank} OF ${count}` : `${count} COUNTRIES`);
+    setText("tourRank", !stop.entry ? `${count} COUNTRIES` : stop.hideRank ? `#? OF ${count}` : `#${stop.entry.rank} OF ${count}`);
     document.getElementById("tourFlag").replaceChildren(...(stop.entry ? [createFlagImage(country, "tour-flag-image")] : []));
     setText("tourName", stop.entry ? country.name : stat.name);
     setText("tourValue", stop.entry ? fmt(stop.entry.value) : "");
     setText("tourLine", stop.line);
-    stopPin.classList.toggle("hidden", !stop.entry);
-    if (stop.entry) movePeckingPin(stopPin, { rank: stop.entry.rank, label: `#${stop.entry.rank}` }, count);
+    stopPin.classList.toggle("hidden", !stop.entry || Boolean(stop.hideRank));
+    if (stop.entry && !stop.hideRank) movePeckingPin(stopPin, { rank: stop.entry.rank, label: `#${stop.entry.rank}` }, count);
     // The card pops each time it changes.
     card.classList.remove("is-popping");
     void card.offsetWidth;
     card.classList.add("is-popping");
     if (stop.entry) {
-      markStop(stop.entry);
+      if (!stop.hideRank) markStop(stop.entry);
       highlight(country);
       sounds.playReveal(stop.entry.rank === 1 ? "match" : "near", stop.entry.rank === 1 ? 3 : 0);
     }
@@ -17534,7 +17560,9 @@ function playExtremeTour(round, state) {
     const cardTop = window.innerHeight - card.offsetHeight - (parseFloat(getComputedStyle(card).bottom) || 0);
     globe.setViewShiftY(Math.round((top + cardTop) / 2 - window.innerHeight / 2), PHONE_SHIFT_MS);
     highlight(null);
-    showStop({ kicker: "THE WHOLE WORLD, RANKED", line: find === "average" ? "Hot: close to the middle. Cold: far from it." : `Hot: near the ${near.toLowerCase()}. Cold: the ${farEnd.toLowerCase()} end.` });
+    showStop({ kicker: "THE WHOLE WORLD, RANKED", line: find === "average"
+      ? "Pink and gold: close to the middle. Blue: furthest from it."
+      : `Pink and gold: the ${near.toLowerCase()} figures. Blue: the ${farEnd.toLowerCase()}.` });
     const first = getCountry(stops[0].entry.iso);
     globe.revealSpin(first.lat, first.lon, TOUR_SPIN_MS, TOUR_ZOOM);
     await wait(TOUR_SPIN_MS - 300);
