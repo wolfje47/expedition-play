@@ -6551,6 +6551,14 @@ const OUTLINE_RADIUS = GLOBE_RADIUS + 0.6;
 // Filled countries lie just under their outlines.
 const FILL_RADIUS = GLOBE_RADIUS + 0.45;
 const FILL_TEXTURE_WIDTH = 4096;
+// The heat map's small countries, which would be a speck or nothing on the globe: an
+// island nation smaller than SMALL_ISLAND_KM2 also gets its waters (the sea within ZONE_KM,
+// split halfway with any country that is nearer), a microstate a circle of CIRCLE_KM.
+const SMALL_ISLAND_KM2 = 30000;
+const ZONE_KM = 200;
+const CIRCLE_KM = 100;
+const MICROSTATES = new Set(["MC", "LI", "SM", "AD", "VA"]);
+const KM_PER_DEGREE = 111.2;
 const PATH_RADIUS = GLOBE_RADIUS + 1.5;
 const MARKER_RADIUS = GLOBE_RADIUS + 2.5;
 // Camera distance from the globe's centre: default view, closest zoom, furthest zoom.
@@ -6588,6 +6596,40 @@ const COUNTRIES_TOPOLOGY_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/count
 function getPolygons(feature) {
   return feature.geometry.type === "Polygon" ? [feature.geometry.coordinates] : feature.geometry.coordinates;
 }
+
+// Fill a country on a map in the earth texture's projection (width × height).
+function fillFeature(context, feature, width, height) {
+  const path = new Path2D();
+  let wraps = false;
+  getPolygons(feature).forEach(polygon => polygon.forEach(ring => {
+    // Rings across the antimeridian are unwrapped, then drawn again a world over.
+    let previous = ring[0][0];
+    let offset = 0;
+    ring.forEach(([lon, lat], index) => {
+      if (lon - previous > 180) offset -= 360;
+      else if (lon - previous < -180) offset += 360;
+      previous = lon;
+      const x = (lon + offset + 180) / 360 * width;
+      const y = (90 - lat) / 180 * height;
+      if (x < 0 || x > width) wraps = true;
+      if (index === 0) path.moveTo(x, y);
+      else path.lineTo(x, y);
+    });
+    path.closePath();
+  }));
+  context.fill(path, "evenodd");
+  if (wraps) {
+    [-width, width].forEach(shift => {
+      context.save();
+      context.translate(shift, 0);
+      context.fill(path, "evenodd");
+      context.restore();
+    });
+  }
+}
+
+// Every point of a country's outline, as [lon, lat].
+const outlinePoints = feature => getPolygons(feature).flatMap(polygon => polygon.flat());
 
 // Ray-casting point-in-polygon on [longitude, latitude] rings. Rings crossing the
 // antimeridian are unwrapped first, and the point is tested at ±360° as well.
@@ -6955,34 +6997,9 @@ class PixelGlobe {
       if (!feature) return;
       context.fillStyle = `#${new THREE.Color(color).getHexString()}`;
       context.globalAlpha = fill.alpha ?? 0.3;
-      const path = new Path2D();
-      let wraps = false;
-      getPolygons(feature).forEach(polygon => polygon.forEach(ring => {
-        // Rings across the antimeridian are unwrapped, then drawn again a world over.
-        let previous = ring[0][0];
-        let offset = 0;
-        ring.forEach(([lon, lat], index) => {
-          if (lon - previous > 180) offset -= 360;
-          else if (lon - previous < -180) offset += 360;
-          previous = lon;
-          const x = (lon + offset + 180) / 360 * width;
-          const y = (90 - lat) / 180 * height;
-          if (x < 0 || x > width) wraps = true;
-          if (index === 0) path.moveTo(x, y);
-          else path.lineTo(x, y);
-        });
-        path.closePath();
-      }));
-      context.fill(path, "evenodd");
-      if (wraps) {
-        [-width, width].forEach(shift => {
-          context.save();
-          context.translate(shift, 0);
-          context.fill(path, "evenodd");
-          context.restore();
-        });
-      }
+      fillFeature(context, feature, width, height);
     });
+    this.drawSmallCountryZones(context, this.heatFills || []);
     context.globalAlpha = 1;
     this.fillMesh.visible = fills.length > 0;
     this.fillTexture.needsUpdate = true;
@@ -6994,6 +7011,158 @@ class PixelGlobe {
   setHeatMap(fills) {
     this.heatFills = fills;
     this.setFills(this.lastFills || []);
+  }
+
+  // Small islands and microstates on the heat map get a bigger patch of their colour (see
+  // SMALL_ISLAND_KM2), slightly lighter than land, so they can be seen at all.
+  drawSmallCountryZones(context, fills) {
+    const { width, height } = this.fillCanvas;
+    fills.forEach(fill => {
+      const { country } = fill;
+      const color = `#${new THREE.Color(fill.color).getHexString()}`;
+      const alpha = (fill.alpha ?? 0.3) * 0.75;
+      if (MICROSTATES.has(country.iso)) {
+        // A circle round it, with a firm edge.
+        const pixelsPerDegree = width / 360;
+        const ry = CIRCLE_KM / KM_PER_DEGREE * pixelsPerDegree;
+        const rx = ry / Math.max(0.2, Math.cos(country.lat * Math.PI / 180));
+        const x = (country.lon + 180) / 360 * width;
+        const y = (90 - country.lat) / 180 * height;
+        context.beginPath();
+        context.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+        context.fillStyle = color;
+        context.globalAlpha = alpha;
+        context.fill();
+        context.globalAlpha = 0.95;
+        context.strokeStyle = color;
+        context.lineWidth = 2;
+        context.stroke();
+        return;
+      }
+      if (country.borders?.length || !(country.area < SMALL_ISLAND_KM2)) return;
+      const zone = this.getWaterZone(country);
+      if (!zone) return;
+      // The zone's mask, tinted, drawn where it lies (and a world over, across the antimeridian).
+      const tint = this.zoneTint || (this.zoneTint = document.createElement("canvas"));
+      tint.width = zone.mask.width;
+      tint.height = zone.mask.height;
+      const tintContext = tint.getContext("2d");
+      tintContext.drawImage(zone.mask, 0, 0);
+      tintContext.globalCompositeOperation = "source-in";
+      tintContext.fillStyle = color;
+      tintContext.fillRect(0, 0, tint.width, tint.height);
+      context.globalAlpha = alpha;
+      [0, -width, width].forEach(shift => context.drawImage(tint, zone.x + shift, zone.y));
+    });
+  }
+
+  // A small island's waters: every sea pixel within ZONE_KM of its coast that is nearer to
+  // it than to any other country, so two zones (or a zone and a neighbour's coast) split
+  // the sea halfway. Worked out once per country (prepareWaterZones does it ahead, in idle
+  // time), as a mask in the fill map's pixels.
+  getWaterZone(country) {
+    this.waterZones = this.waterZones || new Map();
+    if (this.waterZones.has(country.iso)) return this.waterZones.get(country.iso);
+    if (!this.countryFeatures.length) return null;
+    const width = FILL_TEXTURE_WIDTH;
+    const height = FILL_TEXTURE_WIDTH / 2;
+    const pixelsPerDegree = width / 360;
+    const own = this.findFeature(country);
+    // Longitudes relative to the island, so zones across the antimeridian stay in one piece.
+    const centre = country.lon;
+    const relative = lon => ((lon - centre + 540) % 360) - 180;
+    const ownPoints = (own ? outlinePoints(own) : [[country.lon, country.lat]]).map(([lon, lat]) => [relative(lon), lat]);
+    const reach = ZONE_KM / KM_PER_DEGREE;
+    const lats = ownPoints.map(([, lat]) => lat);
+    const lons = ownPoints.map(([lon]) => lon);
+    const stretch = 1 / Math.max(0.2, Math.cos(Math.max(...lats.map(Math.abs)) * Math.PI / 180));
+    const box = { south: Math.min(...lats) - reach, north: Math.max(...lats) + reach, west: Math.min(...lons) - reach * stretch, east: Math.max(...lons) + reach * stretch };
+    // Other countries' outline points near enough to claim part of the zone.
+    const others = this.pointsNear(box.south - reach, box.north + reach, box.west - 2 * reach * stretch + centre, box.east + 2 * reach * stretch + centre, own)
+      .map(([lon, lat]) => [relative(lon), lat]);
+    const x0 = Math.floor((box.west + centre + 180) * pixelsPerDegree);
+    const x1 = Math.ceil((box.east + centre + 180) * pixelsPerDegree);
+    const y0 = Math.max(0, Math.floor((90 - box.north) * pixelsPerDegree));
+    const y1 = Math.min(height - 1, Math.ceil((90 - box.south) * pixelsPerDegree));
+    // The land under the zone: a full-width strip, so wrapping round the map is simple.
+    const land = this.getLandCanvas().getContext("2d", { willReadFrequently: true }).getImageData(0, y0, width, y1 - y0 + 1).data;
+    const mask = Object.assign(document.createElement("canvas"), { width: x1 - x0 + 1, height: y1 - y0 + 1 });
+    const pixels = mask.getContext("2d").createImageData(mask.width, mask.height);
+    const limit = reach ** 2;
+    const nearest = (points, lon, lat, cos, best) => {
+      for (const [pointLon, pointLat] of points) {
+        const dx = (lon - pointLon) * cos;
+        const dy = lat - pointLat;
+        const distance = dx * dx + dy * dy;
+        if (distance < best) best = distance;
+      }
+      return best;
+    };
+    for (let y = y0; y <= y1; y += 1) {
+      const lat = 90 - (y + 0.5) / pixelsPerDegree;
+      const cos = Math.cos(lat * Math.PI / 180);
+      for (let x = x0; x <= x1; x += 1) {
+        const wrapped = ((x % width) + width) % width;
+        if (land[((y - y0) * width + wrapped) * 4 + 3] > 127) continue;
+        const lon = relative((x + 0.5) / pixelsPerDegree - 180);
+        const ownDistance = nearest(ownPoints, lon, lat, cos, Infinity);
+        if (ownDistance > limit || nearest(others, lon, lat, cos, ownDistance) < ownDistance) continue;
+        const index = ((y - y0) * mask.width + (x - x0)) * 4;
+        pixels.data[index] = pixels.data[index + 1] = pixels.data[index + 2] = pixels.data[index + 3] = 255;
+      }
+    }
+    mask.getContext("2d").putImageData(pixels, 0, 0);
+    const zone = { x: x0, y: y0, mask };
+    this.waterZones.set(country.iso, zone);
+    return zone;
+  }
+
+  // Work out the small islands' waters ahead, one per idle moment, so the reveal doesn't
+  // stall when it first shows them.
+  prepareWaterZones(countries) {
+    const queue = countries.filter(country => !MICROSTATES.has(country.iso) && !country.borders?.length && country.area < SMALL_ISLAND_KM2);
+    const idle = window.requestIdleCallback || (callback => setTimeout(callback, 50));
+    const next = () => {
+      if (!queue.length) return;
+      if (!this.countryFeatures.length) { setTimeout(next, 500); return; }
+      this.getWaterZone(queue.shift());
+      idle(next);
+    };
+    // After the flight into the game (the first one also builds the land map, ~0.2 s).
+    setTimeout(() => idle(next), 3000);
+  }
+
+  // Outline points of every country but `except` in a box (longitudes may run past ±180),
+  // from a grid of 5° cells built once.
+  pointsNear(south, north, west, east, except) {
+    if (!this.pointGrid) {
+      this.pointGrid = new Map();
+      this.countryFeatures.forEach(feature => outlinePoints(feature).forEach(point => {
+        const key = `${Math.floor((point[0] + 180) / 5)}:${Math.floor((point[1] + 90) / 5)}`;
+        if (!this.pointGrid.has(key)) this.pointGrid.set(key, []);
+        this.pointGrid.get(key).push([point[0], point[1], feature]);
+      }));
+    }
+    const found = [];
+    for (let row = Math.floor((south + 90) / 5); row <= Math.floor((north + 90) / 5); row += 1) {
+      for (let column = Math.floor((west + 180) / 5); column <= Math.floor((east + 180) / 5); column += 1) {
+        const cell = this.pointGrid.get(`${((column % 72) + 72) % 72}:${row}`);
+        cell?.forEach(([lon, lat, feature]) => { if (feature !== except) found.push([lon, lat]); });
+      }
+    }
+    return found;
+  }
+
+  // Every country filled in on a map the size of the fill map (land is opaque), made once.
+  getLandCanvas() {
+    if (this.landCanvas) return this.landCanvas;
+    const width = FILL_TEXTURE_WIDTH;
+    const height = FILL_TEXTURE_WIDTH / 2;
+    this.landCanvas = Object.assign(document.createElement("canvas"), { width, height });
+    const context = this.landCanvas.getContext("2d", { willReadFrequently: true });
+    context.fillStyle = "#000";
+    this.countryFeatures.forEach(feature => fillFeature(context, feature, width, height));
+    return this.landCanvas;
   }
 
   setCurrentGuess(country) {
@@ -18131,6 +18300,9 @@ function showMenuGlobe() {
   document.querySelector(".how-to-play-modal").classList.remove("is-game-intro");
   afterGameIntro = null;
   globe.setLabels(null);
+  // The menu globe is the plain earth: no heat map or outlines left from a game.
+  globe.setHeatMap([]);
+  globe.setHighlights([]);
   globe.mountTo("menuGlobe");
   globe.setMode("menu");
 }
@@ -18214,6 +18386,8 @@ function closeGameIntro() {
 
 // Opens the game on a day and mode: today by default, or a past day from the archive.
 function enterGameView(dateKey = today, mode = "competitive") {
+  // The globe mode's heat map gives small islands their waters; work those out ahead.
+  if (mode === "extremes") globe.prepareWaterZones(COUNTRIES);
   if (dateKey !== activeDate || mode !== activeMode) {
     activeDate = dateKey;
     activeMode = mode;
