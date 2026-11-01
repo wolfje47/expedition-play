@@ -6559,6 +6559,11 @@ const ZONE_KM = 200;
 const CIRCLE_KM = 100;
 const MICROSTATES = new Set(["MC", "LI", "SM", "AD", "VA"]);
 const KM_PER_DEGREE = 111.2;
+// Countries too small to click (Monaco, Vatican City, the small islands…) get a dashed
+// circle of CLICK_HELP_PX on screen round them: a click inside it picks that country.
+const CLICK_HELP_PX = 15;
+// …but only once zoomed in a little (about two wheel notches): zoomed out they'd clutter.
+const CLICK_HELP_ZOOM = 0.75;
 const PATH_RADIUS = GLOBE_RADIUS + 1.5;
 const MARKER_RADIUS = GLOBE_RADIUS + 2.5;
 // Camera distance from the globe's centre: default view, closest zoom, furthest zoom.
@@ -7274,6 +7279,7 @@ class PixelGlobe {
   setClickable(isClickable) {
     this.isClickable = isClickable;
     this.container.classList.toggle("is-clickable", isClickable);
+    this.updateClickHelpers();
   }
 
   resize() {
@@ -7349,6 +7355,7 @@ class PixelGlobe {
       this.globeGroup.rotation.x = MENU_TILT;
     }
     this.markers.forEach(marker => this.scaleMarker(marker));
+    this.updateClickHelpers();
     this.resize();
   }
 
@@ -7568,8 +7575,10 @@ class PixelGlobe {
       const leeway = event.pointerType === "mouse" ? 5 : 10;
       if (cancelled || !this.isClickable || !this.pressStart) return;
       if (Math.hypot(event.clientX - this.pressStart.x, event.clientY - this.pressStart.y) > leeway) return;
+      const helper = this.clickHelperAt(event);
       const point = this.pointToLatLon(event);
-      if (point) this.onGlobeClick({ ...point, ccn3: this.countryAt(point.lat, point.lon) });
+      if (helper) this.onGlobeClick({ lat: helper.lat, lon: helper.lon, ccn3: helper.ccn3 });
+      else if (point) this.onGlobeClick({ ...point, ccn3: this.countryAt(point.lat, point.lon) });
     };
     dom.addEventListener("pointerup", event => release(event, false));
     dom.addEventListener("pointercancel", event => release(event, true));
@@ -7639,6 +7648,92 @@ class PixelGlobe {
   // A guess marker is just its number, drawn without a background so it never hides
   // the country or its neighbours; the country itself is shown by its outline
   // (setHighlights). An invisible target underneath keeps hover tooltips working.
+  // The tiny countries' click circles ([{ ccn3, lat, lon }]): dashed, so they don't read
+  // as borders, the same size on screen at every zoom, and shown only while the globe can
+  // be clicked.
+  setClickHelpers(places) {
+    this.clickHelpers?.forEach(helper => this.globeGroup.remove(helper.sprite));
+    const texture = this.createDashedCircleTexture();
+    this.clickHelpers = places.map(place => {
+      // Drawn over the globe (a flat circle would sink into its curve away from the
+      // middle); the ones on the far side are hidden in render().
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, depthWrite: false, depthTest: false, transparent: true }));
+      sprite.position.copy(this.latLonToVector3(place.lat, place.lon, GLOBE_RADIUS + 0.6));
+      sprite.renderOrder = 9;
+      this.globeGroup.add(sprite);
+      return { ...place, sprite };
+    });
+    this.updateClickHelpers();
+  }
+
+  createDashedCircleTexture() {
+    const canvas = Object.assign(document.createElement("canvas"), { width: 128, height: 128 });
+    const context = canvas.getContext("2d");
+    context.setLineDash([14, 10]);
+    context.beginPath();
+    context.arc(64, 64, 54, 0, Math.PI * 2);
+    context.lineWidth = 13;
+    context.strokeStyle = "rgba(4, 6, 13, 0.6)";
+    context.stroke();
+    context.lineWidth = 7;
+    context.strokeStyle = "rgba(255, 255, 255, 0.95)";
+    context.stroke();
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.encoding = THREE.sRGBEncoding;
+    return texture;
+  }
+
+  // Size the circles for the current zoom (CLICK_HELP_PX on screen), and show them while
+  // the globe can be clicked and is zoomed in (CLICK_HELP_ZOOM).
+  updateClickHelpers() {
+    if (!this.clickHelpers) return;
+    const visible = this.mode === "game" && this.isClickable && this.getZoomFactor() <= CLICK_HELP_ZOOM;
+    this.clickHelpersShown = visible;
+    const height = this.container.clientHeight || 600;
+    const worldPerPixel = 2 * (this.camera.position.z - GLOBE_RADIUS) * Math.tan(this.camera.fov * Math.PI / 360) / height;
+    const size = CLICK_HELP_PX * 2 * worldPerPixel;
+    this.clickHelpers.forEach(({ sprite }) => {
+      sprite.visible = visible;
+      sprite.scale.set(size, size, 1);
+    });
+    this.requestRender();
+  }
+
+  // Hide the click circles on the far side of the globe (they're drawn without depth).
+  cullClickHelpers() {
+    if (!this.clickHelpersShown) return;
+    this.globeGroup.updateMatrixWorld();
+    const world = new THREE.Vector3();
+    this.clickHelpers.forEach(({ sprite }) => {
+      world.copy(sprite.position).applyMatrix4(this.globeGroup.matrixWorld);
+      sprite.visible = world.clone().normalize().dot(this.camera.position.clone().sub(world).normalize()) > 0.1;
+    });
+  }
+
+  // The tiny country whose circle a click falls in (the nearest, if circles overlap).
+  clickHelperAt(event) {
+    if (!this.clickHelpers?.length || !this.clickHelpersShown) return null;
+    const bounds = this.renderer.domElement.getBoundingClientRect();
+    const world = new THREE.Vector3();
+    let best = null;
+    let bestDistance = CLICK_HELP_PX;
+    this.globeGroup.updateMatrixWorld();
+    this.clickHelpers.forEach(helper => {
+      world.copy(helper.sprite.position).applyMatrix4(this.globeGroup.matrixWorld);
+      // Only circles on the side facing the camera.
+      if (world.clone().normalize().dot(this.camera.position.clone().sub(world).normalize()) < 0.1) return;
+      const screen = world.clone().project(this.camera);
+      const x = bounds.left + (screen.x + 1) / 2 * bounds.width;
+      const y = bounds.top + (1 - screen.y) / 2 * bounds.height;
+      const distance = Math.hypot(event.clientX - x, event.clientY - y);
+      if (distance <= bestDistance) {
+        best = helper;
+        bestDistance = distance;
+      }
+    });
+    return best;
+  }
+
   addMarker(lat, lon, colorHex = "#22c55e", name = "", number = this.markers.length + 1) {
     const pos = this.latLonToVector3(lat, lon);
     const hitTarget = new THREE.Mesh(new THREE.SphereGeometry(3.5, 8, 6), new THREE.MeshBasicMaterial({ visible: false }));
@@ -7862,6 +7957,7 @@ class PixelGlobe {
     if (Math.abs(this.targetCameraDistance - distance) > 0.05) {
       this.camera.position.z = distance + (this.targetCameraDistance - distance) * 0.18;
       this.markers.forEach(marker => this.scaleMarker(marker));
+      this.updateClickHelpers();
     }
     // Rebuild the path and outlines at a matching thickness whenever the zoom has
     // changed by more than 15% since they were last built.
@@ -7901,6 +7997,7 @@ class PixelGlobe {
     this.needsRender = false;
     this.lastRender = now;
     this.stats.renders += 1;
+    this.cullClickHelpers();
     this.renderer.render(this.scene, this.camera);
     this.updateLabels();
   }
@@ -15872,6 +15969,8 @@ globe.renderer.domElement.addEventListener("mousemove", () => {
   });
 }, true);
 globe.onGlobeClick = handleGlobeClick;
+// Countries too small to click get a dashed circle that's easier to hit.
+globe.setClickHelpers(COUNTRIES.filter(country => country.area < 1000 && country.ccn3).map(({ ccn3, lat, lon }) => ({ ccn3, lat, lon })));
 // Phones: while you turn the globe, the bars over it fade, so you see more of it.
 let globeFadeTimer = null;
 globe.onDragChange = active => {
