@@ -274,6 +274,7 @@ h1, h2, h3 { font-weight: normal; }
 .play-tile-text strong { color: var(--tile); font: 12px var(--font-display); }
 .play-tile-text span { color: var(--text); font-size: 12px; }
 .play-tile-text small { color: var(--muted); font: 12px var(--font-body); }
+.play-tile-text small:empty { display: none; }
 .play-tile:disabled { cursor: not-allowed; filter: grayscale(0.6); opacity: 0.55; }
 /* The main game: first, a size up, glowing, with a MAIN GAME ribbon. */
 .play-tile.is-main { position: relative; grid-template-columns: 104px 1fr; padding: 1.1rem 1rem; border-width: 2px; border-color: var(--tile); background: linear-gradient(110deg, color-mix(in srgb, var(--tile) 30%, transparent), color-mix(in srgb, var(--tile) 6%, transparent) 75%); box-shadow: 0 0 34px color-mix(in srgb, var(--tile) 35%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.18); animation: main-tile-glow 2.6s ease-in-out infinite; }
@@ -2845,7 +2846,7 @@ h1, h2, h3 { font-weight: normal; }
           <span class="play-tile-art" data-art="extremes" aria-hidden="true"></span>
           <span class="play-tile-text">
             <strong>HIGHS &amp; LOWS</strong>
-            <span>Six stats, one click each: find the top, the bottom or the middle. Earns badges.</span>
+            <span>A daily ranking quiz. Earn badges and reach the world's top 1%.</span>
             <small id="menuExtremesStatus"></small>
           </span>
         </button>
@@ -2853,7 +2854,7 @@ h1, h2, h3 { font-weight: normal; }
           <span class="play-tile-art" data-art="casual" aria-hidden="true"></span>
           <span class="play-tile-text">
             <strong>CASUAL</strong>
-            <span>No clock, names on the globe, extra clues.</span>
+            <span>Five country puzzles a day.</span>
             <small id="menuCasualStatus"></small>
           </span>
         </button>
@@ -3282,7 +3283,7 @@ h1, h2, h3 { font-weight: normal; }
           <span class="how-to-now">NOW PLAYING</span>
           <span class="how-to-art" data-art="casual" aria-hidden="true"></span>
           <b>CASUAL</b>
-          <span>No clock</span>
+          <span>Five rounds of country puzzles</span>
           <span>Just for fun</span>
         </div>
       </div>
@@ -15479,7 +15480,7 @@ function createCalendar(days, { selected, onSelect, mode }) {
   } else {
     calendar.appendChild(element("p", "calendar-mode-note", mode === "competitive"
       ? "Five rounds against the clock. No badges here: just for fun."
-      : "No clock, names on the globe and extra clues. No badges here: just for fun."));
+      : "Five rounds of country puzzles: clues, maps and rankings. No badges here: just for fun."));
   }
   [...new Set(weeks.map(week => week.month))].forEach(month => {
     const monthWeeks = weeks.filter(week => week.month === month);
@@ -20106,7 +20107,8 @@ function describeMode(mode) {
   const record = getDayRecord(today, mode);
   if (record.completed) return `Played · ${record.score.toLocaleString()} · ${formatTopPercent(getTopPercent(getDayStats(today, mode), record.score))}`;
   if (record.started) return `Round ${record.rounds.filter(round => round.done).length + 1} of ${record.rounds.length} · continue`;
-  return `Day ${getPuzzleNumber(today)} · ready to play`;
+  // Nothing to say before you've started (no day number).
+  return "";
 }
 
 initializeMainMenu({
