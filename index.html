@@ -19501,15 +19501,19 @@ function playExtremeTour(round, state) {
   const fmt = value => formatValue(stat, value);
   const ratioText = ratio => `${ratio < 10 ? ratio.toFixed(1).replace(/\.0$/, "") : Math.round(ratio)}×`;
 
-  const farLine = () => {
-    if (find === "average") return `The furthest from the middle value of ${fmt(standings.target)}.`;
+  // The far end comes before the answer, so its line must not hint at the answer's figure;
+  // the comparison between the two ends waits for the answer's own stop.
+  const farLine = () => find === "average"
+    ? `The furthest from the middle value of ${fmt(standings.target)}.`
+    : `The ${farEnd.toLowerCase()} of all ${count} countries with data.`;
+  const winnerLine = () => {
+    if (find === "average") return "Right in the middle: half the world is above, half below.";
+    const lead = `The ${near.toLowerCase()} of all ${count} countries with data.`;
+    if (far.iso === winner.iso) return lead;
     const [big, small] = find === "highest" ? [winner.value, far.value] : [far.value, winner.value];
-    if (big > 0 && small > 0 && big / small >= 2) return `${nameOf(winner)}'s figure is ${ratioText(big / small)} ${find === "highest" ? "this" : "smaller"}.`;
-    return `${fmt(Math.abs(winner.value - far.value))} away from ${nameOf(winner)}.`;
+    if (big > 0 && small > 0 && big / small >= 2) return `${lead} ${find === "highest" ? `${ratioText(big / small)} ${nameOf(far)}'s figure` : `${nameOf(far)}'s figure is ${ratioText(big / small)} this`}.`;
+    return `${lead} ${fmt(Math.abs(winner.value - far.value))} ${find === "highest" ? "more" : "less"} than ${nameOf(far)}.`;
   };
-  const winnerLine = () => find === "average"
-    ? "Right in the middle: half the world is above, half below."
-    : `The ${near.toLowerCase()} of all ${count} countries with data.`;
   // First your pick (its figure, but not yet its rank), then the worst and the best.
   const pickLine = () => `${nameOf(pick)}: ${fmt(pick.value)}. How does that compare?`;
   const stops = [
