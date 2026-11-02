@@ -1613,91 +1613,17 @@ h1, h2, h3 { font-weight: normal; }
 .modal-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
 .modal-actions .btn { padding: 0 0.5rem; font-size: 9px; }
 
-/* How to play: one screen, no scrolling, mostly pictures. Every part is a box with a
-   small 8-bit heading, like the menu. */
-.how-to-play-modal { width: min(100%, 680px); gap: 0.55rem; padding: 1.2rem 1.3rem; overflow-x: hidden; }
-/* The goal, on the right of the scoring heading. */
-.how-to-goal { margin-left: auto; color: var(--text); font: 600 14px var(--font-body); }
-.how-to-box { display: grid; gap: 0.45rem; padding: 0.55rem 0.6rem; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: rgba(255, 255, 255, 0.03); }
-.how-to-heading { display: flex; align-items: center; gap: 0.5rem; color: var(--muted); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
-.how-to-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-.how-to-modes > div { display: grid; grid-template-columns: 56px 1fr; grid-template-rows: auto auto auto; align-content: center; align-items: center; column-gap: 0.7rem; row-gap: 3px; padding: 0.5rem; border: 1px solid color-mix(in srgb, var(--tile) 45%, transparent); border-radius: 14px; background: linear-gradient(110deg, color-mix(in srgb, var(--tile) 14%, transparent), transparent 75%); }
-.how-to-modes b { color: var(--tile); font: 12px var(--font-display); }
-.how-to-modes > div > span:not(.how-to-art) { color: var(--muted); font-size: 12px; }
-.how-to-art { grid-row: 1 / 4; display: grid; place-items: center; height: 56px; border-radius: 10px; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0 2px, transparent 2px 4px), radial-gradient(circle, color-mix(in srgb, var(--tile) 30%, #04121a), #04121a 75%); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tile) 55%, transparent); }
-.how-to-art svg { width: 38px; height: 38px; }
-/* The six badges small in a row on the competitive tile: that's where they're earned. */
-.how-to-mode-badges { display: flex; gap: 2px; }
-.how-to-mode-badges svg { width: 16px; height: 16px; }
-.how-to-sum { display: flex; align-items: stretch; justify-content: space-between; gap: 0.3rem; }
-.sum-chip { display: grid; flex: 1; justify-items: center; align-content: center; gap: 2px; padding: 0.4rem 0.3rem; border-radius: 10px; background: var(--glass-fill); box-shadow: inset 0 0 0 1px var(--glass-line); text-align: center; }
-.sum-chip b { color: var(--gold); font: 700 14px var(--font-mono); white-space: nowrap; }
-.sum-chip small { color: var(--muted); font-size: 12px; }
-.sum-chip.is-bad b { color: var(--danger); }
-.sum-chip.is-streak b { color: #ff8a3d; }
-.sum-chip.is-fast b { color: var(--accent); }
-.sum-tag { padding: 1px 5px; border-radius: 5px; background: var(--accent-soft); color: var(--accent); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); text-transform: uppercase; font-style: normal; }
-.sum-op { align-self: center; color: var(--muted); font: 700 16px var(--font-mono); }
-.how-to-rounds { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; list-style: none; counter-reset: round; }
-.how-to-rounds li { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.35rem 0.3rem; border-radius: 10px; background: var(--glass-fill); counter-increment: round; color: var(--text); font-size: 12px; font-weight: 600; line-height: 1.2; text-align: center; white-space: nowrap; }
-.how-to-rounds li::before { content: counter(round); display: grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; background: rgba(255, 255, 255, 0.1); font: 9px var(--font-display); }
-/* Warm or cold: one continuous scale. */
-.how-to-temps { display: grid; grid-template-columns: repeat(5, 1fr); overflow: hidden; border-radius: 999px; list-style: none; background: linear-gradient(90deg, var(--t-very-hot), var(--t-hot), var(--t-warm), var(--t-cool), var(--t-very-cold)); }
-.how-to-temps li { display: grid; justify-items: center; gap: 1px; padding: 0.3rem 0.2rem; background: rgba(4, 18, 26, 0.72); text-align: center; }
-.how-to-temps li + li { box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.08); }
-.how-to-temps b { color: var(--temp); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); text-transform: uppercase; white-space: nowrap; }
-.how-to-temps span { color: var(--muted); font: 12px var(--font-mono); white-space: nowrap; }
-.how-to-awards { display: grid; grid-template-columns: 1fr 1.5fr; gap: 0.5rem; }
-.how-to-awards .how-to-box { justify-items: center; align-content: start; text-align: center; }
-.how-to-awards .how-to-box > .how-to-top { margin-top: 0.4rem; }
-.how-to-awards .how-to-heading { justify-self: start; }
-.how-to-awards small { color: var(--muted); font-size: 12px; }
-.how-to-top { padding: 0.3rem 0.8rem; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font: 12px var(--font-display); white-space: nowrap; }
-/* The badges spread across the box, rising a little from Tourist to Mr. Worldwide and
-   turned slightly towards you; each with the top % it asks for. */
+/* The six badges in a row (the archive's badge ladder), rising a little from Tourist to
+   Mr. Worldwide and turned slightly towards you; each with the top % it asks for. */
 .how-to-badges { display: flex; justify-content: space-between; align-items: end; width: 100%; padding: 0.4rem 0.6rem 0; perspective: 600px; }
 .how-to-badge { display: grid; justify-items: center; transform: translateY(calc(var(--stack) * -2px)) rotateY(-18deg); filter: drop-shadow(3px 4px 3px rgba(0, 0, 0, 0.55)); transition: transform 0.2s ease; }
 .how-to-badge:hover { transform: translateY(calc(var(--stack) * -2px - 4px)); }
 .how-to-badge small { margin-top: -6px; padding: 1px 4px; border-radius: 5px; background: var(--glass-strong); color: var(--text); font: 700 12px var(--font-mono); white-space: nowrap; box-shadow: inset 0 0 0 1px var(--glass-line); }
-/* Short laptop screens: a little less air, so it still fits without scrolling. */
-@media (max-height: 760px) and (min-width: 761px) {
-  .how-to-play-modal { gap: 0.35rem; padding: 0.9rem 1.2rem; }
-  .how-to-play-modal > .btn-block { min-height: 0; padding-block: 0.6rem; }
-  .how-to-box { padding: 0.45rem 0.55rem; gap: 0.35rem; }
-  .how-to-modes > div { padding: 0.4rem; }
-  .how-to-art { height: 48px; }
-  .how-to-art svg { width: 32px; height: 32px; }
-  .sum-chip { padding: 0.3rem; }
-}
-
-/* Phones: smaller mode tiles, the sum as a 2×2 grid with each operator inside its
-   chip, and smaller type in the rows of five. */
 @media (max-width: 760px) {
-  .how-to-play-modal { gap: 0.5rem; }
-  .how-to-modes > div { grid-template-columns: 36px 1fr; column-gap: 0.5rem; padding: 0.4rem; }
-  .how-to-modes b { font-size: 9px; }
-  .how-to-modes > div > span:not(.how-to-art) { font-size: 11px; }
-  .how-to-art { height: 36px; }
-  .how-to-art svg { width: 28px; height: 28px; }
-  .how-to-mode-badges svg { width: 12px; height: 12px; }
-  .how-to-box { padding: 0.45rem 0.5rem; gap: 0.35rem; }
-  .how-to-sum { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-  .sum-op { display: none; }
-  .sum-chip { padding: 0.3rem; }
-  .sum-chip b[data-op]::before { content: attr(data-op) " "; color: var(--muted); }
-  .how-to-rounds li { flex-direction: column; gap: 3px; font-size: 10px; white-space: normal; }
-  .how-to-rounds li::before { width: 18px; height: 18px; }
-  .how-to-temps li { padding: 0.25rem 0.1rem; }
-  .how-to-temps b { font-size: 8px; }
-  .how-to-temps span { font-size: 8px; }
-  .how-to-awards { grid-template-columns: 1fr 1.6fr; }
   .how-to-badges { padding: 0.3rem 0 0; }
   .how-to-badge { transform: rotateY(-18deg); }
   .how-to-badge svg { width: 28px; height: 28px; }
   .how-to-badge small { font-size: 8px; }
-  .how-to-heading { flex-wrap: wrap; }
-  .how-to-goal { flex-basis: 100%; margin-left: 0; font-size: 12px; }
-  .how-to-top { padding: 0.3rem 0.6rem; font-size: 10px; }
 }
 
 .stats-modal { width: min(100%, 520px); }
@@ -2276,7 +2202,7 @@ h1, h2, h3 { font-weight: normal; }
 .game-view[data-mode="casual"],
 #victoryModal[data-mode="casual"],
 #archiveModal[data-mode="casual"],
-.how-to-play-modal.is-game-intro[data-mode="casual"] {
+.how-to-play-modal[data-set="casual"] {
   --accent: #ffd45c;
   --accent-hover: #ffe08a;
   --accent-soft: rgba(255, 212, 92, 0.14);
@@ -2423,10 +2349,6 @@ h1, h2, h3 { font-weight: normal; }
   .screen-modal { padding-top: calc(env(safe-area-inset-top, 0px) + 14px); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); }
   .score-burst-card { padding-top: calc(env(safe-area-inset-top, 0px) + 18px); }
   .main-menu { padding-top: calc(env(safe-area-inset-top, 0px) + clamp(1.5rem, 7vh, 5rem)); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1.5rem); }
-
-  /* How to play: the small tags fit their chips. */
-  .sum-tag { font-size: 7px; letter-spacing: 0; white-space: nowrap; }
-  .how-to-temps b { font-size: 7px; letter-spacing: 0; }
 }
 
 @media (max-width: 760px) and (hover: none) {
@@ -2457,7 +2379,6 @@ h1, h2, h3 { font-weight: normal; }
 }
 
 /* ---------- Phones: round three (from testing on an iPhone) ---------- */
-.how-to-now { display: none; }
 
 @media (max-width: 760px) {
   /* Archive: START (or CONTINUE) is always in view at the bottom; a day not started yet
@@ -2478,15 +2399,6 @@ h1, h2, h3 { font-weight: normal; }
   .side-right .target-flag img { width: 34px; height: 23px; box-shadow: none; }
 }
 
-/* In-game How to play: only the mode you're playing, marked NOW PLAYING, and GOT IT
-   (no close button) to go on. */
-.how-to-play-modal.is-game-intro .modal-close { display: none; }
-.how-to-play-modal.is-game-intro .how-to-modes { grid-template-columns: 1fr; }
-.how-to-play-modal.is-game-intro[data-mode="competitive"] .how-to-modes > [data-mode="casual"],
-.how-to-play-modal.is-game-intro[data-mode="casual"] .how-to-modes > [data-mode="competitive"] { display: none; }
-.how-to-play-modal.is-game-intro .how-to-now { display: block; grid-column: 2; color: var(--tile); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); opacity: 0.8; }
-.how-to-play-modal.is-game-intro .how-to-art { grid-row: 1 / 5; }
-
 /* Paint the Map's score card: the question as a readable sentence. */
 .score-burst-card .burst-answer-note { color: var(--text); font-size: 14px; text-align: center; }
 
@@ -2495,10 +2407,6 @@ h1, h2, h3 { font-weight: normal; }
 .stage-current.is-empty { display: none; }
 /* The picked country's name is cut short rather than running under its button. */
 .pinpoint-pick-country .pick-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* Casual How to play: the speed bonus crossed out (it's competitive only). */
-.how-to-play-modal.is-game-intro[data-mode="casual"] .sum-chip.is-fast b,
-.how-to-play-modal.is-game-intro[data-mode="casual"] .sum-chip.is-fast small { text-decoration: line-through; text-decoration-thickness: 2px; opacity: 0.45; }
-.how-to-play-modal.is-game-intro[data-mode="casual"] .sum-chip.is-fast .sum-tag { opacity: 1; }
 @media (max-width: 760px) {
   /* The round numbers sit dead centre in their squares. */
   .side-left .round-row { display: flex; align-items: center; justify-content: center; }
@@ -2778,18 +2686,88 @@ h1, h2, h3 { font-weight: normal; }
 /* `hidden` always wins over a display rule (the reserve modes, their tabs and How to play bits). */
 [hidden] { display: none !important; }
 
-/* How to play: Highs & Lows in brief, with the points by place. */
-.how-to-text { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
 
-.how-to-floors { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; padding: 0; list-style: none; }
-.how-to-floors li { display: flex; align-items: baseline; gap: 5px; padding: 2px 7px; border-radius: 7px; background: rgba(255, 107, 157, 0.1); color: var(--text); font: 700 12px var(--font-mono); }
-.how-to-floors b { color: #ff6b9d; font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
-/* At the start of a game, How to play shows only that game's part. */
-.how-to-play-modal.is-game-intro[data-mode="extremes"] .how-to-modes > :not([data-mode="extremes"]),
-.how-to-play-modal.is-game-intro[data-mode="extremes"] [data-for="casual"],
-.how-to-play-modal.is-game-intro[data-mode="casual"] .how-to-modes > :not([data-mode="casual"]),
-.how-to-play-modal.is-game-intro[data-mode="casual"] [data-for="extremes"] { display: none; }
-.how-to-play-modal.is-game-intro[data-mode="extremes"] { --accent: #ff6b9d; --accent-hover: #ff8db4; --accent-soft: rgba(255, 107, 157, 0.14); }
+/* How to play: a set of cards per game, one idea each, walked through with a real round
+   (index.html, ui.js). Side by side on a computer; on a phone one at a time, swiped, with
+   dots, SKIP and NEXT, and LET'S PLAY on the last card. Pink for Highs & Lows, gold for
+   Casual (data-set). */
+.how-to-play-modal { --accent: #ff6b9d; --accent-hover: #ff8db4; --accent-soft: rgba(255, 107, 157, 0.14); width: min(100%, 1040px); gap: 0.8rem; padding: 1.2rem 1.3rem; }
+.how-to-set { display: grid; gap: 0.75rem; min-height: 0; }
+.how-to-lead { margin: 0; color: var(--muted); font-size: 14px; }
+.how-to-lead b { margin-right: 0.5rem; color: var(--accent); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.how-to-cards { display: grid; grid-auto-columns: minmax(0, 1fr); grid-auto-flow: column; gap: 0.75rem; }
+.how-to-card { display: grid; grid-template-rows: auto 1fr auto; gap: 0.8rem; min-height: 290px; padding: 1rem; border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: 18px; background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 12%, transparent), rgba(255, 255, 255, 0.02) 60%); }
+.how-to-card header { display: flex; justify-content: space-between; gap: 0.5rem; }
+.how-to-card header b { color: var(--accent); font: 12px/1.5 var(--font-display); letter-spacing: var(--ls-pixel); }
+.how-to-card header span { flex-shrink: 0; color: var(--faint); font: 9px var(--font-display); }
+.how-to-card > p { margin: 0; color: var(--text); font-size: 16px; line-height: 1.4; }
+.how-to-card > p small { display: block; margin-top: 4px; color: var(--muted); font-size: 14px; }
+.how-to-card-art { display: grid; place-items: center; align-content: center; gap: 0.6rem; min-width: 0; }
+.how-to-question { margin: 0; padding: 0.8rem; border: 1px solid var(--glass-line); border-radius: 12px; background: rgba(0, 0, 0, 0.3); font-size: 16px; font-weight: 600; text-align: center; }
+/* Two more questions, smaller and quieter under the example one. */
+.how-to-questions { gap: 0.45rem; }
+.how-to-question.is-more { padding: 0.45rem 0.7rem; color: var(--muted); font-size: 13px; font-weight: 500; }
+/* A small globe with a pin, for "click a country". */
+.how-to-globe { position: relative; width: 84px; height: 84px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #4aa3e0, #1a4f8a 55%, #0b2442); box-shadow: inset -8px -8px 16px rgba(0, 0, 0, 0.45); }
+.how-to-globe::before { content: ""; position: absolute; inset: 18% 30% 30% 22%; border-radius: 40% 55% 45% 50%; background: #5cbf6a; opacity: 0.85; }
+.how-to-globe::after { content: ""; position: absolute; top: 30%; left: 48%; width: 14px; height: 14px; border: 3px solid #fff; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 3px rgba(255, 212, 92, 0.35); }
+.how-to-pick { display: flex; align-items: center; gap: 0.5rem; font-size: 14px; }
+.how-to-lock { padding: 6px 10px; border-radius: 8px; background: var(--accent); color: #0a0f1e; font: 9px var(--font-display); }
+.how-to-flag { width: 24px; height: 16px; border-radius: 3px; object-fit: cover; }
+.how-to-ladder { display: grid; gap: 4px; width: 100%; margin: 0; padding: 0; list-style: none; }
+.how-to-ladder li { display: grid; grid-template-columns: 2rem 24px minmax(0, 1fr) auto; align-items: center; column-gap: 8px; padding: 5px 8px; border-radius: 8px; background: rgba(255, 255, 255, 0.04); font-size: 13px; }
+.how-to-ladder b { grid-row: 1 / 3; color: var(--muted); font: 700 12px var(--font-mono); }
+.how-to-ladder .how-to-flag { grid-row: 1 / 3; }
+.how-to-ladder span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.how-to-ladder small { grid-column: 3; color: var(--muted); font: 700 11px var(--font-mono); }
+.how-to-ladder strong { grid-column: 4; grid-row: 1 / 3; color: var(--gold); font: 700 13px var(--font-mono); }
+.how-to-ladder li.is-pick { background: rgba(255, 212, 92, 0.12); outline: 1.5px solid var(--gold); outline-offset: -1.5px; }
+.how-to-top { padding: 5px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font: 11px var(--font-display); }
+.how-to-card-badges { display: flex; gap: 6px; }
+.how-to-card-badges svg { display: block; }
+/* Casual's cards. */
+.how-to-rounds { display: grid; align-content: center; gap: 6px; margin: 0; padding: 0; color: var(--muted); font-size: 13px; list-style: none; }
+.how-to-rounds b { display: block; color: var(--accent); font: 9px/1.6 var(--font-display); letter-spacing: var(--ls-pixel); }
+.how-to-sum { display: grid; justify-items: center; gap: 2px; }
+.how-to-sum b { color: var(--gold); font: 700 30px var(--font-mono); }
+.how-to-sum i { color: var(--danger); font: 700 20px var(--font-mono); font-style: normal; }
+.how-to-sum small { color: var(--muted); font-size: 12px; }
+.how-to-temps { display: grid; gap: 3px; width: 100%; margin: 0; padding: 0; list-style: none; }
+.how-to-temps li { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; border-left: 3px solid var(--temp); border-radius: 6px; background: rgba(255, 255, 255, 0.04); color: var(--muted); font: 700 12px var(--font-mono); }
+.how-to-temps b { color: var(--temp); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+/* The link to the other game's cards. */
+.how-to-other { --link: var(--gold); display: flex; justify-content: space-between; align-items: center; gap: 1rem; width: 100%; padding: 0.75rem 0.9rem; border: 1px solid color-mix(in srgb, var(--link) 35%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--link) 6%, transparent); color: var(--muted); font: 14px var(--font-body); text-align: left; cursor: pointer; }
+.how-to-set[data-set="casual"] .how-to-other { --link: #ff6b9d; }
+.how-to-other b { display: block; margin-bottom: 2px; color: var(--link); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.how-to-other i { color: var(--link); font: 9px var(--font-display); font-style: normal; white-space: nowrap; }
+.how-to-dots, .how-to-pager { display: none; }
+/* At the start of a game: only that game's cards, no way out but LET'S PLAY. */
+.how-to-play-modal.is-game-intro .modal-close,
+.how-to-play-modal.is-game-intro .how-to-other { display: none; }
+
+@media (max-width: 760px) {
+  .how-to-play-modal { display: flex; flex-direction: column; min-height: 100dvh; gap: 0.8rem; }
+  .how-to-lead { display: none; }
+  .how-to-set { display: flex; flex: 1; flex-direction: column; gap: 0.8rem; }
+  .how-to-cards { display: flex; flex: 1; gap: 0; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
+  .how-to-cards::-webkit-scrollbar { display: none; }
+  .how-to-card { flex: 0 0 100%; min-height: 0; padding: 1.2rem 1.1rem 1.4rem; scroll-snap-align: start; }
+  .how-to-card > p { font-size: 17px; }
+  .how-to-question { padding: 1.1rem 1rem; font-size: 21px; }
+  .how-to-globe { width: 140px; height: 140px; }
+  .how-to-card-badges svg { width: 34px; height: 34px; }
+  .how-to-rounds { gap: 10px; font-size: 14px; }
+  .how-to-dots { display: flex; justify-content: center; gap: 8px; }
+  .how-to-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); transition: width 0.2s ease; }
+  .how-to-dots i.is-on { width: 22px; border-radius: 4px; background: var(--accent); }
+  .how-to-pager { display: flex; justify-content: space-between; align-items: center; }
+  .how-to-pager .btn { width: auto; padding-inline: 1.4rem; }
+  .how-to-skip { padding: 0.6rem 0; border: 0; background: none; color: var(--muted); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
+  /* The pager until the last card; then LET'S PLAY (and the other game's link). */
+  .how-to-play-modal.is-last-card .how-to-pager,
+  .how-to-play-modal:not(.is-last-card) #howToMenuButton,
+  .how-to-play-modal:not(.is-last-card) .how-to-other { display: none; }
+}
 
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -3265,86 +3243,82 @@ h1, h2, h3 { font-weight: normal; }
         <h2 id="howToPlayTitle">HOW TO PLAY</h2>
         <button class="modal-close" id="closeHowToButton" type="button" aria-label="Close instructions">×</button>
       </div>
-      <div class="how-to-modes">
-        <div style="--tile: #ff6b9d" data-mode="extremes">
-          <span class="how-to-now">NOW PLAYING</span>
-          <span class="how-to-art" data-art="extremes" aria-hidden="true"></span>
-          <b>HIGHS &amp; LOWS</b>
-          <span>The main game · earns badges</span>
-          <span class="how-to-mode-badges" id="howToModeBadges" aria-hidden="true"></span>
+      <!-- One idea per card, walked through with a real round (filled in by engine.js from
+           the game's data). Side by side on a computer; swiped one at a time on a phone. -->
+      <section class="how-to-set" data-set="extremes" aria-label="Highs &amp; Lows">
+        <p class="how-to-lead"><b>HIGHS &amp; LOWS</b> One daily round, explained with a real question.</p>
+        <div class="how-to-cards">
+          <article class="how-to-card">
+            <header><b>SIX QUESTIONS A DAY</b><span>1/4</span></header>
+            <div class="how-to-card-art how-to-questions" id="howToExampleQuestions"></div>
+            <p>Each one is about a real statistic.<small>Highest, lowest or most average.</small></p>
+          </article>
+          <article class="how-to-card">
+            <header><b>ONE CLICK</b><span>2/4</span></header>
+            <div class="how-to-card-art">
+              <span class="how-to-globe" aria-hidden="true"></span>
+              <span class="how-to-pick" id="howToExamplePick"></span>
+            </div>
+            <p>Pick a country on the globe and lock it in.<small>One try per round.</small></p>
+          </article>
+          <article class="how-to-card">
+            <header><b>CLOSE STILL COUNTS</b><span>3/4</span></header>
+            <div class="how-to-card-art"><ol class="how-to-ladder" id="howToExampleLadder"></ol></div>
+            <p>Spot on is 1,000 points.<small>The nearer your country's figure, the more you score.</small></p>
+          </article>
+          <article class="how-to-card">
+            <header><b>CLIMB THE WORLD</b><span>4/4</span></header>
+            <div class="how-to-card-art"><span class="how-to-top">TOP 12%</span><span class="how-to-card-badges" id="howToBadges"></span></div>
+            <p>See your rank against the world every day.<small>Play through the month to earn a badge, up to the top 1%.</small></p>
+          </article>
         </div>
-        <div style="--tile: var(--accent)" data-mode="competitive" hidden>
-          <span class="how-to-now">NOW PLAYING</span>
-          <span class="how-to-art" data-art="competitive" aria-hidden="true"></span>
-          <b>COMPETITIVE</b>
-          <span>⏱ 30–45 s a round</span>
+        <button class="how-to-other" type="button" data-show="casual"><span><b>ALSO TODAY: CASUAL</b>Five country puzzles a day.</span><i>HOW IT WORKS ›</i></button>
+      </section>
+      <section class="how-to-set" data-set="casual" aria-label="Casual" hidden>
+        <p class="how-to-lead"><b>CASUAL</b> Five country puzzles a day.</p>
+        <div class="how-to-cards">
+          <article class="how-to-card">
+            <header><b>FIVE ROUNDS</b><span>1/3</span></header>
+            <ol class="how-to-rounds">
+              <li><b>MYSTERY COUNTRY</b>Guess the country from clues.</li>
+              <li><b>PINPOINT</b>Find the country on the globe.</li>
+              <li><b>DEEP CUT</b>Name something that fits. The rarer, the more points.</li>
+              <li><b>PAINT THE MAP</b>Click every country that fits.</li>
+              <li><b>RANK 'EM</b>Put five countries in order.</li>
+            </ol>
+          </article>
+          <article class="how-to-card">
+            <header><b>1,000 A ROUND</b><span>2/3</span></header>
+            <div class="how-to-card-art"><span class="how-to-sum"><b>1,000</b><i>−200</i><small>a mistake</small></span></div>
+            <p>Every round starts at 1,000; a mistake costs 200.<small>Perfect rounds in a row add a bonus: ×1.1, ×1.2…</small></p>
+          </article>
+          <article class="how-to-card">
+            <header><b>HOT OR COLD</b><span>3/3</span></header>
+            <div class="how-to-card-art">
+              <ol class="how-to-temps" aria-label="How close a guess is">
+                <li style="--temp: var(--t-very-hot)"><b>VERY HOT</b>&lt; 1,000 km</li>
+                <li style="--temp: var(--t-hot)"><b>HOT</b>&lt; 2,500 km</li>
+                <li style="--temp: var(--t-warm)"><b>WARM</b>&lt; 4,500 km</li>
+                <li style="--temp: var(--t-cool)"><b>COOL</b>&lt; 7,000 km</li>
+                <li style="--temp: var(--t-very-cold)"><b>VERY COLD</b>further</li>
+              </ol>
+            </div>
+            <p>A wrong guess tells you how close you are.</p>
+          </article>
         </div>
-        <div style="--tile: var(--gold)" data-mode="casual">
-          <span class="how-to-now">NOW PLAYING</span>
-          <span class="how-to-art" data-art="casual" aria-hidden="true"></span>
-          <b>CASUAL</b>
-          <span>Five rounds of country puzzles</span>
-          <span>Just for fun</span>
-        </div>
-      </div>
-      <!-- Highs & Lows in brief: what a round asks and how a pick scores. -->
-      <section class="how-to-box how-to-extremes" data-for="extremes">
-        <h3 class="how-to-heading">HIGHS &amp; LOWS <span class="how-to-goal">Six stats a day, one click each</span></h3>
-        <p class="how-to-text">Find the highest, lowest or most average country. Right: 1,000. Close: by how near, or at least by place:</p>
-        <ol class="how-to-floors" aria-label="Points by place">
-          <li><b>#2</b>850</li><li><b>#3</b>750</li><li><b>#4–5</b>650</li><li><b>#6–10</b>500</li><li><b>#11–20</b>300</li><li><b>#21–40</b>150</li>
-        </ol>
+        <button class="how-to-other" type="button" data-show="extremes"><span><b>THE MAIN GAME: HIGHS &amp; LOWS</b>Six questions about the world in numbers.</span><i>HOW IT WORKS ›</i></button>
       </section>
-      <!-- Points as a sum: the round's 1,000, minus mistakes, times both multipliers. -->
-      <section class="how-to-box" data-for="casual">
-        <h3 class="how-to-heading">SCORING RULES <i class="sum-tag">CASUAL</i> <span class="how-to-goal">Score as many points as you can</span></h3>
-        <div class="how-to-sum" role="img" aria-label="Each round: 1,000 points, minus 200 per mistake, times the streak multiplier, times the speed multiplier">
-          <span class="sum-chip"><b>1,000</b><small>a round</small></span>
-          <span class="sum-op">−</span>
-          <span class="sum-chip is-bad"><b data-op="−">200</b><small>a mistake</small></span>
-          <span class="sum-op">×</span>
-          <span class="sum-chip is-streak"><b data-op="×">🔥 1.1 · 1.2…</b><small>perfect in a row</small></span>
-          <span class="sum-op" data-for="competitive" hidden>×</span>
-          <span class="sum-chip is-fast" data-for="competitive" hidden><b data-op="×">⚡ 1.5</b><small>fast answer</small><i class="sum-tag">COMPETITIVE ONLY</i></span>
-        </div>
-      </section>
-      <section class="how-to-box" data-for="casual">
-        <h3 class="how-to-heading">FIVE ROUNDS A DAY <i class="sum-tag">CASUAL</i></h3>
-        <ol class="how-to-rounds">
-          <li>Mystery Country</li>
-          <li>Pinpoint</li>
-          <li>Deep Cut</li>
-          <li>Paint the Map</li>
-          <li>Rank 'Em</li>
-        </ol>
-      </section>
-      <!-- One scale from hot to cold, so it doesn't read as a colour per round. -->
-      <section class="how-to-box" data-for="casual">
-        <h3 class="how-to-heading">🌡 HOW CLOSE A GUESS IS <i class="sum-tag">CASUAL</i></h3>
-        <ol class="how-to-temps" aria-label="How close a guess is">
-          <li style="--temp: var(--t-very-hot)"><b>VERY HOT</b><span>&lt; 1,000 km</span></li>
-          <li style="--temp: var(--t-hot)"><b>HOT</b><span>&lt; 2,500 km</span></li>
-          <li style="--temp: var(--t-warm)"><b>WARM</b><span>&lt; 4,500 km</span></li>
-          <li style="--temp: var(--t-cool)"><b>COOL</b><span>&lt; 7,000 km</span></li>
-          <li style="--temp: var(--t-very-cold)"><b>VERY COLD</b><span>further</span></li>
-        </ol>
-      </section>
-      <div class="how-to-awards">
-        <section class="how-to-box">
-          <h3 class="how-to-heading">YOUR TOP %</h3>
-          <span class="how-to-top">TOP 12%</span>
-          <small>Your world rank, every game</small>
-        </section>
-        <section class="how-to-box">
-          <h3 class="how-to-heading">MONTHLY BADGES <i class="sum-tag">HIGHS &amp; LOWS ONLY</i></h3>
-          <div class="how-to-badges" id="howToBadges"></div>
-        </section>
+      <!-- Phones: one card at a time. -->
+      <div class="how-to-dots" id="howToDots" aria-hidden="true"></div>
+      <div class="how-to-pager">
+        <button type="button" class="how-to-skip" id="howToSkip">SKIP</button>
+        <button type="button" class="btn btn-primary" id="howToNext">NEXT ›</button>
       </div>
       <label id="howToDontShow" class="dont-show hidden">
         <input type="checkbox" id="howToDontShowBox">
         <span>Don't show this again</span>
       </label>
-      <button class="btn btn-primary btn-block" id="howToMenuButton" type="button">GOT IT</button>
+      <button class="btn btn-primary btn-block" id="howToMenuButton" type="button">LET'S PLAY</button>
     </div>
   </section>
 
@@ -12832,7 +12806,8 @@ const STATS = {
   east: {"name":"How far east the middle of the country lies","unit":"° longitude","decimals":1,"source":"the game's country data","url":null,"year":null,"values":{"AR":-63.617,"AU":133.775,"AT":14.55,"BD":90.356,"BE":4.469,"BO":-63.589,"BR":-51.925,"CA":-106.347,"CL":-71.543,"CN":104.195,"CO":-74.297,"CU":-77.782,"DK":9.502,"EC":-78.183,"EG":30.802,"ET":40.489,"FI":25.748,"FR":2.214,"DE":10.452,"GH":-1.023,"GR":21.824,"IN":78.963,"ID":113.921,"IR":53.688,"IQ":43.679,"IE":-7.692,"IL":34.852,"IT":12.568,"JP":138.252,"JO":36.238,"KE":37.906,"MY":101.976,"MX":-102.553,"MA":-7.092,"NP":84.124,"NL":5.291,"NZ":174.886,"NG":8.675,"NO":8.469,"PK":69.345,"PE":-75.015,"PH":121.774,"PL":19.145,"PT":-8.224,"RU":105.319,"SA":45.079,"SG":103.82,"ZA":22.938,"KR":127.767,"ES":-3.749,"SE":18.644,"CH":8.228,"TZ":34.888,"TH":100.993,"TR":35.243,"UA":31.166,"AE":53.848,"GB":-3.436,"US":-95.713,"UY":-55.765,"VE":-66.59,"VN":108.277,"AF":65,"AO":18.5,"AL":20,"AD":1.5,"AM":45,"AG":-61.8,"AZ":47.5,"BI":30,"BJ":2.25,"BF":-2,"BG":25,"BH":50.55,"BS":-76,"BA":18,"BY":28,"BZ":-88.75,"BB":-59.5333,"BN":114.667,"BT":90.5,"BW":24,"CF":21,"CI":-5,"CM":12,"CD":25,"CG":15,"KM":44.25,"CV":-24,"CR":-84,"CY":33,"CZ":15.5,"DJ":43,"DM":-61.3333,"DO":-70.6667,"DZ":3,"ER":39,"EE":26,"FJ":175,"FM":158.25,"GA":11.75,"GE":43.5,"GN":-10,"GM":-16.5667,"GW":-15,"GQ":10,"GD":-61.6667,"GT":-90.25,"GY":-59,"HN":-86.5,"HR":15.5,"HT":-72.4167,"HU":20,"IS":-18,"JM":-77.5,"KZ":68,"KG":75,"KH":105,"KI":173,"KN":-62.75,"KW":45.75,"LA":105,"LB":35.8333,"LR":-9.5,"LY":17,"LC":-60.9667,"LI":9.53333,"LK":81,"LS":28.5,"LT":24,"LU":6.16667,"LV":25,"MC":7.4,"MD":29,"MG":47,"MV":73,"MH":168,"MK":22,"ML":-4,"MT":14.5833,"MM":98,"ME":19.3,"MN":105,"MZ":35,"MR":-12,"MU":57.55,"MW":34,"NA":17,"NE":8,"NI":-85,"NR":166.917,"OM":57,"PA":-80,"PW":134.5,"PG":147,"KP":127,"PY":-58,"PS":35.2,"QA":51.25,"RO":25,"RW":30,"SD":30,"SN":-14,"SB":159,"SL":-11.5,"SV":-88.9167,"SM":12.4167,"SO":49,"RS":21,"SS":30,"ST":7,"SR":-56,"SK":19.5,"SI":14.8167,"SZ":31.5,"SC":55.6667,"SY":38,"TD":19,"TG":1.16667,"TJ":71,"TM":60,"TL":125.917,"TO":-175,"TT":-61,"TN":9,"TV":178,"UG":32,"UZ":64,"VA":12.45,"VC":-61.2,"VU":167,"WS":-172.333,"YE":48,"ZM":30,"ZW":30},"years":{},"missing":{}},
   namelength: {"name":"Letters in the country's name","unit":"letters","decimals":0,"source":"the game's country data","url":null,"year":null,"values":{"AR":9,"AU":9,"AT":7,"BD":10,"BE":7,"BO":7,"BR":6,"CA":6,"CL":5,"CN":5,"CO":8,"CU":4,"DK":7,"EC":7,"EG":5,"ET":8,"FI":7,"FR":6,"DE":7,"GH":5,"GR":6,"IN":5,"ID":9,"IR":4,"IQ":4,"IE":7,"IL":6,"IT":5,"JP":5,"JO":6,"KE":5,"MY":8,"MX":6,"MA":7,"NP":5,"NL":11,"NZ":10,"NG":7,"NO":6,"PK":8,"PE":4,"PH":11,"PL":6,"PT":8,"RU":6,"SA":11,"SG":9,"ZA":11,"KR":10,"ES":5,"SE":6,"CH":11,"TZ":8,"TH":8,"TR":6,"UA":7,"AE":18,"GB":13,"US":12,"UY":7,"VE":9,"VN":7,"AF":11,"AO":6,"AL":7,"AD":7,"AM":7,"AG":17,"AZ":10,"BI":7,"BJ":5,"BF":11,"BG":8,"BH":7,"BS":7,"BA":20,"BY":7,"BZ":6,"BB":8,"BN":6,"BT":6,"BW":8,"CF":22,"CI":10,"CM":8,"CD":7,"CG":5,"KM":7,"CV":9,"CR":9,"CY":6,"CZ":7,"DJ":8,"DM":8,"DO":17,"DZ":7,"ER":7,"EE":7,"FJ":4,"FM":10,"GA":5,"GE":7,"GN":6,"GM":6,"GW":12,"GQ":16,"GD":7,"GT":9,"GY":6,"HN":8,"HR":7,"HT":5,"HU":7,"IS":7,"JM":7,"KZ":10,"KG":10,"KH":8,"KI":8,"KN":18,"KW":6,"LA":4,"LB":7,"LR":7,"LY":5,"LC":10,"LI":13,"LK":8,"LS":7,"LT":9,"LU":10,"LV":6,"MC":6,"MD":7,"MG":10,"MV":8,"MH":15,"MK":14,"ML":4,"MT":5,"MM":7,"ME":10,"MN":8,"MZ":10,"MR":10,"MU":9,"MW":6,"NA":7,"NE":5,"NI":9,"NR":5,"OM":4,"PA":6,"PW":5,"PG":14,"KP":10,"PY":8,"PS":9,"QA":5,"RO":7,"RW":6,"SD":5,"SN":7,"SB":14,"SL":11,"SV":10,"SM":9,"SO":7,"RS":6,"SS":10,"ST":15,"SR":8,"SK":8,"SI":8,"SZ":8,"SC":10,"SY":5,"TD":4,"TG":4,"TJ":10,"TM":12,"TL":10,"TO":5,"TT":17,"TN":7,"TV":6,"UG":6,"UZ":10,"VA":11,"VC":28,"VU":7,"WS":5,"YE":5,"ZM":6,"ZW":8},"years":{},"missing":{}},
   compulsory: {"name":"Years of compulsory school","unit":"years","decimals":0,"source":"World Bank","url":"https://data.worldbank.org/indicator/SE.COM.DURS","year":2025,"values":{"AR":14,"AU":11,"AT":13,"BD":5,"BE":13,"BO":14,"BR":14,"CA":10,"CL":12,"CN":9,"CO":12,"CU":9,"DK":10,"EC":15,"EG":12,"ET":8,"FI":12,"FR":13,"DE":13,"GH":11,"GR":10,"IN":8,"ID":9,"IR":9,"IQ":6,"IE":10,"IL":15,"IT":12,"JP":9,"JO":10,"KE":12,"MY":6,"MX":14,"MA":9,"NP":9,"NL":13,"NZ":10,"NG":9,"NO":10,"PK":12,"PE":14,"PH":13,"PL":9,"PT":12,"RU":11,"SA":9,"SG":6,"ZA":9,"KR":9,"ES":10,"SE":10,"CH":11,"TZ":7,"TH":9,"TR":12,"UA":11,"AE":12,"GB":11,"US":12,"UY":14,"VE":17,"VN":10,"AF":9,"AO":10,"AL":9,"AD":10,"AM":12,"AG":11,"AZ":9,"BJ":6,"BF":10,"BG":12,"BH":9,"BS":12,"BA":9,"BY":11,"BZ":8,"BB":11,"BN":9,"CF":10,"CI":10,"CM":6,"CD":6,"CG":10,"KM":6,"CV":10,"CR":13,"CY":10,"CZ":10,"DJ":10,"DM":12,"DO":15,"DZ":10,"ER":8,"EE":9,"FM":8,"GA":10,"GE":9,"GN":6,"GM":9,"GW":9,"GQ":6,"GD":12,"GT":16,"GY":6,"HN":12,"HR":8,"HT":6,"HU":13,"IS":10,"JM":6,"KZ":9,"KG":10,"KI":9,"KN":12,"KW":9,"LA":9,"LB":10,"LR":6,"LY":9,"LC":10,"LI":9,"LK":11,"LS":7,"LT":11,"LU":12,"LV":11,"MC":11,"MD":10,"MG":5,"MV":12,"MH":13,"MK":13,"ML":9,"MT":11,"MM":5,"ME":9,"MN":12,"MR":9,"MU":12,"MW":8,"NA":7,"NI":7,"NR":14,"OM":10,"PA":11,"PW":12,"KP":12,"PY":13,"PS":10,"QA":12,"RO":10,"RW":6,"SD":8,"SN":11,"SL":9,"SV":15,"SM":10,"SO":8,"RS":8,"SS":8,"ST":6,"SR":6,"SK":11,"SI":9,"SZ":7,"SC":11,"SY":9,"TD":10,"TG":10,"TJ":9,"TM":12,"TL":9,"TO":15,"TT":7,"TN":9,"TV":9,"UG":7,"UZ":11,"VC":12,"WS":8,"YE":9,"ZM":7,"ZW":7},"years":{},"missing":{"BI":0,"BT":0,"BW":0,"FJ":0,"KH":0,"MZ":0,"NE":0,"PG":0,"SB":0,"VA":0,"VU":0}},
-  youthjobless: {"name":"Youth unemployment","unit":"% of 15–24-year-olds in the labour force","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/SL.UEM.1524.ZS","year":2025,"values":{"AR":19.188,"AU":9.61,"AT":10.998,"BD":9.385,"BE":17.777,"BO":5.013,"BR":13.981,"CA":13.8,"CL":21.635,"CN":15.795,"CO":17.653,"CU":4.277,"DK":11.737,"EC":8.16,"EG":18.293,"ET":5.353,"FI":21.479,"FR":18.89,"DE":6.862,"GH":5.826,"GR":21.389,"IN":16.022,"ID":12.977,"IR":21.9,"IQ":32.012,"IE":10.493,"IL":6.032,"IT":20.545,"JP":3.898,"JO":38.876,"KE":15.246,"MY":11.953,"MX":5.714,"MA":21.882,"NP":20.559,"NL":8.833,"NZ":14.355,"NG":5.34,"NO":13.423,"PK":9.594,"PE":9.453,"PH":7.041,"PL":10.699,"PT":20.221,"RU":7.613,"SA":10.01,"SG":6.781,"ZA":59.93,"KR":6.695,"ES":24.745,"SE":24.312,"CH":9.041,"TZ":2.381,"TH":4.531,"TR":16.042,"UA":19.145,"AE":6.451,"GB":14.647,"US":9.34,"UY":25.149,"VE":10.444,"VN":6.165,"AF":16.785,"AO":27.229,"AL":25.567,"AM":26.244,"AZ":13.091,"BI":1.678,"BJ":2.887,"BF":6.438,"BG":10.152,"BH":5.416,"BS":19.248,"BA":28.201,"BY":9.183,"BZ":19.321,"BB":18.479,"BN":18.23,"BT":17.052,"BW":46.004,"CF":10.086,"CI":4.011,"CM":6.548,"CD":7.848,"CG":40.501,"KM":8.753,"CV":28.415,"CR":19.949,"CY":12.709,"CZ":9.219,"DJ":76.766,"DO":12.312,"DZ":29.444,"ER":10.241,"EE":19.695,"FJ":15.208,"GA":36.281,"GE":30.258,"GN":7.017,"GM":10.863,"GW":2.844,"GQ":15.736,"GT":4.764,"GY":24.896,"HN":8.526,"HR":16.474,"HT":37.518,"HU":14.205,"IS":8.671,"JM":10.809,"KZ":3.806,"KG":8.228,"KH":0.711,"KW":15.058,"LA":2.384,"LB":22.744,"LR":2.297,"LY":50.057,"LC":20.251,"LK":18.578,"LS":24.672,"LT":13.756,"LU":21.467,"LV":12.95,"MD":4.197,"MG":5.247,"MV":15.694,"MK":28.75,"ML":3.877,"MT":8.431,"MM":9.806,"ME":24.438,"MN":11.71,"MZ":11.61,"MR":22.921,"MU":17.374,"MW":6.947,"NA":38.05,"NE":0.457,"NI":9.543,"OM":13.885,"PA":19.768,"PG":3.785,"KP":7.899,"PY":11.687,"PS":36.092,"QA":0.559,"RO":24.544,"RW":16.408,"SD":12,"SN":3.616,"SB":2.759,"SL":3.72,"SV":7.809,"SO":34.23,"RS":20.926,"SS":18.524,"ST":8.794,"SR":25.438,"SK":18.427,"SI":9.536,"SZ":54.329,"SY":33.101,"TD":1.457,"TG":3.436,"TJ":14.594,"TM":10.023,"TL":3.717,"TO":6.029,"TT":8.216,"TN":38.075,"UG":4.183,"UZ":11.381,"VC":41.947,"VU":11.343,"WS":12.977,"YE":32.598,"ZM":10.47,"ZW":15.548},"years":{"UA":2021,"LB":2023,"PS":2022,"SD":2022,"SS":2023},"missing":{"AD":0,"AG":0,"DM":0,"FM":0,"GD":0,"KI":0,"KN":0,"LI":0,"MC":0,"MH":0,"NR":0,"PW":0,"SM":0,"SC":0,"TV":0,"VA":0}}
+  youthjobless: {"name":"Youth unemployment","unit":"% of 15–24-year-olds in the labour force","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/SL.UEM.1524.ZS","year":2025,"values":{"AR":19.188,"AU":9.61,"AT":10.998,"BD":9.385,"BE":17.777,"BO":5.013,"BR":13.981,"CA":13.8,"CL":21.635,"CN":15.795,"CO":17.653,"CU":4.277,"DK":11.737,"EC":8.16,"EG":18.293,"ET":5.353,"FI":21.479,"FR":18.89,"DE":6.862,"GH":5.826,"GR":21.389,"IN":16.022,"ID":12.977,"IR":21.9,"IQ":32.012,"IE":10.493,"IL":6.032,"IT":20.545,"JP":3.898,"JO":38.876,"KE":15.246,"MY":11.953,"MX":5.714,"MA":21.882,"NP":20.559,"NL":8.833,"NZ":14.355,"NG":5.34,"NO":13.423,"PK":9.594,"PE":9.453,"PH":7.041,"PL":10.699,"PT":20.221,"RU":7.613,"SA":10.01,"SG":6.781,"ZA":59.93,"KR":6.695,"ES":24.745,"SE":24.312,"CH":9.041,"TZ":2.381,"TH":4.531,"TR":16.042,"UA":19.145,"AE":6.451,"GB":14.647,"US":9.34,"UY":25.149,"VE":10.444,"VN":6.165,"AF":16.785,"AO":27.229,"AL":25.567,"AM":26.244,"AZ":13.091,"BI":1.678,"BJ":2.887,"BF":6.438,"BG":10.152,"BH":5.416,"BS":19.248,"BA":28.201,"BY":9.183,"BZ":19.321,"BB":18.479,"BN":18.23,"BT":17.052,"BW":46.004,"CF":10.086,"CI":4.011,"CM":6.548,"CD":7.848,"CG":40.501,"KM":8.753,"CV":28.415,"CR":19.949,"CY":12.709,"CZ":9.219,"DJ":76.766,"DO":12.312,"DZ":29.444,"ER":10.241,"EE":19.695,"FJ":15.208,"GA":36.281,"GE":30.258,"GN":7.017,"GM":10.863,"GW":2.844,"GQ":15.736,"GT":4.764,"GY":24.896,"HN":8.526,"HR":16.474,"HT":37.518,"HU":14.205,"IS":8.671,"JM":10.809,"KZ":3.806,"KG":8.228,"KH":0.711,"KW":15.058,"LA":2.384,"LB":22.744,"LR":2.297,"LY":50.057,"LC":20.251,"LK":18.578,"LS":24.672,"LT":13.756,"LU":21.467,"LV":12.95,"MD":4.197,"MG":5.247,"MV":15.694,"MK":28.75,"ML":3.877,"MT":8.431,"MM":9.806,"ME":24.438,"MN":11.71,"MZ":11.61,"MR":22.921,"MU":17.374,"MW":6.947,"NA":38.05,"NE":0.457,"NI":9.543,"OM":13.885,"PA":19.768,"PG":3.785,"KP":7.899,"PY":11.687,"PS":36.092,"QA":0.559,"RO":24.544,"RW":16.408,"SD":12,"SN":3.616,"SB":2.759,"SL":3.72,"SV":7.809,"SO":34.23,"RS":20.926,"SS":18.524,"ST":8.794,"SR":25.438,"SK":18.427,"SI":9.536,"SZ":54.329,"SY":33.101,"TD":1.457,"TG":3.436,"TJ":14.594,"TM":10.023,"TL":3.717,"TO":6.029,"TT":8.216,"TN":38.075,"UG":4.183,"UZ":11.381,"VC":41.947,"VU":11.343,"WS":12.977,"YE":32.598,"ZM":10.47,"ZW":15.548},"years":{"UA":2021,"LB":2023,"PS":2022,"SD":2022,"SS":2023},"missing":{"AD":0,"AG":0,"DM":0,"FM":0,"GD":0,"KI":0,"KN":0,"LI":0,"MC":0,"MH":0,"NR":0,"PW":0,"SM":0,"SC":0,"TV":0,"VA":0}},
+  menheight: {"name":"Height of men","unit":"cm","decimals":1,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/average-height-of-men","year":1996,"values":{"AR":174.616,"AU":179.205,"AT":177.408,"BD":163.808,"BE":181.699,"BO":166.846,"BR":173.551,"CA":178.09,"CL":171.811,"CN":171.828,"CO":169.495,"CU":171.996,"DK":181.385,"EC":167.077,"EG":166.684,"ET":166.232,"FI":179.591,"FR":179.738,"DE":179.881,"GH":168.849,"GR":177.316,"IN":164.946,"ID":163.552,"IR":173.571,"IQ":170.43,"IE":178.925,"IL":176.859,"IT":177.768,"JP":170.818,"JO":171.032,"KE":169.64,"MY":167.885,"MX":169.011,"MA":170.4,"NP":162.318,"NL":182.535,"NZ":177.736,"NG":165.907,"NO":179.745,"PK":166.948,"PE":165.232,"PH":163.229,"PL":177.327,"PT":172.933,"RU":176.461,"SA":167.67,"SG":172.566,"ZA":166.678,"KR":174.92,"ES":176.594,"SE":179.737,"CH":178.424,"TZ":164.8,"TH":169.162,"TR":174.21,"UA":178.457,"AE":170.455,"GB":177.49,"US":177.13,"UY":173.432,"VE":171.594,"VN":164.446,"AF":165.256,"AO":167.311,"AL":173.389,"AD":176.06,"AM":171.997,"AG":172.707,"AZ":169.749,"BI":166.635,"BJ":167.057,"BF":169.329,"BG":178.24,"BH":167.743,"BS":172.747,"BA":180.869,"BY":178.438,"BZ":168.732,"BB":175.916,"BN":165.009,"BT":165.306,"BW":171.628,"CF":166.674,"CI":166.533,"CM":167.823,"CD":166.795,"CG":167.448,"KM":166.194,"CV":173.224,"CR":168.932,"CY":174.995,"CZ":180.104,"DJ":166.573,"DM":176.313,"DO":172.747,"DZ":170.072,"ER":168.356,"EE":181.593,"FJ":173.902,"FM":168.511,"GA":167.936,"GE":174.341,"GN":167.545,"GM":165.402,"GW":167.898,"GQ":167.362,"GD":176.967,"GT":163.408,"GY":170.21,"HN":166.393,"HR":180.782,"HT":172.638,"HU":177.265,"IS":180.492,"JM":174.528,"KZ":171.144,"KG":171.239,"KH":163.33,"KI":169.204,"KN":169.623,"KW":172.068,"LA":160.519,"LB":174.389,"LR":163.66,"LY":173.528,"LC":171.945,"LK":165.689,"LS":165.59,"LT":179.028,"LU":177.863,"LV":181.422,"MD":175.489,"MG":161.548,"MV":167.684,"MH":162.809,"MK":178.331,"ML":171.119,"MT":173.32,"MM":164.673,"ME":178.276,"MN":169.066,"MZ":164.798,"MR":163.281,"MU":170.499,"MW":162.228,"NA":166.964,"NE":167.676,"NI":166.706,"NR":167.832,"OM":169.158,"PA":168.49,"PW":167.692,"PG":163.568,"KP":171.993,"PY":172.834,"PS":172.087,"QA":170.476,"RO":174.741,"RW":162.679,"SD":166.631,"SN":173.139,"SB":164.143,"SL":164.406,"SV":169.771,"SO":166.603,"RS":180.567,"ST":167.385,"SR":172.722,"SK":179.501,"SI":179.803,"SZ":168.132,"SC":174.216,"SY":170.428,"TD":170.439,"TG":168.33,"TJ":171.264,"TM":171.97,"TL":159.791,"TO":176.757,"TT":173.735,"TN":173.951,"TV":169.64,"UG":165.625,"UZ":169.385,"VC":172.779,"VU":168.093,"WS":174.377,"YE":159.887,"ZM":166.517,"ZW":168.586},"years":{},"missing":{"LI":0,"MC":0,"SM":0,"SS":0,"VA":0}}
 };
 
 return { STATS };
@@ -12840,7 +12815,7 @@ return { STATS };
 
 // ---- stat-citations.js
 __modules["stat-citations.js"] = (() => {
-// Generated by tools/build-citations.mjs on 2026-11-01. Do not edit by hand.
+// Generated by tools/build-citations.mjs on 2026-11-02. Do not edit by hand.
 // Where every stat in stats-data.js comes from: the original producer, what exactly is
 // measured, how the game works it out where it does, and links to check it.
 const CITATIONS = {
@@ -14202,6 +14177,18 @@ const CITATIONS = {
       }
     ],
     "note": ""
+  },
+  "menheight": {
+    "short": "NCD Risk Factor Collaboration, via Our World in Data",
+    "producer": "NCD Risk Factor Collaboration (2016); processed by Our World in Data",
+    "what": "Mean male height (cm) (centimeters). Mean height of adult men by year of birth. Data for the latest cohort (the year 1996) is therefore the mean height of men aged 18 in 2014.",
+    "links": [
+      {
+        "label": "Our World in Data: Average height of men by year of birth",
+        "url": "https://ourworldindata.org/grapher/average-height-of-men"
+      }
+    ],
+    "note": "The average height of men born in 1996, measured as 18-year-olds (in 2014): the latest year this study covers. It's how tall young men are, not all men."
   }
 };
 
@@ -14303,6 +14290,7 @@ const STAT_WORDS = {
   motherage: ask("Age of mothers giving birth", "Where are mothers the oldest when they have a baby?", "Where are mothers the youngest when they have a baby?"),
   women: ask("Women in the population", "Which country has the largest share of women?", "Which country has the smallest share of women?"),
   migrants: ask("People born abroad", "Where was the largest share of people born in another country?", "Where was the smallest share of people born in another country?"),
+  menheight: ask("Height of men", "Where are men the tallest?", "Where are men the shortest?"),
   compulsory: ask("Years of compulsory school", "Where does the law keep children in school for the most years?", "Where does the law keep children in school for the fewest years?"),
   youthjobless: ask("Youth unemployment", "Where is unemployment among 15- to 24-year-olds the highest?", "Where is unemployment among 15- to 24-year-olds the lowest?"),
   schoolyears: ask("Years at school", "Where do children spend the most years at school?", "Where do children spend the fewest years at school?"),
@@ -16376,6 +16364,52 @@ function createPixelArt(rows, colors) {
 
 // onPlay(mode) starts today's game in a mode; describeMode(mode) says how it stands
 // ("Played · 4,210", "Round 3 of 5", ...), shown under each game in PLAY.
+// How to play: a set of cards per game (Highs & Lows, Casual). On a computer they sit side
+// by side; on a phone they scroll sideways, one at a time, with dots, SKIP and NEXT, and
+// LET'S PLAY on the last card.
+const howToCard = document.querySelector(".how-to-play-modal");
+let howToSetName = "extremes";
+const howToCards = () => howToCard.querySelector(`.how-to-set[data-set="${howToSetName}"] .how-to-cards`);
+const howToCardIndex = cards => Math.round(cards.scrollLeft / Math.max(1, cards.clientWidth));
+
+function updateHowToPager() {
+  const cards = howToCards();
+  const count = cards.children.length;
+  const current = Math.min(count - 1, howToCardIndex(cards));
+  const dots = document.getElementById("howToDots");
+  if (dots.children.length !== count) dots.replaceChildren(...Array.from({ length: count }, () => document.createElement("i")));
+  [...dots.children].forEach((dot, index) => dot.classList.toggle("is-on", index === current));
+  howToCard.classList.toggle("is-last-card", !phoneScreen.matches || current === count - 1);
+}
+
+function showHowToSet(name) {
+  howToSetName = name;
+  howToCard.dataset.set = name;
+  howToCard.querySelectorAll(".how-to-set").forEach(section => { section.hidden = section.dataset.set !== name; });
+  // Back to the first card (again once on screen: a hidden list can't be scrolled).
+  const toStart = () => { howToCards().scrollLeft = 0; updateHowToPager(); };
+  toStart();
+  requestAnimationFrame(toStart);
+}
+
+howToCard.querySelectorAll(".how-to-cards").forEach(cards => cards.addEventListener("scroll", () => requestAnimationFrame(updateHowToPager), { passive: true }));
+howToCard.querySelectorAll(".how-to-other").forEach(button => button.addEventListener("click", () => {
+  sounds.playClick();
+  showHowToSet(button.dataset.show);
+}));
+document.getElementById("howToNext").addEventListener("click", () => {
+  sounds.playClick();
+  const cards = howToCards();
+  cards.scrollTo({ left: (howToCardIndex(cards) + 1) * cards.clientWidth, behavior: "smooth" });
+});
+// SKIP goes to the last card, where LET'S PLAY is.
+document.getElementById("howToSkip").addEventListener("click", () => {
+  sounds.playClick();
+  const cards = howToCards();
+  cards.scrollTo({ left: cards.scrollWidth, behavior: "smooth" });
+});
+phoneScreen.addEventListener("change", updateHowToPager);
+
 function initializeMainMenu({ onPlay, onHome, describeMode = () => "", isModeAvailable = () => true }) {
   const menu = document.getElementById("mainMenu");
   const menuOptions = menu.querySelector(".menu-options");
@@ -16486,6 +16520,8 @@ function initializeMainMenu({ onPlay, onHome, describeMode = () => "", isModeAva
   document.querySelectorAll("#menuHowToButton, .how-to-open-button").forEach(button => {
     button.addEventListener("click", () => {
       sounds.playClick();
+      // The main game's cards first.
+      showHowToSet("extremes");
       howToModal.classList.remove("hidden");
     });
   });
@@ -16859,7 +16895,7 @@ function initializeStatsModal(getStats) {
   });
 }
 
-return { redactCountryName, showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, renderProgressiveHints, renderGlobeMarkerTooltip, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight, initializeStatsModal };
+return { redactCountryName, showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, renderProgressiveHints, renderGlobeMarkerTooltip, showHowToSet, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight, initializeStatsModal };
 })();
 
 // ---- social.js
@@ -17319,12 +17355,12 @@ const { sounds } = __modules["audio.js"];
 const { createDistributionChart, initializeHistoryScreens } = __modules["screens.js"];
 const { RANK_TIERS, formatTopPercent, getDayStats, getTopPercent } = __modules["community.js"];
 const { initializeCommunity } = __modules["social.js"];
-const { FIND_LABELS, formatValue, getStandings, getStat, missingReason } = __modules["extremes.js"];
+const { FIND_LABELS, askQuestion, formatValue, getStandings, getStat, missingReason, scorePick } = __modules["extremes.js"];
 const { createBadge } = __modules["badges.js"];
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
 const { hasExtremeDay, MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MAIN_MODE, MODES, MODE_INFO, getSpeedWindow, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
-const { createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, initializeStatsModal, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, redactCountryName, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
+const { showHowToSet, createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, initializeStatsModal, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, redactCountryName, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
 
 // v3: Deep Cut and Paint the Map replaced Capital Call and Border Patrol (October 2026).
 const DAY_STORAGE_PREFIX = "daily-geography:day:v3:";
@@ -19924,16 +19960,40 @@ function flyFromMenu() {
   });
 }
 
-// How to play shows the six badges as a stack, from Tourist at the back to Mr. Worldwide
-// in front, each with the top % it asks for.
-document.getElementById("howToBadges").replaceChildren(...[...RANK_TIERS].reverse().map((tier, index) => {
-  const item = Object.assign(document.createElement("span"), { className: "how-to-badge", title: `${tier.name}: ${tier.range}` });
-  item.style.setProperty("--stack", index);
-  item.append(createBadge(tier, 40), Object.assign(document.createElement("small"), { textContent: tier.maxPercent >= 100 ? "ALL" : `<${tier.maxPercent}%` }));
-  return item;
-}));
-// And small, in a row, on the competitive tile: badges are earned there only.
-document.getElementById("howToModeBadges").replaceChildren(...[...RANK_TIERS].reverse().map(tier => createBadge(tier, 16)));
+// How to play's example round, with the game's own figures and points for the top three, so
+// the example is as true as the game: Dutch men are the tallest (NCD Risk Factor
+// Collaboration). The first card also shows two more questions the game asks.
+const HOW_TO_EXAMPLE = { stat: "menheight", find: "highest" };
+const HOW_TO_MORE_QUESTIONS = [["chickens", "highest"], ["medianage", "lowest"]];
+function fillHowToExample() {
+  const standings = getStandings(HOW_TO_EXAMPLE.stat, HOW_TO_EXAMPLE.find);
+  document.getElementById("howToExampleQuestions").replaceChildren(
+    Object.assign(document.createElement("p"), { className: "how-to-question", textContent: askQuestion(HOW_TO_EXAMPLE.stat, HOW_TO_EXAMPLE.find) }),
+    ...HOW_TO_MORE_QUESTIONS.map(([stat, find]) => Object.assign(document.createElement("p"), { className: "how-to-question is-more", textContent: askQuestion(stat, find) }))
+  );
+  // The example pick is the runner-up: close, but not spot on.
+  const pick = standings.sorted[1];
+  const pickCountry = getCountry(pick.iso);
+  document.getElementById("howToExamplePick").replaceChildren(
+    createFlagImage(pickCountry, "how-to-flag"),
+    Object.assign(document.createElement("span"), { textContent: pickCountry.name }),
+    Object.assign(document.createElement("span"), { className: "how-to-lock", textContent: "LOCK IN" })
+  );
+  document.getElementById("howToExampleLadder").replaceChildren(...standings.sorted.slice(0, 3).map(entry => {
+    const country = getCountry(entry.iso);
+    const row = Object.assign(document.createElement("li"), { className: entry === pick ? "is-pick" : "" });
+    row.append(
+      Object.assign(document.createElement("b"), { textContent: `#${entry.rank}` }),
+      createFlagImage(country, "how-to-flag"),
+      Object.assign(document.createElement("span"), { textContent: entry === pick ? `${country.name} · you` : country.name }),
+      Object.assign(document.createElement("small"), { textContent: formatValue(standings.stat, entry.value) }),
+      Object.assign(document.createElement("strong"), { textContent: scorePick(HOW_TO_EXAMPLE.stat, HOW_TO_EXAMPLE.find, entry.iso).points.toLocaleString() })
+    );
+    return row;
+  }));
+  document.getElementById("howToBadges").replaceChildren(...[...RANK_TIERS].reverse().map(tier => createBadge(tier, 30)));
+}
+fillHowToExample();
 
 // The how-to-play message, shown when a game starts until the player ticks
 // "Don't show this again". Calls `then` once it is closed (or straight away).
@@ -19943,10 +20003,11 @@ function showGameIntro(then) {
   try { hidden = localStorage.getItem(HIDE_INTRO_KEY) === "1"; } catch { /* storage blocked: just show it */ }
   if (hidden) { then(); return; }
   afterGameIntro = then;
-  // At the start of a game it shows only the mode being played, and it closes with GOT IT.
+  // At the start of a game it shows only the cards of the game being played, and it closes
+  // with LET'S PLAY.
   const modal = document.querySelector(".how-to-play-modal");
   modal.classList.add("is-game-intro");
-  modal.dataset.mode = activeMode;
+  showHowToSet(activeMode === "extremes" ? "extremes" : "casual");
   document.getElementById("howToDontShowBox").checked = false;
   document.getElementById("howToDontShow").classList.remove("hidden");
   document.getElementById("howToPlayModal").classList.remove("hidden");
