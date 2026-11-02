@@ -242,6 +242,17 @@ h1, h2, h3 { font-weight: normal; }
 
 .menu-pixel-icon { width: 22px; height: 22px; flex: 0 0 22px; }
 
+/* Under the games: Archive, Community, How to play and My account as a quiet row of small
+   buttons, icon over label. */
+.menu-secondary { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.4rem; }
+.menu-secondary .menu-option { flex-direction: column; justify-content: center; gap: 0.4rem; min-width: 0; min-height: 0; padding: 0.6rem 0.3rem; border-color: var(--glass-line-soft); background: rgba(255, 255, 255, 0.03); color: var(--muted); font-size: 8px; line-height: 1.4; text-align: center; }
+/* Labels may wrap ("HOW TO / PLAY"); a long account name stops after two lines. */
+.menu-secondary #menuAccountLabel { display: -webkit-box; max-width: 100%; overflow: hidden; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+@media (max-width: 760px) {
+  .menu-secondary .menu-option { padding: 0.55rem 0.2rem; font-size: 7px; letter-spacing: 0; }
+}
+.menu-secondary .menu-pixel-icon { width: 18px; height: 18px; flex: none; }
+
 /* PLAY's games as tiles: 8-bit art on a little screen in the game's colour (--tile), the
    name, what it is, and how today's game stands. */
 .play-tile {
@@ -2444,11 +2455,11 @@ h1, h2, h3 { font-weight: normal; }
   .side-right .round-view[data-round="rank"] .rank-actions .btn { min-height: 38px; padding: 0 0.4rem; font-size: 9px; white-space: normal; line-height: 1.3; }
   .side-right .rank-item { padding: 0.2rem 0.5rem; }
 
-  /* The Play menu fits one screen (BACK in view): a smaller title block while it's open. */
-  .main-menu:has(#menuPlayOptions:not(.hidden)) .menu-marquee { gap: 0.4rem; padding: 0.7rem; }
-  .main-menu:has(#menuPlayOptions:not(.hidden)) .menu-logo { width: 32px; height: 32px; }
-  .main-menu:has(#menuPlayOptions:not(.hidden)) .menu-tagline { display: none; }
-  .main-menu:has(#menuPlayOptions:not(.hidden)) .menu-cabinet { gap: 0.8rem; }
+  /* The menu (games and the row under them) fits one screen: a smaller title block. */
+  .main-menu .menu-marquee { gap: 0.4rem; padding: 0.7rem; }
+  .main-menu .menu-logo { width: 32px; height: 32px; }
+  .main-menu .menu-tagline { display: none; }
+  .main-menu .menu-cabinet { gap: 0.8rem; }
   .play-tile { grid-template-columns: 64px 1fr; gap: 0.8rem; padding: 0.6rem; }
   .play-tile-art { height: 64px; }
   .play-tile-art svg { width: 46px; height: 46px; }
@@ -2531,7 +2542,10 @@ h1, h2, h3 { font-weight: normal; }
 .tour-flag:empty { display: none; }
 .tour-flag-image { display: block; width: 36px; height: 24px; border-radius: 4px; object-fit: cover; }
 .tour-country strong { overflow: hidden; font-size: 20px; font-weight: 700; white-space: nowrap; text-overflow: ellipsis; }
-.tour-value { margin-left: auto; color: var(--gold); font: 700 16px var(--font-mono); white-space: nowrap; }
+.tour-country strong { flex: 0 1 auto; min-width: 5em; }
+.tour-value { display: grid; justify-items: end; flex: 0 1 auto; min-width: 0; max-width: 55%; margin-left: auto; text-align: right; }
+.tour-value b { color: var(--gold); font: 700 16px var(--font-mono); white-space: nowrap; }
+.tour-value small { color: var(--muted); font-size: 12px; line-height: 1.3; }
 .tour-line { margin: 0; color: var(--text); font-size: 14px; line-height: 1.4; }
 .tour-skip { justify-self: end; margin-top: -0.2rem; padding: 0.3rem 0.5rem; border: 0; background: none; color: var(--faint); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
 .tour-skip:hover { color: var(--text); }
@@ -2786,42 +2800,8 @@ h1, h2, h3 { font-weight: normal; }
         <h1 id="menuTitle">EXPEDITION</h1>
         <p class="menu-tagline">The daily geography challenge</p>
       </div>
-      <nav class="menu-options" aria-label="Main menu">
-        <button class="menu-option menu-option-primary" id="menuPlayButton" type="button" aria-expanded="false" aria-controls="menuPlayOptions">
-          <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
-            <path d="M10 6h4v20h-4zm4 2h4v2h4v2h4v2h2v4h-2v2h-4v2h-4v2h-4z" fill="currentColor"/>
-          </svg>
-          <span>PLAY</span>
-        </button>
-        <button class="menu-option" id="menuArchiveButton" type="button">
-          <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
-            <path d="M5 4h4v3h14V4h4v4h2v21H3V8h2zm1 6v16h18V10zm3 2h12v3H9zm0 6h9v3H9z" fill="currentColor"/>
-          </svg>
-          <span>ARCHIVE</span>
-        </button>
-        <button class="menu-option community-open-button" id="menuCommunityButton" type="button">
-          <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
-            <path d="M8 5h6v6H8zm10 0h6v6h-6zM5 13h12v3H5zm12 0h10v3H17zM5 16h3v11H5zm9 0h3v11h-3zm10 0h3v11h-3zM8 22h6v3H8zm9 0h7v3h-7z" fill="currentColor"/>
-          </svg>
-          <span>COMMUNITY</span>
-        </button>
-        <button class="menu-option" id="menuHowToButton" type="button">
-          <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
-            <path d="M10 4h12v3h3v8h-3v3h-4v4h-4v-6h3v-3h3V8h-8v3H8V7h2zm4 21h4v4h-4z" fill="currentColor"/>
-          </svg>
-          <span>HOW TO PLAY</span>
-        </button>
-        <button class="menu-option menu-account" id="menuAccountButton" type="button">
-          <span class="account-avatar" id="menuAccountAvatar" aria-hidden="true">
-            <svg class="menu-pixel-icon" viewBox="0 0 32 32" shape-rendering="crispEdges">
-              <path d="M12 3h8v2h2v2h2v8h-2v2h-2v2h-8v-2h-2v-2H8V7h2V5h2zM8 21h16v2h3v3h2v4H3v-4h2v-3h3z" fill="currentColor"/>
-            </svg>
-          </span>
-          <span id="menuAccountLabel">MY ACCOUNT</span>
-        </button>
-      </nav>
-      <!-- PLAY opens the day's games in place of the main options. -->
-      <nav class="menu-options menu-play-options hidden" id="menuPlayOptions" aria-label="Play">
+      <!-- The day's games, straight away: Highs & Lows (the main game) and Casual. -->
+      <nav class="menu-options menu-play-options" id="menuPlayOptions" aria-label="Play">
         <!-- The main game, made unmistakable: first, bigger, glowing, marked MAIN GAME. -->
         <button class="play-tile menu-mode is-main" id="menuExtremesButton" type="button" data-mode="extremes" style="--tile: #ff6b9d">
           <span class="play-tile-ribbon">MAIN GAME</span>
@@ -2857,11 +2837,34 @@ h1, h2, h3 { font-weight: normal; }
             <small>Coming soon</small>
           </span>
         </button>
-        <button class="menu-option menu-back" id="menuPlayBack" type="button">
+      </nav>
+      <!-- Everything else, smaller and quieter, under the games. -->
+      <nav class="menu-options menu-secondary" aria-label="Main menu">
+        <button class="menu-option" id="menuArchiveButton" type="button">
           <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
-            <path d="M12 6h4v4h-4v4h14v4H12v4h4v4h-4v-4H8v-4H4v-4h4v-4h4z" fill="currentColor"/>
+            <path d="M5 4h4v3h14V4h4v4h2v21H3V8h2zm1 6v16h18V10zm3 2h12v3H9zm0 6h9v3H9z" fill="currentColor"/>
           </svg>
-          <span>BACK</span>
+          <span>ARCHIVE</span>
+        </button>
+        <button class="menu-option community-open-button" id="menuCommunityButton" type="button">
+          <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
+            <path d="M8 5h6v6H8zm10 0h6v6h-6zM5 13h12v3H5zm12 0h10v3H17zM5 16h3v11H5zm9 0h3v11h-3zm10 0h3v11h-3zM8 22h6v3H8zm9 0h7v3h-7z" fill="currentColor"/>
+          </svg>
+          <span>COMMUNITY</span>
+        </button>
+        <button class="menu-option" id="menuHowToButton" type="button">
+          <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
+            <path d="M10 4h12v3h3v8h-3v3h-4v4h-4v-6h3v-3h3V8h-8v3H8V7h2zm4 21h4v4h-4z" fill="currentColor"/>
+          </svg>
+          <span>HOW TO PLAY</span>
+        </button>
+        <button class="menu-option menu-account" id="menuAccountButton" type="button">
+          <span class="account-avatar" id="menuAccountAvatar" aria-hidden="true">
+            <svg class="menu-pixel-icon" viewBox="0 0 32 32" shape-rendering="crispEdges">
+              <path d="M12 3h8v2h2v2h2v8h-2v2h-2v2h-8v-2h-2v-2H8V7h2V5h2zM8 21h16v2h3v3h2v4H3v-4h2v-3h3z" fill="currentColor"/>
+            </svg>
+          </span>
+          <span id="menuAccountLabel">MY ACCOUNT</span>
         </button>
       </nav>
     </div>
@@ -12706,6 +12709,20 @@ const EXTREME_DAYS = {
       ["youthjobless", "highest", "Where is unemployment among 15- to 24-year-olds the highest?"],
       ["births", "lowest", "Where are the fewest babies born for the size of the population?"]
     ]
+  },
+  // Health Check: the team picked these six questions from twelve on 2026-11-02 and
+  // approved all six sources (docs/highs-lows-proposals.md) the same day.
+  "2026-11-02": {
+    name: "Health Check",
+    theme: "Health around the world.",
+    rounds: [
+      ["alcoholwho", "highest", "Where do adults drink the most alcohol?"],
+      ["smokers", "highest", "Where do the most adults smoke?"],
+      ["overweight", "highest", "Where is the largest share of adults overweight?"],
+      ["outofpocket", "highest", "Where do patients pay the largest share of health costs out of their own pocket?"],
+      ["roaddeaths", "highest", "Where are the roads the deadliest?"],
+      ["doctors", "highest", "Which country has the most doctors for its people?"]
+    ]
   }
 };
 
@@ -12819,7 +12836,12 @@ const STATS = {
   namelength: {"name":"Letters in the country's name","unit":"letters","decimals":0,"source":"the game's country data","url":null,"year":null,"values":{"AR":9,"AU":9,"AT":7,"BD":10,"BE":7,"BO":7,"BR":6,"CA":6,"CL":5,"CN":5,"CO":8,"CU":4,"DK":7,"EC":7,"EG":5,"ET":8,"FI":7,"FR":6,"DE":7,"GH":5,"GR":6,"IN":5,"ID":9,"IR":4,"IQ":4,"IE":7,"IL":6,"IT":5,"JP":5,"JO":6,"KE":5,"MY":8,"MX":6,"MA":7,"NP":5,"NL":11,"NZ":10,"NG":7,"NO":6,"PK":8,"PE":4,"PH":11,"PL":6,"PT":8,"RU":6,"SA":11,"SG":9,"ZA":11,"KR":10,"ES":5,"SE":6,"CH":11,"TZ":8,"TH":8,"TR":6,"UA":7,"AE":18,"GB":13,"US":12,"UY":7,"VE":9,"VN":7,"AF":11,"AO":6,"AL":7,"AD":7,"AM":7,"AG":17,"AZ":10,"BI":7,"BJ":5,"BF":11,"BG":8,"BH":7,"BS":7,"BA":20,"BY":7,"BZ":6,"BB":8,"BN":6,"BT":6,"BW":8,"CF":22,"CI":10,"CM":8,"CD":7,"CG":5,"KM":7,"CV":9,"CR":9,"CY":6,"CZ":7,"DJ":8,"DM":8,"DO":17,"DZ":7,"ER":7,"EE":7,"FJ":4,"FM":10,"GA":5,"GE":7,"GN":6,"GM":6,"GW":12,"GQ":16,"GD":7,"GT":9,"GY":6,"HN":8,"HR":7,"HT":5,"HU":7,"IS":7,"JM":7,"KZ":10,"KG":10,"KH":8,"KI":8,"KN":18,"KW":6,"LA":4,"LB":7,"LR":7,"LY":5,"LC":10,"LI":13,"LK":8,"LS":7,"LT":9,"LU":10,"LV":6,"MC":6,"MD":7,"MG":10,"MV":8,"MH":15,"MK":14,"ML":4,"MT":5,"MM":7,"ME":10,"MN":8,"MZ":10,"MR":10,"MU":9,"MW":6,"NA":7,"NE":5,"NI":9,"NR":5,"OM":4,"PA":6,"PW":5,"PG":14,"KP":10,"PY":8,"PS":9,"QA":5,"RO":7,"RW":6,"SD":5,"SN":7,"SB":14,"SL":11,"SV":10,"SM":9,"SO":7,"RS":6,"SS":10,"ST":15,"SR":8,"SK":8,"SI":8,"SZ":8,"SC":10,"SY":5,"TD":4,"TG":4,"TJ":10,"TM":12,"TL":10,"TO":5,"TT":17,"TN":7,"TV":6,"UG":6,"UZ":10,"VA":11,"VC":28,"VU":7,"WS":5,"YE":5,"ZM":6,"ZW":8},"years":{},"missing":{}},
   compulsory: {"name":"Years of compulsory school","unit":"years","decimals":0,"source":"World Bank","url":"https://data.worldbank.org/indicator/SE.COM.DURS","year":2025,"values":{"AR":14,"AU":11,"AT":13,"BD":5,"BE":13,"BO":14,"BR":14,"CA":10,"CL":12,"CN":9,"CO":12,"CU":9,"DK":10,"EC":15,"EG":12,"ET":8,"FI":12,"FR":13,"DE":13,"GH":11,"GR":10,"IN":8,"ID":9,"IR":9,"IQ":6,"IE":10,"IL":15,"IT":12,"JP":9,"JO":10,"KE":12,"MY":6,"MX":14,"MA":9,"NP":9,"NL":13,"NZ":10,"NG":9,"NO":10,"PK":12,"PE":14,"PH":13,"PL":9,"PT":12,"RU":11,"SA":9,"SG":6,"ZA":9,"KR":9,"ES":10,"SE":10,"CH":11,"TZ":7,"TH":9,"TR":12,"UA":11,"AE":12,"GB":11,"US":12,"UY":14,"VE":17,"VN":10,"AF":9,"AO":10,"AL":9,"AD":10,"AM":12,"AG":11,"AZ":9,"BJ":6,"BF":10,"BG":12,"BH":9,"BS":12,"BA":9,"BY":11,"BZ":8,"BB":11,"BN":9,"CF":10,"CI":10,"CM":6,"CD":6,"CG":10,"KM":6,"CV":10,"CR":13,"CY":10,"CZ":10,"DJ":10,"DM":12,"DO":15,"DZ":10,"ER":8,"EE":9,"FM":8,"GA":10,"GE":9,"GN":6,"GM":9,"GW":9,"GQ":6,"GD":12,"GT":16,"GY":6,"HN":12,"HR":8,"HT":6,"HU":13,"IS":10,"JM":6,"KZ":9,"KG":10,"KI":9,"KN":12,"KW":9,"LA":9,"LB":10,"LR":6,"LY":9,"LC":10,"LI":9,"LK":11,"LS":7,"LT":11,"LU":12,"LV":11,"MC":11,"MD":10,"MG":5,"MV":12,"MH":13,"MK":13,"ML":9,"MT":11,"MM":5,"ME":9,"MN":12,"MR":9,"MU":12,"MW":8,"NA":7,"NI":7,"NR":14,"OM":10,"PA":11,"PW":12,"KP":12,"PY":13,"PS":10,"QA":12,"RO":10,"RW":6,"SD":8,"SN":11,"SL":9,"SV":15,"SM":10,"SO":8,"RS":8,"SS":8,"ST":6,"SR":6,"SK":11,"SI":9,"SZ":7,"SC":11,"SY":9,"TD":10,"TG":10,"TJ":9,"TM":12,"TL":9,"TO":15,"TT":7,"TN":9,"TV":9,"UG":7,"UZ":11,"VC":12,"WS":8,"YE":9,"ZM":7,"ZW":7},"years":{},"missing":{"BI":0,"BT":0,"BW":0,"FJ":0,"KH":0,"MZ":0,"NE":0,"PG":0,"SB":0,"VA":0,"VU":0}},
   youthjobless: {"name":"Youth unemployment","unit":"% of 15–24-year-olds in the labour force","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/SL.UEM.1524.ZS","year":2025,"values":{"AR":19.188,"AU":9.61,"AT":10.998,"BD":9.385,"BE":17.777,"BO":5.013,"BR":13.981,"CA":13.8,"CL":21.635,"CN":15.795,"CO":17.653,"CU":4.277,"DK":11.737,"EC":8.16,"EG":18.293,"ET":5.353,"FI":21.479,"FR":18.89,"DE":6.862,"GH":5.826,"GR":21.389,"IN":16.022,"ID":12.977,"IR":21.9,"IQ":32.012,"IE":10.493,"IL":6.032,"IT":20.545,"JP":3.898,"JO":38.876,"KE":15.246,"MY":11.953,"MX":5.714,"MA":21.882,"NP":20.559,"NL":8.833,"NZ":14.355,"NG":5.34,"NO":13.423,"PK":9.594,"PE":9.453,"PH":7.041,"PL":10.699,"PT":20.221,"RU":7.613,"SA":10.01,"SG":6.781,"ZA":59.93,"KR":6.695,"ES":24.745,"SE":24.312,"CH":9.041,"TZ":2.381,"TH":4.531,"TR":16.042,"UA":19.145,"AE":6.451,"GB":14.647,"US":9.34,"UY":25.149,"VE":10.444,"VN":6.165,"AF":16.785,"AO":27.229,"AL":25.567,"AM":26.244,"AZ":13.091,"BI":1.678,"BJ":2.887,"BF":6.438,"BG":10.152,"BH":5.416,"BS":19.248,"BA":28.201,"BY":9.183,"BZ":19.321,"BB":18.479,"BN":18.23,"BT":17.052,"BW":46.004,"CF":10.086,"CI":4.011,"CM":6.548,"CD":7.848,"CG":40.501,"KM":8.753,"CV":28.415,"CR":19.949,"CY":12.709,"CZ":9.219,"DJ":76.766,"DO":12.312,"DZ":29.444,"ER":10.241,"EE":19.695,"FJ":15.208,"GA":36.281,"GE":30.258,"GN":7.017,"GM":10.863,"GW":2.844,"GQ":15.736,"GT":4.764,"GY":24.896,"HN":8.526,"HR":16.474,"HT":37.518,"HU":14.205,"IS":8.671,"JM":10.809,"KZ":3.806,"KG":8.228,"KH":0.711,"KW":15.058,"LA":2.384,"LB":22.744,"LR":2.297,"LY":50.057,"LC":20.251,"LK":18.578,"LS":24.672,"LT":13.756,"LU":21.467,"LV":12.95,"MD":4.197,"MG":5.247,"MV":15.694,"MK":28.75,"ML":3.877,"MT":8.431,"MM":9.806,"ME":24.438,"MN":11.71,"MZ":11.61,"MR":22.921,"MU":17.374,"MW":6.947,"NA":38.05,"NE":0.457,"NI":9.543,"OM":13.885,"PA":19.768,"PG":3.785,"KP":7.899,"PY":11.687,"PS":36.092,"QA":0.559,"RO":24.544,"RW":16.408,"SD":12,"SN":3.616,"SB":2.759,"SL":3.72,"SV":7.809,"SO":34.23,"RS":20.926,"SS":18.524,"ST":8.794,"SR":25.438,"SK":18.427,"SI":9.536,"SZ":54.329,"SY":33.101,"TD":1.457,"TG":3.436,"TJ":14.594,"TM":10.023,"TL":3.717,"TO":6.029,"TT":8.216,"TN":38.075,"UG":4.183,"UZ":11.381,"VC":41.947,"VU":11.343,"WS":12.977,"YE":32.598,"ZM":10.47,"ZW":15.548},"years":{"UA":2021,"LB":2023,"PS":2022,"SD":2022,"SS":2023},"missing":{"AD":0,"AG":0,"DM":0,"FM":0,"GD":0,"KI":0,"KN":0,"LI":0,"MC":0,"MH":0,"NR":0,"PW":0,"SM":0,"SC":0,"TV":0,"VA":0}},
-  menheight: {"name":"Height of men","unit":"cm","decimals":1,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/average-height-of-men","year":1996,"values":{"AR":174.616,"AU":179.205,"AT":177.408,"BD":163.808,"BE":181.699,"BO":166.846,"BR":173.551,"CA":178.09,"CL":171.811,"CN":171.828,"CO":169.495,"CU":171.996,"DK":181.385,"EC":167.077,"EG":166.684,"ET":166.232,"FI":179.591,"FR":179.738,"DE":179.881,"GH":168.849,"GR":177.316,"IN":164.946,"ID":163.552,"IR":173.571,"IQ":170.43,"IE":178.925,"IL":176.859,"IT":177.768,"JP":170.818,"JO":171.032,"KE":169.64,"MY":167.885,"MX":169.011,"MA":170.4,"NP":162.318,"NL":182.535,"NZ":177.736,"NG":165.907,"NO":179.745,"PK":166.948,"PE":165.232,"PH":163.229,"PL":177.327,"PT":172.933,"RU":176.461,"SA":167.67,"SG":172.566,"ZA":166.678,"KR":174.92,"ES":176.594,"SE":179.737,"CH":178.424,"TZ":164.8,"TH":169.162,"TR":174.21,"UA":178.457,"AE":170.455,"GB":177.49,"US":177.13,"UY":173.432,"VE":171.594,"VN":164.446,"AF":165.256,"AO":167.311,"AL":173.389,"AD":176.06,"AM":171.997,"AG":172.707,"AZ":169.749,"BI":166.635,"BJ":167.057,"BF":169.329,"BG":178.24,"BH":167.743,"BS":172.747,"BA":180.869,"BY":178.438,"BZ":168.732,"BB":175.916,"BN":165.009,"BT":165.306,"BW":171.628,"CF":166.674,"CI":166.533,"CM":167.823,"CD":166.795,"CG":167.448,"KM":166.194,"CV":173.224,"CR":168.932,"CY":174.995,"CZ":180.104,"DJ":166.573,"DM":176.313,"DO":172.747,"DZ":170.072,"ER":168.356,"EE":181.593,"FJ":173.902,"FM":168.511,"GA":167.936,"GE":174.341,"GN":167.545,"GM":165.402,"GW":167.898,"GQ":167.362,"GD":176.967,"GT":163.408,"GY":170.21,"HN":166.393,"HR":180.782,"HT":172.638,"HU":177.265,"IS":180.492,"JM":174.528,"KZ":171.144,"KG":171.239,"KH":163.33,"KI":169.204,"KN":169.623,"KW":172.068,"LA":160.519,"LB":174.389,"LR":163.66,"LY":173.528,"LC":171.945,"LK":165.689,"LS":165.59,"LT":179.028,"LU":177.863,"LV":181.422,"MD":175.489,"MG":161.548,"MV":167.684,"MH":162.809,"MK":178.331,"ML":171.119,"MT":173.32,"MM":164.673,"ME":178.276,"MN":169.066,"MZ":164.798,"MR":163.281,"MU":170.499,"MW":162.228,"NA":166.964,"NE":167.676,"NI":166.706,"NR":167.832,"OM":169.158,"PA":168.49,"PW":167.692,"PG":163.568,"KP":171.993,"PY":172.834,"PS":172.087,"QA":170.476,"RO":174.741,"RW":162.679,"SD":166.631,"SN":173.139,"SB":164.143,"SL":164.406,"SV":169.771,"SO":166.603,"RS":180.567,"ST":167.385,"SR":172.722,"SK":179.501,"SI":179.803,"SZ":168.132,"SC":174.216,"SY":170.428,"TD":170.439,"TG":168.33,"TJ":171.264,"TM":171.97,"TL":159.791,"TO":176.757,"TT":173.735,"TN":173.951,"TV":169.64,"UG":165.625,"UZ":169.385,"VC":172.779,"VU":168.093,"WS":174.377,"YE":159.887,"ZM":166.517,"ZW":168.586},"years":{},"missing":{"LI":0,"MC":0,"SM":0,"SS":0,"VA":0}}
+  menheight: {"name":"Height of men","unit":"cm","decimals":1,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/average-height-of-men","year":1996,"values":{"AR":174.616,"AU":179.205,"AT":177.408,"BD":163.808,"BE":181.699,"BO":166.846,"BR":173.551,"CA":178.09,"CL":171.811,"CN":171.828,"CO":169.495,"CU":171.996,"DK":181.385,"EC":167.077,"EG":166.684,"ET":166.232,"FI":179.591,"FR":179.738,"DE":179.881,"GH":168.849,"GR":177.316,"IN":164.946,"ID":163.552,"IR":173.571,"IQ":170.43,"IE":178.925,"IL":176.859,"IT":177.768,"JP":170.818,"JO":171.032,"KE":169.64,"MY":167.885,"MX":169.011,"MA":170.4,"NP":162.318,"NL":182.535,"NZ":177.736,"NG":165.907,"NO":179.745,"PK":166.948,"PE":165.232,"PH":163.229,"PL":177.327,"PT":172.933,"RU":176.461,"SA":167.67,"SG":172.566,"ZA":166.678,"KR":174.92,"ES":176.594,"SE":179.737,"CH":178.424,"TZ":164.8,"TH":169.162,"TR":174.21,"UA":178.457,"AE":170.455,"GB":177.49,"US":177.13,"UY":173.432,"VE":171.594,"VN":164.446,"AF":165.256,"AO":167.311,"AL":173.389,"AD":176.06,"AM":171.997,"AG":172.707,"AZ":169.749,"BI":166.635,"BJ":167.057,"BF":169.329,"BG":178.24,"BH":167.743,"BS":172.747,"BA":180.869,"BY":178.438,"BZ":168.732,"BB":175.916,"BN":165.009,"BT":165.306,"BW":171.628,"CF":166.674,"CI":166.533,"CM":167.823,"CD":166.795,"CG":167.448,"KM":166.194,"CV":173.224,"CR":168.932,"CY":174.995,"CZ":180.104,"DJ":166.573,"DM":176.313,"DO":172.747,"DZ":170.072,"ER":168.356,"EE":181.593,"FJ":173.902,"FM":168.511,"GA":167.936,"GE":174.341,"GN":167.545,"GM":165.402,"GW":167.898,"GQ":167.362,"GD":176.967,"GT":163.408,"GY":170.21,"HN":166.393,"HR":180.782,"HT":172.638,"HU":177.265,"IS":180.492,"JM":174.528,"KZ":171.144,"KG":171.239,"KH":163.33,"KI":169.204,"KN":169.623,"KW":172.068,"LA":160.519,"LB":174.389,"LR":163.66,"LY":173.528,"LC":171.945,"LK":165.689,"LS":165.59,"LT":179.028,"LU":177.863,"LV":181.422,"MD":175.489,"MG":161.548,"MV":167.684,"MH":162.809,"MK":178.331,"ML":171.119,"MT":173.32,"MM":164.673,"ME":178.276,"MN":169.066,"MZ":164.798,"MR":163.281,"MU":170.499,"MW":162.228,"NA":166.964,"NE":167.676,"NI":166.706,"NR":167.832,"OM":169.158,"PA":168.49,"PW":167.692,"PG":163.568,"KP":171.993,"PY":172.834,"PS":172.087,"QA":170.476,"RO":174.741,"RW":162.679,"SD":166.631,"SN":173.139,"SB":164.143,"SL":164.406,"SV":169.771,"SO":166.603,"RS":180.567,"ST":167.385,"SR":172.722,"SK":179.501,"SI":179.803,"SZ":168.132,"SC":174.216,"SY":170.428,"TD":170.439,"TG":168.33,"TJ":171.264,"TM":171.97,"TL":159.791,"TO":176.757,"TT":173.735,"TN":173.951,"TV":169.64,"UG":165.625,"UZ":169.385,"VC":172.779,"VU":168.093,"WS":174.377,"YE":159.887,"ZM":166.517,"ZW":168.586},"years":{},"missing":{"LI":0,"MC":0,"SM":0,"SS":0,"VA":0}},
+  alcoholwho: {"name":"Alcohol per adult (WHO)","unit":"litres of pure alcohol per adult a year","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/SH.ALC.PCAP.LI","year":2020,"values":{"AR":8.05,"AU":10.29,"AT":11.51,"BD":0.092,"BE":9.43,"BO":3.59,"BR":7.7,"CA":9.89,"CL":7.56,"CN":4.58,"CO":4.24,"CU":5.38,"DK":9.49,"EC":2.54,"EG":0.13,"ET":3.06,"FI":9.08,"FR":10.32,"DE":11.84,"GH":4.26,"GR":5.81,"IN":4.1,"ID":0.074,"IR":0.51,"IQ":0.24,"IE":10.77,"IL":2.84,"IT":6.97,"JP":6.38,"JO":0.23,"KE":2.47,"MY":0.74,"MX":4.79,"MA":0.5,"NP":1.06,"NL":8.71,"NZ":10.02,"NG":3.78,"NO":7.38,"PK":0.084,"PE":6.45,"PH":5.66,"PL":11.66,"PT":8.88,"RU":10.53,"SA":0,"SG":1.81,"ZA":7.13,"KR":7.79,"ES":9.16,"SE":9.57,"CH":10.07,"TZ":10.95,"TH":7.99,"TR":1.69,"UA":9.24,"AE":2.08,"GB":10.73,"US":9.9,"UY":5.61,"VE":1.99,"VN":8.04,"AF":0.011,"AO":4.13,"AL":4.47,"AD":9.68,"AM":4.28,"AG":6.66,"AZ":2.49,"BI":4.16,"BJ":8.83,"BF":11.27,"BG":11.62,"BH":1.25,"BS":3.65,"BA":5.87,"BY":11.63,"BZ":3.67,"BB":8.22,"BN":0.51,"BT":0.18,"BW":7.27,"CF":1.75,"CI":2.85,"CM":9.6,"CD":1.92,"CG":6.05,"KM":0.23,"CV":6.01,"CR":3.4,"CY":6.36,"CZ":11.99,"DJ":0.38,"DM":5.02,"DO":6.5,"DZ":0.54,"ER":1.07,"EE":10.68,"FJ":3.58,"FM":2.02,"GA":8.14,"GE":14.41,"GN":0.52,"GM":0.61,"GW":3.73,"GQ":6.56,"GD":7.33,"GT":1.54,"GY":5.04,"HN":3.08,"HR":7.65,"HT":3.11,"HU":9.93,"IS":7.94,"JM":3.1,"KZ":4.52,"KG":3.63,"KH":6.67,"KI":0.72,"KN":4.69,"KW":0,"LA":10.82,"LB":1.26,"LR":2.86,"LY":0.012,"LC":9.28,"LK":2.91,"LS":4.3,"LT":12.1,"LU":10.82,"LV":12.87,"MD":11.08,"MG":0.99,"MV":1.49,"MK":4.36,"ML":5.32,"MT":7.11,"MM":1.93,"ME":10.34,"MN":7.68,"MZ":1.89,"MR":0,"MU":6.86,"MW":3.61,"NA":5.05,"NE":0.13,"NI":3.67,"NR":2.79,"OM":0.51,"PA":4.66,"PG":1.13,"KP":3.87,"PY":5.62,"QA":1.05,"RO":16.8,"RW":2.87,"SD":0.01,"SN":0.38,"SB":1.45,"SL":0.29,"SV":3.15,"SO":0,"RS":7.89,"ST":4.79,"SR":5.93,"SK":10.67,"SI":10.41,"SZ":6.79,"SC":10.19,"SY":0.092,"TD":2.91,"TG":1.44,"TJ":0.74,"TM":2.62,"TL":0.17,"TO":0.36,"TT":6.03,"TN":1.71,"TV":1.26,"UG":11.3,"UZ":2.1,"VC":5.62,"VU":2.04,"WS":2.35,"YE":0.044,"ZM":3.62,"ZW":2.67},"years":{"ME":2019,"RS":2019},"missing":{"LI":0,"MC":0,"MH":0,"PW":0,"PS":0,"SM":0,"SS":0,"VA":0}},
+  smokers: {"name":"Adults who smoke","unit":"%","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/SH.PRV.SMOK","year":2024,"values":{"AR":23.5,"AU":11.6,"AT":23.8,"BD":32,"BE":23.5,"BO":12.3,"BR":11.9,"CA":11.2,"CL":26.7,"CN":22.8,"CO":8,"CU":16.1,"DK":15.7,"EC":10.1,"EG":25,"ET":5.2,"FI":21.4,"FR":33.6,"DE":22,"GH":3.3,"GR":30.2,"IN":22.6,"ID":31,"IR":11.9,"IQ":20.1,"IE":18.2,"IL":21.2,"IT":22.4,"JP":17.5,"JO":34.1,"KE":9.6,"MY":16.9,"MX":15.7,"MA":12.5,"NP":28.7,"NL":20.5,"NZ":9.3,"NG":3.1,"NO":12.9,"PK":17.9,"PE":12.4,"PH":19.9,"PL":21.7,"PT":28.6,"RU":27,"SA":14.7,"SG":13.8,"ZA":23.7,"KR":18.6,"ES":27.6,"SE":20.3,"CH":23.1,"TZ":7.7,"TH":17.8,"TR":31.1,"UA":23.7,"AE":9,"GB":12.8,"US":15.8,"UY":19.3,"VN":21.1,"AF":22.1,"AL":21.4,"AD":35.5,"AM":26.2,"AZ":18.7,"BI":10.1,"BJ":7.4,"BF":11.6,"BG":38.7,"BH":15.4,"BS":17.3,"BA":37.1,"BY":29.2,"BZ":8.5,"BN":14.5,"BT":19.6,"BW":18,"CI":7.3,"CM":5.7,"CD":12.3,"CG":16.2,"KM":8.9,"CV":10.4,"CR":7.9,"CY":32.5,"CZ":28.4,"DZ":22.4,"EE":26.1,"FJ":25.8,"GA":13.3,"GE":33,"GM":11.1,"GW":8.2,"GT":11.2,"GY":11.7,"HN":12.1,"HR":34.4,"HT":8,"HU":30.8,"IS":9.2,"JM":11.5,"KZ":21.1,"KG":22.2,"KH":18.6,"KI":37.7,"KW":19.4,"LA":25.4,"LB":46.9,"LR":5.2,"LY":24.2,"LC":13.9,"LK":20.7,"LS":28,"LT":31.4,"LU":24.5,"LV":34.6,"MD":28.8,"MG":25.6,"MV":25.5,"MH":29.9,"MK":39.6,"ML":7.4,"MT":24.6,"MM":43.4,"ME":37.2,"MN":29.5,"MZ":10.5,"MR":9.9,"MU":17.7,"MW":8.9,"NE":7.4,"NR":34.8,"OM":8.5,"PA":4.8,"PW":23,"PG":39.3,"KP":15.6,"PY":6.4,"PS":35.5,"QA":12.5,"RO":29.7,"RW":10.1,"SN":5.4,"SB":38.4,"SL":11.3,"SV":8.2,"RS":39.7,"ST":8.3,"SK":29.5,"SI":20.9,"SZ":11.5,"SC":17.3,"TD":7.4,"TG":5.8,"TM":5.4,"TL":48.8,"TO":32.1,"TN":24.4,"TV":33.4,"UG":7.5,"UZ":16.3,"VU":24.9,"WS":23.1,"ZM":14.3,"ZW":11},"years":{},"missing":{"VE":0,"AO":0,"AG":0,"BB":0,"CF":0,"DJ":0,"DM":0,"DO":0,"ER":0,"FM":0,"GN":0,"GQ":0,"GD":0,"KN":0,"LI":0,"MC":0,"NA":0,"NI":0,"SD":0,"SM":0,"SO":0,"SS":0,"SR":0,"SY":0,"TJ":0,"TT":0,"VA":0,"VC":0,"YE":0}},
+  overweight: {"name":"Adults who are overweight","unit":"%","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/SH.STA.OWAD.ZS","year":2022,"values":{"AR":68.42,"AU":63.96,"AT":44.99,"BD":27.02,"BE":51.08,"BO":65.14,"BR":63,"CA":59.15,"CL":78.79,"CN":37.46,"CO":59.72,"CU":55.56,"DK":44.91,"EC":66.75,"EG":73.35,"ET":10.87,"FI":55.28,"FR":34.29,"DE":53.82,"GH":36.73,"GR":61.44,"IN":29.48,"ID":38.08,"IR":60.38,"IQ":73.25,"IE":64.74,"IL":54.34,"IT":49.15,"JP":24.04,"JO":69.85,"KE":33.71,"MY":54.93,"MX":73.38,"MA":54.95,"NP":30.9,"NL":45.93,"NZ":67.44,"NG":34.27,"NO":57.48,"PK":54.82,"PE":68.09,"PH":35,"PL":62.74,"PT":54.68,"RU":58.76,"SA":71.84,"SG":40.73,"ZA":55.05,"KR":35.89,"ES":49.9,"SE":50.55,"CH":40.58,"TZ":32.24,"TH":45.68,"TR":67.57,"UA":56.13,"AE":71.33,"GB":61.42,"US":72.43,"UY":67.59,"VE":53.48,"VN":18.21,"AF":48.57,"AO":31.78,"AL":62.16,"AD":48.17,"AM":55.43,"AG":62.67,"AZ":61.68,"BI":16.31,"BJ":30.08,"BF":21.7,"BG":51.95,"BH":68.69,"BS":75.79,"BA":56.86,"BY":55.42,"BZ":72.78,"BB":67.16,"BN":69.63,"BT":46.68,"BW":41.99,"CF":23.67,"CI":34.54,"CM":39.47,"CD":21.79,"CG":24.16,"KM":42.88,"CV":46.69,"CR":66.94,"CY":53.82,"CZ":59.54,"DJ":29.77,"DM":59.01,"DO":63.31,"DZ":57.62,"ER":17.21,"EE":57.21,"FJ":65.79,"FM":71.71,"GA":46.9,"GE":65.75,"GN":28.55,"GM":40.94,"GW":32.12,"GQ":39.51,"GD":59.93,"GT":63.22,"GY":56.42,"HN":63.76,"HR":64.22,"HT":29.88,"HU":62.17,"IS":57.37,"JM":61.09,"KZ":53.13,"KG":58.12,"KH":25.14,"KI":79.14,"KN":75.46,"KW":77.75,"LA":31.02,"LB":65.05,"LR":37.93,"LY":67.61,"LC":62.58,"LK":38.78,"LS":42.27,"LT":58.67,"LU":51.52,"LV":59.32,"MD":61.19,"MG":16.97,"MV":52.54,"MH":73.19,"MK":61.82,"ML":33.29,"MT":64.66,"MM":27.04,"ME":49.98,"MN":58.1,"MZ":27.16,"MR":47.19,"MU":51.12,"MW":24.29,"NA":36.52,"NE":18,"NI":67.22,"NR":88.84,"OM":66.16,"PA":71.6,"PW":71.33,"PG":51.36,"KP":37.01,"PY":69.11,"PS":68.8,"QA":76.6,"RO":65.08,"RW":19.79,"SD":38.92,"SN":30.21,"SB":56.93,"SL":22.81,"SV":66.17,"SO":34.86,"RS":54.27,"SS":24.2,"ST":42.62,"SR":58.12,"SK":60.56,"SI":54.85,"SZ":57.14,"SC":60.77,"SY":71.11,"TD":21.43,"TG":31,"TJ":58.85,"TM":56.98,"TL":14.37,"TO":90.39,"TT":57.67,"TN":57.37,"TV":85.77,"UG":23.75,"UZ":62.46,"VC":61.51,"VU":51.32,"WS":87.68,"YE":37.34,"ZM":29.9,"ZW":34.46},"years":{},"missing":{"LI":0,"MC":0,"SM":0,"VA":0}},
+  outofpocket: {"name":"Health costs paid out of pocket","unit":"% of health spending","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/SH.XPD.OOPC.CH.ZS","year":2023,"values":{"AR":24.4696,"AU":15.849,"AT":16.4648,"BD":79.3071,"BE":21.5098,"BO":27.3155,"BR":26.2307,"CA":15.2773,"CL":39.1479,"CN":32.1735,"CO":14.7374,"CU":16.5824,"DK":13.8686,"EC":30.8885,"EG":57.1951,"ET":46.2686,"FI":14.0949,"FR":9.22743,"DE":10.7067,"GH":26.6772,"GR":34.3031,"IN":43.8851,"ID":31.0837,"IR":43.1453,"IQ":53.9824,"IE":10.6071,"IL":20.4858,"IT":22.3098,"JP":12.2357,"JO":34.4679,"KE":24.2457,"MY":37.0935,"MX":41.2357,"MA":37.2543,"NP":59.3883,"NL":11.7877,"NZ":12.6876,"NG":71.9048,"NO":13.6872,"PK":52.9323,"PE":26.9829,"PH":44.3601,"PL":16.2053,"PT":28.1935,"RU":28.3942,"SA":14.116,"SG":25.4185,"ZA":6.69263,"KR":33.7382,"ES":20.8554,"SE":13.3814,"CH":22.0274,"TZ":27.9313,"TH":9.93405,"TR":19.0472,"UA":45.2937,"AE":9.66617,"GB":14.5554,"US":10.9272,"UY":17.0981,"VE":29.6867,"VN":39.2028,"AF":77.1396,"AO":32.5467,"AL":48.2746,"AD":11.1459,"AM":80.472,"AG":20.8076,"AZ":64.6321,"BI":24.4898,"BJ":42.4053,"BF":43.822,"BG":35.5043,"BH":28.6558,"BS":27.4838,"BA":30.9606,"BY":28.4818,"BZ":26.7814,"BB":49.4934,"BN":7.41179,"BT":25.4628,"BW":4.25866,"CF":45.023,"CI":31.9931,"CM":67.6512,"CD":38.0035,"CG":27.9707,"KM":56.5667,"CV":25.7399,"CR":24.1262,"CY":17.9429,"CZ":14.0639,"DJ":28.8415,"DM":29.3264,"DO":25.0557,"DZ":45.0022,"ER":48.4457,"EE":21.3818,"FJ":8.31421,"FM":2.58106,"GA":17.2715,"GE":58.7593,"GN":54.4157,"GM":33.7827,"GW":61.5588,"GQ":65.9832,"GD":48.4813,"GT":57.1818,"GY":26.3274,"HN":53.0617,"HR":9.3774,"HT":52.4041,"HU":23.06,"IS":14.8799,"JM":20.2454,"KZ":27.6423,"KG":42.2647,"KH":60.6012,"KI":2.90857,"KN":41.8002,"KW":10.0035,"LA":44.8408,"LB":29.7013,"LR":63.2389,"LY":19.1766,"LC":37.1449,"LI":19.7172,"LK":54.8107,"LS":13.1971,"LT":31.4253,"LU":8.50457,"LV":35.0576,"MC":8.45358,"MD":27.4689,"MG":27.4221,"MV":18.0489,"MH":1.05295,"MK":39.5721,"ML":47.2299,"MT":30.9257,"MM":71.1259,"ME":26.3318,"MN":48.7992,"MZ":10.3707,"MR":43.7737,"MU":45.2427,"MW":12.0029,"NA":7.49171,"NE":51.4802,"NI":37.6333,"NR":0.731749,"OM":6.31095,"PA":40.455,"PW":12.1022,"PG":8.55413,"PY":36.3229,"PS":42.0717,"QA":7.42946,"RO":22.9615,"RW":4.1,"SD":57.3663,"SN":44.3256,"SB":3.16049,"SL":54.4692,"SV":32.4944,"SM":13.0918,"SO":30.7795,"RS":32.1385,"SS":27.1448,"ST":16.6631,"SR":19.7167,"SK":20.1531,"SI":11.745,"SZ":11.0184,"SC":27.9594,"SY":72.4008,"TD":51.6791,"TG":64.3412,"TJ":62.361,"TM":77.3933,"TL":6.99333,"TO":5.86377,"TT":45.274,"TN":37.9398,"TV":0.0445859,"UG":32.1718,"UZ":64.0592,"VC":26.5736,"VU":8.38081,"WS":13.4197,"YE":69.1257,"ZM":10.2868,"ZW":10.6348},"years":{"AT":2024,"CA":2024,"CL":2024,"CO":2024,"DK":2024,"FR":2024,"DE":2024,"IE":2024,"IT":2024,"NL":2024,"NZ":2024,"PL":2024,"PT":2024,"KR":2024,"SE":2024,"UA":2021,"GB":2024,"CZ":2024,"EE":2024,"IS":2024,"LT":2024,"LU":2024,"SI":2024},"missing":{"KP":0,"VA":0}},
+  roaddeaths: {"name":"Road deaths","unit":"per 100,000 people a year","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/SH.STA.TRAF.P5","year":2019,"values":{"AR":14.1,"AU":4.9,"AT":4.9,"BD":15.3,"BE":5.8,"BO":21.1,"BR":16,"CA":5.3,"CL":14.9,"CN":17.4,"CO":15.4,"CU":8.9,"DK":3.7,"EC":20.1,"EG":10.1,"ET":28.2,"FI":3.9,"FR":5.1,"DE":3.8,"GH":25.7,"GR":8.3,"IN":15.6,"ID":11.3,"IR":21.5,"IQ":27.3,"IE":3.1,"IL":3.9,"IT":5.3,"JP":3.6,"JO":17,"KE":28.3,"MY":22.5,"MX":12.8,"MA":17,"NP":16.3,"NL":4,"NZ":9.6,"NG":20.7,"NO":2.1,"PK":13,"PE":13.6,"PH":12,"PL":9.4,"PT":8.2,"RU":12,"SA":35.9,"SG":2.1,"ZA":22.2,"KR":8.6,"ES":3.9,"SE":3.1,"CH":2.2,"TZ":31.1,"TH":32.2,"TR":6.7,"UA":10.2,"AE":8.9,"GB":3.2,"US":12.7,"UY":14.8,"VE":39,"VN":30.6,"AF":15.9,"AO":26.1,"AL":11.7,"AD":7.6,"AM":20,"AG":0,"AZ":6.7,"BI":35.5,"BJ":26.8,"BF":31,"BG":9.2,"BH":5.2,"BS":7.7,"BA":13.5,"BY":7.6,"BZ":22.6,"BB":8.2,"BN":7.5,"BT":16.2,"BW":26.4,"CF":37.7,"CI":24.1,"CM":30.2,"CD":34.9,"CG":29.7,"KM":26.6,"CV":26.8,"CR":14.8,"CY":5.8,"CZ":5.9,"DJ":23.5,"DM":10.9,"DO":64.6,"DZ":20.9,"ER":37.9,"EE":4.5,"FJ":13.5,"FM":0.2,"GA":23.9,"GE":12.4,"GN":29.7,"GM":29.6,"GW":32.2,"GQ":27.2,"GD":8,"GT":22.9,"GY":22.3,"HN":16.1,"HR":7.9,"HT":18.8,"HU":7.7,"IS":2,"JM":15.1,"KZ":12.7,"KG":12.7,"KH":19.6,"KI":1.9,"KW":15.4,"LA":17.9,"LB":16.4,"LR":38.9,"LY":21.3,"LC":29.8,"LK":19.7,"LS":31.9,"LT":8.1,"LU":4.1,"LV":8.1,"MC":0,"MD":7.3,"MG":29.2,"MV":1.6,"MH":5.7,"MK":5.1,"ML":22.7,"MT":4.1,"MM":20.4,"ME":7.6,"MN":21,"MZ":30,"MR":25.6,"MU":12.2,"MW":33.4,"NA":34.8,"NE":25.5,"NI":16.9,"OM":10.6,"PA":13.9,"PW":4.78,"PG":12.6,"KP":24.2,"PY":22,"PS":5.3,"QA":7.3,"RO":10.3,"RW":29.4,"SD":26.8,"SN":23.5,"SB":16.5,"SL":33,"SV":20.9,"SM":0,"SO":27.4,"RS":7.5,"SS":36.7,"ST":27.9,"SR":15.3,"SK":6.1,"SI":5.1,"SZ":33.5,"SC":11.3,"SY":14.9,"TD":32.4,"TG":28.7,"TJ":15.7,"TM":13.5,"TL":11.9,"TO":33,"TT":9.3,"TN":16.5,"UG":29.4,"UZ":11.7,"VC":7.4,"VU":14.9,"WS":13,"YE":29.4,"ZM":20.5,"ZW":41.2},"years":{"AD":2013,"DM":2016,"MC":2013,"MH":2013,"PW":2013,"PS":2016,"SM":2016},"missing":{"KN":0,"LI":0,"NR":0,"TV":0,"VA":0}}
 };
 
 return { STATS };
@@ -13619,6 +13641,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Population, total",
         "url": "https://data.worldbank.org/indicator/SP.POP.TOTL"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13631,6 +13657,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Population density (people per sq. km of land area)",
         "url": "https://data.worldbank.org/indicator/EN.POP.DNST"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/EN.POP.DNST?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13643,6 +13673,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Urban population (% of total population)",
         "url": "https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SP.URB.TOTL.IN.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13655,6 +13689,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Population growth (annual %)",
         "url": "https://data.worldbank.org/indicator/SP.POP.GROW"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SP.POP.GROW?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13667,6 +13705,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Life expectancy at birth, total (years)",
         "url": "https://data.worldbank.org/indicator/SP.DYN.LE00.IN"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SP.DYN.LE00.IN?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13679,6 +13721,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Life expectancy at birth, female (years)",
         "url": "https://data.worldbank.org/indicator/SP.DYN.LE00.FE.IN"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SP.DYN.LE00.FE.IN?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13691,6 +13737,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Life expectancy at birth, male (years)",
         "url": "https://data.worldbank.org/indicator/SP.DYN.LE00.MA.IN"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SP.DYN.LE00.MA.IN?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13719,6 +13769,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Fertility rate, total (births per woman)",
         "url": "https://data.worldbank.org/indicator/SP.DYN.TFRT.IN"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SP.DYN.TFRT.IN?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13731,6 +13785,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Birth rate, crude (per 1,000 people)",
         "url": "https://data.worldbank.org/indicator/SP.DYN.CBRT.IN"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SP.DYN.CBRT.IN?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13743,6 +13801,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Population ages 65 and above (% of total population)",
         "url": "https://data.worldbank.org/indicator/SP.POP.65UP.TO.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SP.POP.65UP.TO.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13755,6 +13817,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Population ages 0-14 (% of total population)",
         "url": "https://data.worldbank.org/indicator/SP.POP.0014.TO.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SP.POP.0014.TO.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13791,6 +13857,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Population, female (% of total population)",
         "url": "https://data.worldbank.org/indicator/SP.POP.TOTL.FE.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL.FE.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13803,6 +13873,10 @@ const CITATIONS = {
       {
         "label": "World Bank: International migrant stock (% of population)",
         "url": "https://data.worldbank.org/indicator/SM.POP.TOTL.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SM.POP.TOTL.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13839,6 +13913,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Diabetes prevalence (% of population ages 20 to 79)",
         "url": "https://data.worldbank.org/indicator/SH.STA.DIAB.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SH.STA.DIAB.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13851,6 +13929,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Physicians (per 1,000 people)",
         "url": "https://data.worldbank.org/indicator/SH.MED.PHYS.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SH.MED.PHYS.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13875,6 +13957,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Proportion of seats held by women in national parliaments (%)",
         "url": "https://data.worldbank.org/indicator/SG.GEN.PARL.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SG.GEN.PARL.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13887,6 +13973,10 @@ const CITATIONS = {
       {
         "label": "World Bank: GDP per capita (current US$)",
         "url": "https://data.worldbank.org/indicator/NY.GDP.PCAP.CD"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/NY.GDP.PCAP.CD?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13899,6 +13989,10 @@ const CITATIONS = {
       {
         "label": "World Bank: GDP (current US$)",
         "url": "https://data.worldbank.org/indicator/NY.GDP.MKTP.CD"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.CD?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13911,6 +14005,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Current health expenditure per capita (current US$)",
         "url": "https://data.worldbank.org/indicator/SH.XPD.CHEX.PC.CD"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SH.XPD.CHEX.PC.CD?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13923,6 +14021,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Agriculture, forestry, and fishing, value added (% of GDP)",
         "url": "https://data.worldbank.org/indicator/NV.AGR.TOTL.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/NV.AGR.TOTL.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13947,6 +14049,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Individuals using the Internet (% of population)",
         "url": "https://data.worldbank.org/indicator/IT.NET.USER.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/IT.NET.USER.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13959,6 +14065,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Mobile cellular subscriptions (per 100 people)",
         "url": "https://data.worldbank.org/indicator/IT.CEL.SETS.P2"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/IT.CEL.SETS.P2?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13971,6 +14081,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Fixed broadband subscriptions (per 100 people)",
         "url": "https://data.worldbank.org/indicator/IT.NET.BBND.P2"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/IT.NET.BBND.P2?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13983,6 +14097,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Access to electricity (% of population)",
         "url": "https://data.worldbank.org/indicator/EG.ELC.ACCS.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/EG.ELC.ACCS.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -13995,6 +14113,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Renewable energy consumption (% of total final energy consumption)",
         "url": "https://data.worldbank.org/indicator/EG.FEC.RNEW.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/EG.FEC.RNEW.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -14031,6 +14153,10 @@ const CITATIONS = {
       {
         "label": "World Bank: PM2.5 air pollution, mean annual exposure (micrograms per cubic meter)",
         "url": "https://data.worldbank.org/indicator/EN.ATM.PM25.MC.M3"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/EN.ATM.PM25.MC.M3?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -14055,6 +14181,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Forest area (% of land area)",
         "url": "https://data.worldbank.org/indicator/AG.LND.FRST.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/AG.LND.FRST.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -14067,6 +14197,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Agricultural land (% of land area)",
         "url": "https://data.worldbank.org/indicator/AG.LND.AGRI.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/AG.LND.AGRI.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -14079,6 +14213,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Arable land (% of land area)",
         "url": "https://data.worldbank.org/indicator/AG.LND.ARBL.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/AG.LND.ARBL.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -14091,6 +14229,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Terrestrial and marine protected areas (% of total territorial area)",
         "url": "https://data.worldbank.org/indicator/ER.PTD.TOTL.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/ER.PTD.TOTL.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -14115,6 +14257,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Fertilizer consumption (kilograms per hectare of arable land)",
         "url": "https://data.worldbank.org/indicator/AG.CON.FERT.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/AG.CON.FERT.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -14174,6 +14320,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Compulsory education, duration (years)",
         "url": "https://data.worldbank.org/indicator/SE.COM.DURS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SE.COM.DURS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -14186,6 +14336,10 @@ const CITATIONS = {
       {
         "label": "World Bank: Unemployment, youth total (% of total labor force ages 15-24) (modeled ILO estimate)",
         "url": "https://data.worldbank.org/indicator/SL.UEM.1524.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SL.UEM.1524.ZS?format=json&per_page=20000&date=2010:2026"
       }
     ],
     "note": ""
@@ -14201,6 +14355,86 @@ const CITATIONS = {
       }
     ],
     "note": "The average height of men born in 1996, measured as 18-year-olds (in 2014): the latest year this study covers. It's how tall young men are, not all men."
+  },
+  "alcoholwho": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: Global Health Observatory Data Repository, World Health Organization (WHO)",
+    "what": "Total alcohol consumption per capita (liters of pure alcohol, projected estimates, 15+ years of age) (indicator SH.ALC.PCAP.LI).",
+    "links": [
+      {
+        "label": "World Bank: Total alcohol consumption per capita (liters of pure alcohol, projected estimates, 15+ years of age)",
+        "url": "https://data.worldbank.org/indicator/SH.ALC.PCAP.LI"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SH.ALC.PCAP.LI?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "smokers": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: Global Health Observatory Data Repository, World Health Organization (WHO)",
+    "what": "Prevalence of current tobacco use (% of adults) (indicator SH.PRV.SMOK).",
+    "links": [
+      {
+        "label": "World Bank: Prevalence of current tobacco use (% of adults)",
+        "url": "https://data.worldbank.org/indicator/SH.PRV.SMOK"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SH.PRV.SMOK?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "overweight": {
+    "short": "World Bank",
+    "producer": "World Bank, Health Nutrition and Population Statistics; original data: World Health Organization, Global Health Observatory Data Repository (http://apps.who.int/ghodata/).",
+    "what": "Prevalence of overweight (% of adults) (indicator SH.STA.OWAD.ZS).",
+    "links": [
+      {
+        "label": "World Bank: Prevalence of overweight (% of adults)",
+        "url": "https://data.worldbank.org/indicator/SH.STA.OWAD.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SH.STA.OWAD.ZS?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "outofpocket": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: Global Health Expenditure Database, updated December 12th, 2025, World Health Organization (WHO)",
+    "what": "Out-of-pocket expenditure (% of current health expenditure) (indicator SH.XPD.OOPC.CH.ZS).",
+    "links": [
+      {
+        "label": "World Bank: Out-of-pocket expenditure (% of current health expenditure)",
+        "url": "https://data.worldbank.org/indicator/SH.XPD.OOPC.CH.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SH.XPD.OOPC.CH.ZS?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "roaddeaths": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: World Health Organization, Global Health Observatory Data Repository (http://apps.who.int/ghodata/)., World Health Organization (WHO)",
+    "what": "Mortality caused by road traffic injury (per 100,000 population) (indicator SH.STA.TRAF.P5).",
+    "links": [
+      {
+        "label": "World Bank: Mortality caused by road traffic injury (per 100,000 population)",
+        "url": "https://data.worldbank.org/indicator/SH.STA.TRAF.P5"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SH.STA.TRAF.P5?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
   }
 };
 
@@ -14308,6 +14542,11 @@ const STAT_WORDS = {
   schoolyears: ask("Years at school", "Where do children spend the most years at school?", "Where do children spend the fewest years at school?"),
   obesity: ask("Adults with obesity", "Where do the most adults have obesity?", "Where do the fewest adults have obesity?"),
   diabetes: ask("Adults with diabetes", "Where do the most adults have diabetes?", "Where do the fewest adults have diabetes?"),
+  alcoholwho: ask("Alcohol per adult", "Where do adults drink the most alcohol?", "Where do adults drink the least alcohol?"),
+  smokers: ask("Adults who smoke", "Where do the most adults smoke?", "Where do the fewest adults smoke?"),
+  overweight: ask("Adults who are overweight", "Where is the largest share of adults overweight?", "Where is the smallest share of adults overweight?"),
+  outofpocket: ask("Paid out of pocket", "Where do patients pay the largest share of health costs out of their own pocket?", "Where do patients pay the smallest share of health costs out of their own pocket?"),
+  roaddeaths: ask("Road deaths", "Where are the roads the deadliest?", "Where are the roads the safest?"),
   doctors: ask("Doctors per person", "Which country has the most doctors for its people?", "Which country has the fewest doctors for its people?"),
   prison: ask("People in prison", "Which country puts the most people in prison, for its size?", "Which country puts the fewest people in prison, for its size?"),
   parliament: ask("Women in parliament", "Where do women hold the largest share of seats in parliament?", "Where do women hold the smallest share of seats in parliament?"),
@@ -16424,7 +16663,7 @@ phoneScreen.addEventListener("change", updateHowToPager);
 
 function initializeMainMenu({ onPlay, onHome, describeMode = () => "", isModeAvailable = () => true }) {
   const menu = document.getElementById("mainMenu");
-  const menuOptions = menu.querySelector(".menu-options");
+  const menuOptions = menu.querySelector(".menu-secondary");
   const menuButtons = [...menuOptions.querySelectorAll(".menu-option")];
   const gameView = document.getElementById("gameView");
   const howToModal = document.getElementById("howToPlayModal");
@@ -16473,43 +16712,20 @@ function initializeMainMenu({ onPlay, onHome, describeMode = () => "", isModeAva
 
   document.querySelectorAll("[data-art]").forEach(slot => slot.appendChild(createPixelArt(PLAY_ART[slot.dataset.art], PLAY_ART_COLORS)));
 
-  // PLAY swaps the main options for the day's games; BACK (or Escape) swaps them back.
-  const mainOptions = document.querySelector(".menu-options:not(.menu-play-options)");
-  const playOptions = document.getElementById("menuPlayOptions");
-  const playButton = document.getElementById("menuPlayButton");
-  function showPlayOptions(open) {
-    mainOptions.classList.toggle("hidden", open);
-    playOptions.classList.toggle("hidden", !open);
-    playButton.setAttribute("aria-expanded", String(open));
-    if (open) {
-      document.getElementById("menuCompetitiveStatus").textContent = describeMode("competitive");
-      document.getElementById("menuCasualStatus").textContent = describeMode("casual");
-      document.getElementById("menuExtremesStatus").textContent = describeMode("extremes");
-      // Highs & Lows only has the days the team has reviewed.
-      document.getElementById("menuExtremesButton").disabled = !isModeAvailable("extremes");
-      // The main game first.
-      document.getElementById("menuExtremesButton").focus();
-    } else {
-      playButton.focus();
-    }
+  // The day's games are on the menu itself: how today's game stands, and whether Highs &
+  // Lows has a reviewed day. Brought up to date every time the menu shows.
+  function refreshPlayTiles() {
+    document.getElementById("menuCompetitiveStatus").textContent = describeMode("competitive");
+    document.getElementById("menuCasualStatus").textContent = describeMode("casual");
+    document.getElementById("menuExtremesStatus").textContent = describeMode("extremes");
+    document.getElementById("menuExtremesButton").disabled = !isModeAvailable("extremes");
   }
-  playButton.addEventListener("click", () => {
-    sounds.playClick();
-    showPlayOptions(true);
-  });
-  document.getElementById("menuPlayBack").addEventListener("click", () => {
-    sounds.playClick();
-    showPlayOptions(false);
-  });
-  menu.addEventListener("keydown", event => {
-    if (event.key === "Escape" && !playOptions.classList.contains("hidden")) showPlayOptions(false);
-  });
+  refreshPlayTiles();
 
   function showMenu() {
     gameView.classList.add("hidden");
     menu.classList.remove("hidden");
-    mainOptions.classList.remove("hidden");
-    playOptions.classList.add("hidden");
+    refreshPlayTiles();
     howToModal.classList.add("hidden");
     document.getElementById("victoryModal").classList.add("hidden");
     document.getElementById("statsModal").classList.add("hidden");
@@ -19326,7 +19542,13 @@ function playExtremeTour(round, state) {
     setText("tourRank", !stop.entry ? `${count} COUNTRIES` : stop.hideRank ? `#? OF ${count}` : `#${stop.entry.rank} OF ${count}`);
     document.getElementById("tourFlag").replaceChildren(...(stop.entry ? [createFlagImage(country, "tour-flag-image")] : []));
     setText("tourName", stop.entry ? country.name : stat.name);
-    setText("tourValue", stop.entry ? fmt(stop.entry.value) : "");
+    // The number big, the unit small underneath, so a long unit ("litres of pure alcohol
+    // per adult a year") never pushes the country's name off the card.
+    const unit = stop.entry ? fmt(stop.entry.value).slice(formatValue(stat, stop.entry.value, { unit: false }).length).trim() : "";
+    document.getElementById("tourValue").replaceChildren(...(stop.entry ? [
+      Object.assign(document.createElement("b"), { textContent: formatValue(stat, stop.entry.value, { unit: unit === "%" }) }),
+      ...(unit && unit !== "%" ? [Object.assign(document.createElement("small"), { textContent: unit })] : [])
+    ] : []));
     setText("tourLine", stop.line);
     stopPin.classList.toggle("hidden", !stop.entry || Boolean(stop.hideRank));
     if (stop.entry && !stop.hideRank) movePeckingPin(stopPin, { rank: stop.entry.rank, label: `#${stop.entry.rank}` }, count);
