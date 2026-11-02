@@ -189,7 +189,7 @@ h1, h2, h3 { font-weight: normal; }
   z-index: 1;
   display: grid;
   gap: 1.25rem;
-  width: min(100%, 480px);
+  width: min(100%, 600px);
   padding: 1.5rem;
   border: 1px solid var(--glass-line);
   border-radius: 26px;
@@ -246,7 +246,7 @@ h1, h2, h3 { font-weight: normal; }
 
 /* Under the games: Archive, Community, How to play and My account as a quiet row of small
    buttons, icon over label. */
-.menu-secondary { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.4rem; }
+.menu-secondary { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.4rem; }
 .menu-secondary .menu-option { flex-direction: column; justify-content: center; gap: 0.4rem; min-width: 0; min-height: 0; padding: 0.6rem 0.3rem; border-color: var(--glass-line-soft); background: rgba(255, 255, 255, 0.03); color: var(--muted); font-size: 8px; line-height: 1.4; text-align: center; }
 /* Labels may wrap ("HOW TO / PLAY"); a long account name stops after two lines. */
 .menu-secondary #menuAccountLabel { display: -webkit-box; max-width: 100%; overflow: hidden; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
@@ -1729,7 +1729,7 @@ h1, h2, h3 { font-weight: normal; }
 .end-next-page,
 .end-dots { display: none; }
 .end-archive-note { color: var(--muted); font-size: 12px; text-align: center; }
-.end-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+.end-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
 .end-screen .end-share { width: 100%; }
 .end-actions .btn { padding: 0 0.5rem; font-size: 9px; }
 @media (max-width: 760px) {
@@ -2440,7 +2440,7 @@ h1, h2, h3 { font-weight: normal; }
   .end-screen .end-dots { display: flex; justify-content: center; gap: 6px; }
   .end-dots i { width: 7px; height: 7px; border-radius: 2px; background: var(--glass-line); }
   .end-dots i.is-on { background: var(--accent); }
-  .end-screen .end-actions { grid-template-columns: 1fr 1fr; }
+  .end-screen .end-actions { grid-template-columns: repeat(3, 1fr); }
   .end-screen #reviewRoundsButton,
   .end-screen .end-archive-note { display: none; }
   .end-screen .end-rounds .breakdown-row { padding: 0.4rem 0.7rem; }
@@ -2626,9 +2626,13 @@ h1, h2, h3 { font-weight: normal; }
 .tour-key-item.is-near i { background: #ff6b9d; }
 .tour-key-item.is-far i { background: #5aa8ff; }
 /* SKIP: clearly a button, but quieter than what the tile says; in the corner. */
-.tour-skip { position: absolute; top: 14px; right: 14px; display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border: 1px solid var(--glass-line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--muted); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; transition: color 0.15s ease, border-color 0.15s ease; }
+.tour-skip { margin-top: 14px; display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border: 1px solid var(--glass-line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--muted); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; transition: color 0.15s ease, border-color 0.15s ease; }
 @media (hover: hover) { .tour-skip:hover { border-color: var(--line-strong); color: var(--text); } }
 .tour-skip:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.tour-go { margin-top: 14px; }
+.extreme-tour:not(.is-paused) .tour-go,
+.extreme-tour.is-paused .tour-skip { display: none; }
+.extreme-tour .tour-value { color: var(--text); font-size: 14px; }
 /* Your guess turns out to be the answer: a short pulse round the tile and its label. */
 .extreme-tour.is-win { animation: tour-pop 0.42s cubic-bezier(0.2, 1.4, 0.4, 1), tour-win 1.4s ease-out 0.2s; }
 .extreme-tour.is-win .tour-kicker { background: var(--tone); color: var(--bg); animation: tour-win-label 0.6s cubic-bezier(0.2, 1.6, 0.4, 1); }
@@ -2686,7 +2690,7 @@ h1, h2, h3 { font-weight: normal; }
   .tour-country { margin-top: 12px; }
   .tour-country strong { font-size: 20px; }
   .tour-value b { font-size: 18px; }
-  .tour-skip { top: 8px; right: 8px; min-height: 44px; padding: 0 16px; }
+  .tour-skip { min-height: 44px; padding: 0 18px; }
 }
 
 /* Highs & Lows: the climb. The ranking creeps up through a five-row window (the middle
@@ -2758,7 +2762,7 @@ h1, h2, h3 { font-weight: normal; }
   .score-burst-card.is-extreme .burst-answer-list { display: none; }
   .score-burst-card.is-extreme .info-facts { display: none; }
   .score-burst-card.is-extreme .burst-info .info-text { gap: 0.9rem; }
-  .score-burst-card.is-extreme .burst-info h3 { font-size: 12px; }
+
   .score-burst-card.is-extreme .burst-info p { color: var(--muted); font-size: 12px; }
   .score-burst-card.is-extreme .pecking { margin: 0.4rem 0 0.2rem; }
   .score-burst-card.is-extreme .pecking-track { height: 34px; }
@@ -2772,6 +2776,9 @@ h1, h2, h3 { font-weight: normal; }
 }
 
 /* The full pecking order on the score card: every country, scrolling inside. */
+/* The full ranking keeps both ends in view: #1 sticks to the top, the last to the bottom. */
+.ladder-pinned { display: grid; gap: 5px; }
+.ladder.is-pinned { padding-right: 10px; }
 .ladder.is-full { position: relative; max-height: 300px; overflow-y: auto; padding-right: 4px; overscroll-behavior: contain; scrollbar-width: thin; }
 @media (min-width: 761px) and (max-height: 760px) {
   .ladder.is-full { max-height: 250px; }
@@ -2877,6 +2884,152 @@ h1, h2, h3 { font-weight: normal; }
   .how-to-play-modal:not(.is-last-card) .how-to-other { display: none; }
 }
 
+/* Highs & Lows: the round's results in the round card's look (.round-intro.is-extreme):
+   nearly opaque navy, a pink-tinted border, white text, and the day's journey in its own
+   framed panel, larger, as the reward for the round. */
+.score-burst-card.is-extreme {
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 26px;
+  background: rgba(10, 15, 29, 0.95);
+  box-shadow: var(--glass-shine), var(--glass-shadow), 0 0 60px color-mix(in srgb, var(--accent) 12%, transparent);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.score-burst-card.is-extreme .score-burst-label,
+.score-burst-card.is-extreme .score-burst-total { color: var(--text); }
+.score-burst-card.is-extreme .score-burst-climb { padding: 10px; border: 1px solid var(--glass-line); border-radius: 16px; background: rgba(255, 255, 255, 0.02); }
+.score-burst-card.is-extreme .burst-info p { color: color-mix(in srgb, var(--text) 75%, transparent); }
+.score-burst-card.is-extreme .pecking-end small { color: var(--text); font-size: 12px; }
+.score-burst-card.is-extreme .pecking-end { font-size: 9px; }
+@media (min-width: 761px) {
+  .score-burst-card.is-extreme.has-info { width: min(1040px, 94vw); }
+  .score-burst-card.is-extreme .score-burst-climb svg { max-height: none; }
+}
+/* Highs & Lows results: the round card's type throughout. Pixel labels in white, the stat
+   as the round card's pink pill, the country in its Space Grotesk 600, points in the accent. */
+.score-burst-card.is-extreme .burst-answer-kicker { color: var(--text); }
+.score-burst-card.is-extreme .burst-answer-main strong { color: var(--text); font: 600 26px/1.3 var(--font-body); }
+.score-burst-card.is-extreme .score-burst-points { color: var(--accent); text-shadow: 0 0 40px color-mix(in srgb, var(--accent) 40%, transparent); }
+.score-burst.is-zero .score-burst-card.is-extreme .score-burst-points { color: var(--muted); text-shadow: none; }
+/* The stat reads like the round card's question: white Space Grotesk 600. */
+.score-burst-card.is-extreme .burst-info h3 { color: var(--text); font: 600 24px/1.3 var(--font-body); letter-spacing: normal; text-transform: none; }
+@media (max-width: 760px) {
+  .score-burst-card.is-extreme .burst-answer-main strong { font-size: 21px; }
+  .score-burst-card.is-extreme .burst-info h3 { font-size: 20px; }
+}
+
+/* The climb in the same card as the tour and the round card: navy, pink border, the
+   kicker as a pink pill, the stat as a white question, SKIP as the tour's quiet button. */
+.climb-card { border-color: color-mix(in srgb, #ff6b9d 45%, transparent); background: rgba(10, 15, 29, 0.95); backdrop-filter: none; -webkit-backdrop-filter: none; padding: 20px 24px 18px; }
+.climb-kicker { padding: 8px 14px; border: 1px solid color-mix(in srgb, #ff6b9d 70%, transparent); border-radius: 10px; background: color-mix(in srgb, #ff6b9d 10%, transparent); font: 12px/1.5 var(--font-display); }
+.climb-stat { color: var(--text); font: 600 24px/1.3 var(--font-body); }
+.climb-hint { display: inline-flex; align-items: center; min-height: 32px; padding: 0 14px; border: 1px solid var(--glass-line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--muted); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
+@media (max-width: 760px) { .climb-stat { font-size: 20px; } .climb-kicker { font-size: 9px; } .climb-hint { min-height: 44px; padding: 0 18px; } }
+/* Pinned ends of the ranking: cover the gap so no sliver of the next row peeks through. */
+.climb-points { color: #ff6b9d; text-shadow: 0 0 22px rgba(255, 107, 157, 0.4); }
+
+/* ---------- Archive, in the Highs & Lows cards' look ---------- */
+/* The month at a glance: badge with a bar to the next one, then three numbers. */
+.archive-stats { display: flex; align-items: stretch; gap: 8px; }
+.archive-stats-badge { display: flex; flex: 1; align-items: center; gap: 12px; min-width: 0; padding: 10px 14px; border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 16px; background: rgba(10, 15, 29, 0.95); }
+.archive-stats-badge .is-locked { filter: grayscale(1); opacity: 0.45; }
+.archive-stats-badge-text { display: grid; gap: 6px; min-width: 0; }
+.archive-stats-badge-text strong { color: var(--text); font: 12px var(--font-display); letter-spacing: var(--ls-pixel); }
+.archive-stats-badge-text small { color: var(--text); font-size: 12px; }
+.archive-stats-bar { display: block; height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--accent) var(--share), var(--line) var(--share)); }
+.archive-stat { display: grid; align-content: center; justify-items: center; gap: 6px; min-width: 76px; padding: 10px 8px; border: 1px solid var(--glass-line); border-radius: 16px; background: rgba(10, 15, 29, 0.95); }
+.archive-stat span { color: var(--text); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.archive-stat strong { color: var(--text); font: 700 14px var(--font-mono); white-space: nowrap; }
+
+/* Calendar: a played day in the heat map's colour for your top %, a day in progress as a
+   ring filling up, days not played quiet, days still to come faint. */
+.day-cell.is-played { border: 0; color: #0a0f1e; }
+.day-cell.heat-1 { background: #ff4f9a; }
+.day-cell.heat-2 { background: #ffd45c; }
+.day-cell.heat-3 { background: #45e3ff; }
+.day-cell.heat-4 { background: #23348c; color: var(--text); }
+.day-cell.is-played .day-cell-top, .day-cell.is-played .day-cell-top small { color: inherit; }
+.day-cell.is-open { border: 1px solid var(--glass-line-soft); background: rgba(255, 255, 255, 0.02); color: var(--muted); }
+.day-cell.is-future { border: 0; background: none; color: var(--faint); opacity: 0.5; cursor: default; }
+.day-cell.is-future:hover { border-color: transparent; }
+.day-cell.is-progress { border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); background: rgba(10, 15, 29, 0.95); color: var(--text); }
+.day-cell-ring { width: 18px; height: 18px; border-radius: 50%; background: conic-gradient(var(--accent) var(--done), var(--line) 0); -webkit-mask: radial-gradient(circle, transparent 5px, #000 6px); mask: radial-gradient(circle, transparent 5px, #000 6px); }
+.day-cell.is-today { box-shadow: 0 0 0 2px var(--text); }
+.calendar-legend i.day-cell.is-progress { background: conic-gradient(var(--accent) 180deg, var(--line) 0); }
+
+/* The day's panel: kicker, the day's name as the question, then the result. */
+.day-overview .overview-head { display: grid; justify-items: start; gap: 10px; }
+.overview-kicker { padding: 6px 12px; border: 1px solid color-mix(in srgb, var(--accent) 70%, transparent); border-radius: 10px; background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent); font: 9px/1.5 var(--font-display); letter-spacing: var(--ls-pixel); }
+#archiveModal .day-overview .overview-date { margin: 0; color: var(--text); font: 600 24px/1.3 var(--font-body); }
+.overview-waiting { display: grid; justify-items: start; gap: 10px; margin-top: 18px; }
+.overview-waiting p { margin: 0; color: var(--text); font-size: 14px; }
+.day-overview .overview-play { margin-top: 18px; }
+.overview-result { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0 12px; }
+.overview-result-tile { display: grid; gap: 6px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 16px; background: rgba(10, 15, 29, 0.95); }
+.overview-result-tile span { color: var(--text); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.overview-result-tile strong { color: var(--accent); font: 700 26px/1.1 var(--font-mono); }
+#archiveModal .overview-round-text strong { color: var(--text); font: 600 14px var(--font-body); }
+#archiveModal .overview-round-text span { color: var(--text); }
+.overview-round-pick, .overview-round-best { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.overview-round-best { opacity: 0.75; }
+.overview-round-best b { font: 700 12px var(--font-mono); }
+.overview-round-flag { width: 22px; height: 15px; border-radius: 3px; object-fit: cover; }
+#archiveModal .overview-round-points { color: var(--accent); }
+/* On a computer the button sits in the day's panel; on a phone it stays under the calendar. */
+@media (min-width: 761px) { #archivePlay { display: none; } }
+@media (max-width: 760px) {
+  .day-overview .overview-play { display: none; }
+  .archive-stats { flex-wrap: wrap; }
+  .archive-stats-badge { flex-basis: 100%; }
+  .archive-stat { flex: 1; min-width: 0; }
+  #archiveModal .day-overview .overview-date { font-size: 20px; }
+}
+/* Room round the calendar so a selected day's outline and glow aren't cut off, the same in
+   every mode; Casual's strip (no badge) as tall as Highs & Lows'. */
+.archive-calendar { padding: 4px 6px 4px 4px; }
+.archive-stats { min-height: 70px; }
+.archive-stats:not(:has(.archive-stats-badge)) .archive-stat { flex: 1; }
+/* Small labels in the readable font; the pixel font stays for titles and badge names. */
+.archive-stat span { font: 600 12px var(--font-body); letter-spacing: 0.04em; }
+.archive-mode-tabs .overview-tab { font: 600 14px var(--font-body); letter-spacing: 0.02em; }
+
+/* ---------- Your stats ---------- */
+#statsModal .stats-modal { display: grid; gap: 14px; width: min(560px, 94vw); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 26px; background: rgba(10, 15, 29, 0.97); }
+#statsModal[data-mode="extremes"] { --accent: #ff6b9d; }
+#statsModal[data-mode="casual"] { --accent: #ffd45c; }
+#statsModal .archive-mode-tabs .overview-tab[aria-selected="true"] { background: var(--accent); color: #0a0f1e; }
+.player-stats { display: grid; gap: 14px; }
+.player-stats-numbers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.player-stat { display: grid; justify-items: center; gap: 4px; padding: 12px 6px; border: 1px solid var(--glass-line); border-radius: 16px; background: rgba(255, 255, 255, 0.02); text-align: center; }
+.player-stat span { color: var(--text); font: 600 12px var(--font-body); letter-spacing: 0.04em; }
+.player-stat strong { color: var(--accent); font: 700 24px/1.1 var(--font-mono); }
+.player-stat small { color: var(--text); font-size: 12px; opacity: 0.8; }
+.player-stats-lines { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.player-stats-lines li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 4px; border-bottom: 1px solid var(--glass-line-soft); color: var(--text); font-size: 14px; }
+.player-stats-lines li > span:last-child, .player-stats-link { display: inline-flex; align-items: center; gap: 8px; text-align: right; }
+.player-stats-label { color: var(--text); font-weight: 600; opacity: 0.75; }
+.player-stats-link { padding: 0; border: 0; background: none; color: var(--accent); font: 600 14px var(--font-body); cursor: pointer; }
+.player-stats-empty { margin: 0; color: var(--text); font-size: 14px; text-align: center; }
+.player-stats-share { justify-self: stretch; background: var(--accent); color: #0a0f1e; }
+.archive-stats-open { margin-left: auto; padding: 8px 14px; border: 1px solid var(--glass-line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--text); font: 600 14px var(--font-body); cursor: pointer; }
+@media (hover: hover) { .archive-stats-open:hover { border-color: var(--line-strong); } }
+@media (max-width: 760px) {
+  .player-stats-numbers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #statsModal .stats-modal { width: 100%; border-radius: 0; }
+}
+
+/* Both tabs the same size: the lines scroll inside a fixed area. */
+.player-stats-scroll { height: 330px; overflow-y: auto; padding-right: 4px; scrollbar-width: thin; }
+.player-stats-badge-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 4px 10px; border-bottom: 1px solid var(--glass-line-soft); }
+.player-stats-badges { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.player-stats-badge { display: grid; justify-items: center; gap: 4px; }
+.player-stats-badge small { color: var(--text); font: 600 12px var(--font-body); }
+@media (max-width: 760px) { .player-stats-scroll { height: auto; max-height: 50dvh; } }
+#statsModal { z-index: 520; }
+/* The row under the games: white and in the readable font. */
+.menu-secondary .menu-option { color: var(--text); font: 600 12px/1.3 var(--font-body); letter-spacing: 0.02em; }
+@media (max-width: 760px) { .menu-secondary .menu-option { font-size: 11px; } }
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -2942,6 +3095,12 @@ h1, h2, h3 { font-weight: normal; }
           </svg>
           <span>COMMUNITY</span>
         </button>
+        <button class="menu-option" id="menuStatsButton" type="button">
+          <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
+            <path d="M3 27h26v3H1V5h3zm4-3h5V15H7zm8 0h5V9h-5zm8 0h5V3h-5z" fill="currentColor"/>
+          </svg>
+          <span>STATS</span>
+        </button>
         <button class="menu-option" id="menuHowToButton" type="button">
           <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
             <path d="M10 4h12v3h3v8h-3v3h-4v4h-4v-6h3v-3h3V8h-8v3H8V7h2zm4 21h4v4h-4z" fill="currentColor"/>
@@ -2986,6 +3145,7 @@ h1, h2, h3 { font-weight: normal; }
           <span class="tour-value" id="tourValue"></span>
           <div class="tour-key" id="tourKey"></div>
           <button type="button" class="tour-skip" id="tourSkip">SKIP ›</button>
+          <button type="button" class="round-intro-go tour-go" id="tourGo"><span class="round-intro-play" aria-hidden="true"></span>CONTINUE</button>
         </div>
       </section>
 
@@ -3288,7 +3448,7 @@ h1, h2, h3 { font-weight: normal; }
           <strong class="climb-points" id="climbPoints">+0</strong>
           <p class="climb-line" id="climbLine"></p>
         </div>
-        <span class="climb-hint">Click to skip</span>
+        <span class="climb-hint">SKIP ›</span>
       </div>
     </div>
     <div id="scoreBurst" class="score-burst hidden" role="status" aria-live="assertive">
@@ -3464,6 +3624,7 @@ h1, h2, h3 { font-weight: normal; }
       <div class="end-actions">
         <button class="btn btn-secondary home-button" type="button">HOME</button>
         <button class="btn btn-secondary archive-open-button" id="endArchiveButton" type="button">ARCHIVE</button>
+        <button class="btn btn-secondary stats-open-button" id="endStatsButton" type="button">STATS</button>
         <button class="btn btn-secondary" id="reviewRoundsButton" type="button">REVIEW ROUNDS</button>
       </div>
       <p class="end-archive-note" id="endArchiveTitle"></p>
@@ -3523,17 +3684,15 @@ h1, h2, h3 { font-weight: normal; }
   <div id="statsModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
     <div class="modal stats-modal">
       <div class="modal-head">
-        <h2 id="statsTitle">STATISTICS</h2>
+        <h2 id="statsTitle">YOUR STATS</h2>
         <button class="modal-close" id="closeStatsButton" type="button" aria-label="Close statistics">×</button>
       </div>
-      <dl class="stats-grid">
-        <div class="stat-item"><dd id="statsGamesPlayed">0</dd><dt>Played</dt></div>
-        <div class="stat-item"><dd id="statsWinStreak">0</dd><dt>Streak</dt></div>
-        <div class="stat-item"><dd id="statsMaxStreak">0</dd><dt>Best streak</dt></div>
-        <div class="stat-item"><dd id="statsAverageScore">0</dd><dt>Avg. score</dt></div>
-        <div class="stat-item"><dd id="statsPerfectGuesses">0</dd><dt>Perfect rounds</dt></div>
-      </dl>
-      <ol id="scoreHistory" class="score-history"></ol>
+      <div class="overview-tabs archive-mode-tabs" id="statsModeTabs" role="tablist" aria-label="Mode">
+        <button class="overview-tab" type="button" role="tab" data-mode="extremes">HIGHS &amp; LOWS</button>
+        <button class="overview-tab" type="button" role="tab" data-mode="casual">CASUAL</button>
+      </div>
+      <div class="player-stats" id="statsBody"></div>
+      <button class="btn btn-primary player-stats-share" id="statsShare" type="button">SHARE</button>
     </div>
   </div>
 
@@ -3547,6 +3706,7 @@ h1, h2, h3 { font-weight: normal; }
             <button class="overview-tab" type="button" role="tab" data-mode="casual" aria-selected="false">CASUAL</button>
             <button class="overview-tab" type="button" role="tab" data-mode="competitive" aria-selected="false" hidden>COMPETITIVE</button>
           </div>
+          <button class="archive-stats-open stats-open-button" type="button">STATS ›</button>
         </div>
         <button class="modal-close" id="closeArchiveButton" type="button" aria-label="Close archive">×</button>
       </div>
@@ -8499,9 +8659,9 @@ function createJourney(type, container, { summit = 6000 } = {}) {
       }));
       svg.classList.toggle("is-goal", value >= summit);
     },
-    // Plays the day's journey again and again: from the start through every round's
-    // stretch (a short stop where each round ended), a pause at the end, then back to the
-    // start. Stops by itself once the drawing is hidden or gone; `stop()` ends it too.
+    // Plays the day's journey once: from the start through every round's stretch (a short
+    // stop where each round ended), then stays where the score puts it. With reduced motion
+    // it just draws the end. Stops early once the drawing is hidden or gone, or on `stop()`.
     replay({ stretches: travelled = [], total = travelled.at(-1)?.to || 0 } = {}, { speed = 2.2, pause = 320, hold = 2200, rest = 500 } = {}) {
       this.stop();
       const run = ++replaying;
@@ -8513,11 +8673,13 @@ function createJourney(type, container, { summit = 6000 } = {}) {
         legs.push({ from: part.from, to: part.to, start: time, end: time + length });
         time += length + pause;
       });
-      const cycle = time + hold;
+      const finish = () => this.draw(total, { stretches: travelled, stops: travelled.slice(0, -1).map(part => part.to) });
+      if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { finish(); return; }
       const begin = performance.now();
       const frame = now => {
         if (run !== replaying || !svg.isConnected || svg.closest(".hidden")) return;
-        const t = (now - begin) % cycle;
+        const t = now - begin;
+        if (t >= time) { finish(); return; }
         let value = 0;
         legs.forEach(leg => {
           if (t >= leg.end) value = leg.to;
@@ -15650,508 +15812,6 @@ function createMedal(medal, size = 24) {
 return { createBadge, MEDALS, getGroupMedal, createMedal };
 })();
 
-// ---- screens.js
-__modules["screens.js"] = (() => {
-const { sounds } = __modules["audio.js"];
-const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getRoundStats, getScoreBucket, getTopPercent } = __modules["community.js"];
-const { MAIN_MODE, MAX_DAILY_SCORE, MODE_INFO } = __modules["daily.js"];
-const { createBadge } = __modules["badges.js"];
-
-const SAMPLE_NOTE = "Player numbers and ranks are sample data until the game has real players.";
-
-function element(tag, className, text) {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text !== undefined) node.textContent = text;
-  return node;
-}
-
-// Adds sample community stats and the player's rank to a day record from engine.js.
-function withCommunity(record) {
-  const stats = getDayStats(record.dateKey, record.mode);
-  const topPercent = record.completed ? getTopPercent(stats, record.score) : null;
-  return { ...record, stats, topPercent };
-}
-
-// ---------------------------------------------------------------------------
-// Archive calendar: the days by week (Monday to Sunday) under a header per month. A
-// played day shows your top % of the world that day, a day in progress how many rounds
-// are done, a day not played is just an outline.
-// ---------------------------------------------------------------------------
-
-const WEEKDAYS = ["M", "T", "W", "T", "F", "S", "S"];
-const toDate = dateKey => new Date(`${dateKey}T00:00:00Z`);
-const toKey = date => date.toISOString().slice(0, 10);
-
-// The days in weeks of seven (null where a date isn't in the archive), each week filed
-// under the month its Thursday falls in.
-function groupByWeek(days) {
-  const byKey = new Map(days.map(day => [day.dateKey, day]));
-  const weeks = new Map();
-  days.forEach(day => {
-    const monday = toDate(day.dateKey);
-    monday.setUTCDate(monday.getUTCDate() - (monday.getUTCDay() + 6) % 7);
-    if (weeks.has(toKey(monday))) return;
-    const cells = WEEKDAYS.map((_, offset) => {
-      const date = new Date(monday);
-      date.setUTCDate(date.getUTCDate() + offset);
-      return byKey.get(toKey(date)) || null;
-    });
-    const thursday = new Date(monday);
-    thursday.setUTCDate(thursday.getUTCDate() + 3);
-    weeks.set(toKey(monday), { monday: toKey(monday), month: toKey(thursday).slice(0, 7), cells });
-  });
-  return [...weeks.values()].sort((left, right) => left.monday.localeCompare(right.monday));
-}
-
-function createDayCell(day, { isSelected, onSelect }) {
-  const cell = element("button", "day-cell");
-  cell.type = "button";
-  const roundsDone = day.rounds ? day.rounds.filter(round => round.done).length : 0;
-  const state = day.completed ? "played" : day.started ? "progress" : "open";
-  cell.classList.add(`is-${state}`);
-  cell.classList.toggle("is-today", day.isToday);
-  cell.classList.toggle("is-selected", isSelected);
-  cell.appendChild(element("span", "day-cell-number", String(day.puzzleNumber)));
-  if (state === "played") {
-    const top = element("span", "day-cell-top");
-    top.append(element("small", "", "TOP"), formatTopPercent(day.topPercent).replace(/^Top /, ""));
-    cell.appendChild(top);
-    cell.title = `Day ${day.puzzleNumber}: ${formatTopPercent(day.topPercent)} of the world · ${day.score.toLocaleString()}`;
-  } else if (state === "progress") {
-    cell.appendChild(element("span", "day-cell-progress", `${roundsDone}/${day.rounds.length}`));
-    cell.title = `Day ${day.puzzleNumber}: in progress, ${roundsDone} of ${day.rounds.length} rounds`;
-  } else {
-    cell.title = `Day ${day.puzzleNumber}: not played${day.isToday ? " (today)" : ""}`;
-  }
-  cell.addEventListener("click", () => {
-    sounds.playClick();
-    onSelect(day);
-  });
-  return cell;
-}
-
-// A month's header: days played, your average top % that month, and "FULL MONTH" once
-// every day of the month in the archive is played. Badges are for the main game (MAIN_MODE) only.
-function createMonthHead(month, weeks, mode) {
-  const days = weeks.flatMap(week => week.cells).filter(day => day && day.dateKey.startsWith(month));
-  const played = days.filter(day => day.completed);
-  const head = element("div", "calendar-month");
-  head.classList.toggle("is-full", played.length === days.length);
-  const name = toDate(`${month}-01`).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }).toUpperCase();
-  const summary = element("span", "calendar-month-summary");
-  summary.appendChild(element("span", "", `${played.length}/${days.length} days`));
-  if (played.length) {
-    const average = played.reduce((sum, day) => sum + day.topPercent, 0) / played.length;
-    summary.appendChild(element("span", "calendar-month-top", `avg. ${formatTopPercent(average).toLowerCase()}`));
-    // The badge earned that month (the main game only).
-    if (mode === MAIN_MODE) {
-      const badge = getMonthBadge(days, month);
-      const earned = element("span", "calendar-month-badge");
-      earned.append(createBadge(badge.tier, 20), badge.tier.name);
-      summary.appendChild(earned);
-    }
-  }
-  head.append(element("span", "calendar-month-name", name), summary);
-  if (played.length === days.length) head.appendChild(element("span", "calendar-full", "FULL MONTH"));
-  return head;
-}
-
-// This month's badge at the top of the archive (as big as it was on the leaderboard),
-// with how you're doing and what the next one asks for.
-function createMonthBadgeCard(badge, month) {
-  const monthName = toDate(`${month}-01`).toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" }).toUpperCase();
-  const card = element("div", "player-badge");
-  const icon = createBadge(badge.tier || RANK_TIERS.at(-1), 44);
-  icon.classList.toggle("is-locked", !badge.tier);
-  const text = element("div", "player-badge-text");
-  const name = element("strong", "", badge.tier ? badge.tier.name.toUpperCase() : "NO BADGE YET");
-  if (badge.tier) name.style.color = badge.tier.color;
-  // Short: how this month went (once there is a badge), and what the next one asks for.
-  const lines = [];
-  if (badge.tier) lines.push(element("small", "", `${badge.played} ${badge.played === 1 ? "day" : "days"} played · on average ${formatTopPercent(badge.percent).toLowerCase()}`));
-  lines.push(element("small", "player-badge-next", badge.next
-    ? `Next: ${badge.next.name} at ${badge.next.minDays}+ ${badge.next.minDays === 1 ? "day" : "days"}${badge.next.maxPercent >= 100 ? "" : `, ${badge.next.range.toLowerCase()}`}`
-    : "The highest badge there is."));
-  text.append(element("span", "field-label", `YOUR ${monthName} BADGE`), name, ...lines);
-  card.append(icon, text);
-  return card;
-}
-
-// Every badge from the first to the highest as the stones from How to play, each with the
-// top % and the days it asks for in a month; the one you have this month is lit.
-function createBadgeLadder(current) {
-  const ladder = element("div", "how-to-badges badge-stones");
-  ladder.setAttribute("aria-label", "Badges");
-  [...RANK_TIERS].reverse().forEach((tier, index) => {
-    const stone = element("span", "how-to-badge");
-    stone.style.setProperty("--stack", index);
-    stone.classList.toggle("is-current", tier === current);
-    stone.title = `${tier.name}: ${tier.minDays}+ days in a month${tier.maxPercent >= 100 ? "" : `, ${tier.range.toLowerCase()} on average`}`;
-    stone.append(
-      createBadge(tier, 32),
-      element("small", "", tier.maxPercent >= 100 ? "ALL" : `<${tier.maxPercent}%`),
-      element("span", "badge-stone-days", `${tier.minDays}+ ${tier.minDays === 1 ? "day" : "days"}`)
-    );
-    ladder.appendChild(stone);
-  });
-  return ladder;
-}
-
-function createCalendar(days, { selected, onSelect, mode }) {
-  const weeks = groupByWeek(days);
-  const calendar = element("div", "calendar");
-  const todayKey = days.find(day => day.isToday)?.dateKey || days.at(-1).dateKey;
-  // Your badge comes from the main game's days; the other modes have just the calendar.
-  if (mode === MAIN_MODE) {
-    const thisMonth = getMonthBadge(days, todayKey.slice(0, 7));
-    calendar.append(createMonthBadgeCard(thisMonth, todayKey.slice(0, 7)), createBadgeLadder(thisMonth.tier));
-  } else {
-    calendar.appendChild(element("p", "calendar-mode-note", mode === "competitive"
-      ? "Five rounds against the clock. No badges here: just for fun."
-      : "Five rounds of country puzzles: clues, maps and rankings. No badges here: just for fun."));
-  }
-  [...new Set(weeks.map(week => week.month))].forEach(month => {
-    const monthWeeks = weeks.filter(week => week.month === month);
-    // The month's header with its medals, then the weekday letters, then its weeks.
-    calendar.appendChild(createMonthHead(month, monthWeeks, mode));
-    const weekdays = element("div", "calendar-week calendar-weekdays");
-    WEEKDAYS.forEach(letter => weekdays.appendChild(element("span", "", letter)));
-    calendar.appendChild(weekdays);
-    monthWeeks.forEach(week => {
-      const row = element("div", "calendar-week");
-      week.cells.forEach(day => row.appendChild(day ? createDayCell(day, { isSelected: day === selected, onSelect }) : element("span", "day-cell is-empty")));
-      calendar.appendChild(row);
-    });
-  });
-  const legend = element("div", "calendar-legend");
-  [["is-played", "Played"], ["is-progress", "In progress"], ["is-open", "Not played"]].forEach(([state, label]) => {
-    const item = element("span", "");
-    item.append(element("i", `day-cell ${state}`), label);
-    legend.appendChild(item);
-  });
-  calendar.appendChild(legend);
-  return calendar;
-}
-
-function createStatCard(label, value, note) {
-  const card = element("div", "overview-stat");
-  card.append(element("span", "overview-stat-label", label), element("strong", "overview-stat-value", value));
-  if (note) card.appendChild(note);
-  return card;
-}
-
-function createDistributionChart(day) {
-  const { distribution, bucketSize, maxScore } = day.stats;
-  const highest = Math.max(...distribution);
-  const playerBucket = day.completed ? getScoreBucket(day.stats, day.score) : -1;
-  const chart = element("div", "distribution");
-  const bars = element("div", "distribution-bars");
-  distribution.forEach((count, bucket) => {
-    const bar = element("div", "distribution-bar");
-    bar.style.height = `${Math.max(3, count / highest * 100)}%`;
-    bar.classList.toggle("is-player", bucket === playerBucket);
-    const range = `${(bucket * bucketSize).toLocaleString()}–${((bucket + 1) * bucketSize).toLocaleString()}`;
-    bar.title = `${range}: ${count.toLocaleString()} players`;
-    if (bucket === playerBucket) bar.appendChild(element("span", "distribution-you", "YOU"));
-    bars.appendChild(bar);
-  });
-  const axis = element("div", "distribution-axis");
-  axis.append(
-    element("span", "", "0"),
-    element("span", "", (maxScore / 2).toLocaleString()),
-    element("span", "", maxScore.toLocaleString())
-  );
-  chart.append(bars, axis);
-  return chart;
-}
-
-// Start (or continue) button for a day that hasn't been finished. Finished days get a
-// note instead: each day can only be played once.
-function createPlayPanel(day, onPlay) {
-  const panel = element("div", "overview-play");
-  if (day.completed) {
-    panel.classList.add("is-played");
-    panel.appendChild(element("p", "", "✓ Played. Each day can be played once."));
-    return panel;
-  }
-  const label = day.started ? "CONTINUE DAY ▶" : day.isToday ? "START TODAY'S PUZZLE ▶" : "START DAY ▶";
-  const button = element("button", "btn btn-primary", label);
-  button.type = "button";
-  button.addEventListener("click", () => {
-    sounds.playClick();
-    onPlay(day.dateKey, day.mode);
-  });
-  panel.appendChild(button);
-  return panel;
-}
-
-function renderDayOverview(container, day, onPlay) {
-  container.replaceChildren();
-  // The selected day's start / continue button sits under the calendar.
-  const playSlot = document.getElementById("archivePlay");
-  playSlot.replaceChildren();
-  if (!day) {
-    container.appendChild(element("p", "overview-empty", "Pick a day to see it here."));
-    return;
-  }
-  playSlot.appendChild(createPlayPanel(day, onPlay));
-  // Phones show the day as a sheet over the calendar; this closes it.
-  const back = element("button", "overview-sheet-close", "‹ CALENDAR");
-  back.type = "button";
-  back.addEventListener("click", () => {
-    sounds.playClick();
-    document.getElementById("archiveModal").classList.remove("is-day-open");
-  });
-  container.appendChild(back);
-
-  const head = element("div", "overview-head");
-  const titles = element("div");
-  titles.append(
-    element("span", "field-label", `${day.isToday ? "TODAY'S" : "DAILY"} ${MODE_INFO[day.mode].short} PUZZLE`),
-    element("h3", "overview-date", `Day ${day.puzzleNumber}${day.dayName ? `: ${day.dayName}` : ""}`)
-  );
-  // Played: the medal and score, and, big, where that puts you in the world. Otherwise
-  // a clear status: in progress (how far) or not played.
-  const result = element("div", "overview-answer");
-  if (day.completed) {
-    const world = element("div", "overview-world");
-    const worldText = element("div");
-    worldText.append(element("span", "field-label", "YOU VS THE WORLD"), element("strong", "overview-world-percent", formatTopPercent(day.topPercent).toUpperCase()));
-    world.appendChild(worldText);
-    const scoreText = element("div");
-    scoreText.append(element("span", "field-label", "SCORE"), element("strong", "", day.score.toLocaleString()));
-    result.append(world, scoreText);
-  } else if (day.started) {
-    const done = day.rounds ? day.rounds.filter(round => round.done).length : 0;
-    result.appendChild(element("span", "overview-status is-progress", `IN PROGRESS · ${done}/${day.rounds.length} ROUNDS`));
-  } else {
-    result.appendChild(element("span", "overview-status", "NOT PLAYED"));
-  }
-  head.append(titles, result);
-
-  const yourResult = !day.completed
-    ? "—"
-    : day.score.toLocaleString();
-  const resultNote = element("span", "overview-stat-note");
-  if (day.completed) {
-    resultNote.append(element("span", "rank-chip", formatTopPercent(day.topPercent)));
-    resultNote.append(day.rounds
-      ? ` ${day.rounds.filter(round => round.isPerfect).length}/${day.rounds.length} perfect`
-      : " One-round format");
-  } else {
-    resultNote.textContent = "Not played";
-  }
-
-  const stats = element("div", "overview-stats");
-  stats.append(
-    createStatCard("YOUR SCORE", yourResult, resultNote),
-    createStatCard("PLAYERS", day.stats.players.toLocaleString()),
-    createStatCard("AVG. SCORE", day.stats.averageScore.toLocaleString()),
-    createStatCard("PERFECT ROUNDS", `${day.stats.perfectRoundRate}%`)
-  );
-
-  const distribution = element("section", "overview-section");
-  distribution.append(element("h4", "field-label", "SCORE DISTRIBUTION"), createDistributionChart(day));
-
-  // Two views instead of one long page: your answers per round, and how everyone did.
-  const answers = day.rounds ? createRoundsSection(day)
-    : element("p", "overview-empty", day.completed ? `Played before the five-round format. The original score (out of 1,000) is shown ×${MAX_DAILY_SCORE / 1000}.` : "Nothing played yet.");
-  const everyone = element("div", "overview-everyone");
-  everyone.append(stats, distribution);
-  const views = { answers, everyone };
-  const tabs = element("div", "overview-tabs");
-  tabs.setAttribute("role", "tablist");
-  const show = name => {
-    overviewTab = name;
-    Object.entries(views).forEach(([key, view]) => view.classList.toggle("hidden", key !== name));
-    tabs.querySelectorAll("button").forEach(button => button.setAttribute("aria-selected", String(button.dataset.view === name)));
-  };
-  [["answers", "YOUR ANSWERS"], ["everyone", "HOW EVERYONE DID"]].forEach(([key, label]) => {
-    const button = element("button", "overview-tab", label);
-    button.type = "button";
-    button.dataset.view = key;
-    button.setAttribute("role", "tab");
-    button.addEventListener("click", () => { sounds.playClick(); show(key); });
-    tabs.appendChild(button);
-  });
-  show(overviewTab);
-
-  container.append(head, tabs, answers, everyone, element("p", "sample-note", SAMPLE_NOTE));
-  // A day not started yet has nothing to show but its name; phones show just that and START.
-  container.classList.toggle("is-unplayed", !day.started && !day.completed);
-  container.scrollTop = 0;
-}
-
-// Which view the day panel shows; it stays the same while picking other days.
-let overviewTab = "answers";
-
-// The day's rounds: the answer, how you did, and how everyone else did (who got it,
-// what they answered most). All locked until you've finished the day.
-function createRoundsSection(day) {
-  const section = element("section", "overview-section");
-  const list = element("ol", "overview-rounds");
-  day.rounds.forEach((round, index) => {
-    const item = element("li", "overview-round");
-    item.classList.toggle("is-perfect", round.done && round.isPerfect);
-    item.classList.toggle("is-failed", round.done && round.score === 0);
-    const text = element("div", "overview-round-text");
-    text.append(element("strong", "", `${index + 1}. ${round.name}`));
-    if (day.completed) {
-      const answer = element("span", "overview-round-answer", round.answerText);
-      answer.title = round.answerText;
-      text.append(answer, element("span", "overview-round-you", describeYourRound(round)));
-      const others = describeOthers(getRoundStats(day.dateKey, index, round.plan), round.type);
-      if (others) {
-        const line = element("span", "overview-round-others");
-        const bar = element("i", "overview-round-bar");
-        bar.style.setProperty("--share", `${others.share}%`);
-        line.append(bar, element("span", "", others.text));
-        line.title = others.text;
-        text.appendChild(line);
-      }
-    } else {
-      text.append(element("span", "overview-round-answer", "🔒 Finish the day to see the answers"));
-    }
-    const points = element("span", "overview-round-points", round.done ? round.points.toLocaleString() : "—");
-    if (round.multiplier > 1) points.appendChild(element("small", "", ` ×${round.multiplier.toFixed(1)}`));
-    if (round.speed > 1) points.appendChild(element("small", "", ` ⚡${round.speed.toFixed(2)}`));
-    item.append(text, points);
-    list.appendChild(item);
-  });
-  section.appendChild(list);
-  return section;
-}
-
-// One line on how you did in a round.
-function describeYourRound({ type, state, plan, solved, ...rest }) {
-  switch (type) {
-    case "mystery":
-    case "pinpoint":
-      return solved ? `You: found it in ${state.guesses.length} ${state.guesses.length === 1 ? "guess" : "guesses"}` : state.gaveUp ? "You: gave up" : "You: not found";
-    case "deepcut": {
-      const answer = state.answer && Object.entries(plan.answers).find(([, texts]) => texts.includes(state.answer));
-      return answer ? `You: ${state.answer} (${Number(answer[0]).toLocaleString()})` : "You: gave up";
-    }
-    case "paint":
-      return `You: ${state.found.length} of ${plan.answers.length}${state.wrong.length ? `, ${state.wrong.length} wrong` : ""}`;
-    case "rank":
-      return solved ? `You: right on try ${state.submissions.length}` : "You: not solved";
-    case "extreme":
-      if (!state.pick) return "You: not played";
-      return rest.result.perfect ? "You: spot on" : `You: #${rest.result.rank}${rest.result.offBy === null ? "" : `, ${Math.round(rest.result.offBy * 100)}% off`}`;
-    default:
-      return "";
-  }
-}
-
-// One line on how everyone else did in a round, with the share for its bar.
-function describeOthers(stats, type) {
-  if (!stats) return null;
-  switch (type) {
-    case "mystery":
-    case "pinpoint":
-      return { share: stats.solved, text: `${stats.solved}% found it${stats.commonWrong ? ` · most tried wrong: ${stats.commonWrong}` : ""}` };
-    case "deepcut":
-      return { share: stats.solved, text: `Most given: ${stats.top.map(answer => `${answer.text} (${answer.share}%)`).join(", ")}` };
-    case "paint":
-      return { share: stats.allFound, text: `${stats.allFound}% found them all · most missed: ${stats.mostMissed} (${stats.missedShare}%)` };
-    case "rank":
-      return { share: stats.firstTry, text: `${stats.firstTry}% right on the first try · ${stats.solved}% within five` };
-    case "extreme":
-      return { share: stats.solved, text: `${stats.solved}% spot on · most picked: ${stats.commonPick} (${stats.pickShare}%)` };
-    default:
-      return null;
-  }
-}
-
-function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay }) {
-  const archiveModal = document.getElementById("archiveModal");
-  const archiveGrid = document.getElementById("archiveListContainer");
-  const overview = document.getElementById("dayOverview");
-
-  // The main game's days by default (badges and groups use those).
-  function loadDays(mode = MAIN_MODE) {
-    return getDays().map(dateKey => withCommunity(getDayRecord(dateKey, mode)));
-  }
-
-  function playDay(dateKey, mode) {
-    archiveModal.classList.add("hidden");
-    document.getElementById("communityModal")?.classList.add("hidden");
-    document.getElementById("victoryModal").classList.add("hidden");
-    document.getElementById("gameView").classList.remove("hidden");
-    onPlayDay(dateKey, mode);
-  }
-
-  // The archive has a tab per mode, each with its own calendar; the selected day stays
-  // selected when switching.
-  let archiveMode = MAIN_MODE;
-  let currentSelection = null;
-  const modeTabs = [...document.querySelectorAll("#archiveModeTabs button")];
-  modeTabs.forEach(tab => tab.addEventListener("click", () => {
-    sounds.playClick();
-    openArchive(currentSelection, tab.dataset.mode);
-  }));
-
-  // Phones: a picked day slides up as a sheet (its details, and START under them).
-  const phone = window.matchMedia("(max-width: 760px)");
-  function openDaySheet() {
-    if (!phone.matches) return;
-    archiveModal.querySelector(".screen-modal").scrollTop = 0;
-    archiveModal.classList.add("is-day-open");
-    archiveModal.style.setProperty("--play-height", `${document.getElementById("archivePlay").offsetHeight}px`);
-    overview.scrollTop = 0;
-  }
-
-  function openArchive(selectedDateKey = null, mode = archiveMode) {
-    archiveModal.classList.remove("is-day-open");
-    archiveMode = mode;
-    archiveModal.dataset.mode = mode;
-    modeTabs.forEach(tab => tab.setAttribute("aria-selected", String(tab.dataset.mode === mode)));
-    const days = loadDays(mode);
-    // Selecting a day shows its overview; unfinished days start from a button there.
-    let selected = days.find(day => day.dateKey === selectedDateKey) || days.find(day => day.isToday) || days[0] || null;
-    currentSelection = selected?.dateKey || null;
-
-    const renderGrid = () => {
-      archiveGrid.replaceChildren(createCalendar(days, {
-        selected,
-        mode,
-        onSelect: picked => {
-          selected = picked;
-          currentSelection = picked.dateKey;
-          renderGrid();
-          renderDayOverview(overview, selected, playDay);
-          openDaySheet();
-        }
-      }));
-    };
-    renderGrid();
-    renderDayOverview(overview, selected, playDay);
-    document.getElementById("communityModal")?.classList.add("hidden");
-    archiveModal.classList.remove("hidden");
-    archiveGrid.querySelector(".day-cell.is-selected")?.scrollIntoView({ block: "nearest" });
-  }
-
-  document.querySelectorAll(".archive-open-button, #menuArchiveButton").forEach(button => {
-    button.addEventListener("click", () => {
-      sounds.playClick();
-      // From a game, the archive opens on that game's mode.
-      const mode = document.getElementById("gameView").dataset.mode;
-      openArchive(null, button.id === "menuArchiveButton" ? archiveMode : mode || archiveMode);
-    });
-  });
-  document.getElementById("closeArchiveButton").addEventListener("click", () => {
-    sounds.playClick();
-    archiveModal.classList.add("hidden");
-  });
-
-  return { loadDays };
-}
-
-return { createDistributionChart, initializeHistoryScreens };
-})();
-
 // ---- ui.js
 __modules["ui.js"] = (() => {
 const { sounds } = __modules["audio.js"];
@@ -17193,27 +16853,680 @@ function setGuessHighlight(index, active) {
   });
 }
 
-function initializeStatsModal(getStats) {
-  const statsModal = document.getElementById("statsModal");
-  document.querySelectorAll(".stats-open-button").forEach(button => {
-    button.addEventListener("click", () => {
-      sounds.playClick();
-      const stats = getStats();
-      document.getElementById("statsGamesPlayed").textContent = stats.gamesPlayed;
-      document.getElementById("statsWinStreak").textContent = stats.winStreak;
-      document.getElementById("statsMaxStreak").textContent = stats.maxStreak;
-      document.getElementById("statsAverageScore").textContent = stats.averageScore;
-      document.getElementById("statsPerfectGuesses").textContent = stats.perfectGuesses;
-      statsModal.classList.remove("hidden");
+
+return { redactCountryName, showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, renderProgressiveHints, renderGlobeMarkerTooltip, showHowToSet, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight };
+})();
+
+// ---- screens.js
+__modules["screens.js"] = (() => {
+const { sounds } = __modules["audio.js"];
+const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getScoreBucket, getTopPercent } = __modules["community.js"];
+const { MAIN_MODE, MAX_DAILY_SCORE, MODE_INFO } = __modules["daily.js"];
+const { createBadge } = __modules["badges.js"];
+const { createFlagImage } = __modules["ui.js"];
+const { COUNTRIES } = __modules["countries.js"];
+
+const SAMPLE_NOTE = "Top % is sample data until the game has real players.";
+
+function element(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+// Adds sample community stats and the player's rank to a day record from engine.js.
+function withCommunity(record) {
+  const stats = getDayStats(record.dateKey, record.mode);
+  const topPercent = record.completed ? getTopPercent(stats, record.score) : null;
+  return { ...record, stats, topPercent };
+}
+
+// ---------------------------------------------------------------------------
+// Archive calendar: the days by week (Monday to Sunday) under a header per month. A
+// played day shows your top % of the world that day, a day in progress how many rounds
+// are done, a day not played is just an outline.
+// ---------------------------------------------------------------------------
+
+const WEEKDAYS = ["M", "T", "W", "T", "F", "S", "S"];
+const toDate = dateKey => new Date(`${dateKey}T00:00:00Z`);
+const toKey = date => date.toISOString().slice(0, 10);
+
+// The days in weeks of seven (null where a date isn't in the archive), each week filed
+// under the month its Thursday falls in.
+function groupByWeek(days) {
+  const byKey = new Map(days.map(day => [day.dateKey, day]));
+  const weeks = new Map();
+  days.forEach(day => {
+    const monday = toDate(day.dateKey);
+    monday.setUTCDate(monday.getUTCDate() - (monday.getUTCDay() + 6) % 7);
+    if (weeks.has(toKey(monday))) return;
+    const cells = WEEKDAYS.map((_, offset) => {
+      const date = new Date(monday);
+      date.setUTCDate(date.getUTCDate() + offset);
+      return byKey.get(toKey(date)) || null;
+    });
+    const thursday = new Date(monday);
+    thursday.setUTCDate(thursday.getUTCDate() + 3);
+    weeks.set(toKey(monday), { monday: toKey(monday), month: toKey(thursday).slice(0, 7), cells });
+  });
+  return [...weeks.values()].sort((left, right) => left.monday.localeCompare(right.monday));
+}
+
+// How a played day went, as the heat map's colours: pink for the top 10%, then gold,
+// cyan and blue.
+const heatOf = topPercent => topPercent <= 10 ? 1 : topPercent <= 25 ? 2 : topPercent <= 50 ? 3 : 4;
+const todayKey = () => new Date().toISOString().slice(0, 10);
+
+function createDayCell(day, { isSelected, onSelect }) {
+  const cell = element("button", "day-cell");
+  cell.type = "button";
+  const roundsDone = day.rounds ? day.rounds.filter(round => round.done).length : 0;
+  const state = day.completed ? "played" : day.started ? "progress" : day.dateKey > todayKey() ? "future" : "open";
+  cell.classList.add(`is-${state}`);
+  if (state === "played") cell.classList.add(`heat-${heatOf(day.topPercent)}`);
+  if (state === "progress") cell.style.setProperty("--done", `${roundsDone / day.rounds.length * 360}deg`);
+  if (state === "future") {
+    cell.disabled = true;
+    cell.appendChild(element("span", "day-cell-number", String(day.puzzleNumber)));
+    cell.title = `Day ${day.puzzleNumber}: not out yet`;
+    return cell;
+  }
+  cell.classList.toggle("is-today", day.isToday);
+  cell.classList.toggle("is-selected", isSelected);
+  cell.appendChild(element("span", "day-cell-number", String(day.puzzleNumber)));
+  if (state === "played") {
+    const top = element("span", "day-cell-top");
+    top.append(element("small", "", "TOP"), formatTopPercent(day.topPercent).replace(/^Top /, ""));
+    cell.appendChild(top);
+    cell.title = `Day ${day.puzzleNumber}: ${formatTopPercent(day.topPercent)} of the world · ${day.score.toLocaleString()}`;
+  } else if (state === "progress") {
+    cell.appendChild(element("span", "day-cell-ring"));
+    cell.title = `Day ${day.puzzleNumber}: in progress, ${roundsDone} of ${day.rounds.length} rounds`;
+  } else {
+    cell.title = `Day ${day.puzzleNumber}: not played${day.isToday ? " (today)" : ""}`;
+  }
+  cell.addEventListener("click", () => {
+    sounds.playClick();
+    onSelect(day);
+  });
+  return cell;
+}
+
+// A month's header: days played, your average top % that month, and "FULL MONTH" once
+// every day of the month in the archive is played. Badges are for the main game (MAIN_MODE) only.
+function createMonthHead(month, weeks, mode) {
+  const days = weeks.flatMap(week => week.cells).filter(day => day && day.dateKey.startsWith(month));
+  const played = days.filter(day => day.completed);
+  const head = element("div", "calendar-month");
+  head.classList.toggle("is-full", played.length === days.length);
+  const name = toDate(`${month}-01`).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }).toUpperCase();
+  const summary = element("span", "calendar-month-summary");
+  summary.appendChild(element("span", "", `${played.length}/${days.length} days`));
+  if (played.length) {
+    const average = played.reduce((sum, day) => sum + day.topPercent, 0) / played.length;
+    summary.appendChild(element("span", "calendar-month-top", `avg. ${formatTopPercent(average).toLowerCase()}`));
+    // The badge earned that month (the main game only).
+    if (mode === MAIN_MODE) {
+      const badge = getMonthBadge(days, month);
+      const earned = element("span", "calendar-month-badge");
+      earned.append(createBadge(badge.tier, 20), badge.tier.name);
+      summary.appendChild(earned);
+    }
+  }
+  head.append(element("span", "calendar-month-name", name), summary);
+  if (played.length === days.length) head.appendChild(element("span", "calendar-full", "FULL MONTH"));
+  return head;
+}
+
+// The month at a glance: your badge with a bar to the next one (main game only), days
+// played, your average top % and your best day.
+function createStatsStrip(days, mode, month) {
+  const inMonth = days.filter(day => day.dateKey.startsWith(month) && day.dateKey <= toKey(new Date()));
+  const played = inMonth.filter(day => day.completed);
+  const strip = element("div", "archive-stats");
+  if (mode === MAIN_MODE) {
+    const badge = getMonthBadge(days, month);
+    const block = element("div", "archive-stats-badge");
+    const icon = createBadge(badge.tier || RANK_TIERS.at(-1), 36);
+    icon.classList.toggle("is-locked", !badge.tier);
+    const text = element("div", "archive-stats-badge-text");
+    text.appendChild(element("strong", "", badge.tier ? badge.tier.name.toUpperCase() : "NO BADGE YET"));
+    if (badge.next) {
+      const bar = element("i", "archive-stats-bar");
+      bar.style.setProperty("--share", `${Math.min(1, played.length / badge.next.minDays) * 100}%`);
+      const left = Math.max(0, badge.next.minDays - played.length);
+      text.append(bar, element("small", "", left
+        ? `${left} more ${left === 1 ? "day" : "days"} for ${badge.next.name}${badge.next.maxPercent >= 100 ? "" : `, ${badge.next.range.toLowerCase()}`}`
+        : `${badge.next.name}: ${badge.next.range.toLowerCase()} on average`));
+    } else text.appendChild(element("small", "", "The highest badge there is."));
+    block.append(icon, text);
+    strip.appendChild(block);
+  }
+  const average = played.length ? played.reduce((sum, day) => sum + day.topPercent, 0) / played.length : null;
+  const best = played.length ? Math.min(...played.map(day => day.topPercent)) : null;
+  [["DAYS", `${played.length}/${inMonth.length}`], ["AVG.", average === null ? "—" : formatTopPercent(average)], ["BEST", best === null ? "—" : formatTopPercent(best)]].forEach(([label, value]) => {
+    const stat = element("div", "archive-stat");
+    stat.append(element("span", "", label), element("strong", "", value));
+    strip.appendChild(stat);
+  });
+  return strip;
+}
+
+function createCalendar(days, { selected, onSelect, mode }) {
+  const weeks = groupByWeek(days);
+  const calendar = element("div", "calendar");
+  const todayKey = days.find(day => day.isToday)?.dateKey || days.filter(day => day.dateKey <= toKey(new Date())).at(-1)?.dateKey || days.at(-1).dateKey;
+  // One strip with how you're doing this month (and your badge in the main game).
+  calendar.appendChild(createStatsStrip(days, mode, todayKey.slice(0, 7)));
+  [...new Set(weeks.map(week => week.month))].forEach(month => {
+    const monthWeeks = weeks.filter(week => week.month === month);
+    // The month's header with its medals, then the weekday letters, then its weeks.
+    calendar.appendChild(createMonthHead(month, monthWeeks, mode));
+    const weekdays = element("div", "calendar-week calendar-weekdays");
+    WEEKDAYS.forEach(letter => weekdays.appendChild(element("span", "", letter)));
+    calendar.appendChild(weekdays);
+    monthWeeks.forEach(week => {
+      const row = element("div", "calendar-week");
+      week.cells.forEach(day => row.appendChild(day ? createDayCell(day, { isSelected: day === selected, onSelect }) : element("span", "day-cell is-empty")));
+      calendar.appendChild(row);
     });
   });
-  document.getElementById("closeStatsButton").addEventListener("click", () => {
+  const legend = element("div", "calendar-legend");
+  [["is-played heat-1", "Top 10%"], ["is-played heat-2", "Top 25%"], ["is-played heat-3", "Top 50%"], ["is-played heat-4", "Lower"], ["is-progress", "In progress"]].forEach(([state, label]) => {
+    const item = element("span", "");
+    item.append(element("i", `day-cell ${state}`), label);
+    legend.appendChild(item);
+  });
+  calendar.appendChild(legend);
+  return calendar;
+}
+
+function createDistributionChart(day) {
+  const { distribution, bucketSize, maxScore } = day.stats;
+  const highest = Math.max(...distribution);
+  const playerBucket = day.completed ? getScoreBucket(day.stats, day.score) : -1;
+  const chart = element("div", "distribution");
+  const bars = element("div", "distribution-bars");
+  distribution.forEach((count, bucket) => {
+    const bar = element("div", "distribution-bar");
+    bar.style.height = `${Math.max(3, count / highest * 100)}%`;
+    bar.classList.toggle("is-player", bucket === playerBucket);
+    const range = `${(bucket * bucketSize).toLocaleString()}–${((bucket + 1) * bucketSize).toLocaleString()}`;
+    bar.title = `${range}: ${count.toLocaleString()} players`;
+    if (bucket === playerBucket) bar.appendChild(element("span", "distribution-you", "YOU"));
+    bars.appendChild(bar);
+  });
+  const axis = element("div", "distribution-axis");
+  axis.append(
+    element("span", "", "0"),
+    element("span", "", (maxScore / 2).toLocaleString()),
+    element("span", "", maxScore.toLocaleString())
+  );
+  chart.append(bars, axis);
+  return chart;
+}
+
+// Start (or continue) button for a day that hasn't been finished. Finished days get a
+// note instead: each day can only be played once.
+function createPlayPanel(day, onPlay) {
+  const panel = element("div", "overview-play");
+  if (day.completed) {
+    panel.classList.add("is-played");
+    panel.appendChild(element("p", "", "✓ Played. Each day can be played once."));
+    return panel;
+  }
+  const label = day.started ? "CONTINUE DAY ▶" : day.isToday ? "START TODAY'S PUZZLE ▶" : "START DAY ▶";
+  const button = element("button", "btn btn-primary", label);
+  button.type = "button";
+  button.addEventListener("click", () => {
     sounds.playClick();
-    statsModal.classList.add("hidden");
+    onPlay(day.dateKey, day.mode);
+  });
+  panel.appendChild(button);
+  return panel;
+}
+
+function renderDayOverview(container, day, onPlay) {
+  container.replaceChildren();
+  // The selected day's start / continue button: under the calendar on a phone (always in
+  // view), in the day's panel on a computer.
+  const playSlot = document.getElementById("archivePlay");
+  playSlot.replaceChildren();
+  if (!day) {
+    container.appendChild(element("p", "overview-empty", "Pick a day to see it here."));
+    return;
+  }
+  playSlot.appendChild(createPlayPanel(day, onPlay));
+  // Phones show the day as a sheet over the calendar; this closes it.
+  const back = element("button", "overview-sheet-close", "‹ CALENDAR");
+  back.type = "button";
+  back.addEventListener("click", () => {
+    sounds.playClick();
+    document.getElementById("archiveModal").classList.remove("is-day-open");
+  });
+  container.appendChild(back);
+
+  const head = element("div", "overview-head");
+  head.append(
+    element("span", "overview-kicker", `DAY ${day.puzzleNumber}${day.isToday ? " · TODAY" : ""}`),
+    element("h3", "overview-date", day.dayName || `Day ${day.puzzleNumber}`)
+  );
+  container.appendChild(head);
+
+  if (!day.completed) {
+    // The questions stay a surprise until the day is played.
+    const done = day.rounds ? day.rounds.filter(round => round.done).length : 0;
+    const status = element("div", "overview-waiting");
+    status.append(
+      element("span", "overview-status", day.started ? `IN PROGRESS · ${done}/${day.rounds.length} ROUNDS` : "NOT PLAYED YET"),
+      element("p", "", day.started ? "Pick up where you left off. The answers show here once the day is done." : `${day.rounds?.length || 6} questions, kept a surprise until you play.`)
+    );
+    container.append(status, createPlayPanel(day, onPlay));
+    container.classList.add("is-unplayed");
+    container.scrollTop = 0;
+    return;
+  }
+
+  // Played: your score and top %, then every question with your pick and the answer.
+  const result = element("div", "overview-result");
+  [["SCORE", day.score.toLocaleString()], ["YOU VS THE WORLD", formatTopPercent(day.topPercent).toUpperCase()]].forEach(([label, value]) => {
+    const tile = element("div", "overview-result-tile");
+    tile.append(element("span", "", label), element("strong", "", value));
+    result.appendChild(tile);
+  });
+  const answers = day.rounds ? createRoundsSection(day)
+    : element("p", "overview-empty", `Played before the five-round format. The original score (out of 1,000) is shown ×${MAX_DAILY_SCORE / 1000}.`);
+  container.append(result, answers, element("p", "sample-note", SAMPLE_NOTE));
+  container.classList.remove("is-unplayed");
+  container.scrollTop = 0;
+}
+
+// The day's rounds: the answer, how you did, and how everyone else did (who got it,
+// what they answered most). All locked until you've finished the day.
+function createRoundsSection(day) {
+  const section = element("section", "overview-section");
+  const list = element("ol", "overview-rounds");
+  day.rounds.forEach((round, index) => {
+    const item = element("li", "overview-round");
+    item.classList.toggle("is-perfect", round.done && round.isPerfect);
+    item.classList.toggle("is-failed", round.done && round.score === 0);
+    const text = element("div", "overview-round-text");
+    text.append(element("strong", "", `${index + 1}. ${round.name}`));
+    if (round.extreme) {
+      // Highs & Lows: your pick with its rank, then the answer.
+      const { pick, answer, count } = round.extreme;
+      const you = element("span", "overview-round-pick");
+      if (pick) you.append(createFlagImage(pick, "overview-round-flag"), `${pick.name} · #${round.result.rank} of ${count}`);
+      else you.textContent = "Not played";
+      const best = element("span", "overview-round-best");
+      best.append(element("b", "", "#1"), createFlagImage(answer, "overview-round-flag"), answer.name);
+      text.append(you, ...(round.result?.perfect ? [] : [best]));
+    } else if (day.completed) {
+      const answer = element("span", "overview-round-answer", round.answerText);
+      answer.title = round.answerText;
+      text.append(answer, element("span", "overview-round-you", describeYourRound(round)));
+    }
+    const points = element("span", "overview-round-points", round.done ? round.points.toLocaleString() : "—");
+    if (round.multiplier > 1) points.appendChild(element("small", "", ` ×${round.multiplier.toFixed(1)}`));
+    if (round.speed > 1) points.appendChild(element("small", "", ` ⚡${round.speed.toFixed(2)}`));
+    item.append(text, points);
+    list.appendChild(item);
+  });
+  section.appendChild(list);
+  return section;
+}
+
+// One line on how you did in a round.
+function describeYourRound({ type, state, plan, solved, ...rest }) {
+  switch (type) {
+    case "mystery":
+    case "pinpoint":
+      return solved ? `You: found it in ${state.guesses.length} ${state.guesses.length === 1 ? "guess" : "guesses"}` : state.gaveUp ? "You: gave up" : "You: not found";
+    case "deepcut": {
+      const answer = state.answer && Object.entries(plan.answers).find(([, texts]) => texts.includes(state.answer));
+      return answer ? `You: ${state.answer} (${Number(answer[0]).toLocaleString()})` : "You: gave up";
+    }
+    case "paint":
+      return `You: ${state.found.length} of ${plan.answers.length}${state.wrong.length ? `, ${state.wrong.length} wrong` : ""}`;
+    case "rank":
+      return solved ? `You: right on try ${state.submissions.length}` : "You: not solved";
+    case "extreme":
+      if (!state.pick) return "You: not played";
+      return rest.result.perfect ? "You: spot on" : `You: #${rest.result.rank}${rest.result.offBy === null ? "" : `, ${Math.round(rest.result.offBy * 100)}% off`}`;
+    default:
+      return "";
+  }
+}
+
+function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay }) {
+  const archiveModal = document.getElementById("archiveModal");
+  const archiveGrid = document.getElementById("archiveListContainer");
+  const overview = document.getElementById("dayOverview");
+
+  // The main game's days by default (badges and groups use those).
+  function loadDays(mode = MAIN_MODE) {
+    return getDays().map(dateKey => withCommunity(getDayRecord(dateKey, mode)));
+  }
+
+  function playDay(dateKey, mode) {
+    archiveModal.classList.add("hidden");
+    document.getElementById("communityModal")?.classList.add("hidden");
+    document.getElementById("victoryModal").classList.add("hidden");
+    document.getElementById("gameView").classList.remove("hidden");
+    onPlayDay(dateKey, mode);
+  }
+
+  // The archive has a tab per mode, each with its own calendar; the selected day stays
+  // selected when switching.
+  let archiveMode = MAIN_MODE;
+  let currentSelection = null;
+  const modeTabs = [...document.querySelectorAll("#archiveModeTabs button")];
+  modeTabs.forEach(tab => tab.addEventListener("click", () => {
+    sounds.playClick();
+    openArchive(currentSelection, tab.dataset.mode);
+  }));
+
+  // Phones: a picked day slides up as a sheet (its details, and START under them).
+  const phone = window.matchMedia("(max-width: 760px)");
+  function openDaySheet() {
+    if (!phone.matches) return;
+    archiveModal.querySelector(".screen-modal").scrollTop = 0;
+    archiveModal.classList.add("is-day-open");
+    archiveModal.style.setProperty("--play-height", `${document.getElementById("archivePlay").offsetHeight}px`);
+    overview.scrollTop = 0;
+  }
+
+  function openArchive(selectedDateKey = null, mode = archiveMode) {
+    archiveModal.classList.remove("is-day-open");
+    archiveMode = mode;
+    archiveModal.dataset.mode = mode;
+    modeTabs.forEach(tab => tab.setAttribute("aria-selected", String(tab.dataset.mode === mode)));
+    const days = loadDays(mode);
+    // Selecting a day shows its overview; unfinished days start from a button there.
+    let selected = days.find(day => day.dateKey === selectedDateKey) || days.find(day => day.isToday) || days[0] || null;
+    currentSelection = selected?.dateKey || null;
+
+    const renderGrid = () => {
+      archiveGrid.replaceChildren(createCalendar(days, {
+        selected,
+        mode,
+        onSelect: picked => {
+          selected = picked;
+          currentSelection = picked.dateKey;
+          renderGrid();
+          renderDayOverview(overview, selected, playDay);
+          openDaySheet();
+        }
+      }));
+    };
+    renderGrid();
+    renderDayOverview(overview, selected, playDay);
+    document.getElementById("communityModal")?.classList.add("hidden");
+    archiveModal.classList.remove("hidden");
+    archiveGrid.querySelector(".day-cell.is-selected")?.scrollIntoView({ block: "nearest" });
+  }
+
+  document.querySelectorAll(".archive-open-button, #menuArchiveButton").forEach(button => {
+    button.addEventListener("click", () => {
+      sounds.playClick();
+      // From a game, the archive opens on that game's mode.
+      const mode = document.getElementById("gameView").dataset.mode;
+      openArchive(null, button.id === "menuArchiveButton" ? archiveMode : mode || archiveMode);
+    });
+  });
+  document.getElementById("closeArchiveButton").addEventListener("click", () => {
+    sounds.playClick();
+    archiveModal.classList.add("hidden");
+  });
+
+  initializePlayerStats({ getDays, getDayRecord, openArchive });
+  return { loadDays, openArchive };
+}
+
+// ---------------------------------------------------------------------------
+// Your stats: worked out from the days you played (in this browser, which after signing
+// in holds your account's days too). No top %: that is still sample data.
+// ---------------------------------------------------------------------------
+
+function everyDateUntilToday(firstKey) {
+  const dates = [];
+  for (const date = toDate(firstKey); toKey(date) <= todayKey(); date.setUTCDate(date.getUTCDate() + 1)) dates.push(toKey(date));
+  return dates;
+}
+
+// Days in a row with a finished day: the current run (up to today, or yesterday if today
+// isn't played yet) and the longest.
+function getStreaks(playedKeys, dates) {
+  let longest = 0;
+  let run = 0;
+  dates.forEach(key => {
+    run = playedKeys.has(key) ? run + 1 : 0;
+    longest = Math.max(longest, run);
+  });
+  let current = 0;
+  const back = [...dates].reverse();
+  if (back[0] && !playedKeys.has(back[0])) back.shift();
+  for (const key of back) { if (!playedKeys.has(key)) break; current += 1; }
+  return { current, longest };
+}
+
+function computePlayerStats(records, dates) {
+  const played = records.filter(day => day.completed);
+  const thisMonth = played.filter(day => day.dateKey.startsWith(todayKey().slice(0, 7)));
+  const average = list => list.length ? Math.round(list.reduce((sum, day) => sum + day.score, 0) / list.length) : null;
+  const best = played.reduce((top, day) => (!top || day.score > top.score ? day : top), null);
+  const stats = {
+    played: played.length,
+    playedThisMonth: thisMonth.length,
+    average: average(played),
+    averageThisMonth: average(thisMonth),
+    best,
+    ...getStreaks(new Set(played.map(day => day.dateKey)), dates)
+  };
+  // Highs & Lows: every pick in a finished round.
+  const picks = played.flatMap(day => (day.rounds || []).filter(round => round.extreme?.pick && round.result));
+  if (picks.length) {
+    const byCountry = new Map();
+    picks.forEach(round => {
+      const entry = byCountry.get(round.extreme.pick.iso) || { country: round.extreme.pick, times: 0, points: 0 };
+      entry.times += 1;
+      entry.points += round.points;
+      byCountry.set(round.extreme.pick.iso, entry);
+    });
+    const countries = [...byCountry.values()];
+    const ends = picks.filter(round => round.plan.find !== "average");
+    Object.assign(stats, {
+      rounds: picks.length,
+      spotOn: picks.filter(round => round.result.perfect).length,
+      averageRank: Math.round(picks.reduce((sum, round) => sum + round.result.rank, 0) / picks.length),
+      wrongEnd: ends.filter(round => round.result.rank === round.extreme.count).length,
+      goTo: countries.reduce((top, entry) => (entry.times > top.times ? entry : top)),
+      lucky: countries.reduce((top, entry) => (entry.points > top.points ? entry : top)),
+      distinct: countries.length
+    });
+  }
+  Object.assign(stats, computeCasualStats(played));
+  return stats;
+}
+
+const ROUND_LABELS = { mystery: "Mystery Country", pinpoint: "Pinpoint", deepcut: "Deep Cut", paint: "Paint the Map", rank: "Rank 'Em" };
+
+// Casual: how each kind of round goes, from the rounds you finished.
+function computeCasualStats(played) {
+  const rounds = played.flatMap(day => (day.rounds || []).filter(round => round.type !== "extreme" && round.done));
+  if (!rounds.length) return {};
+  const ofType = type => rounds.filter(round => round.type === type);
+  const mean = list => list.length ? list.reduce((sum, value) => sum + value, 0) / list.length : null;
+  const guessing = type => {
+    const list = ofType(type);
+    const found = list.filter(round => round.solved);
+    return { rounds: list.length, found: found.length, firstTry: found.filter(round => round.state.guesses.length === 1).length, guesses: mean(found.map(round => round.state.guesses.length)) };
+  };
+  const deep = ofType("deepcut");
+  const deepSolved = deep.filter(round => round.solved);
+  const paint = ofType("paint");
+  const rank = ofType("rank");
+  const rankSolved = rank.filter(round => round.solved);
+  // Your best and toughest kind of round: the highest and lowest average score.
+  const byType = Object.keys(ROUND_LABELS).map(type => ({ type, score: mean(ofType(type).map(round => round.score)) })).filter(entry => entry.score !== null);
+  // Perfect rounds in a row within one day.
+  const bestRun = Math.max(0, ...played.map(day => (day.rounds || []).reduce(([best, run], round) => {
+    const next = round.isPerfect ? run + 1 : 0;
+    return [Math.max(best, next), next];
+  }, [0, 0])[0]));
+  // Every country you named (guesses and painted countries), and the one you most often got wrong.
+  const named = new Set();
+  const wrong = new Map();
+  rounds.forEach(round => {
+    const tried = round.type === "paint" ? [...round.state.found, ...round.state.wrong] : round.type === "mystery" || round.type === "pinpoint" ? round.state.guesses : [];
+    tried.forEach(iso => named.add(iso));
+    const misses = round.type === "paint" ? round.state.wrong : round.type === "mystery" || round.type === "pinpoint" ? round.state.guesses.filter(iso => iso !== round.plan.answer) : [];
+    misses.forEach(iso => wrong.set(iso, (wrong.get(iso) || 0) + 1));
+  });
+  const nemesis = [...wrong.entries()].sort((left, right) => right[1] - left[1])[0];
+  return {
+    casual: {
+      rounds: rounds.length,
+      perfect: rounds.filter(round => round.isPerfect).length,
+      bestRun,
+      mystery: guessing("mystery"),
+      pinpoint: guessing("pinpoint"),
+      deepcut: { rounds: deep.length, niche: mean(deepSolved.map(round => round.score)), rarest: deepSolved.filter(round => round.score === 1000).length },
+      paint: { rounds: paint.length, share: paint.length ? paint.reduce((sum, round) => sum + round.found, 0) / paint.reduce((sum, round) => sum + round.total, 0) : null, perfect: paint.filter(round => round.solved && round.wrong === 0).length },
+      rank: { rounds: rank.length, firstTry: rankSolved.filter(round => round.state.submissions.length === 1).length, tries: mean(rankSolved.map(round => round.state.submissions.length)) },
+      strongest: byType.length > 1 ? byType.reduce((top, entry) => (entry.score > top.score ? entry : top)).type : null,
+      weakest: byType.length > 1 ? byType.reduce((low, entry) => (entry.score < low.score ? entry : low)).type : null,
+      named: named.size,
+      nemesis: nemesis && { country: COUNTRIES.find(country => country.iso === nemesis[0]), times: nemesis[1] }
+    }
+  };
+}
+
+function initializePlayerStats({ getDays, getDayRecord, openArchive }) {
+  const archiveModal = () => document.getElementById("archiveModal");
+  const modal = document.getElementById("statsModal");
+  const body = document.getElementById("statsBody");
+  const tabs = [...document.querySelectorAll("#statsModeTabs button")];
+  let mode = MAIN_MODE;
+  let shareText = "";
+
+  const render = () => {
+    modal.dataset.mode = mode;
+    tabs.forEach(tab => tab.setAttribute("aria-selected", String(tab.dataset.mode === mode)));
+    const dates = everyDateUntilToday(getDays()[0]);
+    // (A date without a day in this mode has no record.)
+    const records = [...new Set([...getDays(), ...dates])].map(dateKey => {
+      try { return withCommunity(getDayRecord(dateKey, mode)); } catch { return null; }
+    }).filter(Boolean);
+    const stats = computePlayerStats(records, dates);
+    const numbers = element("div", "player-stats-numbers");
+    const number = (label, value, note) => {
+      const tile = element("div", "player-stat");
+      tile.append(element("span", "", label), element("strong", "", value));
+      if (note) tile.appendChild(element("small", "", note));
+      numbers.appendChild(tile);
+    };
+    number("AVERAGE", stats.average === null ? "—" : stats.average.toLocaleString(), stats.averageThisMonth === null ? "" : `${stats.averageThisMonth.toLocaleString()} this month`);
+    number("BEST DAY", stats.best ? stats.best.score.toLocaleString() : "—", stats.best ? `Day ${stats.best.puzzleNumber}` : "");
+    number("STREAK", String(stats.current), `longest ${stats.longest}`);
+    if (mode === "extremes") number("SPOT ON", stats.rounds ? `${Math.round(stats.spotOn / stats.rounds * 100)}%` : "—", stats.rounds ? `${stats.spotOn} of ${stats.rounds} rounds` : "");
+    else number("PLAYED", String(stats.played), `${stats.playedThisMonth} this month`);
+
+    const lines = element("ul", "player-stats-lines");
+    const line = (label, content) => {
+      const item = element("li", "");
+      item.append(element("span", "player-stats-label", label), content);
+      lines.appendChild(item);
+    };
+    const text = value => element("span", "", value);
+    const countryText = (country, extra) => {
+      const span = element("span", "");
+      span.append(createFlagImage(country, "overview-round-flag"), `${country.name} ${extra}`);
+      return span;
+    };
+    line("Days played", text(`${stats.played} in total · ${stats.playedThisMonth} this month`));
+    if (stats.best) {
+      const link = element("button", "player-stats-link", `Day ${stats.best.puzzleNumber}${stats.best.dayName ? `: ${stats.best.dayName}` : ""} ›`);
+      link.type = "button";
+      link.addEventListener("click", () => { sounds.playClick(); modal.classList.add("hidden"); openArchive(stats.best.dateKey, mode); });
+      line("Best day", link);
+    }
+    if (mode === "extremes" && stats.rounds) {
+      line("Your picks land at", text(`#${stats.averageRank} on average`));
+      line("Wrong end", text(stats.wrongEnd ? `picked the opposite end ×${stats.wrongEnd}` : "never picked the opposite end"));
+      line("Your go-to", countryText(stats.goTo.country, `(picked ${stats.goTo.times}×)`));
+      line("Lucky country", countryText(stats.lucky.country, `(${stats.lucky.points.toLocaleString()} points)`));
+      line("Countries picked", text(`${stats.distinct} of 195`));
+    }
+    const casual = stats.casual;
+    if (mode === "casual" && casual) {
+      const fixed = value => value === null ? "—" : value.toFixed(1);
+      const { mystery, pinpoint, deepcut, paint, rank } = casual;
+      line("Perfect rounds", text(`${casual.perfect} of ${casual.rounds} · best run ${casual.bestRun} in a row`));
+      if (casual.strongest) line("Best at", text(`${ROUND_LABELS[casual.strongest]} · toughest: ${ROUND_LABELS[casual.weakest]}`));
+      if (mystery.rounds) line("Mystery Country", text(`${fixed(mystery.guesses)} guesses on average · ${mystery.firstTry}× first try`));
+      if (pinpoint.rounds) line("Pinpoint", text(`${fixed(pinpoint.guesses)} guesses on average · ${pinpoint.firstTry}× first try`));
+      if (deepcut.rounds) line("Deep Cut", text(`${deepcut.niche === null ? "—" : Math.round(deepcut.niche).toLocaleString()} of 1,000 on average · rarest answer ${deepcut.rarest}×`));
+      if (paint.rounds) line("Paint the Map", text(`${paint.share === null ? "—" : Math.round(paint.share * 100)}% of countries found · ${paint.perfect} perfect maps`));
+      if (rank.rounds) line("Rank 'Em", text(`${rank.firstTry}× right first try · ${fixed(rank.tries)} tries on average`));
+      line("Countries named", text(`${casual.named} of 195`));
+      if (casual.nemesis?.country) line("Your nemesis", countryText(casual.nemesis.country, `(wrong ${casual.nemesis.times}×)`));
+    }
+    // Highs & Lows: the badge you earned in each month you played.
+    const badges = element("div", "player-stats-badges");
+    if (mode === MAIN_MODE) {
+      [...new Set(records.filter(day => day.completed).map(day => day.dateKey.slice(0, 7)))].sort().forEach(month => {
+        const tier = getMonthBadge(records, month).tier;
+        if (!tier) return;
+        const item = element("span", "player-stats-badge");
+        item.title = `${tier.name} · ${toDate(`${month}-01`).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" })}`;
+        item.append(createBadge(tier, 32), element("small", "", toDate(`${month}-01`).toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" }).toUpperCase()));
+        badges.appendChild(item);
+      });
+    }
+    const empty = !stats.played;
+    const scroll = element("div", "player-stats-scroll");
+    if (badges.childElementCount) {
+      const row = element("div", "player-stats-badge-row");
+      row.append(element("span", "player-stats-label", "Badges"), badges);
+      scroll.appendChild(row);
+    }
+    scroll.appendChild(empty ? element("p", "player-stats-empty", "Finish a day to start your stats.") : lines);
+    body.replaceChildren(numbers, scroll);
+    shareText = [
+      `Expedition · my ${MODE_INFO[mode].short} stats`,
+      `Average ${stats.average?.toLocaleString() ?? "—"} · best ${stats.best?.score.toLocaleString() ?? "—"} · streak ${stats.current} (longest ${stats.longest})`,
+      ...(mode === "extremes" && stats.rounds ? [
+        `Spot on ${stats.spotOn} of ${stats.rounds} · picks land at #${stats.averageRank} on average`,
+        `Go-to: ${stats.goTo.country.name} · ${stats.distinct}/195 countries picked`
+      ] : []),
+      location.href.split(/[?#]/)[0]
+    ].join("\n");
+    document.getElementById("statsShare").disabled = empty;
+  };
+
+  tabs.forEach(tab => tab.addEventListener("click", () => { sounds.playClick(); mode = tab.dataset.mode; render(); }));
+  document.querySelectorAll(".stats-open-button, #menuStatsButton").forEach(button => button.addEventListener("click", () => {
+    sounds.playClick();
+    // From a game, the stats open on that game's mode.
+    const gameMode = button.closest("#archiveModal") ? archiveModal().dataset.mode : document.getElementById("gameView").dataset.mode;
+    if (button.id !== "menuStatsButton" && (gameMode === "extremes" || gameMode === "casual")) mode = gameMode;
+    render();
+    modal.classList.remove("hidden");
+  }));
+  document.getElementById("closeStatsButton").addEventListener("click", () => { sounds.playClick(); modal.classList.add("hidden"); });
+  const share = document.getElementById("statsShare");
+  share.addEventListener("click", async () => {
+    sounds.playClick();
+    try {
+      if (navigator.share && window.matchMedia("(pointer: coarse)").matches) await navigator.share({ text: shareText });
+      else { await navigator.clipboard.writeText(shareText); share.textContent = "COPIED ✓"; setTimeout(() => { share.textContent = "SHARE"; }, 1600); }
+    } catch { /* cancelled */ }
   });
 }
 
-return { redactCountryName, showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, renderProgressiveHints, renderGlobeMarkerTooltip, showHowToSet, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight, initializeStatsModal };
+return { createDistributionChart, initializeHistoryScreens, computePlayerStats };
 })();
 
 // ---- social.js
@@ -17678,7 +17991,7 @@ const { createBadge } = __modules["badges.js"];
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
 const { hasExtremeDay, MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MAIN_MODE, MODES, MODE_INFO, getSpeedWindow, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
-const { showHowToSet, createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, initializeStatsModal, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, redactCountryName, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
+const { showHowToSet, createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, redactCountryName, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
 
 // v3: Deep Cut and Paint the Map replaced Capital Call and Border Patrol (October 2026).
 const DAY_STORAGE_PREFIX = "daily-geography:day:v3:";
@@ -17769,7 +18082,7 @@ let globeFadeTimer = null;
 globe.onDragChange = active => {
   clearTimeout(globeFadeTimer);
   const view = document.getElementById("gameView");
-  if (active) view.classList.add("is-globe-active");
+  if (active) { view.classList.add("is-globe-active"); extremeTour?.pauseForDrag?.(); }
   else globeFadeTimer = setTimeout(() => view.classList.remove("is-globe-active"), 700);
 };
 
@@ -18432,9 +18745,8 @@ function showScoreBurst(index, { keepCardsOut = false } = {}) {
   const rise = now => {
     const progress = Math.min(1, (now - climbStart) / 1400);
     climb.draw(before + result.points * (1 - (1 - progress) ** 3), { stretches, stops });
-    if (progress < 1) requestAnimationFrame(rise);
-    // Then the whole day so far plays again and again while the card is open.
-    else setTimeout(() => { if (burst === burstRun) climb.replay({ stretches }); }, 1500);
+    // It rises once, then stays at the day's new total.
+    if (progress < 1 && burst === burstRun) requestAnimationFrame(rise);
   };
   setTimeout(() => requestAnimationFrame(rise), 250);
   setTimeout(() => {
@@ -18580,8 +18892,19 @@ function createLadder(standings, pickIso, { full = false } = {}) {
     );
     ladder.appendChild(row);
   });
-  if (full) scrollToPick(ladder, ladder.querySelector(".is-pick"));
-  return ladder;
+  if (!full) return ladder;
+  // The full ranking: #1 and the last stay in view above and below the list that scrolls
+  // (separate lists, so nothing scrolls underneath them).
+  const rows = [...ladder.children];
+  const pinned = side => Object.assign(document.createElement("ol"), { className: `ladder is-pinned is-${side}` });
+  const top = pinned("top");
+  top.appendChild(rows[0]);
+  const bottom = pinned("bottom");
+  if (rows.length > 1) bottom.appendChild(rows.at(-1));
+  const wrap = Object.assign(document.createElement("div"), { className: "ladder-pinned" });
+  wrap.append(top, ladder, ...(rows.length > 1 ? [bottom] : []));
+  scrollToPick(ladder, ladder.querySelector(".is-pick"));
+  return wrap;
 }
 
 // Scroll a list so your pick's row sits in its middle, once the list is on screen (it may
@@ -19594,17 +19917,9 @@ function playExtremeTour(round, state) {
   const far = sorted.at(-1);
   const pick = standings.ranks[state.pick];
   const fmt = value => formatValue(stat, value);
-  // Always the same three stops, in the same order, whatever you picked (a missing stop
-  // would give the result away): your guess (its figure, not its rank), the far end, then
-  // the answer. When your guess is one of the ends, that stop confirms it instead of
-  // showing the country as a new find; when it is the answer, it's a small celebration.
-  // The tile says no more than that: the colour key below it explains the globe.
-  const stops = [
-    { entry: pick, kind: "pick", kicker: "YOUR GUESS", hideRank: true },
-    { entry: far, kind: "far", match: far.iso === pick.iso, kicker: far.iso === pick.iso ? `YOUR GUESS IS THE ${farEnd}` : `THE ${farEnd}` },
-    { entry: winner, kind: "near", match: winner.iso === pick.iso, kicker: winner.iso === pick.iso ? `YOU GOT THE ${near}!` : `THE ${near}` }
-  ];
-
+  // The reveal is the spinning heat map itself: one tile (the stat and a colour key), no
+  // stops at single countries. Grabbing the globe pauses it there, to look around at your
+  // own pace, until CONTINUE (or SKIP); then the climb gives your rank.
   const view = document.getElementById("gameView");
   const card = document.getElementById("extremeTour");
   const pickCountry = getCountry(pick.iso);
@@ -19681,26 +19996,23 @@ function playExtremeTour(round, state) {
       return item;
     }));
     showStop({ kicker: "THE WHOLE WORLD, RANKED" });
-    const first = getCountry(stops[0].entry.iso);
-    globe.revealSpin(first.lat, first.lon, TOUR_SPIN_MS, TOUR_ZOOM);
-    await wait(TOUR_SPIN_MS - 300);
-    for (const [index, stop] of stops.entries()) {
-      if (tour.cancelled) break;
-      if (index) {
-        // Your guess is still in view when it turns out to be the far end: just a beat.
-        const country = getCountry(stop.entry.iso);
-        if (stop.entry.iso === stops[index - 1].entry.iso) await wait(700);
-        else {
-          globe.rotateTo(country.lat, country.lon, TOUR_MOVE_MS);
-          await wait(TOUR_MOVE_MS * 0.7);
-        }
-        if (tour.cancelled) break;
-      }
-      showStop(stop);
-      await wait(TOUR_HOLD_MS);
-    }
-    // Settle on your pick, behind the climb.
-    globe.rotateTo(pickCountry.lat, pickCountry.lon, 900);
+    setText("tourValue", "Drag the globe to look around.");
+    globe.revealSpin(pickCountry.lat, pickCountry.lon, TOUR_SPIN_MS, TOUR_ZOOM);
+    // A drag stops the spin where it is and holds the tour (no timer runs) until CONTINUE.
+    tour.pauseForDrag = () => {
+      if (tour.paused || tour.cancelled) return;
+      tour.paused = true;
+      globe.rotationToken += 1;
+      clearTimeout(tour.timer);
+      card.classList.add("is-paused");
+      // Looking around by yourself: the country names come back, as in the round.
+      view.classList.remove("is-spinning");
+      setText("tourValue", "Take your time. Continue when you're ready.");
+    };
+    await wait(TOUR_SPIN_MS + 600);
+    tour.pauseForDrag = null;
+    card.classList.remove("is-paused");
+    // The globe stays where you left it, behind the climb.
     globe.zoomTo(1);
     card.classList.add("hidden");
     updatePhoneFrame(PHONE_SHIFT_MS);
@@ -19871,6 +20183,7 @@ function stopExtremeTour({ all = false } = {}) {
 }
 
 document.getElementById("tourSkip").addEventListener("click", () => { sounds.playClick(); stopExtremeTour(); });
+document.getElementById("tourGo").addEventListener("click", () => { sounds.playClick(); stopExtremeTour(); });
 document.getElementById("extremeClimb").addEventListener("click", () => stopExtremeTour());
 document.addEventListener("keydown", event => {
   // (Not the Enter that locked the pick in.)
@@ -20042,7 +20355,7 @@ function showFinalModal() {
   // The day's journey, round by round in each round's colour.
   endClimb = journeyIn(endClimb, "endClimb");
   const stretches = getStretches(dayScore);
-  // Played again and again while the screen is open.
+  // Played once, then it stays at the day's total.
   endClimb.draw(0, { stretches });
   endClimb.replay({ stretches });
   countUp(document.getElementById("modalScore"), dayScore.total, { duration: 1800 });
@@ -20234,6 +20547,11 @@ function getDayRecord(dateKey, mode = "competitive") {
       // The round as planned and your progress in it, for the archive's round list.
       plan: round,
       state: states[index],
+      // Highs & Lows: your pick and the answer as countries, and how many were ranked.
+      ...(round.type === "extreme" ? (() => {
+        const standings = getStandings(round.stat, round.find);
+        return { extreme: { count: standings.count, answer: getCountry(standings.sorted[0].iso), pick: states[index].pick ? getCountry(states[index].pick) : null } };
+      })() : {}),
       ...dayScore.rounds[index]
     }))
   };
@@ -20499,8 +20817,9 @@ document.getElementById("soundToggle").addEventListener("click", () => {
 function describeMode(mode) {
   if (mode === "extremes" && !hasExtremeDay(today)) return "No reviewed day for today yet";
   const record = getDayRecord(today, mode);
-  if (record.completed) return `Played · ${record.score.toLocaleString()} · ${formatTopPercent(getTopPercent(getDayStats(today, mode), record.score))}`;
-  if (record.started) return `Round ${record.rounds.filter(round => round.done).length + 1} of ${record.rounds.length} · continue`;
+  // Short: done, or where to pick up (the score and top % are on the stats card).
+  if (record.completed) return "✓ Played today";
+  if (record.started) return `Continue · round ${record.rounds.filter(round => round.done).length + 1} of ${record.rounds.length}`;
   // Nothing to say before you've started (no day number).
   return "";
 }
@@ -20516,16 +20835,6 @@ initializeMainMenu({
   },
   describeMode,
   isModeAvailable: mode => mode !== "extremes" || hasExtremeDay(today)
-});
-initializeStatsModal(() => {
-  const stats = getStats();
-  return {
-    gamesPlayed: stats.gamesPlayed,
-    winStreak: stats.winStreak,
-    maxStreak: stats.maxStreak,
-    averageScore: stats.gamesPlayed ? Math.round(stats.totalScore / stats.gamesPlayed) : 0,
-    perfectGuesses: stats.perfectGuesses
-  };
 });
 // ---------------------------------------------------------------------------
 // Accounts (auth.js): signing in, and keeping the days in this browser and in the
