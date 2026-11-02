@@ -35,6 +35,8 @@
   --accent-hover: #8af0ff;
   --accent-soft: rgba(69, 227, 255, 0.12);
   --gold: #ffd45c;
+  /* Expedition's own cyan, also where another mode's --accent is in force. */
+  --cyan: #45e3ff;
   --danger: #ff6b7d;
   --hard-shadow: 4px 4px 0 #04060d;
   /* LOGO START */
@@ -1265,6 +1267,61 @@ h1, h2, h3 { font-weight: normal; }
 .game-view:has(#scoreBurst:not(.hidden)) .globe-labels,
 .game-view.is-spinning .globe-labels { opacity: 0; }
 .round-intro-start { margin-top: 0.2rem; color: var(--faint); font: 12px var(--font-body); }
+
+/* Highs & Lows: a sturdier, nearly opaque card that reads over any part of the globe:
+   ROUND 4 OF 6, six segments (done pink, now cyan, to come dark), FIND THE HIGHEST,
+   the question large, and CONTINUE. The whole screen still continues on a click. */
+.round-intro.is-extreme .round-intro-card {
+  gap: 0;
+  width: min(100%, 640px);
+  padding: 28px 32px 30px;
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  background: rgba(10, 15, 29, 0.95);
+}
+.round-intro.is-extreme .round-intro-count { color: var(--text); }
+.round-intro-steps { display: grid; grid-template-columns: repeat(var(--steps, 6), 1fr); gap: 6px; width: min(100%, 320px); margin-top: 10px; }
+.round-intro-steps[hidden] { display: none; }
+.round-intro-steps i { height: 8px; border-radius: 4px; background: var(--line); }
+.round-intro-steps i.is-done { background: var(--accent); }
+.round-intro-steps i.is-now { background: var(--cyan); box-shadow: 0 0 10px color-mix(in srgb, var(--cyan) 55%, transparent); }
+.round-intro.is-extreme .round-intro-name {
+  margin: 22px 0 0;
+  padding: 8px 14px;
+  border: 1px solid color-mix(in srgb, var(--accent) 70%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  font: 12px/1.5 var(--font-display);
+  text-shadow: none;
+}
+.round-intro.is-extreme .round-intro-task { max-width: 30ch; margin: 18px 0 0; font: 600 26px/1.3 var(--font-body); text-wrap: balance; }
+.round-intro.is-extreme .round-intro-start { display: none; }
+.round-intro-go {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: min(100%, 340px);
+  min-height: 50px;
+  margin-top: 24px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--accent);
+  color: var(--bg);
+  font: 12px var(--font-display);
+  letter-spacing: var(--ls-pixel);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.round-intro-go[hidden] { display: none; }
+.round-intro-play { width: 0; height: 0; border-top: 7px solid transparent; border-bottom: 7px solid transparent; border-left: 11px solid currentColor; }
+@media (hover: hover) { .round-intro-go:hover { background: var(--accent-hover); } }
+.round-intro-go:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+@media (max-width: 760px) {
+  .round-intro.is-extreme .round-intro-card { width: calc(100vw - 32px); padding: 20px 20px 22px; }
+  .round-intro.is-extreme .round-intro-name { margin-top: 18px; font-size: 9px; }
+  .round-intro.is-extreme .round-intro-task { margin-top: 14px; font-size: 21px; }
+  .round-intro-go { width: 100%; margin-top: 20px; }
+}
 
 .round-intro.is-showing .round-intro-card { animation: intro-in 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.1) both; }
 .round-intro.is-showing { animation: intro-fade 0.3s ease both; }
@@ -2514,41 +2571,70 @@ h1, h2, h3 { font-weight: normal; }
 /* Highs & Lows: the tour after locking in. A card at the bottom names each stop on the
    globe; its pin slides along the pecking order (hot #1 to cold last). */
 .extreme-tour {
+  /* The round card's look (.round-intro.is-extreme): nearly opaque navy, a tinted border,
+     a pixel label in a pill, readable text in Space Grotesk, centred. The accent changes
+     per stop: neutral for your guess, the far end's blue, the answer's pink. */
+  --tone: var(--accent);
   position: fixed;
   right: 0;
   bottom: calc(var(--gutter) + 12px);
   left: 0;
   z-index: 60;
   display: grid;
-  gap: 0.5rem;
-  width: min(460px, calc(100% - 32px));
+  grid-template-rows: auto auto 32px 40px auto;
+  justify-items: center;
+  align-items: center;
+  width: min(520px, calc(100% - 32px));
   margin-inline: auto;
-  padding: 0.9rem 1.1rem 0.8rem;
-  border: 1px solid var(--glass-line);
-  border-radius: 20px;
-  background: var(--glass-strong);
-  box-shadow: var(--glass-shine), var(--glass-shadow), inset 4px 0 0 var(--heat, var(--accent));
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  padding: 20px 28px 22px;
+  border: 1px solid color-mix(in srgb, var(--tone) 45%, transparent);
+  border-radius: 26px;
+  background: rgba(10, 15, 29, 0.95);
+  box-shadow: var(--glass-shine), var(--glass-shadow), 0 0 60px color-mix(in srgb, var(--tone) 12%, transparent);
+  text-align: center;
 }
+.extreme-tour[data-kind="pick"] { --tone: var(--muted); }
+.extreme-tour[data-kind="far"] { --tone: #5aa8ff; }
+.extreme-tour[data-kind="near"] { --tone: #ff6b9d; }
 .extreme-tour.is-popping { animation: tour-pop 0.42s cubic-bezier(0.2, 1.4, 0.4, 1); }
 @keyframes tour-pop { from { transform: translateY(8px) scale(0.97); opacity: 0.4; } }
-.extreme-tour.is-pick { border-color: rgba(255, 212, 92, 0.6); }
-.tour-head { display: flex; justify-content: space-between; gap: 0.8rem; }
-.tour-kicker { color: var(--heat, var(--accent)); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
-.extreme-tour.is-pick .tour-kicker { color: var(--gold); }
-.tour-rank { color: var(--muted); font: 700 12px var(--font-mono); white-space: nowrap; }
-.tour-country { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+.tour-rank { color: var(--text); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.tour-kicker {
+  margin-top: 14px;
+  padding: 8px 14px;
+  border: 1px solid color-mix(in srgb, var(--tone) 70%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--tone) 10%, transparent);
+  color: var(--tone);
+  font: 12px/1.5 var(--font-display);
+  letter-spacing: var(--ls-pixel);
+}
+.extreme-tour[data-kind="pick"] .tour-kicker { color: var(--text); }
+.tour-country { display: flex; align-items: center; justify-content: center; gap: 10px; max-width: 100%; min-width: 0; margin-top: 14px; }
 .tour-flag:empty { display: none; }
 .tour-flag-image { display: block; width: 36px; height: 24px; border-radius: 4px; object-fit: cover; }
-.tour-country strong { overflow: hidden; font-size: 20px; font-weight: 700; white-space: nowrap; text-overflow: ellipsis; }
-.tour-country strong { flex: 0 1 auto; min-width: 5em; }
-.tour-value { display: grid; justify-items: end; flex: 0 1 auto; min-width: 0; max-width: 55%; margin-left: auto; text-align: right; }
-.tour-value b { color: var(--gold); font: 700 16px var(--font-mono); white-space: nowrap; }
-.tour-value small { color: var(--muted); font-size: 12px; line-height: 1.3; }
-.tour-line { margin: 0; color: var(--text); font-size: 14px; line-height: 1.4; }
-.tour-skip { justify-self: end; margin-top: -0.2rem; padding: 0.3rem 0.5rem; border: 0; background: none; color: var(--faint); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
-.tour-skip:hover { color: var(--text); }
+.tour-country strong { overflow: hidden; min-width: 0; font: 600 24px/1.3 var(--font-body); white-space: nowrap; text-overflow: ellipsis; }
+.tour-value { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 0 8px; max-width: 100%; }
+.tour-value b { color: var(--tone); font: 700 20px var(--font-mono); white-space: nowrap; }
+.extreme-tour[data-kind="pick"] .tour-value b { color: var(--text); }
+.tour-value small { color: var(--text); font-size: 14px; }
+/* The colour key under the tile: the globe's pink for the end we're after, its blue for
+   the other end. */
+.tour-key { display: flex; justify-content: center; gap: 18px; margin-top: 10px; }
+.tour-key-item { display: inline-flex; align-items: center; gap: 7px; color: var(--text); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.tour-key-item i { width: 10px; height: 10px; border-radius: 2px; }
+.tour-key-item.is-near i { background: #ff6b9d; }
+.tour-key-item.is-far i { background: #5aa8ff; }
+/* SKIP: clearly a button, but quieter than what the tile says; in the corner. */
+.tour-skip { position: absolute; top: 14px; right: 14px; display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border: 1px solid var(--glass-line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--muted); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; transition: color 0.15s ease, border-color 0.15s ease; }
+@media (hover: hover) { .tour-skip:hover { border-color: var(--line-strong); color: var(--text); } }
+.tour-skip:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+/* Your guess turns out to be the answer: a short pulse round the tile and its label. */
+.extreme-tour.is-win { animation: tour-pop 0.42s cubic-bezier(0.2, 1.4, 0.4, 1), tour-win 1.4s ease-out 0.2s; }
+.extreme-tour.is-win .tour-kicker { background: var(--tone); color: var(--bg); animation: tour-win-label 0.6s cubic-bezier(0.2, 1.6, 0.4, 1); }
+@keyframes tour-win { 0% { box-shadow: var(--glass-shine), var(--glass-shadow), 0 0 0 0 color-mix(in srgb, var(--tone) 60%, transparent); } 100% { box-shadow: var(--glass-shine), var(--glass-shadow), 0 0 0 18px transparent; } }
+@keyframes tour-win-label { from { transform: scale(0.7); } }
+@media (prefers-reduced-motion: reduce) { .extreme-tour.is-win, .extreme-tour.is-win .tour-kicker { animation: none; } }
 
 /* The pecking order as one bar, with pins (#1, YOU, the tour's current stop). A pin's box
    shifts by its own share, so it stays inside the bar at both ends; its tick sits at --at. */
@@ -2595,8 +2681,12 @@ h1, h2, h3 { font-weight: normal; }
 .burst-answer-list li.is-answer { box-shadow: inset 0 0 0 1px rgba(255, 79, 154, 0.7); }
 
 @media (max-width: 760px) {
-  .extreme-tour { bottom: calc(env(safe-area-inset-bottom) + 12px); width: calc(100% - 16px); padding: 0.8rem 0.9rem 0.6rem; }
-  .tour-country strong { font-size: 16px; }
+  .extreme-tour { bottom: calc(env(safe-area-inset-bottom) + 12px); width: calc(100% - 16px); padding: 18px 20px 18px; grid-template-rows: auto auto 30px 36px auto; }
+  .tour-kicker { margin-top: 14px; font-size: 9px; }
+  .tour-country { margin-top: 12px; }
+  .tour-country strong { font-size: 20px; }
+  .tour-value b { font-size: 18px; }
+  .tour-skip { top: 8px; right: 8px; min-height: 44px; padding: 0 16px; }
 }
 
 /* Highs & Lows: the climb. The ranking creeps up through a five-row window (the middle
@@ -2887,17 +2977,14 @@ h1, h2, h3 { font-weight: normal; }
         <div class="stage-hint" id="stageHint">Drag to rotate · hover a marker for details</div>
         <!-- Highs & Lows: the guided tour of the heat map after locking in. -->
         <div id="extremeTour" class="extreme-tour hidden" role="status" aria-live="polite">
-          <div class="tour-head">
-            <span class="tour-kicker" id="tourKicker"></span>
-            <span class="tour-rank" id="tourRank"></span>
-          </div>
+          <span class="tour-rank" id="tourRank"></span>
+          <span class="tour-kicker" id="tourKicker"></span>
           <div class="tour-country" id="tourCountry">
             <span class="tour-flag" id="tourFlag"></span>
             <strong id="tourName"></strong>
-            <span class="tour-value" id="tourValue"></span>
           </div>
-          <p class="tour-line" id="tourLine"></p>
-          <div class="pecking" id="tourPecking"></div>
+          <span class="tour-value" id="tourValue"></span>
+          <div class="tour-key" id="tourKey"></div>
           <button type="button" class="tour-skip" id="tourSkip">SKIP ›</button>
         </div>
       </section>
@@ -3236,10 +3323,13 @@ h1, h2, h3 { font-weight: normal; }
     <div id="roundIntro" class="round-intro hidden" role="dialog" aria-live="assertive" aria-labelledby="roundIntroName">
       <div class="round-intro-card">
         <span class="round-intro-count" id="roundIntroCount">ROUND 1 / 5</span>
+        <!-- Highs & Lows: one segment per round (done, now, to come). -->
+        <div class="round-intro-steps" id="roundIntroSteps" aria-hidden="true" hidden></div>
         <h2 class="round-intro-name" id="roundIntroName">MYSTERY COUNTRY</h2>
         <p class="round-intro-task" id="roundIntroTask"></p>
         <p class="round-intro-clock hidden" id="roundIntroClock">⚡ Beat the clock for up to ×1.5</p>
         <span class="round-intro-start">Click to start</span>
+        <button type="button" class="round-intro-go" id="roundIntroGo" hidden><span class="round-intro-play" aria-hidden="true"></span>CONTINUE</button>
       </div>
     </div>
   </div>
@@ -17863,10 +17953,19 @@ function showRoundIntro(index) {
   slideCardsOut();
   const round = plan[index];
   const overlay = document.getElementById("roundIntro");
-  setText("roundIntroCount", `ROUND ${index + 1} / ${plan.length}${round.type === "extreme" ? ` · FIND THE ${FIND_LABELS[round.find]}` : ""}`);
-  // The globe mode's title card asks the round's question, under which end to find.
+  // Highs & Lows: the round and a bar of segments, which end to find, the question itself
+  // (the stat's name would only repeat it) and a CONTINUE button.
   const extreme = round.type === "extreme";
-  setText("roundIntroName", extreme ? getStat(round.stat).name.toUpperCase() : ROUND_INFO[round.type].name.toUpperCase());
+  overlay.classList.toggle("is-extreme", extreme);
+  setText("roundIntroCount", extreme ? `ROUND ${index + 1} OF ${plan.length}` : `ROUND ${index + 1} / ${plan.length}`);
+  const steps = document.getElementById("roundIntroSteps");
+  steps.hidden = !extreme;
+  steps.style.setProperty("--steps", plan.length);
+  document.getElementById("roundIntroGo").hidden = !extreme;
+  steps.replaceChildren(...(extreme ? plan.map((_, i) => Object.assign(document.createElement("i"), {
+    className: i < index ? "is-done" : i === index ? "is-now" : ""
+  })) : []));
+  setText("roundIntroName", extreme ? `FIND THE ${FIND_LABELS[round.find]}` : ROUND_INFO[round.type].name.toUpperCase());
   setText("roundIntroTask", extreme ? round.question : ROUND_INFO[round.type].task);
   // Competitive: the clock, as its own short line.
   const clock = document.getElementById("roundIntroClock");
@@ -19087,10 +19186,7 @@ const ROUND_RENDERERS = {
       { country: winner, color: 0xffffff, pulse: true, focus: true },
       ...(state.pick !== winner.iso ? [{ country: selected, color: 0xffd45c, pulse: false, focus: true }] : [])
     ]);
-    // Markers with their place in the pecking order: the top three, your pick and the
-    // other end.
-    // During the reveal they appear one by one, as the tour gets to them.
-    if (!extremeRevealPending) extremeMarkerEntries(standings, state.pick).forEach(entry => addExtremeMarker(entry, standings, state.pick));
+    // No rank markers on the globe in this mode: the tiles and the ladder name the countries.
     // Right after locking in, the globe gives a tour of the heat map; revisiting the round
     // just turns to the answer.
     if (extremeRevealPending) {
@@ -19484,7 +19580,7 @@ function confirmExtremePick() {
 // The reveal after locking in (the globe mode), in two parts, like opening a pack:
 //  1. The tour: the globe zooms out and turns slowly once around the heat map, then stops
 //     at the other end, the runner-up and the answer. A card at the bottom names each stop
-//     with a fun line, and a pin slides along the pecking order (hot #1 to cold last).
+//     with a fun line.
 //  2. The climb (playExtremeClimb): the whole ranking creeps up from the last place,
 //     ticking faster and then slower, until it lands on your pick; then your points.
 // Neither gives away your rank early. SKIP (or Enter) skips the current part.
@@ -19497,41 +19593,26 @@ function playExtremeTour(round, state) {
   const winner = sorted[0];
   const far = sorted.at(-1);
   const pick = standings.ranks[state.pick];
-  const nameOf = entry => getCountry(entry.iso).name;
   const fmt = value => formatValue(stat, value);
-  const ratioText = ratio => `${ratio < 10 ? ratio.toFixed(1).replace(/\.0$/, "") : Math.round(ratio)}×`;
-
-  // The far end comes before the answer, so its line must not hint at the answer's figure;
-  // the comparison between the two ends waits for the answer's own stop.
-  const farLine = () => find === "average"
-    ? `The furthest from the middle value of ${fmt(standings.target)}.`
-    : `The ${farEnd.toLowerCase()} of all ${count} countries with data.`;
-  const winnerLine = () => {
-    if (find === "average") return "Right in the middle: half the world is above, half below.";
-    const lead = `The ${near.toLowerCase()} of all ${count} countries with data.`;
-    if (far.iso === winner.iso) return lead;
-    const [big, small] = find === "highest" ? [winner.value, far.value] : [far.value, winner.value];
-    if (big > 0 && small > 0 && big / small >= 2) return `${lead} ${find === "highest" ? `${ratioText(big / small)} ${nameOf(far)}'s figure` : `${nameOf(far)}'s figure is ${ratioText(big / small)} this`}.`;
-    return `${lead} ${fmt(Math.abs(winner.value - far.value))} ${find === "highest" ? "more" : "less"} than ${nameOf(far)}.`;
-  };
-  // First your pick (its figure, but not yet its rank), then the worst and the best.
-  const pickLine = () => `${nameOf(pick)}: ${fmt(pick.value)}. How does that compare?`;
+  // Always the same three stops, in the same order, whatever you picked (a missing stop
+  // would give the result away): your guess (its figure, not its rank), the far end, then
+  // the answer. When your guess is one of the ends, that stop confirms it instead of
+  // showing the country as a new find; when it is the answer, it's a small celebration.
+  // The tile says no more than that: the colour key below it explains the globe.
   const stops = [
-    ...(pick.iso === winner.iso ? [] : [{ entry: pick, kicker: "YOUR PICK", line: pickLine(), hideRank: true }]),
-    ...(far.iso === pick.iso ? [] : [{ entry: far, kicker: `THE ${farEnd}`, line: farLine() }]),
-    { entry: winner, kicker: `THE ${near}`, line: winnerLine() }
+    { entry: pick, kind: "pick", kicker: "YOUR GUESS", hideRank: true },
+    { entry: far, kind: "far", match: far.iso === pick.iso, kicker: far.iso === pick.iso ? `YOUR GUESS IS THE ${farEnd}` : `THE ${farEnd}` },
+    { entry: winner, kind: "near", match: winner.iso === pick.iso, kicker: winner.iso === pick.iso ? `YOU GOT THE ${near}!` : `THE ${near}` }
   ];
 
   const view = document.getElementById("gameView");
   const card = document.getElementById("extremeTour");
-  const pecking = renderPeckingBar(document.getElementById("tourPecking"), standings, [{ rank: 1, label: "", kind: "stop" }]);
-  const stopPin = pecking.querySelector(".pecking-pin.is-stop");
   const pickCountry = getCountry(pick.iso);
   const highlight = (country, white = true) => globe.setHighlights([
     ...(country ? [{ country, color: 0xffffff, pulse: true, focus: true }] : []),
     ...(country?.iso === pick.iso ? [] : [{ country: pickCountry, color: 0xffd45c, pulse: !country, focus: true }])
   ]);
-  // Markers only appear once the tour has been there (and the rest after the climb).
+  // Rank markers only appear after the climb.
   const marked = new Set();
   const markStop = entry => {
     if (marked.has(entry.iso)) return;
@@ -19540,8 +19621,11 @@ function playExtremeTour(round, state) {
   };
   const showStop = stop => {
     const country = stop.entry && getCountry(stop.entry.iso);
-    card.classList.toggle("is-intro", !stop.entry);
-    card.style.setProperty("--heat", stop.entry ? heatColor(stop.entry.rank, count) : "var(--accent)");
+    // One tile for every stop, styled like the round card; only its accent changes:
+    // neutral for your guess, blue for the far end, pink for the answer.
+    card.dataset.kind = stop.kind || "intro";
+    card.classList.toggle("is-match", Boolean(stop.match));
+    card.classList.toggle("is-win", Boolean(stop.match && stop.kind === "near"));
     setText("tourKicker", stop.kicker);
     setText("tourRank", !stop.entry ? `${count} COUNTRIES` : stop.hideRank ? `#? OF ${count}` : `#${stop.entry.rank} OF ${count}`);
     document.getElementById("tourFlag").replaceChildren(...(stop.entry ? [createFlagImage(country, "tour-flag-image")] : []));
@@ -19553,17 +19637,21 @@ function playExtremeTour(round, state) {
       Object.assign(document.createElement("b"), { textContent: formatValue(stat, stop.entry.value, { unit: unit === "%" }) }),
       ...(unit && unit !== "%" ? [Object.assign(document.createElement("small"), { textContent: unit })] : [])
     ] : []));
-    setText("tourLine", stop.line);
-    stopPin.classList.toggle("hidden", !stop.entry || Boolean(stop.hideRank));
-    if (stop.entry && !stop.hideRank) movePeckingPin(stopPin, { rank: stop.entry.rank, label: `#${stop.entry.rank}` }, count);
     // The card pops each time it changes.
     card.classList.remove("is-popping");
     void card.offsetWidth;
     card.classList.add("is-popping");
-    if (stop.entry) {
-      if (!stop.hideRank) markStop(stop.entry);
+    // No rank markers on the globe during the tour: the tile names the country.
+    if (!stop.entry) return;
+    if (stop.match && stop.kind === "near") {
+      // You found the answer: your country in the mode's pink, pulsing, a little closer.
+      globe.setHighlights([{ country, color: 0xff6b9d, pulse: true, focus: true }]);
+      globe.zoomTo(1);
+      sounds.playVictory();
+    } else {
       highlight(country);
-      sounds.playReveal(stop.entry.rank === 1 ? "match" : "near", stop.entry.rank === 1 ? 3 : 0);
+      if (stop.match) sounds.playError();
+      else sounds.playReveal(stop.entry.rank === 1 ? "match" : "near", stop.entry.rank === 1 ? 3 : 0);
     }
   };
 
@@ -19586,18 +19674,26 @@ function playExtremeTour(round, state) {
     const cardTop = window.innerHeight - card.offsetHeight - (parseFloat(getComputedStyle(card).bottom) || 0);
     globe.setViewShiftY(Math.round((top + cardTop) / 2 - window.innerHeight / 2), PHONE_SHIFT_MS);
     highlight(null);
-    showStop({ kicker: "THE WHOLE WORLD, RANKED", line: find === "average"
-      ? "Pink and gold: close to the middle. Blue: furthest from it."
-      : `Pink and gold: the ${near.toLowerCase()} figures. Blue: the ${farEnd.toLowerCase()}.` });
+    // The colour key: a pink dot for the end we're after, a blue one for the other end.
+    document.getElementById("tourKey").replaceChildren(...[["near", near], ["far", farEnd]].map(([side, label]) => {
+      const item = Object.assign(document.createElement("span"), { className: `tour-key-item is-${side}` });
+      item.append(Object.assign(document.createElement("i"), { ariaHidden: "true" }), label);
+      return item;
+    }));
+    showStop({ kicker: "THE WHOLE WORLD, RANKED" });
     const first = getCountry(stops[0].entry.iso);
     globe.revealSpin(first.lat, first.lon, TOUR_SPIN_MS, TOUR_ZOOM);
     await wait(TOUR_SPIN_MS - 300);
     for (const [index, stop] of stops.entries()) {
       if (tour.cancelled) break;
       if (index) {
+        // Your guess is still in view when it turns out to be the far end: just a beat.
         const country = getCountry(stop.entry.iso);
-        globe.rotateTo(country.lat, country.lon, TOUR_MOVE_MS);
-        await wait(TOUR_MOVE_MS * 0.7);
+        if (stop.entry.iso === stops[index - 1].entry.iso) await wait(700);
+        else {
+          globe.rotateTo(country.lat, country.lon, TOUR_MOVE_MS);
+          await wait(TOUR_MOVE_MS * 0.7);
+        }
         if (tour.cancelled) break;
       }
       showStop(stop);
@@ -19612,7 +19708,6 @@ function playExtremeTour(round, state) {
       tour.cancelled = false;
       await playExtremeClimb(standings, pick, state, tour);
     }
-    extremeMarkerEntries(standings, pick.iso).forEach(markStop);
     const answer = getCountry(winner.iso);
     globe.rotateTo(answer.lat, answer.lon, 700);
     globe.setHighlights([
