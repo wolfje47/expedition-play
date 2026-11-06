@@ -771,7 +771,6 @@ h1, h2, h3 { font-weight: normal; }
 [data-mode="casual"] .mode-chip { color: var(--gold); }
 
 /* Casual Paint the Map: the clues unlocked by wrong clicks, under the question. */
-.paint-clues { padding: 0.6rem 0 0; }
 
 
 /* Score tile: first in the left column, so the score is always in view. */
@@ -2523,7 +2522,6 @@ h1, h2, h3 { font-weight: normal; }
   .play-tile-art { height: 64px; }
   .play-tile-art svg { width: 46px; height: 46px; }
 }
-.paint-clues li.is-found { opacity: 0.55; }
 /* Rank 'Em: what each country stands for in the day's topic (a book, a band…). */
 .rank-label { display: block; color: var(--muted); font: 500 12px/1.3 var(--font-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -3404,8 +3402,6 @@ h1, h2, h3 { font-weight: normal; }
         <div class="round-view hidden" data-round="paint">
           <section class="panel target-card">
             <p class="round-question" id="paintQuestion"></p>
-            <!-- Casual: a clue about a country still to find after every wrong one. -->
-            <ol class="clue-list paint-clues hidden" id="paintClues" aria-label="Clues"></ol>
           </section>
           <section class="pinpoint-pick" aria-live="polite">
             <span class="field-label">SELECTED</span>
@@ -11233,1389 +11229,6 @@ const DAYS = {
 return { DAYS };
 })();
 
-// ---- casual-days.js
-__modules["casual-days.js"] = (() => {
-// The casual calendar: a second, easier puzzle for every day, with its own theme. Same
-// fields as days.js (see there), with a few differences:
-//   - casual answers are well-known countries, questions and topics;
-//   - Deep Cut may leave out `countries` (no country lit up), for questions about the
-//     whole world;
-//   - Rank 'Em has no `reroll`, and its values are far apart.
-// The game makes casual easier by itself too: country names on the globe, no timer, an
-// extra clue up front in Mystery Country, a clue after every wrong Paint the Map click,
-// and a Rank 'Em hint after every wrong try.
-//
-// Check the file with: node tools/check-days.mjs
-
-const CASUAL_DAYS = {
-  "2026-10-01": {
-    name: "Hello, World",
-    theme: "The world's most famous landmarks.",
-    journey: "balloon",
-    mystery: "IN",
-    pinpoint: {
-      answer: "EG",
-      clues: [
-        "Tutankhamun's golden mask is one of its most famous treasures.",
-        "The Nile, one of the longest rivers on Earth, flows through it to the Mediterranean.",
-        "The Great Pyramid of Giza, the last of the Seven Wonders of the Ancient World still standing, is here."
-      ]
-    },
-    deepcut: {
-      countries: ["CN", "IN", "JO", "BR", "PE", "MX", "IT"],
-      question: "Name one of the New Seven Wonders of the World.",
-      answers: {
-        1000: ["Petra", "Chichén Itzá"],
-        800: ["Christ the Redeemer"],
-        600: ["Machu Picchu"],
-        400: ["Colosseum"],
-        200: ["Great Wall of China", "Taj Mahal"]
-      },
-      aliases: {
-        "Chichén Itzá": ["Chichen Itza"], "Christ the Redeemer": ["Cristo Redentor"],
-        "Colosseum": ["Coliseum", "Colosseo"], "Great Wall of China": ["Great Wall", "The Great Wall"]
-      },
-      info: {
-        title: "The New Seven Wonders",
-        text: "In 2007 a worldwide public vote chose seven new wonders of the world. The Great Pyramid of Giza, the only ancient wonder still standing, was given an honorary place.",
-        facts: [["Announced", "2007"], ["Wonders", "7"], ["In the Americas", "3"]]
-      }
-    },
-    paint: {
-      question: "Click the countries where these stand: the Eiffel Tower, the Statue of Liberty, the Sydney Opera House, the Colosseum and the Great Wall.",
-      answers: ["FR", "US", "AU", "IT", "CN"],
-      labels: { FR: "Eiffel Tower", US: "Statue of Liberty", AU: "Sydney Opera House", IT: "Colosseum", CN: "Great Wall" },
-    },
-    rank: {
-      topic: "Height of a famous landmark",
-      detail: "The Burj Khalifa, the Eiffel Tower, the London Eye, the Statue of Liberty and Christ the Redeemer (both with their pedestals).",
-      values: { FR: 330, US: 93, AE: 828, BR: 38, GB: 135 },
-      labels: { FR: "Eiffel Tower", US: "Statue of Liberty", AE: "Burj Khalifa", BR: "Christ the Redeemer", GB: "London Eye" },
-      unit: " m",
-      top: "TALLEST",
-      bottom: "SHORTEST",
-      note: "The Burj Khalifa in Dubai has been the world's tallest building since 2010."
-    }
-  },
-
-  "2026-10-02": {
-    name: "Snack Attack",
-    theme: "Food from around the world.",
-    journey: "climb",
-    mystery: "TH",
-    pinpoint: {
-      answer: "US",
-      clues: [
-        "Peanut butter and jelly sandwiches are a lunchbox classic here.",
-        "Every November, families gather for Thanksgiving with roast turkey and pumpkin pie.",
-        "McDonald's, Burger King and KFC all started here."
-      ]
-    },
-    deepcut: {
-      countries: ["US"],
-      question: "Name a colour of M&M's.",
-      answers: {
-        1000: ["Orange"],
-        800: ["Brown"],
-        600: ["Yellow"],
-        400: ["Green", "Blue"],
-        200: ["Red"]
-      },
-      aliases: {},
-      info: {
-        title: "M&M's",
-        text: "M&M's were first sold in 1941. The two Ms stand for Forrest Mars and Bruce Murrie, the men behind them. Blue replaced tan in 1995, after a public vote.",
-        facts: [["First sold", "1941"], ["Colours today", "6"], ["Newest colour", "Blue, 1995"]]
-      }
-    },
-    paint: {
-      question: "Click the countries these dishes come from: pizza, tacos, paella, kimchi and crêpes.",
-      answers: ["IT", "MX", "ES", "KR", "FR"],
-      labels: { IT: "Pizza", MX: "Tacos", ES: "Paella", KR: "Kimchi", FR: "Crêpes" },
-    },
-    rank: {
-      topic: "Population",
-      detail: "How many mouths there are to feed.",
-      values: { DE: 83, CN: 1407, AU: 28, BR: 213, US: 342 },
-      unit: " million",
-      top: "MOST",
-      bottom: "FEWEST",
-      note: "Figures for 2025. China was the most populous country until India passed it in 2023."
-    }
-  },
-
-  "2026-10-03": {
-    name: "Game On",
-    theme: "Sport.",
-    journey: "rocket",
-    mystery: "ES",
-    pinpoint: {
-      answer: "BR",
-      clues: [
-        "Its carnival in Rio is one of the biggest parties in the world.",
-        "Pelé, one of the greatest footballers of all time, played for its national team.",
-        "It won the men's football World Cup in 1958, 1962, 1970, 1994 and 2002."
-      ]
-    },
-    deepcut: {
-      countries: ["AU", "FR", "GB", "US"],
-      question: "Name one of tennis's four Grand Slam tournaments.",
-      answers: {
-        1000: ["Australian Open"],
-        800: ["French Open"],
-        600: ["US Open"],
-        200: ["Wimbledon"]
-      },
-      aliases: { "French Open": ["Roland Garros", "Roland-Garros"], "US Open": ["U.S. Open"] },
-      info: {
-        title: "The Grand Slams",
-        text: "Tennis's four biggest tournaments are played every year in Melbourne, Paris, London and New York. Wimbledon, first held in 1877, is the oldest, and the only one still played on grass.",
-        facts: [["Tournaments", "4"], ["Oldest", "Wimbledon, 1877"], ["On clay", "French Open"]]
-      }
-    },
-    paint: {
-      question: "Click every country that has hosted the Summer Olympics since 2000.",
-      answers: ["AU", "GR", "CN", "GB", "BR", "JP", "FR"],
-      labels: { AU: "Sydney 2000", GR: "Athens 2004", CN: "Beijing 2008", GB: "London 2012", BR: "Rio 2016", JP: "Tokyo 2020", FR: "Paris 2024" },
-    },
-    rank: {
-      topic: "Medals won at the Paris 2024 Olympics",
-      values: { JP: 45, US: 126, KE: 11, CN: 91, AU: 53 },
-      top: "MOST",
-      bottom: "FEWEST",
-      note: "Gold, silver and bronze together. The United States topped the table, level with China on 40 golds."
-    }
-  },
-
-  "2026-10-04": {
-    name: "Snow Day",
-    theme: "Winter and snow.",
-    journey: "climb",
-    mystery: "RU",
-    pinpoint: {
-      answer: "FI",
-      clues: [
-        "The video game Angry Birds and Nokia phones both come from here.",
-        "Saunas are so popular here that there are about three million of them.",
-        "Santa Claus Village, where you can meet Santa all year round, sits on the Arctic Circle here."
-      ]
-    },
-    deepcut: {
-      countries: ["US"],
-      question: "Name one of Santa's reindeer.",
-      answers: {
-        1000: ["Donner", "Blitzen"],
-        800: ["Vixen"],
-        600: ["Comet", "Cupid"],
-        400: ["Dasher", "Dancer", "Prancer"],
-        200: ["Rudolph"]
-      },
-      aliases: { Donner: ["Donder", "Dunder"], Blitzen: ["Blixem", "Blixen"] },
-      info: {
-        title: "Santa's reindeer",
-        text: "Eight reindeer were named in the 1823 American poem A Visit from St. Nicholas. Rudolph joined them in 1939, in a story written for the department store Montgomery Ward.",
-        facts: [["In the poem", "8"], ["Poem", "1823"], ["Rudolph", "1939"]]
-      }
-    },
-    paint: {
-      question: "Click every country that has hosted the Winter Olympics since 1990.",
-      answers: ["FR", "NO", "JP", "US", "IT", "CA", "RU", "KR", "CN"],
-      labels: { FR: "Albertville 1992", NO: "Lillehammer 1994", JP: "Nagano 1998", US: "Salt Lake City 2002", IT: "Turin 2006", CA: "Vancouver 2010", RU: "Sochi 2014", KR: "Pyeongchang 2018", CN: "Beijing 2022" },
-    },
-    rank: {
-      topic: "Size",
-      detail: "Land and water, in km².",
-      values: { SE: 450295, RU: 17098242, IS: 103000, CA: 9984670, AR: 2780400 },
-      unit: " km²",
-      top: "BIGGEST",
-      bottom: "SMALLEST",
-      note: "Russia is the biggest country in the world, almost twice the size of Canada."
-    }
-  },
-
-  "2026-10-05": {
-    name: "Wild Things",
-    theme: "Animals.",
-    journey: "trek",
-    mystery: "KE",
-    pinpoint: {
-      answer: "CN",
-      clues: [
-        "It sometimes lends its giant pandas to zoos around the world as a sign of friendship.",
-        "It is the only country where giant pandas live in the wild.",
-        "The Great Wall stretches for thousands of kilometres across its north."
-      ]
-    },
-    deepcut: {
-      countries: ["TZ", "ZA", "BW"],
-      question: "Name one of Africa's Big Five animals.",
-      answers: {
-        1000: ["Buffalo"],
-        800: ["Leopard"],
-        600: ["Rhinoceros"],
-        400: ["Elephant"],
-        200: ["Lion"]
-      },
-      aliases: {
-        Buffalo: ["Cape buffalo", "African buffalo"], Rhinoceros: ["Rhino", "Black rhino", "White rhino"],
-        Elephant: ["African elephant"]
-      },
-      info: {
-        title: "The Big Five",
-        text: "Big-game hunters named them the five animals hardest to hunt on foot. Today safari-goers hope to see all five, in parks such as the Serengeti and Kruger.",
-        facts: [["Animals", "5"], ["Most endangered", "Black rhino"], ["On", "South African banknotes"]]
-      }
-    },
-    paint: {
-      question: "Click the countries where these animals live in the wild: the kiwi, the koala, the ring-tailed lemur and the Komodo dragon.",
-      answers: ["NZ", "AU", "MG", "ID"],
-      labels: { NZ: "Kiwi", AU: "Koala", MG: "Ring-tailed lemur", ID: "Komodo dragon" },
-    },
-    rank: {
-      topic: "Share of the land covered by forest",
-      values: { AU: 17.4, FI: 74.2, IS: 0.6, BR: 58.5, US: 33.8 },
-      decimals: 1,
-      unit: "%",
-      note: "World Bank figures for 2024. Finland is the most forested country in Europe."
-    }
-  },
-
-  "2026-10-06": {
-    name: "Rock and Roll",
-    theme: "Music.",
-    journey: "balloon",
-    mystery: "GB",
-    pinpoint: {
-      answer: "SE",
-      clues: [
-        "Spotify was founded here in 2006.",
-        "The DJ Avicii, who made Wake Me Up and Levels, came from here.",
-        "ABBA, the band behind Dancing Queen and Mamma Mia, comes from here."
-      ]
-    },
-    deepcut: {
-      countries: ["GB"],
-      question: "Name a member of the Beatles, past or present.",
-      answers: {
-        1000: ["Pete Best", "Stuart Sutcliffe"],
-        800: ["George Harrison"],
-        600: ["Ringo Starr"],
-        400: ["Paul McCartney"],
-        200: ["John Lennon"]
-      },
-      aliases: {
-        "Pete Best": ["Best"], "Stuart Sutcliffe": ["Sutcliffe", "Stuart"], "George Harrison": ["George", "Harrison"],
-        "Ringo Starr": ["Ringo", "Starr"], "Paul McCartney": ["Paul", "McCartney"], "John Lennon": ["John", "Lennon"]
-      },
-      info: {
-        title: "The Beatles",
-        text: "The band from Liverpool is the best-selling music act of all time. Stuart Sutcliffe and Pete Best played with them before they were famous; Ringo Starr joined in 1962.",
-        facts: [["From", "Liverpool"], ["Number-one singles (UK)", "17"], ["Ringo joined", "1962"]]
-      }
-    },
-    paint: {
-      question: "Click the home countries of these stars: Shakira, Taylor Swift, Ed Sheeran, BTS and Céline Dion.",
-      answers: ["CO", "US", "GB", "KR", "CA"],
-      labels: { CO: "Shakira", US: "Taylor Swift", GB: "Ed Sheeran", KR: "BTS", CA: "Céline Dion" },
-    },
-    rank: {
-      topic: "Year the band's first album came out",
-      detail: "The Beatles, ABBA, U2, Nirvana and BTS.",
-      values: { US: 1989, GB: 1963, KR: 2013, SE: 1973, IE: 1980 },
-      labels: { US: "Nirvana", GB: "The Beatles", KR: "BTS", SE: "ABBA", IE: "U2" },
-      years: true,
-      note: "Please Please Me (1963), Ring Ring (1973), Boy (1980), Bleach (1989) and 2 Cool 4 Skool (2013)."
-    }
-  },
-
-  "2026-10-07": {
-    name: "Movie Night",
-    theme: "Films and television.",
-    journey: "rocket",
-    mystery: "NZ",
-    pinpoint: {
-      answer: "KR",
-      clues: [
-        "Parasite, made here, was the first film not in English to win the Oscar for Best Picture.",
-        "Squid Game, made here, became Netflix's most-watched series.",
-        "Samsung and Hyundai are based here, and its capital is Seoul."
-      ]
-    },
-    deepcut: {
-      countries: ["DE"],
-      question: "Name one of Disney's Seven Dwarfs.",
-      answers: {
-        1000: ["Bashful"],
-        800: ["Sneezy"],
-        600: ["Doc"],
-        400: ["Happy", "Sleepy"],
-        200: ["Grumpy", "Dopey"]
-      },
-      aliases: {},
-      info: {
-        title: "Snow White",
-        text: "The Brothers Grimm published the fairy tale in Germany in 1812. Disney's Snow White and the Seven Dwarfs (1937), its first full-length animated film, gave the dwarfs their names.",
-        facts: [["Fairy tale", "1812"], ["Disney film", "1937"], ["Dwarfs", "7"]]
-      }
-    },
-    paint: {
-      question: "Click the countries where these Disney films are set: Mulan, Coco, Ratatouille, Brave and Encanto.",
-      answers: ["CN", "MX", "FR", "GB", "CO"],
-      labels: { CN: "Mulan", MX: "Coco", FR: "Ratatouille", GB: "Brave", CO: "Encanto" },
-    },
-    rank: {
-      topic: "Population of five film countries",
-      detail: "The homes of Hollywood, Cannes, Venice, Berlin and Busan's film festivals.",
-      values: { US: 341.8, DE: 83.5, FR: 68.7, IT: 58.9, KR: 51.7 },
-      decimals: 1,
-      unit: " million",
-      top: "MOST",
-      bottom: "FEWEST",
-      note: "From the game's country data (World Bank and UN figures)."
-    }
-  },
-
-  "2026-10-08": {
-    name: "Big Splash",
-    theme: "Oceans and seas.",
-    journey: "dive",
-    mystery: "PT",
-    pinpoint: {
-      answer: "AU",
-      clues: [
-        "Bondi is one of its most famous surf beaches.",
-        "The Great Barrier Reef, the world's largest coral reef system, lies off its coast.",
-        "Kangaroos and koalas live in the wild here."
-      ]
-    },
-    deepcut: {
-      question: "Name one of the world's five oceans.",
-      answers: {
-        1000: ["Southern Ocean"],
-        800: ["Arctic Ocean"],
-        600: ["Indian Ocean"],
-        400: ["Atlantic Ocean"],
-        200: ["Pacific Ocean"]
-      },
-      aliases: {
-        "Southern Ocean": ["Southern", "Antarctic", "Antarctic Ocean"], "Arctic Ocean": ["Arctic"],
-        "Indian Ocean": ["Indian"], "Atlantic Ocean": ["Atlantic"], "Pacific Ocean": ["Pacific"]
-      },
-      info: {
-        title: "The five oceans",
-        text: "The Pacific is the biggest and deepest: it covers about a third of the Earth's surface. The Southern Ocean around Antarctica was only widely counted as the fifth ocean from the 2000s.",
-        facts: [["Biggest", "Pacific"], ["Smallest", "Arctic"], ["Deepest point", "Challenger Deep, ~11 km"]]
-      }
-    },
-    paint: {
-      question: "Click every country with a coast on the Caspian Sea.",
-      answers: ["RU", "KZ", "TM", "IR", "AZ"]
-    },
-    rank: {
-      topic: "Population density",
-      detail: "People per km².",
-      values: { IT: 196, AU: 4, BD: 1190, US: 36, NL: 432 },
-      unit: " people per km²",
-      top: "MOST CROWDED",
-      bottom: "EMPTIEST",
-      note: "Bangladesh is the most crowded large country in the world."
-    }
-  },
-
-  "2026-10-09": {
-    name: "Fly the Flag",
-    theme: "Flags.",
-    journey: "balloon",
-    mystery: "CA",
-    pinpoint: {
-      answer: "JP",
-      clues: [
-        "Its bullet trains, the Shinkansen, have run since 1964.",
-        "Pokémon, Super Mario and Hello Kitty were all created here.",
-        "Its white flag has a red circle in the middle, standing for the sun."
-      ]
-    },
-    deepcut: {
-      countries: ["ZA"],
-      question: "Name a colour on the flag of South Africa.",
-      answers: {
-        1000: ["Yellow"],
-        800: ["White"],
-        600: ["Black"],
-        400: ["Blue", "Red"],
-        200: ["Green"]
-      },
-      aliases: { Yellow: ["Gold"] },
-      info: {
-        title: "South Africa's flag",
-        text: "It was adopted in 1994, for the country's first democratic elections. It has six colours, more than almost any other national flag, and its Y shape stands for different paths coming together.",
-        facts: [["Adopted", "1994"], ["Colours", "6"], ["Shape", "A sideways Y"]]
-      }
-    },
-    paint: {
-      question: "Click every country with a Nordic cross on its flag.",
-      answers: ["DK", "SE", "NO", "FI", "IS"]
-    },
-    rank: {
-      topic: "Area of five flag countries",
-      detail: "Land and water, in km².",
-      values: { CA: 9984670, US: 9372610, ZA: 1221037, JP: 377930, GB: 242900 },
-      unit: " km²",
-      top: "BIGGEST",
-      bottom: "SMALLEST",
-      note: "Canada is a little bigger than the United States, and only Russia is bigger than Canada."
-    }
-  },
-
-  "2026-10-10": {
-    name: "Capital Idea",
-    theme: "Capital cities.",
-    journey: "trek",
-    mystery: "FR",
-    pinpoint: {
-      answer: "TR",
-      clues: [
-        "Its biggest city, which lies on two continents, is not its capital.",
-        "Hot-air balloons float over the fairy chimneys of Cappadocia here every morning.",
-        "Its capital is Ankara, and its red flag has a white crescent and star."
-      ]
-    },
-    deepcut: {
-      countries: ["GB"],
-      question: "Name the capital of one of the four nations of the United Kingdom.",
-      answers: {
-        1000: ["Belfast"],
-        800: ["Cardiff"],
-        600: ["Edinburgh"],
-        200: ["London"]
-      },
-      aliases: {},
-      info: {
-        title: "Four capitals",
-        text: "The United Kingdom is made up of England, Scotland, Wales and Northern Ireland, and each has its own capital. Scotland, Wales and Northern Ireland also have their own parliaments.",
-        facts: [["Nations", "4"], ["Cardiff a capital since", "1955"], ["Scottish Parliament", "Edinburgh, 1999"]]
-      }
-    },
-    paint: {
-      question: "Click the countries with these capitals: Ottawa, Canberra, Brasília, Pretoria and Wellington.",
-      answers: ["CA", "AU", "BR", "ZA", "NZ"],
-      labels: { CA: "Ottawa", AU: "Canberra", BR: "Brasília", ZA: "Pretoria", NZ: "Wellington" },
-    },
-    rank: {
-      topic: "Height of the capital above sea level",
-      detail: "Quito, Mexico City, Nairobi, Kathmandu and London.",
-      values: { NP: 1400, GB: 11, EC: 2850, KE: 1795, MX: 2240 },
-      labels: { NP: "Kathmandu", GB: "London", EC: "Quito", KE: "Nairobi", MX: "Mexico City" },
-      approx: true,
-      unit: " m",
-      top: "HIGHEST",
-      bottom: "LOWEST",
-      note: "Quito is the highest official capital in the world."
-    }
-  },
-
-  "2026-10-11": {
-    name: "Sky High",
-    theme: "Mountains and tall things.",
-    journey: "climb",
-    mystery: "NP",
-    pinpoint: {
-      answer: "AE",
-      clues: [
-        "One of its cities built islands in the shape of a palm tree.",
-        "It is made up of seven emirates.",
-        "The Burj Khalifa, the tallest building in the world, stands in Dubai, here."
-      ]
-    },
-    deepcut: {
-      countries: ["NP", "AR", "US", "TZ", "RU", "AU", "ID"],
-      question: "Name one of the Seven Summits, the highest mountain on each continent.",
-      answers: {
-        1000: ["Vinson", "Kosciuszko", "Carstensz Pyramid"],
-        800: ["Elbrus", "Aconcagua"],
-        600: ["Denali"],
-        400: ["Kilimanjaro"],
-        200: ["Everest"]
-      },
-      aliases: {
-        Vinson: ["Mount Vinson", "Vinson Massif"], Kosciuszko: ["Mount Kosciuszko", "Kosciusko"],
-        "Carstensz Pyramid": ["Puncak Jaya", "Carstensz"], Elbrus: ["Mount Elbrus"],
-        Denali: ["Mount McKinley", "McKinley"], Kilimanjaro: ["Mount Kilimanjaro"], Everest: ["Mount Everest"]
-      },
-      info: {
-        title: "The Seven Summits",
-        text: "In 1985 Dick Bass became the first person to climb the highest mountain on every continent. Climbers still argue whether Australia's is Kosciuszko or Carstensz Pyramid in New Guinea, so both count here.",
-        facts: [["Highest", "Everest, 8,849 m"], ["Lowest", "Kosciuszko, 2,228 m"], ["First to climb all", "1985"]]
-      }
-    },
-    paint: {
-      question: "Click every country with a mountain higher than 8,000 metres.",
-      answers: ["NP", "CN", "PK", "IN"]
-    },
-    rank: {
-      topic: "Height of the country's tallest building",
-      detail: "The Burj Khalifa, the Shanghai Tower, One World Trade Center, the Shard and Zalmhaven.",
-      values: { GB: 310, AE: 828, NL: 215, CN: 632, US: 541 },
-      labels: { GB: "The Shard", AE: "Burj Khalifa", NL: "Zalmhaven", CN: "Shanghai Tower", US: "One World Trade Center" },
-      unit: " m",
-      top: "TALLEST",
-      bottom: "SHORTEST"
-    }
-  },
-
-  "2026-10-12": {
-    name: "Sweet Tooth",
-    theme: "Chocolate and sweets.",
-    journey: "balloon",
-    mystery: "BE",
-    pinpoint: {
-      answer: "CH",
-      clues: [
-        "Toblerone, the triangle-shaped chocolate bar, was invented here.",
-        "Milk chocolate was first made here, in 1875.",
-        "Its flag is a white cross on a square red background."
-      ]
-    },
-    deepcut: {
-      countries: ["GB"],
-      question: "Name one of the five children who find a golden ticket in Charlie and the Chocolate Factory.",
-      answers: {
-        1000: ["Mike Teavee"],
-        800: ["Violet Beauregarde"],
-        600: ["Veruca Salt"],
-        400: ["Augustus Gloop"],
-        200: ["Charlie Bucket"]
-      },
-      aliases: {
-        "Mike Teavee": ["Mike", "Teavee", "Mike TV"], "Violet Beauregarde": ["Violet"], "Veruca Salt": ["Veruca"],
-        "Augustus Gloop": ["Augustus", "Gloop"], "Charlie Bucket": ["Charlie"]
-      },
-      info: {
-        title: "Charlie and the Chocolate Factory",
-        text: "Roald Dahl's book came out in 1964. Five golden tickets bring five children into Willy Wonka's factory, and only Charlie Bucket makes it to the end.",
-        facts: [["Published", "1964"], ["Golden tickets", "5"], ["Author", "Roald Dahl"]]
-      }
-    },
-    paint: {
-      question: "Click the countries these sweet things come from: churros, mochi, gulab jamun, pastéis de nata and maple syrup.",
-      answers: ["ES", "JP", "IN", "PT", "CA"],
-      labels: { ES: "Churros", JP: "Mochi", IN: "Gulab jamun", PT: "Pastéis de nata", CA: "Maple syrup" },
-    },
-    rank: {
-      topic: "Year the famous chocolate first went on sale",
-      detail: "Côte d'Or, the Hershey bar, Toblerone, the Mars bar and Nutella.",
-      values: { CH: 1908, IT: 1964, BE: 1883, GB: 1932, US: 1900 },
-      labels: { CH: "Toblerone", IT: "Nutella", BE: "Côte d'Or", GB: "Mars bar", US: "Hershey bar" },
-      years: true
-    }
-  },
-
-  "2026-10-13": {
-    name: "On the Road",
-    theme: "Cars and driving.",
-    journey: "trek",
-    mystery: "DE",
-    pinpoint: {
-      answer: "IT",
-      clues: [
-        "Ferrari, Lamborghini and Maserati are all made here.",
-        "The Vespa scooter was first built here in 1946.",
-        "On the map, it is shaped like a boot."
-      ]
-    },
-    deepcut: {
-      countries: ["GB", "IE", "MT", "CY"],
-      question: "Name a country in Europe where people drive on the left.",
-      answers: {
-        1000: ["Malta"],
-        800: ["Cyprus"],
-        400: ["Ireland"],
-        200: ["United Kingdom"]
-      },
-      aliases: { "United Kingdom": ["UK", "Britain", "Great Britain", "England"], Ireland: ["Republic of Ireland"] },
-      info: {
-        title: "Driving on the left",
-        text: "About a third of the world's people drive on the left, mostly in places once tied to Britain. In Europe only four countries still do; Sweden switched to the right overnight in 1967.",
-        facts: [["Countries in Europe", "4"], ["Sweden switched", "1967"], ["Most people", "India"]]
-      }
-    },
-    paint: {
-      question: "Click the home countries of these car brands: Toyota, Volvo, Hyundai, Ford and Renault.",
-      answers: ["JP", "SE", "KR", "US", "FR"],
-      labels: { JP: "Toyota", SE: "Volvo", KR: "Hyundai", US: "Ford", FR: "Renault" },
-    },
-    rank: {
-      topic: "Year the car company was founded",
-      detail: "Ford, BMW, Volvo, Toyota and Hyundai.",
-      values: { SE: 1927, KR: 1967, US: 1903, JP: 1937, DE: 1916 },
-      labels: { SE: "Volvo", KR: "Hyundai", US: "Ford", JP: "Toyota", DE: "BMW" },
-      years: true
-    }
-  },
-
-  "2026-10-14": {
-    name: "Island Life",
-    theme: "Islands.",
-    journey: "dive",
-    mystery: "GR",
-    pinpoint: {
-      answer: "IS",
-      clues: [
-        "Its parliament, the Althing, first met in the year 930.",
-        "Geysers, glaciers and volcanoes sit side by side here, and you can see the northern lights.",
-        "It is an island in the North Atlantic, and its capital is Reykjavík."
-      ]
-    },
-    deepcut: {
-      countries: ["US"],
-      question: "Name one of the eight main Hawaiian islands.",
-      answers: {
-        1000: ["Niihau", "Kahoolawe"],
-        800: ["Lanai", "Molokai"],
-        600: ["Kauai"],
-        400: ["Oahu", "Maui"],
-        200: ["Hawaii"]
-      },
-      aliases: {
-        Niihau: ["Ni'ihau"], Kahoolawe: ["Kaho'olawe"], Lanai: ["Lana'i"], Molokai: ["Moloka'i"],
-        Kauai: ["Kaua'i"], Oahu: ["O'ahu"], Hawaii: ["Big Island", "Hawaii Island", "Hawai'i"]
-      },
-      info: {
-        title: "Hawaii",
-        text: "The islands were made by volcanoes rising from the floor of the Pacific, and Kīlauea on the Big Island is one of the most active on Earth. Hawaii became the 50th US state in 1959.",
-        facts: [["Main islands", "8"], ["Became a state", "1959"], ["Capital", "Honolulu, on Oahu"]]
-      }
-    },
-    paint: {
-      question: "Click every country on the islands of Borneo and Hispaniola.",
-      answers: ["ID", "MY", "BN", "HT", "DO"],
-      labels: { ID: "Borneo", MY: "Borneo", BN: "Borneo", HT: "Hispaniola", DO: "Hispaniola" },
-    },
-    rank: {
-      topic: "Size of the island country",
-      detail: "Land and water, in km².",
-      values: { JP: 377930, JM: 10991, ID: 1904569, IS: 103000, NZ: 270467 },
-      unit: " km²",
-      top: "BIGGEST",
-      bottom: "SMALLEST"
-    }
-  },
-
-  "2026-10-15": {
-    name: "Once Upon a Time",
-    theme: "Fairy tales and legends.",
-    journey: "balloon",
-    mystery: "DK",
-    pinpoint: {
-      answer: "NO",
-      clues: [
-        "In its folk tales, trolls live in the mountains and turn to stone in sunlight.",
-        "Disney's Frozen was inspired by its fjords and wooden stave churches.",
-        "Its long coast is cut by deep fjords, and its capital is Oslo."
-      ]
-    },
-    deepcut: {
-      countries: ["GB"],
-      question: "Name one of the things the Three Little Pigs built their houses from.",
-      answers: {
-        1000: ["Sticks"],
-        600: ["Straw"],
-        200: ["Bricks"]
-      },
-      aliases: { Sticks: ["Stick", "Wood", "Twigs"], Straw: ["Hay"], Bricks: ["Brick"] },
-      info: {
-        title: "The Three Little Pigs",
-        text: "The English fairy tale was written down in the 1840s and became famous with Disney's 1933 cartoon, whose song Who's Afraid of the Big Bad Wolf? was a hit.",
-        facts: [["Pigs", "3"], ["Houses blown down", "2"], ["Disney cartoon", "1933"]]
-      }
-    },
-    paint: {
-      question: "Click the home countries of these storytellers: the Brothers Grimm, Charles Perrault, Aesop, Lewis Carroll and Astrid Lindgren.",
-      answers: ["DE", "FR", "GR", "GB", "SE"],
-      labels: { DE: "The Brothers Grimm", FR: "Charles Perrault", GR: "Aesop", GB: "Lewis Carroll", SE: "Astrid Lindgren" },
-    },
-    rank: {
-      topic: "Year the story was first published",
-      detail: "Cinderella (Perrault), Snow White (the Grimms), The Little Mermaid (Andersen), Alice in Wonderland (Carroll) and Pippi Longstocking (Lindgren).",
-      values: { DK: 1837, SE: 1945, FR: 1697, GB: 1865, DE: 1812 },
-      labels: { DK: "The Little Mermaid", SE: "Pippi Longstocking", FR: "Cinderella", GB: "Alice in Wonderland", DE: "Snow White" },
-      years: true
-    }
-  },
-
-  "2026-10-16": {
-    name: "Party Time",
-    theme: "Festivals and celebrations.",
-    journey: "rocket",
-    mystery: "BR",
-    pinpoint: {
-      answer: "IE",
-      clues: [
-        "Halloween grew out of Samhain, an old festival celebrated here.",
-        "On St Patrick's Day, people around the world wear green for it.",
-        "Its symbol is the shamrock, and its capital is Dublin."
-      ]
-    },
-    deepcut: {
-      countries: ["CN"],
-      question: "Name an animal of the Chinese zodiac.",
-      answers: {
-        1000: ["Ox", "Goat", "Rooster"],
-        800: ["Rat", "Pig"],
-        600: ["Snake", "Horse"],
-        400: ["Rabbit", "Monkey", "Dog"],
-        200: ["Dragon", "Tiger"]
-      },
-      aliases: { Ox: ["Cow", "Bull"], Goat: ["Sheep", "Ram"], Rooster: ["Chicken", "Cock"], Pig: ["Boar"], Rabbit: ["Hare"] },
-      info: {
-        title: "The Chinese zodiac",
-        text: "Every Lunar New Year starts the year of a new animal, in a cycle of twelve. Legend says their order was decided by a great race. 2026 is the Year of the Horse.",
-        facts: [["Animals", "12"], ["2026", "Horse"], ["First in the cycle", "Rat"]]
-      }
-    },
-    paint: {
-      question: "Click the countries famous for these festivals: Oktoberfest, La Tomatina, Holi, the Day of the Dead and Songkran.",
-      answers: ["DE", "ES", "IN", "MX", "TH"],
-      labels: { DE: "Oktoberfest", ES: "La Tomatina", IN: "Holi", MX: "Day of the Dead", TH: "Songkran" },
-    },
-    rank: {
-      topic: "Population of five party countries",
-      detail: "The homes of Burning Man, Oktoberfest, Glastonbury, La Tomatina and Tomorrowland.",
-      values: { US: 341.8, DE: 83.5, GB: 69.5, ES: 49.4, BE: 11.9 },
-      decimals: 1,
-      unit: " million",
-      top: "MOST",
-      bottom: "FEWEST",
-      note: "From the game's country data (World Bank and UN figures)."
-    }
-  },
-
-  "2026-10-17": {
-    name: "In Full Bloom",
-    theme: "Flowers and gardens.",
-    journey: "trek",
-    mystery: "NL",
-    pinpoint: {
-      answer: "KE",
-      clues: [
-        "Many of the roses sold in Europe are grown here, around Lake Naivasha.",
-        "Its long-distance runners, like Eliud Kipchoge, are among the best in the world.",
-        "Wildebeest cross into it every year on the Great Migration, and its capital is Nairobi."
-      ]
-    },
-    deepcut: {
-      question: "Name a colour of the rainbow.",
-      answers: {
-        1000: ["Indigo"],
-        800: ["Violet"],
-        600: ["Orange"],
-        400: ["Green", "Yellow"],
-        200: ["Red", "Blue"]
-      },
-      aliases: { "Violet": ["Purple"] },
-      info: {
-        title: "The rainbow",
-        text: "Isaac Newton split sunlight into its colours with a glass prism and named seven of them, partly so they would match the seven notes of a musical scale.",
-        facts: [["Colours", "7"], ["Named by", "Isaac Newton"], ["Shortcut", "ROY G BIV"]]
-      }
-    },
-    paint: {
-      question: "Click the three Benelux countries.",
-      answers: ["BE", "NL", "LU"]
-    },
-    rank: {
-      topic: "Share of people living in cities",
-      values: { CN: 66.3, ET: 24.1, NL: 95.9, KE: 32.2, US: 80.2 },
-      decimals: 1,
-      unit: "%",
-      note: "World Bank figures for 2025."
-    }
-  },
-
-  "2026-10-18": {
-    name: "Bright Ideas",
-    theme: "Inventions.",
-    journey: "rocket",
-    mystery: "US",
-    pinpoint: {
-      answer: "GB",
-      clues: [
-        "Tim Berners-Lee, who invented the World Wide Web, was born here.",
-        "The first steam railway carrying passengers opened here in 1825.",
-        "Its capital is London, and its flag is the Union Jack."
-      ]
-    },
-    deepcut: {
-      countries: ["IN"],
-      question: "Name a chess piece.",
-      answers: {
-        1000: ["Rook"],
-        800: ["Bishop"],
-        600: ["Knight"],
-        400: ["Pawn"],
-        200: ["King", "Queen"]
-      },
-      aliases: { Rook: ["Castle"], Knight: ["Horse"] },
-      info: {
-        title: "Chess",
-        text: "Chess grew out of chaturanga, a game played in India about 1,500 years ago, and reached Europe through Persia. Each player starts with 16 pieces on a board of 64 squares.",
-        facts: [["Pieces per player", "16"], ["Squares", "64"], ["Born in", "India"]]
-      }
-    },
-    paint: {
-      question: "Click the home countries of these companies: LEGO, Samsung, Nokia, Sony and IKEA.",
-      answers: ["DK", "KR", "FI", "JP", "SE"],
-      labels: { DK: "LEGO", KR: "Samsung", FI: "Nokia", JP: "Sony", SE: "IKEA" },
-    },
-    rank: {
-      topic: "Year of the invention",
-      detail: "Paper (China), the printing press (Germany), the telephone (United States), television (United Kingdom) and the World Wide Web (Switzerland, at CERN).",
-      values: { DE: 1440, CH: 1989, CN: 105, GB: 1926, US: 1876 },
-      labels: { DE: "Printing press", CH: "World Wide Web", CN: "Paper", GB: "Television", US: "Telephone" },
-      years: true,
-      approx: true
-    }
-  },
-
-  "2026-10-19": {
-    name: "Out of This World",
-    theme: "Space.",
-    journey: "rocket",
-    mystery: "CN",
-    pinpoint: {
-      answer: "RU",
-      clues: [
-        "Sputnik 1, the first satellite, was launched from here in 1957, when it was part of the Soviet Union.",
-        "Yuri Gagarin, the first person in space, was born here.",
-        "It is the biggest country in the world, and its capital is Moscow."
-      ]
-    },
-    deepcut: {
-      question: "Name a planet in our solar system.",
-      answers: {
-        1000: ["Mercury", "Uranus"],
-        800: ["Neptune", "Venus"],
-        600: ["Saturn", "Jupiter"],
-        400: ["Earth"],
-        200: ["Mars"]
-      },
-      aliases: {},
-      info: {
-        title: "The planets",
-        text: "Eight planets circle the Sun. Pluto counted as the ninth until 2006, when astronomers called it a dwarf planet. Jupiter is so big that all the other planets would fit inside it.",
-        facts: [["Planets", "8"], ["Biggest", "Jupiter"], ["Pluto dropped", "2006"]]
-      }
-    },
-    paint: {
-      question: "Click the home countries of these astronauts: Neil Armstrong, Yang Liwei, Tim Peake, Chris Hadfield and Thomas Pesquet.",
-      answers: ["US", "CN", "GB", "CA", "FR"],
-      labels: { US: "Neil Armstrong", CN: "Yang Liwei", GB: "Tim Peake", CA: "Chris Hadfield", FR: "Thomas Pesquet" },
-    },
-    rank: {
-      topic: "Year the space agency was founded",
-      detail: "NASA, ISRO (India), the CNSA (China), JAXA (Japan) and the UAE Space Agency.",
-      values: { JP: 2003, US: 1958, AE: 2014, IN: 1969, CN: 1993 },
-      labels: { JP: "JAXA", US: "NASA", AE: "UAE Space Agency", IN: "ISRO", CN: "CNSA" },
-      years: true
-    }
-  },
-
-  "2026-10-20": {
-    name: "Desert Heat",
-    theme: "Deserts.",
-    journey: "trek",
-    mystery: "EG",
-    pinpoint: {
-      answer: "SA",
-      clues: [
-        "The Rub' al Khali, or Empty Quarter, the biggest sand desert in the world, covers much of it.",
-        "Mecca, the holiest city in Islam, is here.",
-        "It covers most of the Arabian Peninsula, and its capital is Riyadh."
-      ]
-    },
-    deepcut: {
-      question: "Name a country the Sahara Desert reaches into.",
-      answers: {
-        1000: ["Tunisia"],
-        800: ["Chad", "Mauritania"],
-        600: ["Sudan", "Mali", "Niger"],
-        400: ["Libya", "Algeria", "Morocco"],
-        200: ["Egypt"]
-      },
-      aliases: {},
-      info: {
-        title: "The Sahara",
-        text: "The world's biggest hot desert covers about 9 million km², nearly the size of the United States. Only about a quarter of it is sand dunes; the rest is mostly rock and gravel.",
-        facts: [["Area", "~9 million km²"], ["Countries", "10, and Western Sahara"], ["Biggest share", "Algeria"]]
-      }
-    },
-    paint: {
-      question: "Click the countries of these deserts: the Atacama, the Mojave, the Taklamakan and the Simpson Desert.",
-      answers: ["CL", "US", "CN", "AU"],
-      labels: { CL: "Atacama", US: "Mojave", CN: "Taklamakan", AU: "Simpson Desert" },
-    },
-    rank: {
-      topic: "Life expectancy",
-      values: { EG: 71.8, NG: 54.6, JP: 84.0, PK: 67.8, SA: 79.0 },
-      decimals: 1,
-      unit: " years",
-      note: "How long a baby born in 2024 can expect to live (World Bank)."
-    }
-  },
-
-  "2026-10-21": {
-    name: "Big and Small",
-    theme: "The biggest and smallest.",
-    journey: "climb",
-    mystery: "AU",
-    pinpoint: {
-      answer: "CA",
-      clues: [
-        "It has more lakes than any other country.",
-        "It is the second-biggest country in the world by area.",
-        "There is a red maple leaf on its flag, and its capital is Ottawa."
-      ]
-    },
-    deepcut: {
-      question: "Name one of the five biggest countries in the world by area.",
-      answers: {
-        1000: ["Brazil"],
-        800: ["China"],
-        600: ["United States"],
-        400: ["Canada"],
-        200: ["Russia"]
-      },
-      aliases: { "United States": ["USA", "US", "America", "United States of America"] },
-      info: {
-        title: "The giants",
-        text: "Russia alone covers more than a tenth of the world's land. The United States and China are so close in size that which is bigger depends on how lakes and coastal waters are counted.",
-        facts: [["Biggest", "Russia, 17.1 million km²"], ["Sixth", "Australia"], ["Smallest country", "Vatican City"]]
-      }
-    },
-    paint: {
-      question: "Click the five countries with the most people.",
-      answers: ["IN", "CN", "US", "ID", "PK"]
-    },
-    rank: {
-      topic: "Money made per person (GDP per head)",
-      values: { BR: 10713, US: 90027, IN: 2702, AU: 65130, JP: 35951 },
-      prefix: "$",
-      note: "World Bank figures for 2025, in US dollars."
-    }
-  },
-
-  "2026-10-22": {
-    name: "All Aboard",
-    theme: "Trains and railways.",
-    journey: "trek",
-    mystery: "JP",
-    pinpoint: {
-      answer: "FR",
-      clues: [
-        "Its TGV high-speed trains set a world record of 574.8 km/h in 2007.",
-        "The Channel Tunnel links it to Britain under the sea.",
-        "The Eiffel Tower stands in its capital, Paris."
-      ]
-    },
-    deepcut: {
-      countries: ["GB"],
-      question: "Name one of the four railway stations on the London Monopoly board.",
-      answers: {
-        1000: ["Fenchurch Street"],
-        800: ["Marylebone"],
-        600: ["Liverpool Street"],
-        200: ["King's Cross"]
-      },
-      aliases: { "Fenchurch Street": ["Fenchurch St"], "Liverpool Street": ["Liverpool St"], "King's Cross": ["Kings Cross"] },
-      info: {
-        title: "Monopoly's stations",
-        text: "The London edition of Monopoly came out in 1936. It has four railway stations, one in the middle of each side of the board, and each costs £200.",
-        facts: [["Stations", "4"], ["Price each", "£200"], ["Rent with all four", "£200"]]
-      }
-    },
-    paint: {
-      question: "Click the countries of these famous train journeys: the Trans-Siberian, the Ghan, the Glacier Express, the Rocky Mountaineer and the Blue Train.",
-      answers: ["RU", "AU", "CH", "CA", "ZA"],
-      labels: { RU: "Trans-Siberian", AU: "The Ghan", CH: "Glacier Express", CA: "Rocky Mountaineer", ZA: "Blue Train" },
-    },
-    rank: {
-      topic: "Year the first railway opened",
-      values: { JP: 1872, GB: 1825, TH: 1893, DE: 1835, IN: 1853 },
-      labels: { JP: "Tokyo–Yokohama", GB: "Stockton–Darlington", TH: "Bangkok–Paknam", DE: "Nuremberg–Fürth", IN: "Bombay–Thane" },
-      years: true,
-      note: "Stockton and Darlington (1825), Nuremberg to Fürth (1835), Bombay to Thane (1853), Tokyo to Yokohama (1872) and Bangkok to Paknam (1893)."
-    }
-  },
-
-  "2026-10-23": {
-    name: "Coffee Break",
-    theme: "Drinks.",
-    journey: "balloon",
-    mystery: "ET",
-    pinpoint: {
-      answer: "VN",
-      clues: [
-        "Its coffee is often served with sweet condensed milk, or even with egg.",
-        "It grows more coffee than any country except Brazil.",
-        "Its long S-shaped coast runs along the South China Sea, and its capital is Hanoi."
-      ]
-    },
-    deepcut: {
-      countries: ["US"],
-      question: "Name a cup size at Starbucks.",
-      answers: {
-        1000: ["Trenta"],
-        800: ["Short"],
-        600: ["Venti"],
-        400: ["Grande"],
-        200: ["Tall"]
-      },
-      aliases: {},
-      info: {
-        title: "Starbucks sizes",
-        text: "Starbucks opened in Seattle in 1971. Its Italian-sounding sizes came after Howard Schultz visited espresso bars in Milan: venti is Italian for twenty, the hot cup's size in ounces.",
-        facts: [["Founded", "1971, Seattle"], ["Venti (hot)", "20 oz"], ["Biggest", "Trenta, ~31 oz"]]
-      }
-    },
-    paint: {
-      question: "Click the homes of these drinks: espresso, sake, tequila, the caipirinha and rooibos tea.",
-      answers: ["IT", "JP", "MX", "BR", "ZA"],
-      labels: { IT: "Espresso", JP: "Sake", MX: "Tequila", BR: "Caipirinha", ZA: "Rooibos tea" },
-    },
-    rank: {
-      topic: "Population of five coffee countries",
-      detail: "Five countries that grow coffee.",
-      values: { ID: 285.7, ET: 135.5, VN: 101.6, CO: 53.4, JM: 2.8 },
-      decimals: 1,
-      unit: " million",
-      top: "MOST",
-      bottom: "FEWEST",
-      note: "Indonesia has the fourth-biggest population in the world. Jamaica is small, but its Blue Mountain coffee is among the most expensive."
-    }
-  },
-
-  "2026-10-24": {
-    name: "Happy Birthday",
-    theme: "Famous people.",
-    journey: "climb",
-    mystery: "AR",
-    pinpoint: {
-      answer: "PT",
-      clues: [
-        "The explorer Vasco da Gama sailed from here to India in 1497.",
-        "Cristiano Ronaldo was born on its island of Madeira.",
-        "Its capital is Lisbon, and it lies west of Spain."
-      ]
-    },
-    deepcut: {
-      question: "Name a month with 31 days.",
-      answers: {
-        1000: ["August"],
-        800: ["July"],
-        600: ["October", "May"],
-        400: ["March"],
-        200: ["January", "December"]
-      },
-      aliases: {},
-      info: {
-        title: "Months with 31 days",
-        text: "Seven months have 31 days. To remember which, count the months over your knuckles and the dips between them: every knuckle is a 31-day month.",
-        facts: [["31-day months", "7"], ["30-day months", "4"], ["February", "28 or 29"]]
-      }
-    },
-    paint: {
-      question: "Click the home countries of these footballers: Mohamed Salah, Kylian Mbappé, Neymar, Erling Haaland and Son Heung-min.",
-      answers: ["EG", "FR", "BR", "NO", "KR"],
-      labels: { EG: "Mohamed Salah", FR: "Kylian Mbappé", BR: "Neymar", NO: "Erling Haaland", KR: "Son Heung-min" },
-    },
-    rank: {
-      topic: "Year the famous person was born",
-      detail: "William Shakespeare, Mahatma Gandhi, Bob Marley, Diego Maradona and Cristiano Ronaldo.",
-      values: { IN: 1869, PT: 1985, GB: 1564, AR: 1960, JM: 1945 },
-      labels: { IN: "Mahatma Gandhi", PT: "Cristiano Ronaldo", GB: "William Shakespeare", AR: "Diego Maradona", JM: "Bob Marley" },
-      years: true
-    }
-  },
-
-  "2026-10-25": {
-    name: "Into the Jungle",
-    theme: "Rainforests.",
-    journey: "trek",
-    mystery: "ID",
-    pinpoint: {
-      answer: "PE",
-      clues: [
-        "The Amazon River begins high in its mountains.",
-        "Its Lake Titicaca, shared with Bolivia, is one of the highest big lakes in the world.",
-        "The Inca city of Machu Picchu is here, and its capital is Lima."
-      ]
-    },
-    deepcut: {
-      question: "Name a country the Amazon rainforest covers.",
-      answers: {
-        1000: ["Suriname", "Guyana", "French Guiana"],
-        800: ["Venezuela", "Ecuador"],
-        600: ["Bolivia"],
-        400: ["Colombia", "Peru"],
-        200: ["Brazil"]
-      },
-      aliases: { "French Guiana": ["France"] },
-      info: {
-        title: "The Amazon rainforest",
-        text: "The biggest rainforest on Earth covers about 5.5 million km², and about 60% of it is in Brazil. Around one in ten of all known species live there.",
-        facts: [["Area", "~5.5 million km²"], ["In Brazil", "~60%"], ["Countries", "8, and French Guiana"]]
-      }
-    },
-    paint: {
-      question: "Click every country in South America that the Equator crosses.",
-      answers: ["EC", "CO", "BR"]
-    },
-    rank: {
-      topic: "Distance from the capital to the Equator",
-      detail: "Quito, Jakarta, Lima, Brasília and Mexico City.",
-      values: { PE: 1340, MX: 2161, EC: 20, BR: 1756, ID: 690 },
-      labels: { PE: "Lima", MX: "Mexico City", EC: "Quito", BR: "Brasília", ID: "Jakarta" },
-      order: "lowest",
-      approx: true,
-      unit: " km",
-      top: "CLOSEST",
-      bottom: "FARTHEST"
-    }
-  },
-
-  "2026-10-26": {
-    name: "Pirates Ahoy",
-    theme: "Pirates and the Caribbean.",
-    journey: "dive",
-    mystery: "JM",
-    pinpoint: {
-      answer: "CU",
-      clues: [
-        "Old American cars from the 1950s still drive its streets.",
-        "It is famous for its cigars and its salsa music.",
-        "It is the biggest island in the Caribbean, and its capital is Havana."
-      ]
-    },
-    deepcut: {
-      question: "Name a Pirates of the Caribbean film.",
-      answers: {
-        1000: ["On Stranger Tides"],
-        800: ["Dead Men Tell No Tales"],
-        600: ["At World's End"],
-        400: ["Dead Man's Chest"],
-        200: ["The Curse of the Black Pearl"]
-      },
-      aliases: {
-        "The Curse of the Black Pearl": ["Curse of the Black Pearl", "Black Pearl"],
-        "Dead Men Tell No Tales": ["Salazar's Revenge"]
-      },
-      info: {
-        title: "Pirates of the Caribbean",
-        text: "The films began as a Disneyland ride from 1967. Johnny Depp played Captain Jack Sparrow in all five, which together earned about $4.5 billion.",
-        facts: [["Films", "5"], ["First film", "2003"], ["Based on", "A Disneyland ride"]]
-      }
-    },
-    paint: {
-      question: "Click every country in Central America with a coast on the Caribbean Sea.",
-      answers: ["BZ", "GT", "HN", "NI", "CR", "PA"]
-    },
-    rank: {
-      topic: "Area of five Caribbean countries",
-      detail: "Land and water, in km².",
-      values: { CU: 109884, DO: 48671, HT: 27750, BS: 13943, JM: 10991 },
-      unit: " km²",
-      top: "BIGGEST",
-      bottom: "SMALLEST",
-      note: "Cuba is the biggest island in the Caribbean. The Dominican Republic and Haiti share the island of Hispaniola."
-    }
-  },
-
-  "2026-10-27": {
-    name: "Digging Deep",
-    theme: "Dinosaurs, fossils and things underground.",
-    journey: "dive",
-    mystery: "MN",
-    pinpoint: {
-      answer: "ZA",
-      clues: [
-        "Its Cradle of Humankind holds some of the oldest fossils of our human ancestors.",
-        "Nelson Mandela became its first president elected by all its people, in 1994.",
-        "It sits at the southern tip of Africa, and Table Mountain rises above Cape Town."
-      ]
-    },
-    deepcut: {
-      countries: ["US"],
-      question: "Name a kind of dinosaur seen in the film Jurassic Park (1993).",
-      answers: {
-        1000: ["Gallimimus", "Parasaurolophus"],
-        800: ["Dilophosaurus"],
-        600: ["Brachiosaurus"],
-        400: ["Triceratops"],
-        200: ["Tyrannosaurus rex", "Velociraptor"]
-      },
-      aliases: { "Tyrannosaurus rex": ["T. rex", "T rex", "T-rex", "Tyrannosaurus"], Velociraptor: ["Raptor"] },
-      info: {
-        title: "Jurassic Park",
-        text: "Steven Spielberg's film mixed life-size robots with computer-made dinosaurs, which were new at the time. It was based on Michael Crichton's 1990 novel.",
-        facts: [["Released", "1993"], ["Director", "Steven Spielberg"], ["Novel", "1990"]]
-      }
-    },
-    paint: {
-      question: "Click the countries where these famous fossils were found: Lucy, Archaeopteryx, Sue the T. rex, Spinosaurus and Argentinosaurus.",
-      answers: ["ET", "DE", "US", "EG", "AR"],
-      labels: { ET: "Lucy", DE: "Archaeopteryx", US: "Sue the T. rex", EG: "Spinosaurus", AR: "Argentinosaurus" },
-    },
-    rank: {
-      topic: "Year the capital's metro opened",
-      detail: "London, Paris, Tokyo, Moscow and Seoul.",
-      values: { RU: 1935, GB: 1863, KR: 1974, FR: 1900, JP: 1927 },
-      labels: { RU: "Moscow", GB: "London", KR: "Seoul", FR: "Paris", JP: "Tokyo" },
-      years: true
-    }
-  },
-
-  "2026-10-28": {
-    name: "Pole Position",
-    theme: "Motor racing.",
-    journey: "rocket",
-    mystery: "AT",
-    pinpoint: {
-      answer: "NL",
-      clues: [
-        "Max Verstappen, who won four Formula One titles in a row, races for it.",
-        "About a quarter of it lies below sea level, kept dry by dikes.",
-        "It is famous for windmills, tulips and bikes, and its capital is Amsterdam."
-      ]
-    },
-    deepcut: {
-      question: "Name a Formula One driver who won at least four world titles.",
-      answers: {
-        1000: ["Juan Manuel Fangio", "Alain Prost"],
-        800: ["Sebastian Vettel"],
-        600: ["Max Verstappen"],
-        400: ["Michael Schumacher"],
-        200: ["Lewis Hamilton"]
-      },
-      aliases: {
-        "Juan Manuel Fangio": ["Fangio"], "Alain Prost": ["Prost"], "Sebastian Vettel": ["Vettel"],
-        "Max Verstappen": ["Verstappen"], "Michael Schumacher": ["Schumacher"], "Lewis Hamilton": ["Hamilton"]
-      },
-      info: {
-        title: "F1's greatest",
-        text: "Lewis Hamilton and Michael Schumacher share the record of seven world titles. Juan Manuel Fangio won five in the 1950s, a record that stood for 46 years.",
-        facts: [["Most titles", "7"], ["Fangio's titles", "5"], ["First championship", "1950"]]
-      }
-    },
-    paint: {
-      question: "Click the home countries of these racing legends: Ayrton Senna, Michael Schumacher, Fernando Alonso, Kimi Räikkönen and Lewis Hamilton.",
-      answers: ["BR", "DE", "ES", "FI", "GB"],
-      labels: { BR: "Ayrton Senna", DE: "Michael Schumacher", ES: "Fernando Alonso", FI: "Kimi Räikkönen", GB: "Lewis Hamilton" },
-    },
-    rank: {
-      topic: "Population of five racing countries",
-      detail: "Home countries of famous Formula One teams and drivers.",
-      values: { US: 341.8, JP: 123.4, DE: 83.5, GB: 69.5, IT: 58.9 },
-      decimals: 1,
-      unit: " million",
-      top: "MOST",
-      bottom: "FEWEST",
-      note: "From the game's country data (World Bank and UN figures)."
-    }
-  },
-
-  "2026-10-29": {
-    name: "Holiday Snaps",
-    theme: "Holidays.",
-    journey: "balloon",
-    mystery: "MA",
-    pinpoint: {
-      answer: "GR",
-      clues: [
-        "The Olympic Games began here, at Olympia, almost 2,800 years ago.",
-        "Santorini, with its white houses and blue domes, is one of its islands.",
-        "The Parthenon stands on the Acropolis in its capital, Athens."
-      ]
-    },
-    deepcut: {
-      countries: ["ES"],
-      question: "Name one of the eight main Canary Islands.",
-      answers: {
-        1000: ["La Graciosa", "El Hierro"],
-        800: ["La Gomera", "La Palma"],
-        600: ["Fuerteventura"],
-        400: ["Lanzarote", "Gran Canaria"],
-        200: ["Tenerife"]
-      },
-      aliases: {},
-      info: {
-        title: "The Canary Islands",
-        text: "Spain's islands off north-west Africa are a holiday spot all year round thanks to their mild weather. Mount Teide on Tenerife, a volcano, is Spain's highest mountain.",
-        facts: [["Main islands", "8"], ["Highest point", "Teide, 3,715 m"], ["Biggest island", "Tenerife"]]
-      }
-    },
-    paint: {
-      question: "Click the countries of these holiday islands: Bali, Phuket, Sicily, Mallorca and Zanzibar.",
-      answers: ["ID", "TH", "IT", "ES", "TZ"],
-      labels: { ID: "Bali", TH: "Phuket", IT: "Sicily", ES: "Mallorca", TZ: "Zanzibar" },
-    },
-    rank: {
-      topic: "Year it joined the European Union",
-      detail: "Or the European Economic Community before it.",
-      values: { AT: 1995, IT: 1958, HR: 2013, ES: 1986, GR: 1981 },
-      years: true
-    }
-  },
-
-  "2026-10-30": {
-    name: "Trick or Treat",
-    theme: "Halloween.",
-    journey: "climb",
-    mystery: "IE",
-    pinpoint: {
-      answer: "MX",
-      clues: [
-        "On the Day of the Dead, families here build altars with marigolds and sugar skulls.",
-        "Chocolate, chilli peppers and avocados were first grown here.",
-        "The Maya pyramid of Chichén Itzá is here, and its capital has the same name as the country."
-      ]
-    },
-    deepcut: {
-      countries: ["US"],
-      question: "Name one of the four Ghostbusters in the 1984 film.",
-      answers: {
-        1000: ["Winston Zeddemore"],
-        800: ["Egon Spengler"],
-        600: ["Ray Stantz"],
-        200: ["Peter Venkman"]
-      },
-      aliases: {
-        "Winston Zeddemore": ["Winston", "Zeddemore"], "Egon Spengler": ["Egon", "Spengler"],
-        "Ray Stantz": ["Ray", "Stantz"], "Peter Venkman": ["Peter", "Venkman"]
-      },
-      info: {
-        title: "Ghostbusters",
-        text: "The 1984 comedy follows four ghost-catchers in New York. Its theme song, by Ray Parker Jr., went to number one in the United States.",
-        facts: [["Released", "1984"], ["Ghostbusters", "4"], ["Base", "A New York firehouse"]]
-      }
-    },
-    paint: {
-      question: "Click the countries these legends come from: Dracula, the Loch Ness Monster, the Yeti, Bigfoot and the Golem of Prague.",
-      answers: ["RO", "GB", "NP", "US", "CZ"],
-      labels: { RO: "Dracula", GB: "Loch Ness Monster", NP: "Yeti", US: "Bigfoot", CZ: "Golem of Prague" },
-    },
-    rank: {
-      topic: "Year the horror classic came out",
-      detail: "Frankenstein (novel), Dracula (novel, by the Irish writer Bram Stoker), Nosferatu (film), The Exorcist (film) and Ringu (film).",
-      values: { DE: 1922, JP: 1998, GB: 1818, US: 1973, IE: 1897 },
-      labels: { DE: "Nosferatu", JP: "Ringu", GB: "Frankenstein", US: "The Exorcist", IE: "Dracula" },
-      years: true
-    }
-  }
-};
-
-return { CASUAL_DAYS };
-})();
-
 // ---- extremes-days.js
 __modules["extremes-days.js"] = (() => {
 // The globe mode's calendar (working title "Highs & Lows"): per day a name, a theme and six
@@ -12627,6 +11240,8 @@ __modules["extremes-days.js"] = (() => {
 // On 2026-11-03 every "most average" round became highest or lowest of the same stat,
 // with a direction that has one clear answer; Day 14 lost its coffee and green-power
 // rounds (no clean answer either way); the team picked two new ones the same day.
+// On 2026-11-04 the map-reading stats (where a country's middle lies, distance from the
+// equator, letters in its name) left the calendar: Day 5 and Day 23 got new rounds.
 const EXTREME_DAYS = {
   "2026-10-01": {
     name: "Breakfast Club",
@@ -12679,15 +11294,18 @@ const EXTREME_DAYS = {
       ["farmlandpp", "lowest", "Where is there the least farmland per person?"]
     ]
   },
+  // 2026-11-04: was "Compass Points"; its map-reading rounds (furthest north, east, closest
+  // to the equator) were dropped as no fun. Claude picked the three new rounds at the
+  // team's request, from stats already in the game; not yet through the source review.
   "2026-10-05": {
-    name: "Compass Points",
-    theme: "North, south, east and west.",
+    name: "Elbow Room",
+    theme: "Room to live, air to breathe, and the basics: power, food and care.",
     rounds: [
-      ["north", "highest", "The middle of which country lies furthest north?"],
+      ["powerpp", "lowest", "Where is the least electricity generated per person?"],
       ["airpollution", "highest", "Where is the air the most polluted?"],
-      ["east", "highest", "Which country's middle lies furthest east (closest to 180°)?"],
+      ["protein", "lowest", "Where do people get the least protein from their food?"],
       ["density", "lowest", "Which country is the emptiest, with the fewest people per km²?"],
-      ["equator", "lowest", "The middle of which country lies closest to the equator?"],
+      ["outofpocket", "lowest", "Where do patients pay the smallest share of health costs out of their own pocket?"],
       ["area", "highest", "Which country is the biggest of all?"]
     ]
   },
@@ -12897,15 +11515,18 @@ const EXTREME_DAYS = {
       ["hdi", "highest", "Which country scores highest on the Human Development Index?"]
     ]
   },
+  // 2026-11-04: was "Map Nerds"; its map-reading rounds (longest name, furthest from the
+  // equator, south, west) were dropped as no fun. Claude picked the four new rounds at the
+  // team's request, from stats already in the game; not yet through the source review.
   "2026-10-23": {
-    name: "Map Nerds",
-    theme: "Facts you can read off the map.",
+    name: "Clean Living",
+    theme: "Healthy and unhealthy habits, and room to live.",
     rounds: [
-      ["namelength", "highest", "Which country has the longest name (counting letters)?"],
-      ["equator", "highest", "Which country lies furthest from the equator?"],
-      ["north", "lowest", "The middle of which country lies furthest south?"],
+      ["overweight", "lowest", "Where is the smallest share of adults overweight?"],
+      ["smokers", "highest", "Where do the most adults smoke?"],
+      ["diabetes", "lowest", "Where do the fewest adults have diabetes?"],
       ["farmlandpp", "highest", "Where is there the most farmland per person?"],
-      ["east", "lowest", "The middle of which country lies furthest west?"],
+      ["alcoholwho", "highest", "Where do adults drink the most alcohol?"],
       ["density", "highest", "Which country is the most crowded?"]
     ]
   },
@@ -14996,14 +13617,13 @@ return { EXTREME_ROUNDS, EXTREME_MAX_ROUND, EXTREME_MAX_DAY, MODE_NAME, getStat,
 __modules["daily.js"] = (() => {
 // The daily puzzle: which rounds a day has, what's in them, and how they score.
 // Every day has three puzzles, one per mode: competitive (days.js, timed, five rounds),
-// casual (casual-days.js, easier and untimed) and the globe mode (extremes-days.js, working
+// casual (the same days.js rounds, untimed) and the globe mode (extremes-days.js, working
 // title "Highs & Lows": six one-click rounds about stats, see extremes.js). A day without
 // a hand-made entry is generated, seeded by the date. Everything here is pure, so every
 // player gets the same day.
 const { COUNTRIES, buildRoundClues, createSeededRandom, getClueSeed, hashStringToSeed } = __modules["countries.js"];
 const { SHAPES } = __modules["shape-data.js"];
 const { DAYS } = __modules["days.js"];
-const { CASUAL_DAYS } = __modules["casual-days.js"];
 const { EXTREME_DAYS } = __modules["extremes-days.js"];
 const { EXTREME_MAX_DAY, MODE_NAME, scorePick } = __modules["extremes.js"];
 
@@ -15016,7 +13636,8 @@ const MODE_INFO = {
   casual: { name: "Casual", short: "CASUAL" },
   extremes: { name: MODE_NAME, short: MODE_NAME.toUpperCase() }
 };
-const calendarOf = mode => ({ casual: CASUAL_DAYS, extremes: EXTREME_DAYS })[mode] || DAYS;
+// Casual plays the competitive days (without the clock), so both share one calendar.
+const calendarOf = mode => mode === "extremes" ? EXTREME_DAYS : DAYS;
 
 const ROUND_TYPES = ["mystery", "pinpoint", "deepcut", "paint", "rank"];
 
@@ -15336,15 +13957,14 @@ function pickFrom(items, random) {
 
 // Each competitive day spreads difficulty levels 1–5 across its five rounds in a
 // different order, so every day is equally hard overall but the tough round moves
-// around. Casual days stay at the easy end. Every round knows its mode.
+// around. Casual plays the very same rounds, untimed. Every round knows its mode.
 function getDailyPlan(dateKey, mode = "competitive") {
   if (mode === "extremes") return getExtremePlan(dateKey);
-  const prefix = mode === "casual" ? "casual:" : "";
-  const difficulties = shuffle(mode === "casual" ? [1, 1, 1, 2, 2] : [1, 2, 3, 4, 5], seededRandom(`plan:${prefix}${dateKey}`));
+  const difficulties = shuffle([1, 2, 3, 4, 5], seededRandom(`plan:${dateKey}`));
   const authored = calendarOf(mode)[dateKey];
   const used = new Set();
   return ROUND_TYPES.map((type, index) => {
-    const random = seededRandom(`round:${prefix}${dateKey}:${type}`);
+    const random = seededRandom(`round:${dateKey}:${type}`);
     const content = authored?.[type]
       ? AUTHORED[type](authored[type], dateKey, index)
       : BUILDERS[type](difficulties[index], random, used, dateKey, index);
@@ -15512,9 +14132,7 @@ function createRoundState(type) {
     case "mystery":
     case "pinpoint": return { guesses: [], gaveUp: false, ...clock };
     case "deepcut": return { tries: [], answer: null, gaveUp: false, ...clock };
-    // clues: which country each casual clue is about, saved when given (null: worked out
-    // from the misses, as in days saved before clues were stored).
-    case "paint": return { found: [], wrong: [], clues: null, finished: false, ...clock };
+    case "paint": return { found: [], wrong: [], finished: false, ...clock };
     case "rank": return { submissions: [], order: null, rerolled: false, ...clock };
     // The globe mode: the one country clicked.
     case "extreme": return { pick: null, ...clock };
@@ -15523,15 +14141,14 @@ function createRoundState(type) {
 }
 
 // Rank 'Em hints: every wrong try that gets at least one country in the right place
-// reveals the real value of one more country (a fixed random pick per try). In casual,
-// every wrong try does.
+// reveals the real value of one more country (a fixed random pick per try).
 function getRankHints(round, state) {
   const hints = [];
   state.submissions.forEach((submission, index) => {
     if (submission.join() === round.answer.join()) return;
     const right = submission.filter((iso, position) => round.answer[position] === iso).length;
     const remaining = round.countries.filter(iso => !hints.some(hint => hint.iso === iso));
-    if ((right === 0 && round.mode !== "casual") || remaining.length === 0) return;
+    if (right === 0 || remaining.length === 0) return;
     const random = seededRandom(`rank-hint:${round.answer.join()}:${index}`);
     hints.push({ iso: remaining[Math.floor(random() * remaining.length)], afterTry: index + 1 });
   });
@@ -18076,12 +16693,14 @@ const { createBadge } = __modules["badges.js"];
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
 const { hasExtremeDay, MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MAIN_MODE, MODES, MODE_INFO, getSpeedWindow, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
-const { showHowToSet, createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, redactCountryName, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
+const { showHowToSet, createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
 
 // v3: Deep Cut and Paint the Map replaced Capital Call and Border Patrol (October 2026).
 const DAY_STORAGE_PREFIX = "daily-geography:day:v3:";
 // Casual days are kept apart from competitive ones.
-const CASUAL_STORAGE_PREFIX = "daily-geography:casual:v1:";
+// v2 since 4 November 2026: casual plays the competitive days, so v1 saves (the old
+// casual calendar) answer other questions and are no longer read.
+const CASUAL_STORAGE_PREFIX = "daily-geography:casual:v2:";
 // The globe mode ("Highs & Lows"): kept in this browser only for now (not in the account).
 const EXTREMES_STORAGE_PREFIX = "daily-geography:extremes:v1:";
 const storagePrefix = mode => ({ casual: CASUAL_STORAGE_PREFIX, extremes: EXTREMES_STORAGE_PREFIX })[mode] || DAY_STORAGE_PREFIX;
@@ -18102,7 +16721,7 @@ const PRELOADED_DAYS = 30;
 const RANK_COLORS = ["#45e3ff", "#ffd45c", "#ff8a3d", "#c58cff", "#5cf28a"];
 // Competitive: Pinpoint's guess cards go on by themselves once they've turned over (a
 // right guess quickly, a new clue after time to read it). Mystery Country and Rank 'Em
-// cards wait for a click, like every card in casual; the clock is stopped meanwhile.
+// cards wait for a click (in casual, every card does); the clock is stopped meanwhile.
 const AUTO_CONTINUE_MS = 1300;
 // The globe mode: the heat map's turn around the world, and how long it all shows before
 // the score card (the turn, then a moment on the answer).
@@ -18508,7 +17127,7 @@ function applyJourneyWords() {
 function getRoundInfo(round) {
   // Each round's photo on the hand-made days (see tools/fetch-pictures.mjs).
   // A re-rolled Rank 'Em topic has no photo of its own, and casual days have none yet.
-  const photo = round.rerolled || activeMode !== "competitive" ? null : ROUND_PICTURES[activeDate]?.[round.type];
+  const photo = round.rerolled || activeMode === "extremes" ? null : ROUND_PICTURES[activeDate]?.[round.type];
   switch (round.type) {
     case "deepcut":
       return round.info ? { ...round.info, picture: photo } : null;
@@ -19157,14 +17776,10 @@ function render({ animateGlobe = true } = {}) {
   // The hot-to-cold colours only mean something in Mystery Country.
   document.getElementById("stageHint").classList.toggle("hidden", isRank);
   document.querySelector(".stage-current").classList.toggle("hidden", isRank);
-  // Pinpoint and Paint the Map are played by clicking countries on the globe, and so can
-  // casual Mystery Country be.
-  const casualPick = activeMode === "casual" && round.type === "mystery";
-  const clicking = (["pinpoint", "paint", "extreme"].includes(round.type) || casualPick) && !progress.done;
+  // Pinpoint, Paint the Map and Highs & Lows are played by clicking countries on the globe.
+  const clicking = ["pinpoint", "paint", "extreme"].includes(round.type) && !progress.done;
   globe.setClickable(clicking);
-  if (clicking && casualPick) {
-    setText("stageHint", "Click a country to pick it, or type its name · drag to rotate");
-  } else if (clicking) {
+  if (clicking) {
     setText("stageHint", "Click a country to select it · drag to rotate");
   } else {
     setText("stageHint", "Drag to rotate · hover a marker for details");
@@ -19484,14 +18099,6 @@ const ROUND_RENDERERS = {
   paint(round, state, progress) {
     const total = round.answers.length;
     setText("paintQuestion", round.question);
-    // Casual: every wrong click gives a clue about a country still to find.
-    const clues = round.mode === "casual" ? getPaintClues(round, state) : [];
-    const clueList = document.getElementById("paintClues");
-    clueList.classList.toggle("hidden", !clues.length || progress.done);
-    clueList.replaceChildren(...clues.map((clue, index) => Object.assign(document.createElement("li"), {
-      className: `is-open${index === clues.length - 1 ? " is-latest" : ""}${clue.found ? " is-found" : ""}`,
-      textContent: clue.found ? `✓ ${clue.text}` : clue.text
-    })));
     setText("paintCount", `${state.found.length} / ${total}`);
     document.getElementById("paintDone").disabled = progress.done;
 
@@ -19701,30 +18308,6 @@ const ROUND_RENDERERS = {
   }
 };
 
-// Casual Paint the Map: one clue per wrong click, each about a country not found yet (its
-// hand-written location clue, with its name taken out). Which country each clue is about
-// is saved when it's given (state.clues), so a clue stays put once you paint its country.
-function getPaintClueCountries(round, state) {
-  // Days saved before clues were stored: the clues as they were worked out then.
-  return state.clues || round.answers.filter(iso => !state.found.includes(iso)).slice(0, state.wrong.length);
-}
-
-function getPaintClues(round, state) {
-  return getPaintClueCountries(round, state).map(iso => ({
-    iso,
-    found: state.found.includes(iso),
-    text: redactCountryName(CLUES[iso]?.[3] || getCountry(iso).trivia, getCountry(iso))
-  }));
-}
-
-// A wrong click: the next clue is about the first country not found and not yet clued.
-function addPaintClue(round, state) {
-  const clued = getPaintClueCountries(round, state).slice();
-  const next = round.answers.find(iso => !state.found.includes(iso) && !clued.includes(iso));
-  state.clues = next ? [...clued, next] : clued;
-  return next;
-}
-
 // Average position of some countries on the sphere, so the globe can face all of them.
 function getCentroid(countries) {
   const sum = countries.reduce((total, country) => {
@@ -19845,15 +18428,14 @@ function submitMysteryGuess(value, selectedCountry) {
 
 function handleGlobeClick({ ccn3 }) {
   const painting = isPlaying("paint");
-  const picking = activeMode === "casual" && isPlaying("mystery");
   const extreme = isPlaying("extreme");
-  if (!isPlaying("pinpoint") && !painting && !picking && !extreme) return;
+  if (!isPlaying("pinpoint") && !painting && !extreme) return;
   const state = day.rounds[viewIndex];
   // Territories drawn as their own shape (Greenland, Puerto Rico…) count as their country.
   const iso = TERRITORIES.find(territory => territory.ccn3 && territory.ccn3 === ccn3)?.iso;
   const country = ccn3 && COUNTRIES.find(candidate => candidate.ccn3 === ccn3 || candidate.iso === iso);
   if (!country) {
-    showProblem(ccn3 ? "That place isn't one of the game's 195 countries." : "That's open sea. Click on a country.", picking ? answerBox("countryInput") : pickCard(painting ? "paint" : extreme ? "extreme" : "pinpoint"));
+    showProblem(ccn3 ? "That place isn't one of the game's 195 countries." : "That's open sea. Click on a country.", pickCard(painting ? "paint" : extreme ? "extreme" : "pinpoint"));
     return;
   }
   // The globe mode: select the country, unless the stat has no figure for it.
@@ -19862,18 +18444,6 @@ function handleGlobeClick({ ccn3 }) {
     const reason = missingReason(round.stat, country.iso, country.name);
     if (reason) { showProblem(reason, pickCard("extreme")); return; }
     extremeSelection = country.iso;
-    sounds.playClick();
-    render({ animateGlobe: false });
-    return;
-  }
-  // Casual Mystery Country: the clicked country goes into the answer box, to guess it.
-  if (picking) {
-    if (state.guesses.includes(country.iso)) { showProblem(`You already guessed ${country.name}.`, answerBox("countryInput")); return; }
-    mysterySelection = country.iso;
-    const field = document.getElementById("countryInput");
-    field.value = country.name;
-    // On a touch screen this would open the keyboard and move everything; GUESS is enough.
-    if (!onTouch) field.focus();
     sounds.playClick();
     render({ animateGlobe: false });
     return;
@@ -20293,14 +18863,10 @@ function confirmPaint() {
     if (state.found.length < round.answers.length) sounds.playGuess();
   } else {
     state.wrong.push(country.iso);
-    if (round.mode === "casual") addPaintClue(round, state);
   }
   commit({ animateGlobe: false });
   if (isRight) return;
   showMiss(pickCard("paint"), "#paintWrong .attempt.is-wrong");
-  // Casual: the clue that miss unlocked flies in on its own card.
-  const clues = round.mode === "casual" && !progressOf(viewIndex).done ? getPaintClues(round, state) : [];
-  if (clues.length) setTimeout(() => revealClue({ label: `CLUE ${clues.length}`, text: clues.at(-1).text, target: "#paintClues li.is-latest" }), 450);
 }
 
 function moveRankItem(from, to) {
@@ -20783,8 +19349,8 @@ function enterGameView(dateKey = today, mode = "competitive") {
   }
   document.getElementById("victoryModal").classList.add("hidden");
   isGameViewVisible = true;
-  // Casual writes every country's name on the globe.
-  globe.setLabels(activeMode === "competitive" ? null : COUNTRIES);
+  // Highs & Lows writes every country's name on the globe; the country puzzles don't.
+  globe.setLabels(activeMode === "extremes" ? COUNTRIES : null);
   // Started before render(), so the flight turns the globe to where the round wants it.
   const flight = globe.mode === "menu" ? flyFromMenu() : null;
   if (!flight) {
@@ -20948,14 +19514,15 @@ function syncDayToAccount(dateKey) {
   const main = readDayState(dateKey, MAIN_MODE);
   const mainRounds = main?.rounds || roundTypesOf(dateKey, MAIN_MODE).map(createRoundState);
   const dayScore = main ? getDayScore(resolvePlan(getDailyPlan(dateKey, MAIN_MODE), mainRounds), mainRounds) : { completed: false };
-  const state = { ...(competitive || { version: 2, rounds }), ...(casual ? { casual } : {}), ...(extremes ? { extremes } : {}) };
+  const state = { ...(competitive || { version: 2, rounds }), ...(casual ? { casualV2: casual } : {}), ...(extremes ? { extremes } : {}) };
   return pushDay(dateKey, state, { score: dayScore.completed ? dayScore.total : null, completed: dayScore.completed });
 }
 
-// An account row's state as { competitive, casual, extremes }.
+// An account row's state as { competitive, casual, extremes }. Casual is `casualV2`: the
+// old `casual` field holds days of the retired casual calendar, which are dropped.
 function splitAccountDay(state) {
-  const { casual = null, extremes = null, ...competitive } = state || {};
-  return { competitive: state ? competitive : null, casual, extremes };
+  const { casual: retired, casualV2 = null, extremes = null, ...competitive } = state || {};
+  return { competitive: state ? competitive : null, casual: casualV2, extremes };
 }
 
 // Every date this browser has a day for, in any mode.
