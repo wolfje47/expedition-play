@@ -2050,6 +2050,32 @@ h1, h2, h3 { font-weight: normal; }
 .provider-mark.is-google { color: #4285f4; }
 .provider-mark.is-x { background: #000; color: #fff; }
 .account-note { color: var(--faint); font-size: 12px; }
+/* Email sign-in (no password): a quiet "or" line, LOG IN / SIGN UP as a two-way switch, the
+   address, and after sending, the "check your inbox" state with an optional code. */
+.account-or { display: flex; align-items: center; gap: 10px; margin: 0.2rem 0 0.8rem; color: var(--faint); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.account-or::before, .account-or::after { content: ""; flex: 1; height: 1px; background: var(--glass-line); }
+.account-email, .account-sent { display: grid; gap: 0.7rem; margin-bottom: 0.9rem; }
+.account-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border: 1px solid var(--glass-line); border-radius: 12px; background: rgba(255, 255, 255, 0.03); }
+.account-tab { min-height: 36px; border: 0; border-radius: 8px; background: none; color: var(--muted); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
+.account-tab[aria-selected="true"] { background: rgba(255, 255, 255, 0.1); color: var(--text); }
+.account-tab:focus-visible, .account-link:focus-visible, .account-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.account-field { display: grid; gap: 6px; }
+.account-field .field-label { line-height: 1.6; }
+.account-input { width: 100%; min-height: 46px; padding: 0 14px; border: 1px solid var(--glass-line); border-radius: 12px; background: rgba(6, 10, 22, 0.6); color: var(--text); font: 16px var(--font-body); }
+.account-input::placeholder { color: var(--faint); }
+.account-input.is-code { font: 700 20px var(--font-mono); letter-spacing: 0.3em; }
+.account-input[aria-invalid="true"] { border-color: var(--danger); }
+.account-hint { color: var(--faint); font-size: 12px; }
+.account-message { padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--danger) 50%, transparent); border-radius: 10px; background: rgba(255, 107, 125, 0.08); color: var(--text); font-size: 14px; }
+.account-message button { margin-left: 4px; }
+.account-code { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 8px; }
+.account-code .btn { min-height: 46px; }
+.account-sent-actions { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.account-link { min-height: 32px; padding: 0; border: 0; background: none; color: var(--muted); font: 14px var(--font-body); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.account-link:disabled { opacity: 0.5; cursor: default; text-decoration: none; }
+@media (hover: hover) { .account-link:hover:not(:disabled) { color: var(--text); } }
+.account-guest { display: block; margin: 0.6rem auto 0; }
+@media (max-width: 760px) { .account-link { min-height: 40px; } }
 .account-profile { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 0.6rem; }
 .account-profile strong { display: block; font-size: 16px; }
 .account-profile small { color: var(--muted); font-size: 14px; }
@@ -3708,7 +3734,7 @@ h1, h2, h3 { font-weight: normal; }
     </div>
   </section>
 
-  <!-- Your account: sign in with Google or X to keep your days on every device. -->
+  <!-- Your account: sign in with Google or an email link to keep your days on every device. -->
   <div id="accountModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
     <div class="modal account-modal">
       <div class="modal-head">
@@ -3716,7 +3742,7 @@ h1, h2, h3 { font-weight: normal; }
         <button class="modal-close" id="closeAccountButton" type="button" aria-label="Close account">×</button>
       </div>
       <div class="account-signed-out" id="accountSignedOut">
-        <p class="account-lead">Sign in to keep your days, streak and badge on every device, and to share your results.</p>
+        <p class="account-lead" id="accountIntro">Sign in to keep your days, streak and badge on every device, and to share your results.</p>
         <div class="account-providers">
           <button class="btn account-provider" type="button" data-provider="google">
             <span class="provider-mark is-google" aria-hidden="true">G</span>Continue with Google
@@ -3727,7 +3753,40 @@ h1, h2, h3 { font-weight: normal; }
             <span class="provider-mark is-x" aria-hidden="true">𝕏</span>Continue with X
           </button>
         </div>
-        <p class="account-note" id="accountNote">No account needed to play. Your days stay in this browser until you sign in.</p>
+        <!-- Email: no password. Log in or sign up, then a link (and maybe a code) by email. -->
+        <div class="account-or" aria-hidden="true"><span>OR USE YOUR EMAIL</span></div>
+        <form class="account-email" id="accountEmailForm" novalidate>
+          <div class="account-tabs" role="tablist" aria-label="Email">
+            <button class="account-tab" type="button" role="tab" data-email-mode="login" aria-selected="true">LOG IN</button>
+            <button class="account-tab" type="button" role="tab" data-email-mode="signup" aria-selected="false">SIGN UP</button>
+          </div>
+          <label class="account-field">
+            <span class="field-label">EMAIL</span>
+            <input class="account-input" id="accountEmail" type="email" name="email" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" placeholder="you@example.com" required>
+          </label>
+          <button class="btn btn-primary btn-block" id="accountEmailSubmit" type="submit">EMAIL ME A LOGIN LINK</button>
+          <p class="account-hint" id="accountEmailHint">We'll email you a link to sign in. No password needed.</p>
+          <p class="account-message hidden" id="accountEmailMessage" role="alert"></p>
+        </form>
+        <!-- After sending: open the link, or type the code from the email. -->
+        <div class="account-sent hidden" id="accountSent" aria-live="polite">
+          <p class="account-lead">Check your inbox. We sent a sign-in link to <b id="accountSentTo"></b>. Open it on this device and you're in.</p>
+          <form class="account-code" id="accountCodeForm" novalidate>
+            <label class="account-field">
+              <span class="field-label">OR ENTER THE CODE</span>
+              <input class="account-input is-code" id="accountCode" type="text" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="6" placeholder="123456">
+            </label>
+            <button class="btn btn-secondary" id="accountCodeSubmit" type="submit">SIGN IN</button>
+          </form>
+          <p class="account-message hidden" id="accountCodeMessage" role="alert"></p>
+          <div class="account-sent-actions">
+            <button class="account-link" id="accountResend" type="button">Send it again</button>
+            <button class="account-link" id="accountBack" type="button">Use another email</button>
+          </div>
+          <p class="account-note">No email? Check your spam folder. The link works once and expires after an hour.</p>
+        </div>
+        <p class="account-note" id="accountNote">No account needed to play. Your days stay in this browser until you sign in, then they move to your account.</p>
+        <button class="account-link account-guest" id="accountGuest" type="button">Keep playing as a guest</button>
       </div>
       <div class="account-signed-in hidden" id="accountSignedIn">
         <div class="account-profile">
@@ -8803,7 +8862,7 @@ return { SUPABASE_URL, SUPABASE_ANON_KEY };
 
 // ---- auth.js
 __modules["auth.js"] = (() => {
-// Player accounts, optional: sign in with Google or X through Supabase, and your days are
+// Player accounts, optional: sign in with Google, X or an email link through Supabase, and your days are
 // kept in your account so they follow you to other devices. Without an account (or before
 // config.js is filled in) the game works as before, with progress in this browser only.
 const { SUPABASE_ANON_KEY, SUPABASE_URL } = __modules["config.js"];
@@ -8854,9 +8913,11 @@ const getUser = () => user;
 // A name and picture to show, from whatever the provider shares.
 function getProfile(account = user) {
   const meta = account?.user_metadata || {};
-  const provider = PROVIDERS.find(item => item.id === account?.app_metadata?.provider);
+  const providerId = account?.app_metadata?.provider;
+  const provider = providerId === "email" ? { name: "email" } : PROVIDERS.find(item => item.id === providerId);
   return {
-    name: meta.full_name || meta.name || meta.user_name || meta.preferred_username || account?.email || "Player",
+    // An email account has no name: the part before the @ will do.
+    name: meta.full_name || meta.name || meta.user_name || meta.preferred_username || account?.email?.split("@")[0] || "Player",
     avatar: meta.avatar_url || meta.picture || "",
     provider: provider?.name || ""
   };
@@ -8871,6 +8932,57 @@ async function signIn(providerId) {
     options: { redirectTo: `${location.origin}${location.pathname}` }
   });
   if (error) throw error;
+}
+
+// Email sign-in, without a password: Supabase emails a link (and, if the email template
+// includes {{ .Token }}, a 6-digit code). `create: false` only signs in an existing account
+// ("Log in"); `create: true` makes one if needed ("Sign up"; an existing account just gets a
+// sign-in link, so nobody can find out which emails have accounts). Passwords never exist,
+// so none are stored or reset. The link brings the player back to this page, signed in.
+async function sendEmailLink(email, { create }) {
+  const supabase = await getClient();
+  if (!supabase) throw new Error("Accounts aren't set up yet.");
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: { shouldCreateUser: create, emailRedirectTo: `${location.origin}${location.pathname}` }
+  });
+  if (error) throw explainAuthError(error);
+}
+
+// The 6-digit code from the email, for when the link would open in another browser (an
+// app's built-in browser, or the home-screen app on a phone).
+async function verifyEmailCode(email, token) {
+  const supabase = await getClient();
+  if (!supabase) throw new Error("Accounts aren't set up yet.");
+  const { error } = await supabase.auth.verifyOtp({ email, token, type: "email" });
+  if (error) throw explainAuthError(error);
+}
+
+// Supabase's errors in the game's words. `noAccount` lets the form offer "Sign up".
+function explainAuthError(error) {
+  const code = error.code || "";
+  const message = error.message || "";
+  if (code === "otp_disabled" || /signups? not allowed/i.test(message)) return Object.assign(new Error("There's no account with this email yet."), { noAccount: true });
+  // Supabase's own mail server only writes to the project's team until a mail service
+  // (SMTP) is set up: see docs/accounts-setup.md.
+  if (code === "email_address_not_authorized") return new Error("Email sign-in isn't open to everyone yet. Use Google for now.");
+  if (code === "over_email_send_rate_limit" || error.status === 429) return new Error("Too many emails in a short time. Wait a minute and try again.");
+  if (code === "otp_expired" || /expired|invalid/i.test(message) && /token|otp|code/i.test(message)) return new Error("That code is wrong or has expired. Ask for a new email.");
+  if (code === "email_address_invalid" || /invalid.*email|email.*invalid/i.test(message)) return new Error("That email address doesn't look right.");
+  return new Error("Something went wrong on our side. Try again in a moment.");
+}
+
+// Coming back from an email link that didn't work (expired or already used): Supabase puts
+// the reason in the address. Returns a message for the player (or null) and tidies the
+// address so a reload doesn't show it again.
+function takeAuthRedirectError() {
+  const params = new URLSearchParams(location.hash.replace(/^#/, "") || location.search);
+  const code = params.get("error_code");
+  if (!code && !params.get("error")) return null;
+  history.replaceState(null, "", `${location.pathname}${location.search.replace(/([?&])(error|error_code|error_description)=[^&]*/g, "$1").replace(/[?&]+$/, "")}`);
+  return code === "otp_expired"
+    ? "That sign-in link has expired or was already used. Ask for a new one."
+    : "Signing in didn't work. Try again.";
 }
 
 async function signOut() {
@@ -8930,7 +9042,7 @@ const getGroups = () => call("my_groups");
 // Rows of { user_id, display_name, date, score } for the group's finished days.
 const getGroupBoard = (groupId, from, to) => call("group_board", { group_ref: groupId, from_date: from, to_date: to });
 
-return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, addToGroup, leaveGroup, getGroups, getGroupBoard };
+return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, addToGroup, leaveGroup, getGroups, getGroupBoard };
 })();
 
 // ---- round-pictures.js
@@ -16875,7 +16987,7 @@ __modules["engine.js"] = (() => {
 const { COUNTRIES, LEGACY_COUNTRY_ISOS, TERRITORIES } = __modules["countries.js"];
 const { PixelGlobe } = __modules["globe.js"];
 const { JOURNEYS, ROUND_COLORS, createJourney } = __modules["journeys.js"];
-const { getProfile, getUser, initAuth, isConfigured: isAuthConfigured, pullDays, pushDay, signIn, signOut } = __modules["auth.js"];
+const { getProfile, getUser, initAuth, isConfigured: isAuthConfigured, pullDays, pushDay, sendEmailLink, signIn, signOut, takeAuthRedirectError, verifyEmailCode } = __modules["auth.js"];
 const { ROUND_PICTURES } = __modules["round-pictures.js"];
 const { CLUES } = __modules["clues.js"];
 const { sounds } = __modules["audio.js"];
@@ -19853,7 +19965,9 @@ function renderAccount(account) {
     document.getElementById("accountAvatar").replaceChildren(...(avatar ? [avatar.cloneNode()] : []));
   }
   // Before config.js is filled in, the buttons wait.
-  document.querySelectorAll(".account-provider").forEach(button => { button.disabled = !isAuthConfigured; });
+  document.querySelectorAll(".account-provider, #accountEmailForm :is(input, button)").forEach(button => { button.disabled = !isAuthConfigured; });
+  // Signed in: the email form starts over for next time.
+  if (account) resetEmailSignIn();
   if (!isAuthConfigured) setText("accountNote", "Accounts aren't switched on yet. Until then your days stay in this browser.");
 }
 
@@ -19875,6 +19989,148 @@ document.querySelectorAll(".account-provider").forEach(button => {
     }
   });
 });
+// Email sign-in (sendEmailLink in auth.js): LOG IN only signs in an existing account, SIGN UP
+// makes one if needed. Either way a link (and maybe a code) comes by email; no passwords.
+// Days played as a guest move into the account once signed in (mergeAccountDays).
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const EMAIL_RESEND_S = 60;
+let emailMode = "login";
+let sentEmail = "";
+let resendTimer = 0;
+function setEmailMode(mode) {
+  emailMode = mode;
+  document.querySelectorAll("[data-email-mode]").forEach(tab => tab.setAttribute("aria-selected", String(tab.dataset.emailMode === mode)));
+  setText("accountEmailSubmit", mode === "signup" ? "CREATE MY ACCOUNT" : "EMAIL ME A LOGIN LINK");
+  setText("accountEmailHint", mode === "signup"
+    ? "Just your email. We'll send a link to confirm it and sign you in. No password needed."
+    : "We'll email you a link to sign in. No password needed.");
+  showEmailMessage("accountEmailMessage", "");
+}
+// A problem under the form (empty text hides it); with noAccount, a button to sign up instead.
+function showEmailMessage(id, text, { noAccount = false } = {}) {
+  const box = document.getElementById(id);
+  box.classList.toggle("hidden", !text);
+  box.replaceChildren(text);
+  if (noAccount) {
+    const button = Object.assign(document.createElement("button"), { type: "button", className: "account-link", textContent: "Sign up instead" });
+    button.addEventListener("click", () => { setEmailMode("signup"); document.getElementById("accountEmailForm").requestSubmit(); });
+    box.append(" ", button);
+  }
+}
+function showEmailSent(sent) {
+  document.getElementById("accountEmailForm").classList.toggle("hidden", sent);
+  document.querySelector(".account-or").classList.toggle("hidden", sent);
+  document.querySelector(".account-providers").classList.toggle("hidden", sent);
+  document.getElementById("accountIntro").classList.toggle("hidden", sent);
+  document.getElementById("accountSent").classList.toggle("hidden", !sent);
+  showEmailMessage("accountCodeMessage", "");
+  if (sent) setText("accountSentTo", sentEmail);
+}
+function resetEmailSignIn() {
+  clearInterval(resendTimer);
+  sentEmail = "";
+  document.getElementById("accountEmail").value = "";
+  document.getElementById("accountCode").value = "";
+  document.getElementById("accountEmail").removeAttribute("aria-invalid");
+  showEmailSent(false);
+  setEmailMode("login");
+}
+// "Send it again" waits a minute (Supabase won't send sooner).
+function startResendWait() {
+  const button = document.getElementById("accountResend");
+  let left = EMAIL_RESEND_S;
+  const tick = () => {
+    button.disabled = left > 0;
+    button.textContent = left > 0 ? `Send it again (${left} s)` : "Send it again";
+    left -= 1;
+    if (left < -1) clearInterval(resendTimer);
+  };
+  clearInterval(resendTimer);
+  tick();
+  resendTimer = setInterval(tick, 1000);
+}
+async function sendSignInEmail(email) {
+  const submit = document.getElementById("accountEmailSubmit");
+  submit.disabled = true;
+  const label = submit.textContent;
+  submit.textContent = "SENDING…";
+  try {
+    await sendEmailLink(email, { create: emailMode === "signup" });
+    sentEmail = email;
+    showEmailSent(true);
+    startResendWait();
+    return true;
+  } catch (error) {
+    showEmailMessage(sentEmail ? "accountCodeMessage" : "accountEmailMessage", error.message, { noAccount: error.noAccount });
+    return false;
+  } finally {
+    submit.disabled = !isAuthConfigured;
+    submit.textContent = label;
+  }
+}
+document.querySelectorAll("[data-email-mode]").forEach(tab => tab.addEventListener("click", () => {
+  sounds.playClick();
+  setEmailMode(tab.dataset.emailMode);
+}));
+document.getElementById("accountEmailForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const field = document.getElementById("accountEmail");
+  const email = field.value.trim().toLowerCase();
+  field.value = email;
+  const valid = EMAIL_PATTERN.test(email);
+  field.setAttribute("aria-invalid", String(!valid));
+  if (!valid) {
+    showEmailMessage("accountEmailMessage", email ? "That doesn't look like an email address. Try something like name@example.com." : "Type your email address first.");
+    field.focus();
+    return;
+  }
+  sounds.playClick();
+  showEmailMessage("accountEmailMessage", "");
+  sendSignInEmail(email);
+});
+document.getElementById("accountCodeForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const field = document.getElementById("accountCode");
+  const code = field.value.replace(/\D/g, "");
+  if (code.length !== 6) {
+    field.setAttribute("aria-invalid", "true");
+    showEmailMessage("accountCodeMessage", "The code has 6 digits.");
+    return;
+  }
+  field.removeAttribute("aria-invalid");
+  sounds.playClick();
+  const submit = document.getElementById("accountCodeSubmit");
+  submit.disabled = true;
+  try {
+    await verifyEmailCode(sentEmail, code);
+    showToastNotice("Signed in. Your days are in your account now.");
+  } catch (error) {
+    showEmailMessage("accountCodeMessage", error.message);
+  } finally {
+    submit.disabled = false;
+  }
+});
+document.getElementById("accountResend").addEventListener("click", () => {
+  sounds.playClick();
+  if (sentEmail) sendSignInEmail(sentEmail);
+});
+document.getElementById("accountBack").addEventListener("click", () => {
+  sounds.playClick();
+  clearInterval(resendTimer);
+  showEmailSent(false);
+  document.getElementById("accountEmail").focus();
+});
+document.getElementById("accountGuest").addEventListener("click", () => {
+  sounds.playClick();
+  document.getElementById("accountModal").classList.add("hidden");
+});
+// Back from an email link that had expired or was used already: say so, in the account screen.
+const authRedirectError = takeAuthRedirectError();
+if (authRedirectError) {
+  document.getElementById("accountModal").classList.remove("hidden");
+  showEmailMessage("accountEmailMessage", authRedirectError);
+}
+
 document.getElementById("signOutButton").addEventListener("click", async () => {
   sounds.playClick();
   const cleared = await signOutAndForgetDays();
@@ -19965,6 +20221,7 @@ const archive = initializeHistoryScreens({
 community = initializeCommunity({ getDays: archive.loadDays, today, dayLabel: dateKey => `Day ${getPuzzleNumber(dateKey)}` });
 render({ animateGlobe: false });
 showMenuGlobe();
+
 
 return { getPuzzleNumber, getAllPuzzleDays, getAnswerText };
 })();
