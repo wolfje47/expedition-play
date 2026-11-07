@@ -2046,13 +2046,26 @@ h1, h2, h3 { font-weight: normal; }
 .account-provider { display: flex; align-items: center; justify-content: center; gap: 0.7rem; min-height: 48px; border: 1px solid var(--glass-line); background: rgba(255, 255, 255, 0.06); color: var(--text); font: 600 14px var(--font-body); text-transform: none; }
 .account-provider:hover:not(:disabled) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
 .account-provider:disabled { opacity: 0.45; cursor: not-allowed; }
+/* Google is the main way in: a bright button, the first thing under the heading; email
+   and guest play sit below it, quieter. */
+.account-provider.is-primary { min-height: 56px; border-color: transparent; background: #eef1f8; color: #10162a; font-size: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35); }
+.account-provider.is-primary:hover:not(:disabled) { border-color: var(--cyan); background: #fff; box-shadow: 0 0 0 2px var(--cyan), 0 0 24px color-mix(in srgb, var(--cyan) 35%, transparent); }
+.account-provider.is-primary:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.account-provider.is-primary .provider-mark { width: 30px; height: 30px; box-shadow: 0 0 0 1px rgba(16, 22, 42, 0.08); }
+.account-email-toggle { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 48px; margin-bottom: 0.9rem; border: 1px solid var(--glass-line); border-radius: 12px; background: none; color: var(--text); font: 600 14px var(--font-body); cursor: pointer; transition: border-color 0.15s ease, color 0.15s ease; }
+.account-email-toggle i { width: 7px; height: 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform 0.2s ease; }
+.account-email-toggle[aria-expanded="true"] { border-color: color-mix(in srgb, var(--cyan) 55%, transparent); margin-bottom: 0.7rem; }
+.account-email-toggle[aria-expanded="true"] i { transform: translateY(2px) rotate(-135deg); }
+@media (hover: hover) { .account-email-toggle:hover:not(:disabled) { border-color: var(--cyan); color: var(--cyan); } }
+.account-email-toggle:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.account-email-toggle:disabled { opacity: 0.45; cursor: not-allowed; }
 .provider-mark { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; background: #fff; color: #04121a; font: 700 14px var(--font-body); }
 .provider-mark.is-google { color: #4285f4; }
 .provider-mark.is-x { background: #000; color: #fff; }
 .account-note { color: var(--faint); font-size: 12px; }
 /* Email sign-in (no password): a quiet "or" line, LOG IN / SIGN UP as a two-way switch, the
    address, and after sending, the "check your inbox" state with an optional code. */
-.account-or { display: flex; align-items: center; gap: 10px; margin: 0.2rem 0 0.8rem; color: var(--faint); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.account-or { display: flex; align-items: center; gap: 10px; margin: 0 0 0.9rem; color: var(--faint); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
 .account-or::before, .account-or::after { content: ""; flex: 1; height: 1px; background: var(--glass-line); }
 .account-email, .account-sent { display: grid; gap: 0.7rem; margin-bottom: 0.9rem; }
 .account-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border: 1px solid var(--glass-line); border-radius: 12px; background: rgba(255, 255, 255, 0.03); }
@@ -2074,7 +2087,8 @@ h1, h2, h3 { font-weight: normal; }
 .account-link { min-height: 32px; padding: 0; border: 0; background: none; color: var(--muted); font: 14px var(--font-body); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .account-link:disabled { opacity: 0.5; cursor: default; text-decoration: none; }
 @media (hover: hover) { .account-link:hover:not(:disabled) { color: var(--text); } }
-.account-guest { display: block; margin: 0.6rem auto 0; }
+.account-foot { text-align: center; }
+.account-guest { display: block; margin: 0.2rem auto 0; color: var(--faint); font-size: 12px; }
 @media (max-width: 760px) { .account-link { min-height: 40px; } }
 .account-profile { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 0.6rem; }
 .account-profile strong { display: block; font-size: 16px; }
@@ -3742,9 +3756,9 @@ h1, h2, h3 { font-weight: normal; }
         <button class="modal-close" id="closeAccountButton" type="button" aria-label="Close account">×</button>
       </div>
       <div class="account-signed-out" id="accountSignedOut">
-        <p class="account-lead" id="accountIntro">Sign in to keep your days, streak and badge on every device, and to share your results.</p>
+        <p class="account-lead" id="accountIntro">Save your progress, protect your streak and take your Expedition account anywhere.</p>
         <div class="account-providers">
-          <button class="btn account-provider" type="button" data-provider="google">
+          <button class="btn account-provider is-primary" type="button" data-provider="google">
             <span class="provider-mark is-google" aria-hidden="true">G</span>Continue with Google
           </button>
           <!-- Hidden until X login works: X needs paid API credits and, for the email Supabase
@@ -3753,9 +3767,13 @@ h1, h2, h3 { font-weight: normal; }
             <span class="provider-mark is-x" aria-hidden="true">𝕏</span>Continue with X
           </button>
         </div>
-        <!-- Email: no password. Log in or sign up, then a link (and maybe a code) by email. -->
-        <div class="account-or" aria-hidden="true"><span>OR USE YOUR EMAIL</span></div>
-        <form class="account-email" id="accountEmailForm" novalidate>
+        <!-- Email: no password. Folded away behind "Continue with email"; inside, log in or
+             sign up, then a link (and maybe a code) by email. -->
+        <div class="account-or" aria-hidden="true"><span>OR</span></div>
+        <button class="account-email-toggle" id="accountEmailToggle" type="button" aria-expanded="false" aria-controls="accountEmailForm">
+          <span>Continue with email</span><i aria-hidden="true"></i>
+        </button>
+        <form class="account-email hidden" id="accountEmailForm" novalidate>
           <div class="account-tabs" role="tablist" aria-label="Email">
             <button class="account-tab" type="button" role="tab" data-email-mode="login" aria-selected="true">LOG IN</button>
             <button class="account-tab" type="button" role="tab" data-email-mode="signup" aria-selected="false">SIGN UP</button>
@@ -3785,7 +3803,7 @@ h1, h2, h3 { font-weight: normal; }
           </div>
           <p class="account-note">No email? Check your spam folder. The link works once and expires after an hour.</p>
         </div>
-        <p class="account-note" id="accountNote">No account needed to play. Your days stay in this browser until you sign in, then they move to your account.</p>
+        <p class="account-note account-foot" id="accountNote">No account needed to play. Your days move to your account when you sign in.</p>
         <button class="account-link account-guest" id="accountGuest" type="button">Keep playing as a guest</button>
       </div>
       <div class="account-signed-in hidden" id="accountSignedIn">
@@ -11856,6 +11874,20 @@ const EXTREME_DAYS = {
       ["gdppc", "lowest", "Which country is the poorest per person?"]
     ]
   },
+  // Weather Report: themes and picks by Claude at the team's request (docs/highs-lows-options-2026-11-07.md);
+  // all six sources approved by the team on 2026-11-07 (docs/highs-lows-proposals.md).
+  "2026-10-31": {
+    name: "Weather Report",
+    theme: "Weather and climate.",
+    rounds: [
+      ["rain", "highest", "Where does it rain the most?"],
+      ["tempmean", "highest", "Which country was the warmest on average in 2025?"],
+      ["tempmin", "lowest", "Where was the coldest month of 2025?"],
+      ["tempmax", "lowest", "Where was even the warmest month of 2025 cool?"],
+      ["temprange", "highest", "Where is the gap between summer and winter the biggest?"],
+      ["tempanomaly", "highest", "Where was 2025 the most above normal?"]
+    ]
+  },
   // Made with the team's process (CLAUDE.md): theme and 12 options proposed, 6 picked,
   // sources (docs/highs-lows-sources.md) approved by the team on 2026-11-01.
   "2026-11-01": {
@@ -11882,6 +11914,76 @@ const EXTREME_DAYS = {
       ["outofpocket", "highest", "Where do patients pay the largest share of health costs out of their own pocket?"],
       ["roaddeaths", "highest", "Where are the roads the deadliest?"],
       ["doctors", "highest", "Which country has the most doctors for its people?"]
+    ]
+  },
+  // Water World: themes and picks by Claude at the team's request (docs/highs-lows-options-2026-11-07.md);
+  // all six sources approved by the team on 2026-11-07 (docs/highs-lows-proposals.md).
+  "2026-11-03": {
+    name: "Water World",
+    theme: "Water and sanitation.",
+    rounds: [
+      ["waterpp", "highest", "Where is there the most fresh water per person?"],
+      ["wateruse", "highest", "Which country uses far more water than nature gives it?"],
+      ["toilets", "lowest", "Where do the fewest people have a basic toilet?"],
+      ["watertotal", "highest", "Which country uses the most fresh water in total?"],
+      ["waterfarm", "highest", "Where does farming take the biggest share of the water?"],
+      ["waterproductivity", "highest", "Which country earns the most for every m³ of water it uses?"]
+    ]
+  },
+  // Jet Set: themes and picks by Claude at the team's request (docs/highs-lows-options-2026-11-07.md);
+  // all six sources approved by the team on 2026-11-07 (docs/highs-lows-proposals.md).
+  "2026-11-04": {
+    name: "Jet Set",
+    theme: "Flying and tourism.",
+    rounds: [
+      ["airpax", "highest", "Whose airlines carry the most passengers?"],
+      ["tourismexports", "highest", "Where does tourism bring in the biggest share of all exports?"],
+      ["airpaxpp", "highest", "Whose airlines carry the most passengers for the size of the country?"],
+      ["tourismspend", "highest", "Which country's tourists spend the most abroad?"],
+      ["airfreight", "highest", "Whose airlines fly the most cargo?"],
+      ["tourismimports", "highest", "Where is travel abroad the biggest share of what the country buys from other countries?"]
+    ]
+  },
+  // Nine to Five: themes and picks by Claude at the team's request (docs/highs-lows-options-2026-11-07.md);
+  // all six sources approved by the team on 2026-11-07 (docs/highs-lows-proposals.md).
+  "2026-11-05": {
+    name: "Nine to Five",
+    theme: "Work and jobs.",
+    rounds: [
+      ["farmjobs", "highest", "Where do the most workers work on the land?"],
+      ["womenwork", "lowest", "Where do the fewest women go out to work?"],
+      ["ownboss", "highest", "Where are the most workers their own boss?"],
+      ["unemployment", "highest", "Where is unemployment the highest?"],
+      ["servicejobs", "highest", "Where do the most workers work in services (shops, offices, care…)?"],
+      ["familywork", "highest", "Where do the most people help out in a family business, unpaid?"]
+    ]
+  },
+  // Pocket Money: themes and picks by Claude at the team's request (docs/highs-lows-options-2026-11-07.md);
+  // all six sources approved by the team on 2026-11-07 (docs/highs-lows-proposals.md).
+  "2026-11-06": {
+    name: "Pocket Money",
+    theme: "Money and prices.",
+    rounds: [
+      ["inflation", "highest", "Where did prices rise the fastest?"],
+      ["corruption", "highest", "Which country is seen as the least corrupt?"],
+      ["remittances", "highest", "Where is money sent home by migrants the biggest share of the economy?"],
+      ["householdspend", "lowest", "Where do households spend the least per person?"],
+      ["gdpgrowth", "highest", "Whose economy grew the fastest?"],
+      ["exports", "highest", "Which country exports the most for the size of its economy?"]
+    ]
+  },
+  // Sports Day: themes and picks by Claude at the team's request (docs/highs-lows-options-2026-11-07.md);
+  // all six sources approved by the team on 2026-11-07 (docs/highs-lows-proposals.md).
+  "2026-11-07": {
+    name: "Sports Day",
+    theme: "Sport and exercise.",
+    rounds: [
+      ["paris", "highest", "Which country won the most medals at Paris 2024?"],
+      ["inactive", "highest", "Where do the most adults get too little exercise?"],
+      ["parispp", "highest", "Which country won the most Paris 2024 medals for its population?"],
+      ["beijing", "highest", "Which country won the most medals at the Beijing 2022 Winter Olympics?"],
+      ["parisathletes", "highest", "Which country sent the most athletes to Paris 2024?"],
+      ["parisathletespp", "highest", "Which country sent the most athletes to Paris 2024 for its population?"]
     ]
   }
 };
@@ -12003,7 +12105,43 @@ const STATS = {
   mobile: {"name":"Mobile phone subscriptions","unit":"per 100 people","decimals":0,"source":"World Bank","url":"https://data.worldbank.org/indicator/IT.CEL.SETS.P2","year":2024,"values":{"AR":140.235,"AU":112.581,"AT":124.459,"BD":108.077,"BE":103.905,"BO":98.0288,"BR":101.927,"CA":94.106,"CL":132.66,"CN":131.754,"CO":174.094,"CU":72.93,"DK":126.687,"EC":101.598,"EG":97.1295,"ET":65.0825,"FI":125.861,"FR":116.688,"DE":129.151,"GH":113.648,"GR":113.598,"IN":79.3527,"ID":122.515,"IR":174.066,"IQ":100.08,"IE":112.639,"IL":177.393,"IT":132.575,"JP":178.432,"JO":69.6426,"KE":126.478,"MY":139.665,"MX":116.487,"MA":153.057,"NP":99.8471,"NL":128.539,"NZ":130.093,"NG":70.7619,"NO":109.349,"PK":76.8545,"PE":124.624,"PH":115.299,"PL":138.016,"PT":124.13,"RU":186.104,"SA":159.541,"SG":170.783,"ZA":179.336,"KR":172.52,"ES":130.261,"SE":140.687,"CH":129.471,"TZ":126.559,"TH":160.639,"TR":107.827,"UA":133.38,"AE":203.206,"GB":121.643,"US":113.19,"UY":145.502,"VE":71.0076,"VN":127.606,"AF":60.0991,"AO":69.7039,"AL":89.1329,"AD":155.692,"AM":134.887,"AG":200.541,"AZ":109.543,"BI":63.1631,"BJ":125.941,"BF":116.59,"BG":118.067,"BH":159.536,"BS":96.6799,"BA":121.232,"BY":131.123,"BZ":67.175,"BB":114.581,"BN":118.131,"BT":99.7577,"BW":164,"CF":38.8218,"CI":183.876,"CM":108.213,"CD":58.5322,"CG":95.5319,"KM":109.856,"CV":111.841,"CR":136.025,"CY":156.218,"CZ":126.6,"DJ":48.4505,"DM":85.1899,"DO":93.7096,"DZ":115.457,"ER":59.1248,"EE":151.132,"FJ":111.749,"FM":19.9886,"GA":125.337,"GE":161.202,"GN":97.8795,"GM":126.244,"GW":147.198,"GQ":49.538,"GD":95.7592,"GT":112.521,"GY":112.565,"HN":70.9397,"HR":121.733,"HT":65.1889,"HU":104.581,"IS":120.928,"JM":117.694,"KZ":127.085,"KG":107.492,"KH":116.092,"KI":53.5244,"KN":118.893,"KW":167.684,"LA":64.7588,"LB":74.0148,"LR":32.0639,"LY":192.973,"LC":98.6676,"LI":128.901,"LK":132.549,"LS":70.328,"LT":138.729,"LU":144.475,"LV":121.262,"MC":107.401,"MD":120.083,"MG":75.4563,"MV":148.137,"MH":39.7061,"MK":108.387,"ML":112.12,"MT":142.07,"MM":114.329,"ME":221.687,"MN":140.67,"MZ":49.5048,"MR":92.0749,"MU":172.684,"MW":69.2605,"NA":85.1649,"NE":60.594,"NI":105.961,"NR":87.1706,"OM":120.611,"PA":156.587,"PW":135.387,"PG":38.7652,"KP":24.1311,"PY":126.605,"PS":76.6919,"QA":153.612,"RO":119.805,"RW":93.2015,"SD":70.2084,"SN":123.894,"SB":62.0735,"SL":107.882,"SV":176.517,"SM":120.27,"SO":53.958,"RS":123.822,"SS":46.6152,"ST":62.4367,"SR":142.123,"SK":139.968,"SI":130.861,"SZ":139.833,"SC":125.617,"SY":71.2231,"TD":72.929,"TG":80.8036,"TJ":76.2159,"TM":88.1929,"TL":116.382,"TO":61.7258,"TT":118.787,"TN":117.607,"TV":98.8591,"UG":83.165,"UZ":110.492,"VC":108.355,"VU":89.2943,"WS":62.3987,"YE":50.8938,"ZM":108.705,"ZW":94.2452},"years":{"FR":2023,"JP":2023,"UA":2023,"AG":2022,"BI":2023,"BZ":2022,"BB":2022,"CF":2022,"KM":2023,"DJ":2023,"DM":2022,"ER":2022,"FJ":2022,"FM":2022,"GN":2023,"GQ":2022,"GD":2022,"GY":2022,"HT":2022,"KN":2023,"KW":2023,"LA":2023,"LB":2022,"LR":2022,"LY":2022,"LC":2022,"LU":2023,"MG":2023,"MH":2022,"ML":2022,"NR":2022,"PA":2023,"PW":2023,"KP":2022,"PY":2023,"PS":2023,"SD":2022,"SB":2022,"SL":2022,"SM":2022,"SO":2023,"SS":2023,"TJ":2023,"TM":2021,"TO":2022,"TV":2022,"VU":2023,"WS":2022,"YE":2023},"missing":{"VA":0},"skipped":{"FJ":[2023,2024]}},
   powerpp: {"name":"Electricity generated per person","unit":"kWh per person a year","decimals":0,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/per-capita-electricity-generation","year":2024,"values":{"AR":3340.14,"AU":10615.4,"AT":8034.17,"BD":588.547,"BE":6198.87,"BO":1083.31,"BR":3526.72,"CA":16259.5,"CL":4456.21,"CN":7473.62,"CO":1691.32,"CU":1769.62,"DK":5547.67,"EC":2001.1,"EG":2075.85,"ET":246.324,"FI":14635.5,"FR":8551.73,"DE":5952.66,"GH":704.961,"GR":5862.85,"IN":1421.99,"ID":1310.6,"IR":4282.51,"IQ":3252.03,"IE":5830.78,"IL":8626.5,"IT":4475.35,"JP":8365.81,"JO":2048.84,"KE":244.036,"MY":5589.27,"MX":2705.41,"MA":1157.93,"NP":375.366,"NL":7356.04,"NZ":8252.26,"NG":174.885,"NO":28598.2,"PK":764.166,"PE":1748,"PH":1054.23,"PL":4542.63,"PT":4910.76,"RU":8283.41,"SA":13386.4,"SG":10245.7,"ZA":3749.34,"KR":12090.1,"ES":6011.49,"SE":16019.1,"CH":7250.7,"TZ":128.938,"TH":2628.32,"TR":4035.56,"UA":2716.53,"AE":16074.9,"GB":4202.8,"US":13015,"UY":3527.65,"VE":2820.93,"VN":3051.13,"AF":23.2136,"AO":411.499,"AL":2987.37,"AM":3292.29,"AG":3945.32,"AZ":2701.56,"BI":34.8809,"BJ":69.8347,"BF":71.7659,"BG":5653.39,"BH":23614.6,"BS":5607.03,"BA":4598.58,"BY":5153.6,"BZ":1126.89,"BB":3929.54,"BN":12015.5,"BT":13897.1,"BW":1360.49,"CF":27.1717,"CI":337.882,"CM":249.281,"CD":145.686,"CG":862.155,"KM":164.63,"CV":990.706,"CR":2485.96,"CY":4311.5,"CZ":7116.44,"DJ":171.127,"DM":2254.59,"DO":1968.67,"DZ":2058.35,"ER":127.276,"EE":4545.33,"FJ":1238.16,"GA":1024.04,"GE":3546.41,"GN":273.132,"GM":184.783,"GW":36.3412,"GQ":787.309,"GD":2047.47,"GT":857.855,"GY":1660.47,"HN":1152.81,"HR":3820,"HT":73.0512,"HU":4177.62,"IS":48423.5,"JM":1732.89,"KZ":5934.15,"KG":2163.11,"KH":995.071,"KI":297.351,"KN":4907.5,"KW":18402,"LA":6732.46,"LB":919.744,"LR":101.553,"LY":4686.34,"LC":2225.3,"LK":742.591,"LS":209.963,"LT":3141.18,"LU":2263.19,"LV":3382.68,"MD":2056,"MG":76.0207,"MV":1610.46,"MK":3760.08,"ML":243.478,"MT":4015.36,"MM":398.348,"ME":3887.91,"MN":2755.11,"MZ":571.441,"MR":400.433,"MU":2682.57,"MW":84.5059,"NA":541.231,"NE":35.143,"NI":653.544,"NR":4177.81,"OM":9616.55,"PA":2974.15,"PG":447.217,"KP":1022.69,"PY":6466.49,"PS":180.149,"QA":18030.2,"RO":2634.24,"RW":79.2617,"SD":292.771,"SN":412.388,"SB":134.276,"SL":24.2998,"SV":1014.84,"SO":22.6207,"RS":5474.63,"SS":46.8878,"ST":389.81,"SR":2742.58,"SK":5315.19,"SI":7009.69,"SZ":490.816,"SC":4829.95,"SY":1008.4,"TD":18.2274,"TG":84.4579,"TJ":2287.07,"TM":4404.57,"TL":364.12,"TO":671.837,"TT":6333.82,"TN":1806.69,"UG":116.165,"UZ":2339.86,"VC":1490.61,"VU":249.671,"WS":733.841,"YE":129.364,"ZM":925.172,"ZW":616.795},"years":{"AR":2025,"AU":2025,"AT":2025,"BD":2025,"BE":2025,"BO":2025,"BR":2025,"CA":2025,"CL":2025,"CN":2025,"CO":2025,"DK":2025,"EC":2025,"EG":2025,"ET":2025,"FI":2025,"FR":2025,"DE":2025,"GR":2025,"IN":2025,"IR":2025,"IE":2025,"IL":2025,"IT":2025,"JP":2025,"KE":2025,"MY":2025,"MX":2025,"MA":2025,"NL":2025,"NZ":2025,"NG":2025,"NO":2025,"PK":2025,"PE":2025,"PH":2025,"PL":2025,"PT":2025,"RU":2025,"SG":2025,"ZA":2025,"KR":2025,"ES":2025,"SE":2025,"CH":2025,"TH":2025,"TR":2025,"UA":2022,"GB":2025,"US":2025,"UY":2025,"VN":2025,"AM":2025,"AZ":2025,"BG":2025,"BA":2025,"BY":2025,"CF":2023,"KM":2023,"CR":2025,"CY":2025,"CZ":2025,"DM":2023,"DO":2025,"EE":2025,"GE":2025,"HR":2025,"HU":2025,"KZ":2025,"KG":2025,"KH":2025,"KW":2025,"LK":2025,"LS":2022,"LT":2025,"LU":2025,"LV":2025,"MD":2025,"MK":2025,"MT":2025,"ME":2025,"MN":2025,"OM":2025,"PY":2025,"QA":2025,"RO":2025,"SV":2025,"RS":2025,"ST":2023,"SK":2025,"SI":2025,"TJ":2025,"TN":2025,"UZ":2025,"VU":2023},"missing":{"AD":0,"FM":0,"LI":0,"MC":0,"MH":0,"PW":0,"SM":0,"TV":0,"VA":0},"skipped":{"LS":[2023,2024]}},
   itservices: {"name":"IT share of service exports","unit":"% of service exports","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/BX.GSR.CCIS.ZS","year":2025,"values":{"AR":15.9189,"AU":3.39417,"AT":12.9317,"BD":8.79406,"BE":15.0199,"BO":3.28446,"BR":13.6726,"CA":14.3866,"CL":5.87198,"CN":19.1351,"CO":11.4633,"DK":8.20225,"EC":3.86083,"EG":6.05077,"ET":0.559794,"FI":32.6937,"FR":6.68065,"DE":11.4733,"GH":0.609797,"GR":3.17027,"IN":48.5973,"ID":9.60461,"IQ":0.920877,"IE":65.4723,"IL":64.6327,"IT":6.26272,"JP":5.98919,"JO":0.509793,"KE":11.1842,"MY":11.1497,"MX":4.15671,"MA":8.33552,"NP":9.60732,"NL":9.53042,"NZ":5.56928,"NG":2.13596,"NO":8.98821,"PK":46.0598,"PE":2.28861,"PH":17.1413,"PL":16.8861,"PT":9.19369,"RU":5.83181,"SA":3.61537,"SG":7.95533,"ZA":9.45296,"KR":12.4686,"ES":10.4198,"SE":20.7811,"CH":12.7671,"TZ":1.00351,"TH":0.625206,"TR":4.48925,"UA":42.8194,"AE":4.27713,"GB":9.14259,"US":8.21831,"UY":20.3407,"VE":3.69393,"AF":7.82852,"AO":17.4407,"AL":3.05103,"AD":3.50319,"AM":29.2244,"AG":0.546644,"AZ":1.51601,"BI":2.87574,"BJ":3.0409,"BF":14.2144,"BG":25.6813,"BH":7.61426,"BA":13.0079,"BY":31.4054,"BZ":10.1555,"BB":0.225771,"BN":3.27205,"BT":0.447055,"BW":1.56411,"CI":9.8727,"CM":10.4795,"CD":0.458636,"CG":5.46433,"KM":11.6873,"CV":1.17013,"CR":14.753,"CY":28.0749,"CZ":18.1664,"DJ":6.86389,"DM":1.77736,"DO":0.521656,"DZ":1.9925,"EE":25.2448,"FJ":0.474598,"FM":4.02988,"GA":0.768762,"GE":15.2144,"GM":0.18519,"GW":29.3577,"GD":0.722118,"GT":11.1524,"GY":0.860902,"HN":0.934645,"HR":8.38697,"HT":2.07112,"HU":11.2729,"IS":9.67188,"JM":2.52219,"KZ":10.5722,"KG":11.5569,"KH":4.73587,"KI":2.92388,"KN":0.357952,"KW":49.271,"LA":2.7135,"LB":1.77654,"LY":1.85301,"LC":0.86382,"LK":12.7782,"LS":0.0756698,"LT":12.4354,"LU":3.75378,"LV":18.9822,"MD":27.7748,"MG":21.2621,"MV":0.808457,"MH":1.50269,"MK":21.5248,"ML":33.3417,"MT":1.79152,"MM":2.2404,"ME":6.30252,"MN":3.04945,"MZ":1.38879,"MR":1.23329,"MU":4.07726,"MW":23.8326,"NA":2.01917,"NE":28.2724,"NI":19.4358,"OM":7.73645,"PA":2.48258,"PW":0.264969,"PG":0.261104,"PY":14.0541,"PS":17.6982,"QA":2.37375,"RO":26.0081,"RW":3.18701,"SD":11.264,"SN":8.67023,"SB":1.91642,"SL":3.16353,"SV":7.32703,"RS":29.864,"SS":7.35645,"ST":1.17045,"SR":8.33242,"SK":16.1839,"SI":9.06196,"SZ":3.51226,"SC":1.16389,"SY":1.91814,"TG":6.92169,"TJ":1.77352,"TL":4.42599,"TO":0.720143,"TT":3.30479,"TN":4.25609,"TV":1.42888,"UG":1.35616,"UZ":9.93632,"VC":0.789634,"VU":8.21791,"WS":8.19031,"YE":25.3633,"ZM":2.50929,"ZW":3.26612},"years":{"ET":2024,"JO":2024,"TZ":2024,"AF":2020,"BJ":2023,"BF":2024,"BY":2021,"BB":2017,"BT":2024,"CI":2024,"CM":2024,"CG":2021,"KM":2023,"DJ":2024,"FJ":2024,"FM":2014,"GA":2015,"GW":2024,"GY":2023,"HT":2024,"KG":2024,"KI":2014,"LB":2023,"LY":2023,"MH":2024,"ML":2024,"MT":2024,"MM":2019,"MR":2024,"MU":2024,"NA":2024,"NE":2024,"NI":2024,"PW":2023,"PG":2024,"PS":2024,"RW":2024,"SN":2023,"SB":2024,"SL":2024,"SS":2023,"SY":2010,"TG":2020,"TV":2023,"VU":2022,"YE":2016,"ZW":2024},"missing":{"CU":0,"IR":0,"VN":0,"BS":0,"CF":0,"ER":2000,"GN":2009,"GQ":0,"LR":0,"LI":0,"MC":0,"NR":0,"KP":0,"SM":0,"SO":0,"TD":0,"TM":0,"VA":0},"leftOut":{"GN":"its figures jump between 1% and 61% from year to year, and other sources disagree"}},
-  coffee: {"name":"Coffee","unit":"cups a day","decimals":1,"source":"UN FAO food balance sheets","url":"https://ourworldindata.org/grapher/1200660","year":2023,"values":{"AR":0.982387,"AU":2.30137,"AT":2.41879,"BD":0.0117417,"BE":2.46575,"BO":0.868884,"BR":1.96869,"CA":2.6771,"CL":0.551859,"CN":0.0821918,"CO":0.563601,"CU":0.348337,"DK":4.57143,"EC":0.0117417,"EG":0.215264,"ET":0.900196,"FI":4.21135,"FR":2.03914,"DE":2.07828,"GH":0.00391389,"GR":3.89824,"IN":0,"ID":0.109589,"IR":0.250489,"IQ":0.265205,"IE":6.18004,"IL":1.40509,"IT":2.39139,"JP":1.502,"JO":2.96282,"KE":0.074364,"MY":0,"MX":0.324853,"MA":0.465753,"NP":0.0313111,"NL":1.56164,"NZ":5.0137,"NG":0.0469667,"NO":4.1409,"PK":0.00391389,"PE":1.99217,"PH":1.66732,"PL":0.833659,"PT":2.19178,"RU":0.500978,"SA":2.10959,"ZA":0.395303,"KR":1.00978,"ES":1.42466,"SE":4.26614,"CH":2.51663,"TZ":0.00391389,"TH":0.270059,"TR":0.712329,"UA":1.0998,"AE":0.250489,"GB":1.95303,"US":1.63209,"UY":0.958903,"VE":0.818004,"VN":1.51076,"AF":0.00782779,"AO":0.215264,"AL":1.39335,"AM":3.22895,"AG":5.651,"AZ":0.841487,"BI":0.1174,"BJ":0.110148,"BF":0.113503,"BG":4.16047,"BH":2.60665,"BS":2.40697,"BA":5.58121,"BY":0.53229,"BZ":1.863,"BB":4.12906,"BT":0.508802,"BW":0.630136,"CI":0.0430528,"CM":0.180039,"CD":0.207436,"CG":0.0821918,"KM":0.227006,"CV":1.34637,"CR":2.38748,"CY":4.71624,"CZ":0.763209,"DJ":0.12133,"DM":4.63372,"DO":1.42074,"DZ":0.53229,"EE":6.13701,"FJ":3.02544,"FM":1.20922,"GA":0.367906,"GE":4.90019,"GN":3.90215,"GM":0.223092,"GW":0.0626222,"GD":0.328728,"GT":1.34247,"GY":3.76122,"HN":1.58513,"HR":3.58512,"HT":0.16047,"HU":0.759295,"IS":3.10373,"JM":1.2094,"KZ":1.6047,"KG":1.2955,"KH":0.79452,"KI":0.0704448,"KN":0.19951,"KW":2.27397,"LA":8.84147,"LB":5.05283,"LR":0.313111,"LY":2.32485,"LC":0.36397,"LK":0.0900196,"LS":0.0861054,"LT":5.24461,"LU":7.42856,"LV":4.76321,"MD":3.17429,"MG":0.60274,"MV":8.1093,"MH":9.09927,"MK":3.96477,"ML":0.126477,"MT":4.2896,"MM":0.199609,"ME":3.53032,"MN":1.17417,"MZ":0.0313112,"MR":0.156556,"MU":1.72211,"MW":0.191781,"NA":0.935417,"NE":0.0234834,"NI":0.0978472,"NR":0.468878,"OM":1.48728,"PA":1.72603,"PG":1.40509,"KP":0.148728,"PY":0.234834,"QA":3.83561,"RO":3.39726,"RW":0.187867,"SD":0.486669,"SN":0.309198,"SB":4.53618,"SL":0.0391389,"SV":0.978472,"SO":0.317255,"RS":4.75538,"SS":0.0775107,"ST":0.0704464,"SR":2.09001,"SK":4.13698,"SI":4.0822,"SZ":0.277887,"SC":3.02518,"SY":0.340509,"TD":0.00375865,"TG":0.798367,"TJ":0.117417,"TM":0.191781,"TL":4.92367,"TO":0.974439,"TT":1.47162,"TN":0.731898,"TV":1.07446,"UG":0.0587084,"UZ":0.379648,"VC":0.669203,"VU":1.70248,"WS":3.2953,"YE":0.285714,"ZM":0.0234834,"ZW":0.0508806},"years":{"CU":2019,"JP":2022,"BI":2022,"BJ":2022,"DM":2022,"ML":2022,"KP":2018,"SD":2022,"SO":2022,"SS":2022,"TD":2022,"TG":2022},"missing":{"SG":0,"AD":0,"BN":2009,"CF":2009,"ER":0,"GQ":0,"LI":0,"MC":0,"PW":0,"PS":0,"SM":0,"VA":0},"leftOut":{"CF":"FAO's 57 kg of coffee per person a year is more than twice any other country, and the team judged it a data error"},"gramsPerCup":7}
+  coffee: {"name":"Coffee","unit":"cups a day","decimals":1,"source":"UN FAO food balance sheets","url":"https://ourworldindata.org/grapher/1200660","year":2023,"values":{"AR":0.982387,"AU":2.30137,"AT":2.41879,"BD":0.0117417,"BE":2.46575,"BO":0.868884,"BR":1.96869,"CA":2.6771,"CL":0.551859,"CN":0.0821918,"CO":0.563601,"CU":0.348337,"DK":4.57143,"EC":0.0117417,"EG":0.215264,"ET":0.900196,"FI":4.21135,"FR":2.03914,"DE":2.07828,"GH":0.00391389,"GR":3.89824,"IN":0,"ID":0.109589,"IR":0.250489,"IQ":0.265205,"IE":6.18004,"IL":1.40509,"IT":2.39139,"JP":1.502,"JO":2.96282,"KE":0.074364,"MY":0,"MX":0.324853,"MA":0.465753,"NP":0.0313111,"NL":1.56164,"NZ":5.0137,"NG":0.0469667,"NO":4.1409,"PK":0.00391389,"PE":1.99217,"PH":1.66732,"PL":0.833659,"PT":2.19178,"RU":0.500978,"SA":2.10959,"ZA":0.395303,"KR":1.00978,"ES":1.42466,"SE":4.26614,"CH":2.51663,"TZ":0.00391389,"TH":0.270059,"TR":0.712329,"UA":1.0998,"AE":0.250489,"GB":1.95303,"US":1.63209,"UY":0.958903,"VE":0.818004,"VN":1.51076,"AF":0.00782779,"AO":0.215264,"AL":1.39335,"AM":3.22895,"AG":5.651,"AZ":0.841487,"BI":0.1174,"BJ":0.110148,"BF":0.113503,"BG":4.16047,"BH":2.60665,"BS":2.40697,"BA":5.58121,"BY":0.53229,"BZ":1.863,"BB":4.12906,"BT":0.508802,"BW":0.630136,"CI":0.0430528,"CM":0.180039,"CD":0.207436,"CG":0.0821918,"KM":0.227006,"CV":1.34637,"CR":2.38748,"CY":4.71624,"CZ":0.763209,"DJ":0.12133,"DM":4.63372,"DO":1.42074,"DZ":0.53229,"EE":6.13701,"FJ":3.02544,"FM":1.20922,"GA":0.367906,"GE":4.90019,"GN":3.90215,"GM":0.223092,"GW":0.0626222,"GD":0.328728,"GT":1.34247,"GY":3.76122,"HN":1.58513,"HR":3.58512,"HT":0.16047,"HU":0.759295,"IS":3.10373,"JM":1.2094,"KZ":1.6047,"KG":1.2955,"KH":0.79452,"KI":0.0704448,"KN":0.19951,"KW":2.27397,"LA":8.84147,"LB":5.05283,"LR":0.313111,"LY":2.32485,"LC":0.36397,"LK":0.0900196,"LS":0.0861054,"LT":5.24461,"LU":7.42856,"LV":4.76321,"MD":3.17429,"MG":0.60274,"MV":8.1093,"MH":9.09927,"MK":3.96477,"ML":0.126477,"MT":4.2896,"MM":0.199609,"ME":3.53032,"MN":1.17417,"MZ":0.0313112,"MR":0.156556,"MU":1.72211,"MW":0.191781,"NA":0.935417,"NE":0.0234834,"NI":0.0978472,"NR":0.468878,"OM":1.48728,"PA":1.72603,"PG":1.40509,"KP":0.148728,"PY":0.234834,"QA":3.83561,"RO":3.39726,"RW":0.187867,"SD":0.486669,"SN":0.309198,"SB":4.53618,"SL":0.0391389,"SV":0.978472,"SO":0.317255,"RS":4.75538,"SS":0.0775107,"ST":0.0704464,"SR":2.09001,"SK":4.13698,"SI":4.0822,"SZ":0.277887,"SC":3.02518,"SY":0.340509,"TD":0.00375865,"TG":0.798367,"TJ":0.117417,"TM":0.191781,"TL":4.92367,"TO":0.974439,"TT":1.47162,"TN":0.731898,"TV":1.07446,"UG":0.0587084,"UZ":0.379648,"VC":0.669203,"VU":1.70248,"WS":3.2953,"YE":0.285714,"ZM":0.0234834,"ZW":0.0508806},"years":{"CU":2019,"JP":2022,"BI":2022,"BJ":2022,"DM":2022,"ML":2022,"KP":2018,"SD":2022,"SO":2022,"SS":2022,"TD":2022,"TG":2022},"missing":{"SG":0,"AD":0,"BN":2009,"CF":2009,"ER":0,"GQ":0,"LI":0,"MC":0,"PW":0,"PS":0,"SM":0,"VA":0},"leftOut":{"CF":"FAO's 57 kg of coffee per person a year is more than twice any other country, and the team judged it a data error"},"gramsPerCup":7},
+  rain: {"name":"Rain per year","unit":"mm a year","decimals":0,"source":"World Bank","url":"https://data.worldbank.org/indicator/AG.LND.PRCP.MM","year":2022,"values":{"AR":591,"AU":534,"AT":1110,"BD":2666,"BE":847,"BO":1146,"BR":1761,"CA":537,"CL":1522,"CN":645,"CO":3240,"CU":1335,"DK":703,"EC":2274,"EG":18.1,"ET":848,"FI":536,"FR":867,"DE":700,"GH":1187,"GR":652,"IN":1083,"ID":2702,"IR":228,"IQ":216,"IE":1118,"IL":435,"IT":832,"JP":1668,"JO":111,"KE":630,"MY":2875,"MX":758,"MA":346,"NP":1500,"NL":778,"NZ":1732,"NG":1150,"NO":1414,"PK":494,"PE":1738,"PH":2348,"PL":600,"PT":854,"RU":460,"SA":59,"SG":2497,"ZA":495,"KR":1274,"ES":636,"SE":624,"CH":1537,"TZ":1071,"TH":1622,"TR":593,"UA":565,"AE":78,"GB":1220,"US":715,"UY":1300,"VE":2044,"VN":1821,"AF":327,"AO":1010,"AL":1485,"AM":562,"AG":1030,"AZ":447,"BI":1274,"BJ":1039,"BF":748,"BG":608,"BH":83,"BS":1292,"BA":1028,"BY":618,"BZ":1705,"BB":1422,"BN":2722,"BT":2200,"BW":416,"CF":1343,"CI":1348,"CM":1604,"CD":1543,"CG":1646,"KM":900,"CV":228,"CR":2926,"CY":498,"CZ":677,"DJ":220,"DM":2083,"DO":1410,"DZ":89,"ER":384,"EE":626,"FJ":2592,"GA":1831,"GE":1026,"GN":1651,"GM":836,"GW":1577,"GQ":2156,"GD":2350,"GT":1996,"GY":2387,"HN":1976,"HR":1113,"HT":1440,"HU":589,"IS":1940,"JM":2051,"KZ":250,"KG":533,"KH":1904,"KN":1427,"KW":121,"LA":1834,"LB":661,"LR":2391,"LY":56,"LC":2301,"LK":1712,"LS":788,"LT":656,"LU":934,"LV":667,"MD":450,"MG":1513,"MV":1972,"MK":619,"ML":282,"MT":560,"MM":2091,"MN":241,"MZ":1032,"MR":92,"MU":2041,"MW":1181,"NA":285,"NE":151,"NI":2280,"OM":125,"PA":2928,"PG":3142,"KP":1054,"PY":1130,"PS":402,"QA":74,"RO":637,"RW":1212,"SD":250,"SN":686,"SB":3028,"SL":2526,"SV":1784,"SO":282,"SS":900,"ST":3200,"SR":2331,"SK":824,"SI":1162,"SZ":788,"SC":2330,"SY":252,"TD":322,"TG":1168,"TJ":691,"TM":161,"TL":1500,"TT":2200,"TN":207,"UG":1180,"UZ":206,"VC":1583,"VU":2000,"WS":2880,"YE":167,"ZM":1020,"ZW":657},"years":{"IL":2021,"PS":2021},"missing":{"AD":0,"FM":0,"KI":0,"LI":0,"MC":0,"MH":0,"ME":0,"NR":0,"PW":0,"SM":0,"RS":0,"TO":0,"TV":0,"VA":0}},
+  tempmean: {"name":"Average temperature","unit":"°C","decimals":1,"source":"Copernicus ERA5, via Our World in Data","url":"https://ourworldindata.org/grapher/average-monthly-surface-temperature","year":2025,"values":{"AR":15.3877,"AU":22.6389,"AT":7.80557,"BD":25.8685,"BE":11.2861,"BO":20.5289,"BR":25.1603,"CA":-2.54881,"CL":9.48499,"CN":8.21477,"CO":24.3451,"CU":26.0929,"DK":9.82456,"EC":21.2007,"EG":23.5656,"ET":24.0771,"FI":4.47621,"FR":14.224,"DE":10.0767,"GH":27.9167,"GR":16.0172,"IN":24.2342,"ID":25.497,"IR":19.7051,"IQ":23.9021,"IE":10.75,"IL":21.319,"IT":14.0522,"JP":12.8647,"JO":20.4796,"KE":25.7964,"MY":25.8723,"MX":21.6792,"MA":19.298,"NP":14.1331,"NL":11.2746,"NZ":11.1876,"NG":27.783,"NO":2.49556,"PK":21.4647,"PE":19.1601,"PH":26.3245,"PL":9.49669,"PT":16.1718,"RU":-2.34663,"SA":26.5587,"ZA":18.3474,"KR":13.402,"ES":15.0871,"SE":5.20969,"CH":6.78204,"TZ":23.2462,"TH":26.3074,"TR":12.8845,"UA":10.4894,"AE":28.8526,"GB":10.366,"US":10.4254,"UY":17.4838,"VE":25.9885,"VN":23.9749,"AF":13.8043,"AO":22.3471,"AL":13.9983,"AD":6.47935,"AM":7.90877,"AG":26.6481,"AZ":13.18,"BI":21.2388,"BJ":28.2608,"BF":29.2118,"BG":12.5051,"BH":26.4714,"BS":25.97,"BA":11.6996,"BY":8.51615,"BZ":26.0973,"BN":26.8462,"BT":9.76137,"BW":21.7398,"CF":26.6491,"CI":26.7822,"CM":25.2317,"CD":24.8749,"CG":25.2908,"KM":25.6186,"CV":22.8597,"CR":23.3411,"CY":20.1181,"CZ":9.07881,"DJ":29.1035,"DO":25.0238,"DZ":24.7491,"ER":27.4361,"EE":7.71467,"FJ":24.8225,"GA":24.941,"GE":9.00449,"GN":26.4158,"GM":27.877,"GW":27.5574,"GQ":24.349,"GT":23.6917,"GY":25.6323,"HN":24.3319,"HR":13.1429,"HT":25.8077,"HU":11.9551,"IS":2.86809,"JM":26.6664,"KZ":8.9465,"KG":2.49673,"KH":27.2632,"KI":26.2489,"KW":26.7448,"LA":23.2047,"LB":16.9926,"LR":25.6754,"LY":23.1906,"LK":26.9325,"LS":11.753,"LT":8.3369,"LU":10.3926,"LV":7.95449,"MD":11.6041,"MG":23.121,"MK":12.0862,"ML":29.5591,"MM":24.0275,"ME":10.8639,"MN":2.24337,"MZ":24.348,"MR":28.2151,"MU":24.0584,"MW":22.2851,"NA":21.6121,"NE":28.3759,"NI":25.9487,"OM":28.2832,"PA":25.1363,"PG":24.0778,"KP":8.33418,"PY":24.0253,"PS":21.2415,"QA":27.8771,"RO":11.0535,"RW":20.1189,"SD":27.7633,"SN":28.5227,"SB":26.6718,"SL":26.3054,"SV":27.0607,"SO":27.1121,"RS":12.2228,"SS":28.1881,"ST":25.8698,"SR":26.2443,"SK":9.46405,"SI":10.9169,"SZ":20.0423,"SC":26.6439,"SY":20.2574,"TD":28.0204,"TG":27.4874,"TJ":2.62551,"TM":18.2167,"TL":24.9061,"TT":26.527,"TN":21.1242,"UG":23.874,"UZ":15.4428,"VC":26.8913,"VU":25.5852,"WS":25.4177,"YE":26.2947,"ZM":22.021,"ZW":21.798},"years":{},"missing":{"SG":0,"BB":0,"DM":0,"FM":0,"GD":0,"KN":0,"LC":0,"LI":0,"MC":0,"MV":0,"MH":0,"MT":0,"NR":0,"PW":0,"SM":0,"TO":0,"TV":0,"VA":0}},
+  tempmax: {"name":"Temperature of the warmest month","unit":"°C","decimals":1,"source":"Copernicus ERA5, via Our World in Data","url":"https://ourworldindata.org/grapher/average-monthly-surface-temperature","year":2025,"values":{"AR":22.8361,"AU":29.9417,"AT":17.9185,"BD":29.2397,"BE":18.7705,"BO":22.3457,"BR":26.086,"CA":13.5877,"CL":14.0384,"CN":21.5148,"CO":24.7716,"CU":28.4919,"DK":18.1888,"EC":21.9233,"EG":31.7026,"ET":25.5607,"FI":18.7056,"FR":21.375,"DE":18.5108,"GH":30.5234,"GR":26.5997,"IN":28.6332,"ID":25.924,"IR":31.4776,"IQ":36.5716,"IE":16.1786,"IL":28.8718,"IT":23.1896,"JP":25.4248,"JO":30.2291,"KE":27.2614,"MY":26.6582,"MX":25.3678,"MA":28.6334,"NP":20.6761,"NL":18.8404,"NZ":16.2082,"NG":30.9978,"NO":13.693,"PK":30.3446,"PE":19.9993,"PH":27.2474,"PL":18.9545,"PT":23.9945,"RU":16.475,"SA":35.6355,"ZA":24.1431,"KR":26.9529,"ES":24.8834,"SE":17.7828,"CH":16.7567,"TZ":24.8626,"TH":28.6843,"TR":25.207,"UA":23.0187,"AE":37.1879,"GB":16.8104,"US":22.6892,"UY":24.7993,"VE":27.3622,"VN":26.907,"AF":26.5657,"AO":24.4885,"AL":24.3046,"AD":16.4392,"AM":20.3233,"AG":27.8731,"AZ":25.2485,"BI":22.5787,"BJ":31.8633,"BF":33.7347,"BG":24.674,"BH":34.42,"BS":28.7763,"BA":21.7403,"BY":19.8486,"BZ":28.513,"BN":27.7222,"BT":16.0725,"BW":25.9565,"CF":29.9172,"CI":28.8275,"CM":27.8228,"CD":25.9263,"CG":26.3371,"KM":26.9937,"CV":25.6916,"CR":24.0528,"CY":28.5055,"CZ":18.3307,"DJ":34.4175,"DO":26.9094,"DZ":35.5452,"ER":31.4127,"EE":19.4071,"FJ":26.4795,"GA":25.9619,"GE":20.6463,"GN":29.7567,"GM":30.3016,"GW":29.9647,"GQ":25.3739,"GT":26.575,"GY":27.273,"HN":26.6604,"HR":23.162,"HT":27.7328,"HU":22.5107,"IS":10.4679,"JM":28.5201,"KZ":24.9556,"KG":14.571,"KH":29.3769,"KI":27.07,"KW":38.7775,"LA":25.7235,"LB":25.8555,"LR":27.253,"LY":31.6303,"LK":28.3304,"LS":17.97,"LT":18.8445,"LU":18.6806,"LV":19.0286,"MD":24.0622,"MG":25.6919,"MK":23.8715,"ML":34.8064,"MM":26.6913,"ME":21.1794,"MN":20.993,"MZ":26.7303,"MR":34.3561,"MU":27.0845,"MW":24.7013,"NA":25.169,"NE":33.7757,"NI":27.6048,"OM":34.6284,"PA":25.585,"PG":24.8223,"KP":24.1087,"PY":29.7104,"PS":28.9065,"QA":36.6188,"RO":22.4046,"RW":21.292,"SD":31.9294,"SN":32.1564,"SB":27.1885,"SL":28.9126,"SV":28.2036,"SO":28.8132,"RS":23.2476,"SS":31.734,"ST":27.6278,"SR":28.4114,"SK":19.1695,"SI":21.3441,"SZ":24.1356,"SC":28.0997,"SY":31.5043,"TD":32.5873,"TG":30.3124,"TJ":16.6397,"TM":33.0614,"TL":26.1661,"TT":27.3933,"TN":31.3343,"UG":26.5599,"UZ":30.9026,"VC":28.0191,"VU":26.7677,"WS":26.0784,"YE":32.3833,"ZM":26.1807,"ZW":25.2374},"years":{},"missing":{"SG":0,"BB":0,"DM":0,"FM":0,"GD":0,"KN":0,"LC":0,"LI":0,"MC":0,"MV":0,"MH":0,"MT":0,"NR":0,"PW":0,"SM":0,"TO":0,"TV":0,"VA":0}},
+  tempmin: {"name":"Temperature of the coldest month","unit":"°C","decimals":1,"source":"Copernicus ERA5, via Our World in Data","url":"https://ourworldindata.org/grapher/average-monthly-surface-temperature","year":2025,"values":{"AR":7.11163,"AU":14.3452,"AT":-1.14662,"BD":18.7464,"BE":2.80809,"BO":17.1554,"BR":23.3662,"CA":-19.9346,"CL":4.57047,"CN":-5.7844,"CO":23.689,"CU":23.0602,"DK":1.87449,"EC":20.1832,"EG":14.2095,"ET":22.4398,"FI":-6.7107,"FR":7.40083,"DE":1.5373,"GH":25.274,"GR":6.42825,"IN":17.3421,"ID":24.9973,"IR":6.10631,"IQ":9.81832,"IE":5.06104,"IL":11.5684,"IT":6.34776,"JP":0.50322,"JO":8.82778,"KE":24.0384,"MY":25.1888,"MX":14.9458,"MA":10.0098,"NP":5.79947,"NL":3.54646,"NZ":6.17058,"NG":25.3279,"NO":-6.32201,"PK":9.28791,"PE":17.6758,"PH":25.3517,"PL":-0.770656,"PT":9.64584,"RU":-20.4476,"SA":14.9671,"ZA":11.2227,"KR":-0.888452,"ES":7.47878,"SE":-4.65489,"CH":-2.02808,"TZ":21.2514,"TH":22.3091,"TR":-0.411182,"UA":-4.11152,"AE":18.1936,"GB":3.59663,"US":-3.05945,"UY":9.37758,"VE":24.9771,"VN":18.9632,"AF":-1.81281,"AO":19.5769,"AL":5.31711,"AD":-1.38177,"AM":-5.45067,"AG":25.4374,"AZ":-0.0575416,"BI":20.5204,"BJ":25.2855,"BF":26.1768,"BG":-0.151279,"BH":17.2862,"BS":22.9099,"BA":2.49811,"BY":-4.50311,"BZ":23.6357,"BN":26.3226,"BT":3.0517,"BW":14.3815,"CF":24.0758,"CI":24.6344,"CM":23.2259,"CD":23.9178,"CG":23.9182,"KM":23.2672,"CV":20.139,"CR":22.6659,"CY":9.98119,"CZ":-0.630658,"DJ":23.8189,"DO":23.5009,"DZ":13.1639,"ER":23.3072,"EE":-3.15709,"FJ":23.1129,"GA":23.283,"GE":-3.72132,"GN":24.2262,"GM":24.8514,"GW":25.4102,"GQ":22.8735,"GT":21.4755,"GY":24.7685,"HN":22.457,"HR":3.59067,"HT":24.2322,"HU":0.631922,"IS":-4.26161,"JM":25.1728,"KZ":-7.62145,"KG":-11.0258,"KH":24.6893,"KI":25.5538,"KW":13.2031,"LA":17.5849,"LB":5.29527,"LR":23.9475,"LY":14.0954,"LK":25.0231,"LS":3.63003,"LT":-2.58251,"LU":2.2062,"LV":-3.14624,"MD":-2.47133,"MG":19.4737,"MK":2.08545,"ML":21.557,"MM":19.4448,"ME":1.61989,"MN":-16.17,"MZ":20.4416,"MR":18.5478,"MU":20.8666,"MW":18.2104,"NA":15.3793,"NE":20.3881,"NI":24.9177,"OM":19.3334,"PA":24.6554,"PG":23.3382,"KP":-7.77762,"PY":17.425,"PS":11.2643,"QA":17.206,"RO":-1.67918,"RW":19.3247,"SD":21.4957,"SN":24.8096,"SB":26.2643,"SL":24.1724,"SV":25.7204,"SO":24.7285,"RS":1.11093,"SS":24.808,"ST":23.0958,"SR":25.0676,"SK":-0.834797,"SI":1.60386,"SZ":15.3946,"SC":25.0314,"SY":7.29896,"TD":21.8968,"TG":24.8017,"TJ":-12.6547,"TM":3.42006,"TL":23.6057,"TT":25.7908,"TN":12.0431,"UG":22.45,"UZ":-0.114685,"VC":25.7069,"VU":24.2249,"WS":24.5329,"YE":18.9969,"ZM":17.6992,"ZW":16.8278},"years":{},"missing":{"SG":0,"BB":0,"DM":0,"FM":0,"GD":0,"KN":0,"LC":0,"LI":0,"MC":0,"MV":0,"MH":0,"MT":0,"NR":0,"PW":0,"SM":0,"TO":0,"TV":0,"VA":0}},
+  temprange: {"name":"Difference between the warmest and coldest month","unit":"°C","decimals":1,"source":"Copernicus ERA5, via Our World in Data","url":"https://ourworldindata.org/grapher/average-monthly-surface-temperature","year":2025,"values":{"AR":15.7245,"AU":15.5965,"AT":19.0651,"BD":10.4933,"BE":15.9624,"BO":5.19031,"BR":2.7198,"CA":33.5223,"CL":9.46798,"CN":27.2992,"CO":1.08259,"CU":5.4317,"DK":16.3143,"EC":1.74011,"EG":17.4931,"ET":3.12085,"FI":25.4163,"FR":13.9741,"DE":16.9735,"GH":5.24938,"GR":20.1715,"IN":11.2911,"ID":0.926724,"IR":25.3713,"IQ":26.7533,"IE":11.1175,"IL":17.3034,"IT":16.8419,"JP":24.9216,"JO":21.4014,"KE":3.22297,"MY":1.46937,"MX":10.422,"MA":18.6236,"NP":14.8766,"NL":15.2939,"NZ":10.0377,"NG":5.66991,"NO":20.015,"PK":21.0567,"PE":2.32357,"PH":1.89567,"PL":19.7251,"PT":14.3487,"RU":36.9226,"SA":20.6684,"ZA":12.9204,"KR":27.8414,"ES":17.4046,"SE":22.4377,"CH":18.7848,"TZ":3.61115,"TH":6.3752,"TR":25.6182,"UA":27.1302,"AE":18.9943,"GB":13.2138,"US":25.7486,"UY":15.4218,"VE":2.38512,"VN":7.94371,"AF":28.3785,"AO":4.91162,"AL":18.9875,"AD":17.821,"AM":25.774,"AG":2.43573,"AZ":25.3061,"BI":2.05827,"BJ":6.57787,"BF":7.55797,"BG":24.8253,"BH":17.1338,"BS":5.86646,"BA":19.2422,"BY":24.3517,"BZ":4.87733,"BN":1.39963,"BT":13.0208,"BW":11.5749,"CF":5.84141,"CI":4.19308,"CM":4.59685,"CD":2.00845,"CG":2.41887,"KM":3.72653,"CV":5.55264,"CR":1.38688,"CY":18.5243,"CZ":18.9613,"DJ":10.5986,"DO":3.40846,"DZ":22.3813,"ER":8.10552,"EE":22.5642,"FJ":3.36658,"GA":2.67894,"GE":24.3676,"GN":5.53054,"GM":5.45029,"GW":4.55447,"GQ":2.50041,"GT":5.09953,"GY":2.50457,"HN":4.20343,"HR":19.5713,"HT":3.50058,"HU":21.8787,"IS":14.7295,"JM":3.34727,"KZ":32.577,"KG":25.5968,"KH":4.68755,"KI":1.51627,"KW":25.5744,"LA":8.13867,"LB":20.5602,"LR":3.30542,"LY":17.5349,"LK":3.30734,"LS":14.3399,"LT":21.427,"LU":16.4744,"LV":22.1748,"MD":26.5335,"MG":6.21811,"MK":21.786,"ML":13.2494,"MM":7.24647,"ME":19.5595,"MN":37.163,"MZ":6.28866,"MR":15.8083,"MU":6.21788,"MW":6.49086,"NA":9.78975,"NE":13.3877,"NI":2.68716,"OM":15.295,"PA":0.92956,"PG":1.48404,"KP":31.8864,"PY":12.2855,"PS":17.6421,"QA":19.4128,"RO":24.0838,"RW":1.9673,"SD":10.4337,"SN":7.34689,"SB":0.924249,"SL":4.74024,"SV":2.48325,"SO":4.08477,"RS":22.1366,"SS":6.92606,"ST":4.53201,"SR":3.34379,"SK":20.0043,"SI":19.7402,"SZ":8.74102,"SC":3.06835,"SY":24.2054,"TD":10.6905,"TG":5.51073,"TJ":29.2944,"TM":29.6414,"TL":2.56048,"TT":1.60251,"TN":19.2912,"UG":4.1099,"UZ":31.0173,"VC":2.31219,"VU":2.54277,"WS":1.54551,"YE":13.3864,"ZM":8.48146,"ZW":8.40961},"years":{},"missing":{"SG":0,"BB":0,"DM":0,"FM":0,"GD":0,"KN":0,"LC":0,"LI":0,"MC":0,"MV":0,"MH":0,"MT":0,"NR":0,"PW":0,"SM":0,"TO":0,"TV":0,"VA":0}},
+  tempanomaly: {"name":"How much warmer than normal","unit":"°C above the 1991–2020 average","decimals":2,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/annual-temperature-anomalies","year":2025,"values":{"AR":0.698917,"AU":0.471598,"AT":0.942306,"BD":0.502902,"BE":0.980923,"BO":0.256409,"BR":0.161793,"CA":1.15152,"CL":0.398493,"CN":1.02924,"CO":0.484568,"CU":0.606177,"DK":0.932875,"EC":0.604834,"EG":0.517916,"ET":0.706278,"FI":1.54925,"FR":0.779443,"DE":0.681353,"GH":0.540902,"GR":1.06815,"IN":0.0682688,"ID":0.370921,"IR":1.37214,"IQ":0.861638,"IE":0.880642,"IL":1.02858,"IT":0.954843,"JP":0.864258,"JO":1.10253,"KE":0.563274,"MY":0.340469,"MX":0.82326,"MA":0.853741,"NP":0.96041,"NL":0.809542,"NZ":0.825979,"NG":0.719898,"NO":1.63482,"PK":1.03822,"PE":0.36022,"PH":0.41023,"PL":0.747046,"PT":0.83059,"RU":1.17704,"SA":0.566327,"ZA":0.435779,"KR":0.987815,"ES":0.906113,"SE":1.4236,"CH":1.19924,"TZ":0.446356,"TH":-0.0639838,"TR":1.247,"UA":1.30765,"AE":0.815804,"GB":0.942025,"US":0.833377,"UY":-0.0263308,"VE":0.523895,"VN":0.0806815,"AF":1.27427,"AO":0.119362,"AL":1.36465,"AD":1.02837,"AM":1.41639,"AG":0.465694,"AZ":1.01527,"BI":0.645601,"BJ":0.680128,"BF":0.567708,"BG":1.06131,"BH":0.414847,"BS":0.473161,"BA":1.37556,"BY":1.2,"BZ":0.502161,"BN":0.463386,"BT":1.48014,"BW":-0.371889,"CF":0.842371,"CI":0.411868,"CM":0.677586,"CD":0.786444,"CG":0.565925,"KM":0.618168,"CV":0.10586,"CR":0.327036,"CY":0.387315,"CZ":0.527129,"DJ":0.741267,"DO":0.788517,"DZ":1.04045,"ER":0.531818,"EE":1.37749,"FJ":0.495084,"GA":0.375883,"GE":0.923459,"GN":0.472266,"GM":0.105871,"GW":0.0127478,"GQ":0.581589,"GT":0.750093,"GY":0.348558,"HN":0.828372,"HR":1.00173,"HT":0.807719,"HU":0.657941,"IS":1.05215,"JM":0.990355,"KZ":1.97822,"KG":2.06595,"KH":-0.156399,"KI":-0.19296,"KW":0.525804,"LA":0.101195,"LB":1.40541,"LR":0.614494,"LY":0.823163,"LK":0.355558,"LS":0.430019,"LT":1.00671,"LU":0.80255,"LV":1.18918,"MD":1.1215,"MG":0.486737,"MK":0.975345,"ML":0.877026,"MM":0.386082,"ME":1.17832,"MN":0.80299,"MZ":0.433322,"MR":0.674765,"MU":0.526898,"MW":0.138173,"NA":0.104699,"NE":0.892017,"NI":0.572969,"OM":0.40424,"PA":0.239456,"PG":0.596898,"KP":1.16864,"PY":0.120695,"PS":0.951427,"QA":0.395162,"RO":1.06141,"RW":0.715523,"SD":0.578098,"SN":-0.213933,"SB":0.624971,"SL":0.582913,"SV":1.03981,"SO":0.567826,"RS":1.05653,"SS":0.443501,"ST":0.243165,"SR":0.306203,"SK":0.800558,"SI":0.728268,"SZ":0.307897,"SC":0.20427,"SY":1.28363,"TD":0.871603,"TG":0.565359,"TJ":2.71467,"TM":1.59304,"TL":0.441377,"TT":0.336608,"TN":0.857079,"UG":0.754662,"UZ":2.02444,"VC":0.484699,"VU":0.652191,"WS":0.145361,"YE":0.543527,"ZM":-0.00963815,"ZW":0.241677},"years":{},"missing":{"SG":0,"BB":0,"DM":0,"FM":0,"GD":0,"KN":0,"LC":0,"LI":0,"MC":0,"MV":0,"MH":0,"MT":0,"NR":0,"PW":0,"SM":0,"TO":0,"TV":0,"VA":0}},
+  waterpp: {"name":"Fresh water per person","unit":"m³ per person a year","decimals":0,"source":"World Bank","url":"https://data.worldbank.org/indicator/ER.H2O.INTR.PC","year":2022,"values":{"AR":6430.6,"AU":18909.5,"AT":6082.83,"BD":619.89,"BE":1027.38,"BO":25130.1,"BR":26917.9,"CA":73170.5,"CL":45261.5,"CN":1991.89,"CO":41458.9,"CU":3446.71,"DK":1016.43,"EC":24820.6,"EG":8.87956,"ET":973.009,"FI":19258.1,"FR":2933.22,"DE":1286.4,"GH":914.051,"GR":5556.72,"IN":1014.44,"ID":7239.88,"IR":1435.37,"IQ":798.719,"IE":9399.87,"IL":80.0307,"IT":3092.5,"JP":3436.56,"JO":60.5885,"KE":381.55,"MY":16716.9,"MX":3180.08,"MA":776.875,"NP":6669.93,"NL":621.434,"NZ":64348.5,"NG":990.361,"NO":70000.2,"PK":225.687,"PE":49021,"PH":4203.07,"PL":1455.66,"PT":3641.82,"RU":29895.3,"SA":74.5916,"SG":106.439,"ZA":718.197,"KR":1255.02,"ES":2327.04,"SE":16306,"CH":4602.89,"TZ":1298.06,"TH":3129.7,"TR":2671.22,"UA":1342.31,"AE":14.8884,"GB":2143.83,"US":8437.22,"UY":27190.3,"VE":28532.9,"VN":3605.71,"AF":1161.94,"AO":4153.22,"AL":10972.3,"AD":3959.6,"AM":2310.05,"AG":560.103,"AZ":800.157,"BI":755.193,"BJ":748.574,"BF":555.332,"BG":3248.21,"BH":2.62348,"BS":1760.84,"BA":11077.1,"BY":3684.41,"BZ":37891.1,"BB":283.368,"BN":18666.1,"BT":99883,"BW":983.65,"CF":27657.7,"CI":2528.05,"CM":9879.57,"CD":8789.32,"CG":36784.8,"KM":1438.52,"CV":577.211,"CR":22236.4,"CY":585.863,"CZ":1232.18,"DJ":263.83,"DM":2992.85,"DO":2092.47,"DZ":247.31,"ER":821.248,"EE":9422.91,"FJ":31052.1,"GA":67469,"GE":15657.9,"GN":16079.5,"GM":1137.89,"GW":7599.04,"GQ":14416.1,"GD":1710.67,"GT":6118.37,"GY":293317,"HN":8664.1,"HR":9777.88,"HT":1130.69,"HU":624.67,"IS":445023,"JM":3812.06,"KZ":3211.94,"KG":7014.83,"KH":7010.93,"KN":513.82,"KW":0,"LA":25188.5,"LB":835.583,"LR":37221.1,"LY":96.9018,"LC":1678.03,"LK":2380.42,"LS":2287.73,"LT":5459.74,"LU":1531.15,"LV":9013.6,"MD":640.657,"MG":11072,"MV":57.2403,"MK":2948.06,"ML":2600.48,"MT":95.0833,"MM":18654.4,"MN":10134.7,"MZ":3071.39,"MR":82.0406,"MU":2178.97,"MW":784.686,"NA":2131.74,"NE":138.274,"NI":23208.7,"NR":847.386,"OM":295.969,"PA":31040,"PG":78505,"KP":2544.74,"PY":17306.5,"PS":164.948,"QA":21.0738,"RO":2224.85,"RW":695.918,"SD":80.999,"SN":1461.67,"SB":57229.5,"SL":19331.1,"SV":2488.73,"SO":337.043,"RS":1261.47,"SS":2359.09,"ST":9633.02,"SR":158867,"SK":2319.69,"SI":8839.64,"SZ":2165.86,"SY":317.512,"TD":812.774,"TG":1425.28,"TJ":6232.43,"TM":194.324,"TL":5999.44,"TT":2811.53,"TN":346.141,"UG":824.303,"UZ":467.673,"VC":979.95,"VU":31944.2,"YE":54.9409,"ZM":3979.57,"ZW":762.957},"years":{"IL":2021,"PS":2021},"missing":{"FM":0,"KI":0,"LI":0,"MC":0,"MH":0,"ME":0,"PW":0,"SM":0,"SC":0,"TO":0,"TV":0,"VA":0,"WS":0}},
+  wateruse: {"name":"Water used, as a share of what there is","unit":"% of renewable fresh water","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/ER.H2O.FWTL.ZS","year":2022,"values":{"AR":12.9075,"AU":2.36179,"AT":5.70909,"BD":34.1619,"BE":35.8335,"BO":0.118644,"BR":1.20014,"CA":1.26765,"CL":3.99638,"CN":20.2097,"CO":1.13117,"CU":18.2529,"DK":15.5725,"EC":2.24137,"EG":7750,"ET":8.64598,"FI":2.80374,"FR":12.2138,"DE":24.1052,"GH":4.78086,"GR":17.3224,"IN":44.7787,"ID":11.0286,"IR":72.3346,"IQ":120.522,"IE":3.41429,"IL":204,"IT":18.5112,"JP":18.5349,"JO":139.277,"KE":19.4783,"MY":1.15638,"MX":21.957,"MA":36.4586,"NP":4.79168,"NL":74.8573,"NZ":3.01988,"NG":5.64344,"NO":0.703631,"PK":326,"PE":1.57946,"PH":19.0056,"PL":17.5093,"PT":16.1303,"RU":1.50325,"SA":974.167,"SG":33.2552,"ZA":47.1205,"KR":45.0224,"ES":26.0971,"SE":1.45205,"CH":4.21782,"TZ":6.17143,"TH":25.5254,"TR":28.4007,"UA":8.82196,"AE":1509.93,"GB":5.80621,"US":15.7661,"UY":4.88878,"VE":2.81007,"VN":22.7761,"AF":43.0159,"AO":0.476824,"AL":2.96283,"AM":44.7879,"AG":8.46154,"AZ":160.53,"BI":2.78429,"BJ":1.26214,"BF":6.544,"BG":25.9211,"BH":3877.5,"BA":0.878972,"BY":4.15882,"BZ":0.661861,"BB":87.5,"BN":1.08235,"BT":0.433205,"BW":8.88566,"CF":0.0514184,"CI":1.51223,"CM":0.398681,"CD":0.0759556,"CG":0.0207207,"KM":0.833333,"CV":59.6837,"CR":3.05029,"CY":28.5897,"CZ":10.9886,"DJ":6.33333,"DM":10,"DO":30.3702,"DZ":91.5088,"ER":20.7857,"EE":9.48447,"FJ":0.297373,"GA":0.0848171,"GE":2.22498,"GN":0.393805,"GM":3.38667,"GW":1.09375,"GQ":0.0761538,"GD":7.05,"GT":3.04405,"GY":0.599461,"HN":1.77256,"HR":1.80106,"HT":11.1478,"HU":78.247,"IS":0.170588,"JM":12.3828,"KZ":38.7972,"KG":15.7511,"KH":1.81095,"KN":50.8333,"LA":3.86029,"LB":37.75,"LR":0.07295,"LY":817.143,"LC":14.3,"LK":24.5189,"LS":0.837476,"LT":1.94282,"LU":4.774,"LV":1.01732,"MD":52.2222,"MG":3.99332,"MV":15.6667,"MK":40.213,"ML":8.64333,"MT":72.6,"MM":3.31382,"MN":1.32874,"MZ":1.46859,"MR":337.05,"MU":22.9735,"MW":8.40644,"NA":1.67142,"NE":73.8088,"NI":0.814941,"OM":116.714,"PA":0.886823,"PG":0.0489513,"KP":12.9221,"PY":2.06239,"PS":41.2315,"QA":446.429,"RO":19.2331,"RW":6.42105,"SD":673.375,"SN":11.8667,"SL":0.132625,"SV":12.4026,"SO":54.9667,"RS":60.5567,"SS":2.53077,"ST":1.87615,"SR":0.622121,"SK":4.4732,"SI":4.42957,"SZ":40.4545,"SY":195.799,"TD":5.864,"TG":1.93913,"TJ":16.7066,"TM":1867.97,"TL":14.2666,"TT":8.75521,"TN":92.1097,"UG":1.63333,"UZ":262.546,"VC":7.9,"YE":169.762,"ZM":1.9601,"ZW":40.0463},"years":{"IL":2021,"PS":2021},"missing":{"AD":0,"BS":0,"FM":0,"KI":0,"KW":0,"LI":0,"MC":0,"MH":0,"ME":0,"NR":0,"PW":0,"SB":0,"SM":0,"SC":0,"TO":0,"TV":0,"VA":0,"VU":0,"WS":0}},
+  watertotal: {"name":"Fresh water used","unit":"billion m³ a year","decimals":2,"source":"World Bank","url":"https://data.worldbank.org/indicator/ER.H2O.FWTL.K3","year":2022,"values":{"AR":37.69,"AU":11.62,"AT":3.14,"BD":35.87,"BE":4.30002,"BO":0.360086,"BR":67.94,"CA":36.128,"CL":35.368,"CN":568.48,"CO":24.2636,"CU":6.958,"DK":0.93435,"EC":9.9158,"EG":77.5,"ET":10.5481,"FI":3,"FR":24.4277,"DE":25.7926,"GH":1.4486,"GR":10.047,"IN":647.5,"ID":222.635,"IR":92.95,"IQ":42.4237,"IE":1.673,"IL":1.53,"IT":33.783,"JP":79.7,"JO":0.94987,"KE":4.032,"MY":6.707,"MX":89.804,"MA":10.573,"NP":9.4971,"NL":8.2343,"NZ":9.875,"NG":12.472,"NO":2.68787,"PK":179.3,"PE":25.919,"PH":91.0369,"PL":9.385,"PT":6.12953,"RU":64.82,"SA":23.38,"SG":0.199531,"ZA":21.11,"KR":29.197,"ES":29.02,"SE":2.483,"CH":1.704,"TZ":5.184,"TH":57.307,"TR":64.4696,"UA":4.8609,"AE":2.2649,"GB":8.419,"US":444.29,"UY":4.50745,"VE":22.6211,"VN":81.862,"AF":20.282,"AO":0.7057,"AL":0.797,"AM":3.072,"AG":0.0044,"AZ":13.027,"BI":0.2801,"BJ":0.13,"BF":0.818,"BG":5.44343,"BH":0.1551,"BA":0.312035,"BY":1.414,"BZ":0.101,"BB":0.07,"BN":0.092,"BT":0.3379,"BW":0.213256,"CF":0.0725,"CI":1.162,"CM":1.0884,"CD":0.6836,"CG":0.046,"KM":0.01,"CV":0.179051,"CR":3.44683,"CY":0.223,"CZ":1.445,"DJ":0.019,"DM":0.02,"DO":7.137,"DZ":10.292,"ER":0.582,"EE":1.20548,"FJ":0.0849,"GA":0.1391,"GE":1.29338,"GN":0.89,"GM":0.1016,"GW":0.175,"GQ":0.0198,"GD":0.0141,"GT":3.3241,"GY":1.4447,"HN":1.607,"HR":0.679,"HT":1.45,"HU":4.69482,"IS":0.29,"JM":1.34019,"KZ":24.966,"KG":7.707,"KH":2.184,"KN":0.0122,"KW":0.7701,"LA":7.35,"LB":1.812,"LR":0.1459,"LY":5.72,"LC":0.0429,"LK":12.946,"LS":0.0438,"LT":0.30036,"LU":0.04774,"LV":0.172334,"MC":0.005,"MD":0.846,"MG":13.4575,"MV":0.0047,"MK":2.1715,"ML":5.186,"MT":0.036663,"MM":33.231,"ME":2.20704,"MN":0.4624,"MZ":1.473,"MR":1.3482,"MU":0.632,"MW":1.3568,"NA":0.102959,"NE":2.58331,"NI":1.27302,"OM":1.634,"PA":1.2114,"PG":0.3921,"KP":8.6578,"PY":2.413,"PS":0.3348,"QA":0.25,"RO":8.151,"RW":0.61,"SD":26.935,"SN":3.0616,"SL":0.2122,"SV":1.93852,"SO":3.298,"RS":5.091,"SS":0.658,"ST":0.0409,"SR":0.6159,"SK":0.563624,"SI":0.827,"SZ":1.068,"SC":0.011294,"SY":13.9644,"TD":0.8796,"TG":0.223,"TJ":10.602,"TM":26.245,"TL":1.172,"TT":0.3362,"TN":3.864,"UG":0.637,"UZ":42.9,"VC":0.0079,"YE":3.565,"ZM":1.572,"ZW":4.90968},"years":{"IL":2021,"PS":2021},"missing":{"AD":0,"BS":0,"FM":0,"KI":0,"LI":0,"MH":0,"NR":0,"PW":0,"SB":0,"SM":0,"TO":0,"TV":0,"VA":0,"VU":0,"WS":0}},
+  waterfarm: {"name":"Water used by farming","unit":"% of water used","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/ER.H2O.FWAG.ZS","year":2022,"values":{"AR":73.928,"AU":66.8858,"AT":5.23569,"BD":87.8171,"BE":0.852681,"BO":87.0784,"BR":60.8419,"CA":10.6942,"CL":90.8866,"CN":62.1445,"CO":82.1745,"CU":64.9375,"DK":54.2074,"EC":81.4277,"EG":79.1613,"ET":91.8364,"FI":35.726,"FR":10.2964,"DE":4.16659,"GH":73.0575,"GR":80.4745,"IN":90.4074,"ID":85.2067,"IR":92.1758,"IQ":73.4702,"IE":2.3688,"IL":48.3969,"IT":50.2245,"JP":66.6667,"JO":51.6455,"KE":80.2083,"MY":45.645,"MX":76.3011,"MA":87.7768,"NP":98.1352,"NL":3.2193,"NZ":64.9453,"NG":44.1683,"NO":31.417,"PK":93.9766,"PE":81.4538,"PH":74.626,"PL":13.0193,"PT":55.4285,"RU":28.7566,"SA":81.5636,"SG":0,"ZA":59.3999,"KR":58.9321,"ES":65.3343,"SE":4.9323,"CH":9.23938,"TZ":89.3519,"TH":90.3745,"TR":86.927,"UA":21.1318,"AE":51.1797,"GB":14.0499,"US":39.6588,"UY":77.1905,"VE":73.8521,"VN":94.7824,"AF":98.1696,"AO":20.7849,"AL":70.8908,"AM":77.474,"AG":15.6522,"AZ":92.2424,"BI":79.2574,"BJ":25.2137,"BF":51.4303,"BG":13.3451,"BH":33.3103,"BY":27.2277,"BZ":67.7228,"BB":67.6543,"BN":5.76087,"BT":94.0828,"BW":27.9726,"CF":0.551724,"CI":51.6351,"CM":67.7141,"CD":10.5178,"CG":4.36205,"KM":47,"CV":38.9902,"CR":60.7193,"CY":61.2457,"CZ":3.04288,"DJ":15.7895,"DM":5,"DO":83.3122,"DZ":67.43,"ER":94.5017,"EE":0.414783,"FJ":58.8928,"GA":28.972,"GE":33.5524,"GN":67.4157,"GM":38.5827,"GW":75.7895,"GQ":5.05051,"GD":14.8936,"GT":56.7372,"GY":94.3448,"HN":73.3043,"HR":7.48031,"HT":83.3793,"HU":11.0466,"IS":0.107797,"JM":17.0629,"KZ":56.7473,"KG":92.6893,"KH":94.0018,"KN":1.28205,"KW":62.272,"LA":95.9184,"LB":38.0435,"LR":8.43043,"LY":83.1904,"LC":70.8625,"LK":87.3629,"LS":8.6758,"LT":19.5565,"LU":1.02639,"LV":29.0703,"MC":0,"MD":6.89223,"MG":95.8921,"MV":4.54567,"MK":6.40111,"ML":97.8596,"MT":34.5293,"MM":88.5557,"ME":0.306293,"MN":54.2604,"MZ":73.0482,"MR":90.5792,"MU":47.8673,"MW":85.9375,"NA":71.4849,"NE":91.0231,"NI":85.045,"OM":80.7833,"PA":36.8252,"PG":0.255037,"KP":76.3473,"PY":78.6158,"PS":49.2245,"QA":33.3073,"RO":36.2532,"RW":60.0666,"SD":96.1945,"SN":91.3139,"SL":21.5363,"SV":72.7863,"SO":99.4845,"RS":8.28914,"SS":36.4742,"ST":62.5917,"SR":69.9951,"SK":5.82854,"SI":0.411125,"SZ":94.1948,"SC":6.56934,"SY":87.5277,"TD":76.4211,"TG":34.0807,"TJ":74.5253,"TM":92.7487,"TL":91.3823,"TT":4.35804,"TN":75.5422,"UG":40.6593,"UZ":92.1348,"VC":0,"YE":90.7433,"ZM":73.2824,"ZW":87.2002},"years":{"IL":2021,"PS":2021},"missing":{"AD":0,"BS":0,"BA":0,"FM":0,"KI":0,"LI":0,"MH":0,"NR":0,"PW":0,"SB":0,"SM":0,"TO":0,"TV":0,"VA":0,"VU":0,"WS":0}},
+  toilets: {"name":"People with at least a basic toilet","unit":"%","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/SH.STA.BASS.ZS","year":2024,"values":{"AR":94.821,"AU":100,"AT":99.9721,"BD":67.6172,"BE":99.4862,"BO":71.5839,"BR":92.4013,"CA":98.5879,"CL":100,"CN":97.2719,"CO":96.582,"CU":94.7704,"DK":99.5972,"EC":91.2043,"EG":97.0861,"ET":10.3577,"FI":99.4479,"FR":98.6444,"DE":99.227,"GH":31.5789,"GR":99.0073,"IN":83.3809,"ID":88.2032,"IR":90.4583,"IQ":98.5048,"IE":89.7256,"IL":99.9201,"IT":99.8849,"JP":99.9433,"JO":96.4148,"KE":40.885,"MY":96.02,"MX":92.9913,"MA":87.778,"NP":86.026,"NL":97.6567,"NZ":100,"NG":47.9019,"NO":98.047,"PK":71.8829,"PE":78.7732,"PH":87.1527,"PL":98.9562,"PT":99.6592,"RU":92.2176,"SA":97.6075,"SG":100,"ZA":77.3845,"KR":99.7294,"ES":99.9181,"SE":98.7432,"CH":99.8999,"TZ":37.2194,"TH":99.3505,"TR":99.2777,"UA":97.7258,"AE":99.0869,"GB":99.1027,"US":99.6183,"UY":99.1508,"VE":98.3956,"VN":95.447,"AF":54.4958,"AO":50.2951,"AL":99.2997,"AD":100,"AM":93.6649,"AG":99.6057,"AZ":98.9785,"BI":44.634,"BJ":22.249,"BF":31.7963,"BG":86.0766,"BH":100,"BS":93.71,"BA":95.3851,"BY":99.7474,"BZ":84.3018,"BB":98.0925,"BN":100,"BT":86.8421,"BW":72.1155,"CF":14.0363,"CI":40.4071,"CM":47.0729,"CD":16.3033,"CG":20.5548,"KM":57.2231,"CV":83.1279,"CR":98.7888,"CY":99.4777,"CZ":99.0701,"DJ":67.0235,"DM":80.3664,"DO":90.1198,"DZ":85.9065,"ER":11.94,"EE":99.0215,"FJ":92.7543,"FM":90.4539,"GA":57.4015,"GE":90.6807,"GN":32.6496,"GM":48.1711,"GW":28.9416,"GQ":66.3128,"GD":92.6192,"GT":71.1697,"GY":91.3087,"HN":87.6718,"HR":95.7937,"HT":29.1081,"HU":97.9736,"IS":98.778,"JM":91.6265,"KZ":97.9447,"KG":98.5399,"KH":83.3359,"KI":45.1735,"KN":94.9536,"KW":100,"LA":88.7314,"LB":99.2,"LR":23.3352,"LY":88.4991,"LC":83.358,"LI":99.95,"LK":95.353,"LS":47.8913,"LT":96.3966,"LU":97.6012,"LV":92.5346,"MC":100,"MD":86.8829,"MG":15.3671,"MV":99.7013,"MH":78.9586,"MK":98.9976,"ML":47.7562,"MT":100,"MM":74.1835,"ME":97.8491,"MN":74.2807,"MZ":38.5901,"MR":58.6769,"MU":97.3737,"MW":49.2322,"NA":38.7229,"NE":16.336,"NR":71.3211,"OM":99.3209,"PA":89.054,"PW":99.0249,"PG":23.5743,"KP":84.8185,"PY":95.9348,"PS":99.395,"QA":99.9365,"RO":90.5414,"RW":81.3307,"SD":65.7086,"SN":62.5196,"SB":34.6491,"SL":24.9136,"SV":88.0411,"SM":100,"SO":44.4568,"RS":97.9423,"SS":14.4282,"ST":48.6785,"SR":89.9983,"SK":97.543,"SI":98.3112,"SZ":64.4605,"SC":99.7,"SY":95.6484,"TD":13.1415,"TG":25.1681,"TJ":95.9857,"TM":99.7354,"TL":72.9358,"TO":93.9335,"TT":94.1781,"TN":98.5373,"TV":89.6745,"UG":23.8964,"UZ":96.5478,"VC":89.7011,"VU":47.8142,"WS":97.0991,"YE":63.0827,"ZM":37.4763,"ZW":34.6415},"years":{"AR":2016,"AO":2022,"BS":2019,"BA":2018,"CG":2021,"DJ":2023,"DM":2017,"ER":2016,"FM":2020,"GQ":2017,"HR":2021,"KN":2017,"LC":2022,"KP":2023,"TJ":2023,"VC":2018},"missing":{"NI":0,"VA":0}},
+  waterproductivity: {"name":"Economy per m³ of water used","unit":"US$ of GDP per m³","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/ER.GDP.FWTL.M3.KD","year":2022,"values":{"AR":15.9956,"AU":137.036,"AT":136.297,"BD":8.52048,"BE":120.92,"BO":103.579,"BR":27.9586,"CA":49.4671,"CL":7.89209,"CN":29.3879,"CO":14.6208,"CU":12.0045,"DK":373.437,"EC":10.9784,"EG":5.85583,"ET":9.64239,"FI":85.2235,"FR":108.492,"DE":144.53,"GH":47.3051,"GR":21.3499,"IN":4.61906,"ID":5.04084,"IR":5.26389,"IQ":4.58431,"IE":304.711,"IL":249.832,"IT":59.2039,"JP":58.792,"JO":51.0703,"KE":23.5139,"MY":57.8947,"MX":14.3405,"MA":11.9536,"NP":3.4842,"NL":111.304,"NZ":21.9818,"NG":40.3341,"NO":170.05,"PK":2.23215,"PE":8.61624,"PH":4.47874,"PL":67.8903,"PT":37.5237,"RU":22.9036,"SA":36.7537,"SG":1928.75,"ZA":17.0997,"KR":63.3744,"ES":46.441,"SE":229.354,"CH":480.888,"TZ":12.9551,"TH":7.86091,"TR":18.8145,"UA":14.8757,"AE":186.066,"GB":388.914,"US":48.3544,"UY":13.7288,"VE":1.71732,"VN":4.40511,"AF":0.755608,"AO":141.289,"AL":18.0494,"AM":4.63068,"AG":366.281,"AZ":4.35938,"BI":12.5358,"BJ":128.969,"BF":20.3711,"BG":11.3998,"BH":248.064,"BA":64.9841,"BY":40.5057,"BZ":24.9717,"BB":85.9696,"BN":141.309,"BT":7.7415,"BW":81.9139,"CF":28.0508,"CI":58.2549,"CM":37.0331,"CD":76.9195,"CG":221.2,"KM":114.029,"CV":11.6045,"CR":20.5401,"CY":132.721,"CZ":152.344,"DJ":177.135,"DM":28.7048,"DO":13.6873,"DZ":20.0807,"ER":3.87111,"EE":23.5235,"FJ":57.3043,"GA":114.067,"GE":16.4654,"GN":15.5949,"GM":18.442,"GW":9.04955,"GQ":503.193,"GD":77.9934,"GT":23.5382,"GY":9.8761,"HN":16.1628,"HR":94.3657,"HT":9.97023,"HU":33.7322,"IS":75.9083,"JM":12.6376,"KZ":8.87406,"KG":1.09708,"KH":15.8413,"KN":80.5951,"KW":158.411,"LA":2.66267,"LB":18.7331,"LR":23.4968,"LY":8.84371,"LC":46.919,"LK":6.91018,"LS":50.499,"LT":177.933,"LU":1470.19,"LV":179.083,"MC":1669.05,"MD":10.7905,"MG":0.99163,"MV":1219.94,"MK":5.27255,"ML":3.90543,"MT":455.558,"MM":1.90039,"ME":2.1964,"MN":31.2326,"MZ":13.2152,"MR":5.71647,"MU":21.3815,"MW":8.49909,"NA":109.613,"NE":5.54459,"NI":11.5035,"OM":54.4018,"PA":57.9652,"PG":64.2022,"PY":17.3822,"PS":44.8677,"QA":683.632,"RO":28.2218,"RW":20.9441,"SD":1.78434,"SN":8.26285,"SL":42.0116,"SV":14.1122,"SO":2.48323,"RS":10.2931,"SS":18.2337,"ST":7.76427,"SR":7.16485,"SK":182.768,"SI":64.5517,"SZ":4.21787,"SC":164.216,"SY":1.15323,"TD":18.0987,"TG":35.1161,"TJ":1.27326,"TM":2.07973,"TL":1.84564,"TT":63.8306,"TN":12.5037,"UG":69.3049,"UZ":3.34655,"VC":110.219,"YE":10.3195,"ZM":16.6511,"ZW":4.48129},"years":{"IL":2021,"ER":2011,"PS":2021,"SS":2015,"YE":2018},"missing":{"AD":0,"BS":0,"FM":0,"KI":0,"LI":0,"MH":0,"NR":0,"PW":0,"KP":0,"SB":0,"SM":0,"TO":0,"TV":0,"VA":0,"VU":0,"WS":0},"prefix":"$"},
+  airpax: {"name":"Air passengers","unit":"passengers a year","decimals":0,"source":"World Bank","url":"https://data.worldbank.org/indicator/IS.AIR.PSGR","year":2023,"values":{"AR":21057800,"AU":68958600,"AT":46040200,"BD":6628500,"BE":11390700,"BO":5601300,"BR":95398500,"CA":88618000,"CL":21323400,"CN":619216000,"CO":42399000,"CU":136998,"EC":4567420,"EG":16672100,"ET":15273300,"FI":10794500,"FR":64644700,"DE":80199600,"GH":440680,"GR":19090500,"IN":180416000,"ID":97045800,"IR":18067400,"IQ":3756180,"IE":192528000,"IL":7377780,"IT":20264700,"JP":120306000,"JO":3731350,"KE":5138290,"MY":46698400,"MX":78763300,"MA":9354200,"NP":4289300,"NL":41436800,"NZ":15033200,"NG":5269400,"PK":7153420,"PE":17717400,"PH":41501800,"PL":8782360,"PT":18289000,"RU":98872600,"SA":47980000,"SG":47502800,"ZA":15454600,"KR":76272500,"ES":94101500,"SE":19554600,"CH":27725200,"TZ":1911060,"TH":51920700,"TR":125940000,"UA":452344,"AE":91062300,"GB":118946000,"US":941557000,"VE":1783670,"VN":55114800,"AF":1031380,"AO":1321410,"AL":374800,"AM":1311510,"AG":35515.2,"AZ":2581840,"BJ":899,"BF":103592,"BG":723825,"BH":5734420,"BS":1465430,"BA":1593,"BY":1322490,"BZ":776198,"BN":820886,"BT":189878,"BW":172720,"CI":716233,"CM":331025,"CD":1150170,"CG":147084,"CV":71784.4,"CR":1971060,"CY":724062,"CZ":2175760,"DO":996238,"DZ":7160660,"ER":45104,"EE":857,"FJ":2154560,"GA":77320,"GE":320810,"GM":109542,"GQ":118427,"GT":221478,"GY":7512,"HN":428443,"HR":1670010,"HT":74542,"HU":55613600,"IS":4342330,"JM":180951,"KZ":11884200,"KG":804478,"KH":675283,"KI":58879.1,"KW":9499900,"LA":842280,"LB":2693220,"LY":1094580,"LK":3866000,"LT":29256,"LU":2457680,"LV":4475900,"MC":316,"MD":827604,"MG":313313,"MV":1414190,"MH":29502.2,"ML":0,"MT":2387400,"MM":3541240,"ME":379068,"MN":773702,"MZ":680108,"MR":328992,"MU":1504660,"MW":3507,"NA":60304,"NE":5775,"NR":39104,"OM":8697030,"PA":15750300,"PG":1547500,"KP":3690,"PY":407865,"QA":37714300,"RO":2806650,"RW":1537010,"SD":911090,"SN":1070960,"SB":157418,"SL":50193,"SV":3263920,"SO":34065.6,"RS":3868570,"ST":38767,"SR":149672,"SK":1925.45,"SI":1866,"SZ":34663.2,"SC":236917,"SY":610745,"TD":28332,"TG":2175170,"TJ":690677,"TM":1078120,"TT":2028650,"TN":4110270,"UG":21650.2,"UZ":4849940,"VU":359290,"WS":42120,"YE":618613,"ZM":321739,"ZW":92494.4},"years":{"UA":2022,"AG":2022,"BJ":2016,"BA":2020,"ER":2020,"EE":2019,"GA":2016,"GM":2019,"GY":2021,"JM":2018,"LT":2022,"MC":2019,"ML":2014,"SL":2012,"SO":2019,"SK":2022,"SI":2022,"TD":2014},"missing":{"DK":2004,"NO":2004,"UY":2009,"AD":0,"BI":1998,"BB":1991,"CF":2001,"KM":1996,"DJ":1991,"DM":0,"FM":0,"GN":1999,"GW":1998,"GD":0,"KN":0,"LR":1992,"LC":0,"LI":0,"LS":1999,"MK":2009,"NI":2000,"PW":0,"PS":0,"SM":0,"SS":0,"TL":0,"TO":2004,"TV":0,"VA":0,"VC":0}},
+  airpaxpp: {"name":"Air passengers per person","unit":"passengers per person a year","decimals":2,"source":"World Bank (ICAO)","url":"https://data.worldbank.org/indicator/IS.AIR.PSGR","year":2025,"values":{"AR":0.459262,"AU":2.4972,"AT":4.99993,"BD":0.037729,"BE":0.95385,"BO":0.445189,"BR":0.448275,"CA":2.1276,"CL":1.07369,"CN":0.440226,"CO":0.793609,"CU":0.0125259,"EC":0.249724,"EG":0.140852,"ET":0.112741,"FI":1.91174,"FR":0.940693,"DE":0.960575,"GH":0.0125678,"GR":1.83317,"IN":0.123246,"ID":0.339652,"IR":0.195497,"IQ":0.0798834,"IE":35.105,"IL":0.728828,"IT":0.343962,"JP":0.97519,"JO":0.323882,"KE":0.0893111,"MY":1.29798,"MX":0.596932,"MA":0.243404,"NP":0.14482,"NL":2.29089,"NZ":2.82329,"NG":0.0221844,"PK":0.0280285,"PE":0.512409,"PH":0.355364,"PL":0.241036,"PT":1.69266,"RU":0.688944,"SA":1.29768,"SG":7.77311,"ZA":0.238691,"KR":1.47573,"ES":1.90662,"SE":1.84536,"CH":3.04926,"TZ":0.0270897,"TH":0.724948,"TR":1.46649,"UA":0.0116044,"AE":7.90942,"GB":1.71177,"US":2.75482,"VE":0.0625477,"VN":0.542477,"AF":0.0235238,"AO":0.0338476,"AL":0.159518,"AM":0.424889,"AG":0.376983,"AZ":0.251961,"BJ":0.000060684,"BF":0.00430296,"BG":0.112512,"BH":3.58319,"BS":3.63601,"BA":0.000507309,"BY":0.145553,"BZ":1.83531,"BN":1.76031,"BT":0.238336,"BW":0.0674129,"CI":0.0218954,"CM":0.0110787,"CD":0.0101936,"CG":0.0226826,"CV":0.136129,"CR":0.38251,"CY":0.528222,"CZ":0.199852,"DO":0.0864753,"DZ":0.150956,"ER":0.0125046,"EE":0.000627161,"FJ":2.3089,"GA":0.0298172,"GE":0.0815115,"GM":0.0388159,"GQ":0.0610943,"GT":0.0118514,"GY":0.0089858,"HN":0.0389287,"HR":0.430837,"HT":0.00626083,"HU":5.84529,"IS":11.066,"JM":0.0637809,"KZ":0.570158,"KG":0.109556,"KH":0.0378353,"KI":0.431387,"KW":1.95258,"LA":0.106983,"LB":0.460425,"LY":0.146755,"LK":0.177698,"LT":0.0101275,"LU":3.57757,"LV":2.42231,"MC":0.00824183,"MD":0.350602,"MG":0.00956953,"MV":2.66992,"MH":0.813135,"ML":0,"MT":4.11831,"MM":0.0645616,"ME":0.60833,"MN":0.216785,"MZ":0.0190872,"MR":0.061898,"MU":1.20978,"MW":0.000157858,"NA":0.0194981,"NE":0.000206857,"NR":3.25189,"OM":1.58281,"PA":3.44556,"PG":0.143782,"KP":0.000138873,"PY":0.0581578,"QA":12.689,"RO":0.147561,"RW":0.105496,"SD":0.0176355,"SN":0.0565689,"SB":0.187705,"SL":0.00569095,"SV":0.512752,"SO":0.0017332,"RS":0.590699,"ST":0.161358,"SR":0.233917,"SK":0.000355656,"SI":0.000875651,"SZ":0.0275943,"SC":1.93039,"SY":0.0238382,"TD":0.0013489,"TG":0.253173,"TJ":0.0640303,"TM":0.141507,"TT":1.48319,"TN":0.332853,"UG":0.000421334,"UZ":0.13089,"VU":1.07197,"WS":0.19206,"YE":0.0148086,"ZM":0.014682,"ZW":0.00545664},"years":{},"missing":{"DK":0,"NO":0,"UY":0,"AD":0,"BI":0,"BB":0,"CF":0,"KM":0,"DJ":0,"DM":0,"FM":0,"GN":0,"GW":0,"GD":0,"KN":0,"LR":0,"LC":0,"LI":0,"LS":0,"MK":0,"NI":0,"PW":0,"PS":0,"SM":0,"SS":0,"TL":0,"TO":0,"TV":0,"VA":0,"VC":0}},
+  airfreight: {"name":"Air freight","unit":"million tonne-km a year","decimals":0,"source":"World Bank","url":"https://data.worldbank.org/indicator/IS.AIR.GOOD.MT.K1","year":2023,"values":{"AR":136.476,"AU":1188.15,"AT":207.835,"BD":98.8501,"BE":1831.48,"BO":19.8905,"BR":1387.08,"CA":2036.41,"CL":1499.04,"CN":26170.4,"CO":1936.48,"CU":5.16135,"EC":120.01,"EG":492.655,"ET":4015.46,"FI":816.393,"FR":4301.69,"DE":12766.5,"GH":0,"GR":16.0232,"IN":1806.99,"ID":870.513,"IR":136.931,"IQ":0,"IE":430.494,"IL":609.656,"IT":1120.99,"JP":8474.02,"JO":110.056,"KE":288.621,"MY":1910.14,"MX":1091.48,"MA":92.638,"NP":16.9295,"NL":3285.75,"NZ":767.758,"NG":3.14179,"PK":309.515,"PE":299.232,"PH":649.207,"PL":343.932,"PT":568.979,"RU":1268.81,"SA":1036.79,"SG":7604.21,"ZA":59.6653,"KR":12293.8,"ES":1130.88,"SE":324.82,"CH":1257.5,"TZ":20.0372,"TH":1649.93,"TR":8367.3,"UA":0,"AE":13566.2,"GB":4413.9,"US":42762.9,"VE":0.123204,"VN":927.889,"AF":0.794172,"AO":70.7077,"AL":0,"AM":15.6806,"AG":0,"AZ":1434.48,"BJ":0.00644278,"BF":1.4746,"BG":0.626,"BH":895.44,"BS":18.5711,"BA":0,"BY":5.5725,"BZ":3.44779,"BN":45.9101,"BT":0.501684,"BW":0.282,"CI":3.09807,"CM":0.017701,"CD":0.479762,"CG":0,"CV":0.094055,"CR":7.1761,"CY":0.369485,"CZ":0.0407455,"DO":0,"DZ":8.58308,"ER":0,"EE":0,"FJ":156.08,"GA":0,"GE":0.22139,"GM":0,"GQ":0.79992,"GT":0.53954,"GY":0,"HN":1.14374,"HR":0.14608,"HT":0.055037,"HU":145.081,"IS":191.911,"JM":0,"KZ":53.0831,"KG":0.654975,"KH":2.44146,"KI":0.345358,"KW":331.172,"LA":0,"LB":34.3959,"LY":60.0529,"LK":278.498,"LT":1.68904,"LU":6873.24,"LV":2.3673,"MC":0,"MD":0.370693,"MG":2.49141,"MV":29.4587,"MH":0.407146,"ML":0,"MT":3.35594,"MM":9.93088,"ME":0,"MN":26.5201,"MZ":3.01554,"MR":0,"MU":170.21,"MW":0,"NA":0,"NE":0.279008,"NR":2.94469,"OM":542.341,"PA":143.667,"PG":7.12066,"KP":0.0075,"PY":0.905,"QA":13926.6,"RO":2.33576,"RW":0,"SD":20.0365,"SN":0,"SB":9.14438,"SL":0,"SV":27.8016,"SO":0,"RS":19.33,"ST":0.8486,"SR":23.62,"SK":0,"SI":0,"SZ":0,"SC":1.17786,"SY":1.55352,"TD":0.471912,"TG":58.5498,"TJ":131.735,"TM":62.7243,"TT":45.8363,"TN":10.9591,"UG":0.0558605,"UZ":96.459,"VU":30.2716,"WS":0.005954,"YE":49.7252,"ZM":104.32,"ZW":3.78154},"years":{"BJ":2016,"GA":2013,"JM":2019,"ML":2014,"SL":2012,"TD":2014},"missing":{"DK":2004,"NO":2004,"UY":2009,"AD":0,"BI":0,"BB":1991,"CF":1991,"KM":0,"DJ":1991,"DM":0,"FM":0,"GN":1999,"GW":1997,"GD":0,"KN":0,"LR":1992,"LC":0,"LI":0,"LS":1993,"MK":2009,"NI":2000,"PW":0,"PS":0,"SM":0,"SS":0,"TL":0,"TO":2004,"TV":0,"VA":0,"VC":0}},
+  tourismexports: {"name":"Tourism's share of exports","unit":"% of exports","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/ST.INT.RCPT.XP.ZS","year":2020,"values":{"AR":2.64133,"AU":8.70537,"AT":6.85054,"BD":0.566327,"BE":1.77484,"BO":3.26714,"BR":1.30098,"CA":3.6567,"CL":1.29934,"CO":5.1251,"DK":4.49513,"EC":3.11678,"EG":12.1541,"ET":29.5803,"FI":1.79481,"FR":4.80404,"DE":3.47314,"GH":0.865151,"GR":10.4928,"IN":2.76733,"ID":1.98018,"IQ":1.8849,"IE":0.681306,"IL":2.38506,"IT":3.65371,"JP":1.43461,"JO":16.7076,"KE":15.3601,"MY":1.62619,"MX":2.56785,"MA":12.0228,"NP":13.4362,"NL":1.44153,"NZ":18.8273,"NG":0.803762,"NO":1.85607,"PK":2.79881,"PE":2.2041,"PH":3.45979,"PL":2.62687,"PT":12.2445,"RU":1.30043,"SA":3.22397,"SG":3.03939,"ZA":2.88546,"KR":1.92398,"SE":4.84573,"CH":2.08024,"TZ":27.1727,"TH":5.9742,"TR":6.63234,"UA":1.12728,"US":3.87575,"UY":7.70839,"VE":1.81927,"VN":1.1136,"AF":5.08025,"AO":0.090457,"AL":35.9164,"AD":81.8022,"AM":7.96944,"AG":70.0418,"AZ":2.23476,"BI":1.57003,"BJ":6.71867,"BF":3.87226,"BG":4.44373,"BH":2.81928,"BS":59.6415,"BA":6.23964,"BY":1.45765,"BB":44.4376,"BN":2.6985,"BT":10.6778,"BW":4.56136,"CI":1.50623,"CM":7.13534,"CD":0.376205,"CG":0.932706,"KM":26.836,"CV":39.9289,"CR":7.39534,"CY":3.25331,"CZ":2.27568,"DJ":1.24916,"DM":75.0778,"DO":37.7075,"DZ":0.200788,"EE":3.98177,"FJ":17.8132,"GA":0.532472,"GE":9.88456,"GN":0.0143396,"GM":30.1682,"GW":6.48378,"GD":88.2059,"GT":2.34799,"HN":3.01492,"HR":23.414,"HT":34.8378,"HU":3.40349,"JM":48.0601,"KZ":1.19537,"KG":8.00684,"KH":5.37395,"KI":17.5597,"KN":61.7509,"KW":1.1051,"LA":3.51312,"LB":27.0026,"LY":0.344512,"LC":88.7749,"LK":8.22454,"LU":2.9657,"MD":10.986,"MG":7.80155,"MV":78.869,"MH":15.593,"MK":3.51868,"ML":5.51809,"MM":14.2724,"ME":14.4298,"MN":0.640893,"MZ":2.51038,"MR":0.229888,"MU":12.9295,"MW":2.67516,"NA":3.99164,"NE":9.37508,"NR":2.31603,"OM":1.8744,"PA":9.29636,"PW":93.5482,"PG":0.0418463,"PY":0.842867,"PS":9.43033,"QA":20.1852,"RO":1.73218,"RW":10.9904,"SD":20.8779,"SN":10.5352,"SB":1.63233,"SL":5.49167,"SV":12.343,"RS":5.57654,"SS":0.387776,"ST":73.1936,"SR":0.776653,"SK":1.43228,"SI":3.3878,"SZ":0.403801,"SC":18.3912,"SY":32.1742,"TG":15.8546,"TJ":7.26673,"TL":64.0015,"TO":47.8054,"TT":2.34465,"TN":8.9616,"TV":43.4425,"UG":9.21438,"UZ":2.71731,"VC":46.0388,"VU":50.3975,"WS":19.7907,"YE":12.3606,"ZW":1.25397},"years":{"CA":2011,"DK":2018,"DE":2019,"KE":2019,"NZ":2018,"SG":2018,"SE":2010,"TZ":2019,"VE":2016,"AD":2019,"BI":2011,"BJ":2019,"BF":2019,"BB":2016,"BN":2018,"CD":2018,"CG":2016,"DJ":2018,"DM":2018,"DO":2018,"GA":2015,"GW":2019,"GD":2018,"HT":2018,"JM":2011,"KI":2017,"KN":2018,"LY":2010,"LC":2018,"MH":2018,"ML":2018,"MM":2019,"NE":2019,"NR":2018,"PW":2017,"PG":2018,"PS":2018,"SD":2018,"SN":2018,"SL":2018,"SS":2018,"ST":2018,"SY":2010,"TG":2019,"TL":2018,"TV":2013,"YE":2016},"missing":{"CN":2004,"CU":0,"IR":2000,"ES":1998,"AE":0,"GB":1998,"BZ":1998,"CF":0,"ER":2000,"FM":0,"GQ":1996,"GY":2003,"IS":2008,"LR":2009,"LI":0,"LS":1999,"LT":2004,"LV":2007,"MC":0,"MT":2007,"NI":1999,"KP":0,"SM":0,"SO":0,"TD":0,"TM":0,"VA":0,"ZM":0}},
+  tourismspend: {"name":"Spent by tourists abroad","unit":"US$ a year","decimals":0,"source":"World Bank","url":"https://data.worldbank.org/indicator/ST.INT.XPND.CD","year":2020,"values":{"AR":2746000000,"AU":7654000000,"AT":5551000000,"BD":659000000,"BE":13928000000,"BO":325000000,"BR":6490000000,"CA":41247000000,"CL":720000000,"CO":1576000000,"DK":10485000000,"EC":533000000,"EG":2578000000,"ET":322500000,"FI":1940000000,"FR":31193000000,"DE":101231000000,"GH":946000000,"GR":1500000000,"IN":15777000000,"ID":1980000000,"IR":9271000000,"IQ":4172000000,"IE":2334000000,"IL":2175000000,"IT":12965000000,"JP":6741000000,"JO":408000000,"MY":5206000000,"MX":4286000000,"MA":1509000000,"NP":267000000,"NL":7435700000,"NZ":4603000000,"NG":6613000000,"NO":4230000000,"PK":1245000000,"PE":938000000,"PH":4872000000,"PL":5547000000,"PT":3536000000,"RU":10800000000,"SA":9069000000,"SG":25346000000,"ZA":1594000000,"KR":16705000000,"SE":13973000000,"CH":10372000000,"TZ":738200000,"TH":3681000000,"TR":1639000000,"UA":4823000000,"AE":15085000000,"US":48837000000,"UY":412000000,"VE":2920000000,"VN":4360000000,"AF":49000000,"AO":691000000,"AL":805000000,"AD":187000000,"AM":330000000,"AG":35000000,"AZ":439000000,"BI":49000000,"BJ":130000000,"BF":185200000,"BG":1263000000,"BH":2637000000,"BS":166000000,"BA":163000000,"BY":477000000,"BZ":22040000,"BB":99000000,"BN":585000000,"BT":50000000,"BW":91800000,"CF":69800000,"CI":315000000,"CM":697000000,"CD":115000000,"CG":457000000,"KM":43000000,"CV":59000000,"CR":697000000,"CY":880000000,"CZ":3495000000,"DJ":29600000,"DM":9000000,"DO":444000000,"DZ":272000000,"EE":676000000,"FJ":77000000,"FM":29000000,"GA":346000000,"GE":292000000,"GN":1075100000,"GM":5200000,"GW":88900000,"GD":12000000,"GT":346000000,"HN":230000000,"HR":789687000,"HT":554000000,"HU":1334000000,"JM":291000000,"KZ":861000000,"KG":185000000,"KH":213000000,"KI":24570000,"KN":18000000,"KW":6696000000,"LA":260000000,"LB":1699000000,"LY":2042000000,"LC":28000000,"LK":803000000,"LS":277000000,"LU":2458000000,"MD":303000000,"MG":97000000,"MV":106000000,"MH":31400000,"MK":153000000,"ML":255000000,"MM":214000000,"ME":38000000,"MN":573000000,"MZ":95000000,"MR":35000000,"MU":224000000,"MW":119000000,"NA":77000000,"NE":144500000,"NI":102000000,"NR":7100000,"OM":1236000000,"PA":601000000,"PW":23300000,"PG":134000000,"PY":226000000,"PS":567000000,"QA":11504000000,"RO":3472000000,"RW":127000000,"SD":13000000,"SN":324000000,"SB":30910000,"SL":83000000,"SV":162000000,"RS":1179000000,"SS":469000000,"ST":3200000,"SR":64000000,"SK":1291000000,"SI":855800000,"SZ":36400000,"SC":39000000,"SY":850000000,"TG":61000000,"TJ":10800000,"TL":61000000,"TO":38000000,"TT":42000000,"TN":407000000,"TV":9800000,"UG":268000000,"UZ":1062000000,"VC":13000000,"VU":22000000,"WS":1800000,"YE":56000000,"ZM":474000000,"ZW":157000000},"years":{"CA":2011,"DK":2018,"DE":2019,"IR":2018,"NZ":2018,"SG":2018,"SE":2010,"TZ":2019,"VE":2016,"AD":2019,"BI":2011,"BJ":2019,"BF":2019,"BH":2019,"BB":2016,"BN":2018,"CF":2013,"CD":2018,"CG":2016,"DJ":2012,"FM":2014,"GA":2015,"GW":2019,"HT":2019,"KI":2017,"LY":2018,"MH":2018,"ML":2018,"MM":2019,"NE":2019,"NR":2018,"PW":2017,"PG":2018,"SD":2018,"SN":2018,"SL":2019,"ST":2012,"SY":2011,"TG":2019,"TV":2019,"YE":2016},"missing":{"CN":2004,"CU":0,"KE":2001,"ES":1998,"GB":1998,"ER":0,"GQ":2001,"GY":2003,"IS":2007,"LR":2009,"LI":0,"LT":2004,"LV":2007,"MC":0,"MT":2007,"KP":0,"SM":0,"SO":0,"TD":2002,"TM":1997,"VA":0},"prefix":"$","scale":"billion"},
+  tourismimports: {"name":"Travel abroad as a share of imports","unit":"% of imports","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/ST.INT.XPND.MP.ZS","year":2020,"values":{"AR":5.24618,"AU":2.96305,"AT":2.64124,"BD":1.16069,"BE":3.3807,"BO":4.03104,"BR":2.85654,"CA":7.25592,"CL":1.05673,"CO":3.07043,"DK":5.70113,"EC":2.61354,"EG":3.55673,"ET":1.87831,"FI":1.99868,"FR":3.92679,"DE":6.94337,"GH":3.85409,"GR":2.09035,"IN":3.19999,"ID":1.23849,"IQ":7.60417,"IE":0.450448,"IL":2.20658,"IT":2.64223,"JP":0.84064,"JO":2.21449,"MY":2.78972,"MX":1.0105,"MA":3.25508,"NP":2.49663,"NL":1.12287,"NZ":7.87071,"NG":9.16202,"NO":3.47683,"PK":2.38973,"PE":2.20414,"PH":4.8748,"PL":1.9471,"PT":3.92736,"RU":3.54288,"SA":4.69066,"SG":4.53049,"ZA":2.0165,"KR":3.07012,"SE":7.10717,"CH":2.3642,"TZ":7.09561,"TH":1.58631,"TR":0.711949,"UA":7.56217,"US":1.73818,"UY":3.5522,"VE":11.2247,"VN":1.61596,"AF":0.701719,"AO":4.56235,"AL":14.1943,"AD":9.2023,"AM":6.52215,"AG":4.65033,"AZ":2.80835,"BI":6.40254,"BJ":3.01862,"BF":3.68693,"BG":3.30787,"BH":10.2593,"BS":4.86689,"BA":1.67594,"BY":1.35374,"BZ":2.44395,"BB":4.42315,"BN":10.2962,"BT":4.20707,"BW":1.21525,"CI":2.48812,"CM":9.66383,"CD":0.646997,"CG":6.26799,"KM":12.5143,"CV":5.85522,"CR":3.97928,"CY":4.24756,"CZ":2.26926,"DJ":4.08589,"DM":2.97732,"DO":2.18699,"DZ":0.642312,"EE":3.05325,"FJ":3.90724,"FM":12.5398,"GA":6.85249,"GE":3.25623,"GN":17.0286,"GM":0.752555,"GW":17.702,"GD":2.20293,"GT":1.79582,"HN":2.31391,"HR":2.81999,"HT":11.4652,"HU":1.09854,"JM":4.92115,"KZ":1.85154,"KG":4.56694,"KH":0.922968,"KI":12.5868,"KN":4.18349,"KW":15.2129,"LA":4.47052,"LB":11.1735,"LY":10.8336,"LC":3.91864,"LK":4.39486,"LS":13.9158,"LU":2.02227,"MD":5.11961,"MG":2.60878,"MV":4.32935,"MH":17.9714,"MK":1.74404,"ML":4.19336,"MM":1.23299,"ME":1.30293,"MN":7.80626,"MZ":1.09053,"MR":0.952461,"MU":4.2895,"MW":3.52767,"NA":1.57604,"NE":4.25624,"NI":1.71385,"NR":6.54372,"OM":3.65388,"PA":3.41735,"PW":10.5031,"PG":2.23666,"PY":2.05971,"PS":7.03014,"QA":19.477,"RO":3.33461,"RW":3.5499,"SD":0.157818,"SN":3.61603,"SB":5.55675,"SL":5.11405,"SV":1.55063,"RS":3.90696,"SS":11.0475,"ST":2.2259,"SR":3.46873,"SK":1.43655,"SI":2.31292,"SZ":2.15871,"SC":2.92756,"SY":8.23338,"TG":2.69823,"TJ":0.345548,"TL":4.59681,"TO":12.0726,"TT":0.616889,"TN":2.78667,"TV":13.1523,"UG":2.62522,"UZ":4.69121,"VC":3.46633,"VU":5.01855,"WS":0.477719,"YE":0.678286,"ZM":8.08019,"ZW":2.65779},"years":{"CA":2011,"DK":2018,"DE":2019,"NZ":2018,"SG":2018,"SE":2010,"TZ":2019,"VE":2016,"AD":2019,"BI":2011,"BJ":2019,"BF":2019,"BH":2019,"BB":2016,"BN":2018,"CD":2018,"CG":2016,"DJ":2012,"FM":2014,"GA":2015,"GW":2019,"HT":2019,"KI":2017,"LY":2018,"MH":2018,"ML":2018,"MM":2019,"NE":2019,"NR":2018,"PW":2017,"PG":2018,"SD":2018,"SN":2018,"SL":2019,"ST":2012,"SY":2010,"TG":2019,"TV":2019,"YE":2016},"missing":{"CN":2004,"CU":0,"IR":2000,"KE":2001,"ES":1998,"AE":0,"GB":1998,"CF":0,"ER":0,"GQ":1996,"GY":2003,"IS":2007,"LR":2009,"LI":0,"LT":2004,"LV":2007,"MC":0,"MT":2007,"KP":0,"SM":0,"SO":0,"TD":0,"TM":0,"VA":0}},
+  farmjobs: {"name":"Workers in farming","unit":"% of workers","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/SL.AGR.EMPL.ZS","year":2025,"values":{"AR":7.00094,"AU":2.17612,"AT":2.76647,"BD":44.2601,"BE":0.984722,"BO":24.7144,"BR":7.62783,"CA":1.10471,"CL":6.06552,"CN":21.6769,"CO":14.1576,"CU":15.528,"DK":1.62048,"EC":32.4812,"EG":17.5246,"ET":60.1432,"FI":3.49338,"FR":2.33413,"DE":1.07105,"GH":34.5736,"GR":10.6778,"IN":41.6251,"ID":27.2969,"IR":13.6239,"IQ":8.16873,"IE":3.8532,"IL":0.759712,"IT":3.34722,"JP":2.81371,"JO":3.11572,"KE":45.7884,"MY":9.1823,"MX":11.4004,"MA":27.8922,"NP":22.912,"NL":1.70416,"NZ":5.41826,"NG":33.5337,"NO":2.50062,"PK":36.2295,"PE":23.1346,"PH":20.4879,"PL":6.22257,"PT":2.77623,"RU":5.10898,"SA":2.49866,"SG":0.0954027,"ZA":5.4071,"KR":5.10383,"ES":3.3744,"SE":1.76685,"CH":2.24176,"TZ":64.5718,"TH":28.5567,"TR":14.22,"UA":14.1162,"AE":1.43785,"GB":0.851259,"US":1.52494,"UY":8.07077,"VE":8.87473,"VN":25.0434,"AF":51.629,"AO":51.9494,"AL":30.7723,"AM":26.9716,"AZ":34.2268,"BI":85.3411,"BJ":40.241,"BF":51.7754,"BG":4.68922,"BH":0.834352,"BS":0.774971,"BA":16.709,"BY":9.47837,"BZ":16.1329,"BB":1.24533,"BN":1.20106,"BT":42.37,"BW":18.0285,"CF":66.0601,"CI":45.3665,"CM":41.854,"CD":58.5245,"CG":36.3524,"KM":33.5567,"CV":9.24518,"CR":11.4893,"CY":2.15461,"CZ":2.70894,"DJ":1.15107,"DO":7.00888,"DZ":9.4846,"ER":55.476,"EE":2.95684,"FJ":35.6391,"GA":28.8657,"GE":33.9512,"GN":47.3584,"GM":27.5541,"GW":61.0726,"GQ":55.3235,"GT":29.0528,"GY":12.2137,"HN":22.4238,"HR":4.32773,"HT":46.6145,"HU":4.11368,"IS":3.60655,"JM":13.9408,"KZ":11.3196,"KG":15.4454,"KH":33.4047,"KW":1.89127,"LA":68.597,"LB":3.513,"LR":41.1209,"LY":9.99748,"LC":7.47352,"LK":25.8568,"LS":30.8762,"LT":4.66291,"LU":0.87817,"LV":6.66365,"MD":50.502,"MG":69.2089,"MV":11.3051,"MK":8.50272,"ML":63.0137,"MT":0.876548,"MM":44.9546,"ME":4.19271,"MN":27.0039,"MZ":73.0061,"MR":32.1227,"MU":4.71101,"MW":64.9775,"NA":22.3382,"NE":72.9925,"NI":30.4723,"OM":5.9478,"PA":16.0402,"PG":36.8625,"KP":54.0793,"PY":15.9654,"PS":6.34335,"QA":1.62035,"RO":10.9455,"RW":35.0514,"SD":39.775,"SN":29.5764,"SB":42.4666,"SL":44.4935,"SV":13.8526,"SO":30.0286,"RS":18.0274,"SS":63.7605,"ST":12.0607,"SR":6.97515,"SK":2.16305,"SI":3.65722,"SZ":14.5468,"SY":16.2968,"TD":71.736,"TG":37.5922,"TJ":43.2727,"TM":21.9332,"TL":46.0186,"TO":23.6094,"TT":4.49481,"TN":12.4585,"UG":64.8536,"UZ":25.1979,"VC":9.0748,"VU":44.5276,"WS":26.8774,"YE":31.6169,"ZM":54.5286,"ZW":54.3115},"years":{"UA":2021,"LB":2023,"PS":2022,"SD":2022,"SS":2023},"missing":{"AD":0,"AG":0,"DM":0,"FM":0,"GD":0,"KI":0,"KN":0,"LI":0,"MC":0,"MH":0,"NR":0,"PW":0,"SM":0,"SC":0,"TV":0,"VA":0}},
+  servicejobs: {"name":"Workers in services","unit":"% of workers","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/SL.SRV.EMPL.ZS","year":2025,"values":{"AR":71.8147,"AU":78.5307,"AT":72.586,"BD":37.7063,"BE":79.7686,"BO":55.4921,"BR":72.1591,"CA":80.1469,"CL":72.4344,"CN":46.5308,"CO":65.8427,"CU":67.5631,"DK":79.5748,"EC":50.9283,"EG":53.118,"ET":33.4086,"FI":75.6666,"FR":78.3267,"DE":72.9548,"GH":47.1708,"GR":73.007,"IN":32.5576,"ID":50.1699,"IR":51.6741,"IQ":65.2955,"IE":77.9328,"IL":84.0935,"IT":70.2268,"JP":73.9576,"JO":80.7571,"KE":41.7331,"MY":64.8618,"MX":64.0793,"MA":48.2746,"NP":45.8085,"NL":84.5397,"NZ":74.6439,"NG":49.4564,"NO":79.664,"PK":38.515,"PE":60.0787,"PH":59.548,"PL":63.7521,"PT":72.6729,"RU":69.0585,"SA":74.4305,"SG":85.9068,"ZA":73.8332,"KR":71.5134,"ES":76.7742,"SE":81.4112,"CH":78.1685,"TZ":27.3247,"TH":49.206,"TR":58.4895,"UA":60.6652,"AE":67.9677,"GB":83.2346,"US":79.5628,"UY":73.1515,"VE":74.3733,"VN":40.1305,"AF":29.4719,"AO":40.8515,"AL":47.2444,"AM":51.7297,"AZ":50.238,"BI":11.5557,"BJ":41.4424,"BF":31.5581,"BG":67.4344,"BH":64.2594,"BS":84.4354,"BA":52.6908,"BY":59.4634,"BZ":68.5182,"BB":82.583,"BN":78.4134,"BT":41.7511,"BW":66.1988,"CF":20.5464,"CI":40.302,"CM":43.5314,"CD":33.4535,"CG":44.1675,"KM":51.6476,"CV":67.689,"CR":70.0321,"CY":81.5765,"CZ":62.3967,"DJ":92.1663,"DO":74.0204,"DZ":58.2543,"ER":31.7823,"EE":71.0458,"FJ":51.7108,"GA":52.2824,"GE":49.4768,"GN":38.4901,"GM":53.6437,"GW":29.2145,"GQ":34.7479,"GT":48.2345,"GY":56.692,"HN":55.9399,"HR":69.3106,"HT":44.585,"HU":65.3517,"IS":78.1495,"JM":68.9286,"KZ":68.7946,"KG":57.7311,"KH":37.7215,"KW":73.4967,"LA":23.9881,"LB":76.3636,"LR":50.5312,"LY":71.3752,"LC":76.3163,"LK":47.8393,"LS":36.0865,"LT":69.4353,"LU":91.4778,"LV":71.5002,"MD":36.9441,"MG":20.8883,"MV":71.7658,"MK":60.8713,"ML":28.3964,"MT":81.3861,"MM":36.8856,"ME":77.5793,"MN":49.9059,"MZ":20.554,"MR":52.8347,"MU":74.6679,"MW":27.679,"NA":61.1149,"NE":17.737,"NI":52.6494,"OM":54.6167,"PA":66.952,"PG":55.2661,"KP":23.5149,"PY":65.0838,"PS":63.7764,"QA":60.3597,"RO":56.4832,"RW":46.5412,"SD":46.2442,"SN":47.9249,"SB":49.9548,"SL":44.0369,"SV":63.0108,"SO":52.2194,"RS":54.9047,"SS":34.5675,"ST":65.4242,"SR":66.9214,"SK":63.3087,"SI":64.3743,"SZ":58.72,"SY":58.5022,"TD":19.7619,"TG":44.2472,"TJ":39.0719,"TM":49.5002,"TL":50.1773,"TO":53.0483,"TT":71.3244,"TN":54.262,"UG":27.8502,"UZ":50.1907,"VC":69.7908,"VU":45.4273,"WS":57.1816,"YE":57.2547,"ZM":35.1916,"ZW":34.1609},"years":{"UA":2021,"LB":2023,"PS":2022,"SD":2022,"SS":2023},"missing":{"AD":0,"AG":0,"DM":0,"FM":0,"GD":0,"KI":0,"KN":0,"LI":0,"MC":0,"MH":0,"NR":0,"PW":0,"SM":0,"SC":0,"TV":0,"VA":0}},
+  ownboss: {"name":"Self-employed workers","unit":"% of workers","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/SL.EMP.SELF.ZS","year":2025,"values":{"AR":25.5757,"AU":16.1049,"AT":12.1955,"BD":61.0416,"BE":14.5915,"BO":66.2674,"BR":30.2939,"CA":12.9099,"CL":23.9175,"CN":37.668,"CO":45.6406,"CU":24.897,"DK":7.91069,"EC":52.3346,"EG":26.9848,"ET":84.3117,"FI":12.5437,"FR":13.2848,"DE":8.14921,"GH":67.4597,"GR":30.4553,"IN":74.9031,"ID":53.337,"IR":42.9431,"IQ":31.6559,"IE":13.3667,"IL":11.3422,"IT":21.1242,"JP":9.05082,"JO":11.2077,"KE":64.7955,"MY":25.3702,"MX":30.8452,"MA":40.0641,"NP":78.5828,"NL":16.7876,"NZ":18.4058,"NG":86.152,"NO":4.87411,"PK":57.0025,"PE":51.3474,"PH":36.1484,"PL":18.8897,"PT":14.4327,"RU":6.32297,"SA":5.5469,"SG":12.6918,"ZA":17.2734,"KR":22.6696,"ES":14.5417,"SE":10.2371,"CH":16.8608,"TZ":85.3421,"TH":50.6979,"TR":28.5488,"UA":21.0048,"AE":5.06631,"GB":13.1487,"US":6.07376,"UY":27.9675,"VE":40.4206,"VN":53.3468,"AF":83.4002,"AO":75.905,"AL":50.2797,"AM":33.6644,"AZ":66.9833,"BI":84.8501,"BJ":79.8348,"BF":82.5985,"BG":11.7955,"BH":2.44073,"BS":17.0548,"BA":22.0631,"BY":6.83344,"BZ":35.1801,"BB":19.5465,"BN":7.27073,"BT":69.5106,"BW":28.1076,"CF":85.3998,"CI":70.9653,"CM":69.2761,"CD":85.0785,"CG":76.7563,"KM":57.9014,"CV":38.4571,"CR":26.5875,"CY":10.1683,"CZ":15.7231,"DJ":51.1172,"DO":42.1009,"DZ":30.1984,"ER":52.3655,"EE":12.068,"FJ":34.0756,"GA":32.3929,"GE":46.0734,"GN":81.949,"GM":68.6086,"GW":75.4686,"GQ":27.4987,"GT":39.0814,"GY":31.1144,"HN":44.1056,"HR":12.737,"HT":76.8339,"HU":11.6311,"IS":13.2968,"JM":35.7496,"KZ":26.1258,"KG":30.5029,"KH":55.5183,"KW":3.16085,"LA":77.1408,"LB":28.3782,"LR":78.3414,"LY":25.8794,"LC":26.7449,"LK":42.0703,"LS":38.5184,"LT":11.4988,"LU":10.3376,"LV":13.6574,"MD":58.7824,"MG":88.3198,"MV":20.0469,"MK":16.5866,"ML":76.3544,"MT":13.9025,"MM":65.4728,"ME":17.3551,"MN":41.178,"MZ":85.3095,"MR":57.4482,"MU":17.7888,"MW":61.2585,"NA":36.5404,"NE":89.4779,"NI":44.2679,"OM":4.96151,"PA":40.5839,"PG":78.6684,"KP":62.0536,"PY":41.2527,"PS":23.8273,"QA":0.832182,"RO":14.464,"RW":40.4485,"SD":46.5211,"SN":64.321,"SB":69.9438,"SL":88.8077,"SV":35.6649,"SO":52.1792,"RS":27.0198,"SS":82.5463,"ST":43.9916,"SR":22.4754,"SK":14.8728,"SI":13.9557,"SZ":30.2157,"SY":42.4366,"TD":91.5611,"TG":76.6223,"TJ":31.2613,"TM":32.0266,"TL":74.8594,"TO":41.7898,"TT":25.7203,"TN":24.943,"UG":80.5261,"UZ":45.4358,"VC":25.6729,"VU":60.6162,"WS":44.5127,"YE":52.6445,"ZM":71.7263,"ZW":70.7764},"years":{"UA":2021,"LB":2023,"PS":2022,"SD":2022,"SS":2023},"missing":{"AD":0,"AG":0,"DM":0,"FM":0,"GD":0,"KI":0,"KN":0,"LI":0,"MC":0,"MH":0,"NR":0,"PW":0,"SM":0,"SC":0,"TV":0,"VA":0}},
+  familywork: {"name":"Unpaid workers in a family business","unit":"% of workers","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/SL.FAM.WORK.ZS","year":2025,"values":{"AR":0.214338,"AU":0.0997293,"AT":1.00133,"BD":5.52042,"BE":0.652122,"BO":16.6222,"BR":1.13335,"CA":0.0997948,"CL":0.543333,"CN":8.2021,"CO":1.91808,"CU":0.526208,"DK":0.293708,"EC":13.9834,"EG":4.72465,"ET":29.6164,"FI":0.58134,"FR":0.269921,"DE":0.219525,"GH":2.80422,"GR":3.32566,"IN":15.6753,"ID":12.9749,"IR":3.24826,"IQ":4.94741,"IE":0.883535,"IL":0.0999939,"IT":0.962111,"JP":1.68103,"JO":0.100172,"KE":27.175,"MY":0.103298,"MX":3.56132,"MA":4.82248,"NP":40.9488,"NL":0.273165,"NZ":0.573737,"NG":9.91737,"NO":0.101427,"PK":19.6969,"PE":10.9552,"PH":6.13972,"PL":0.621573,"PT":0.100203,"RU":0.0998738,"SA":0.137777,"SG":0.123491,"ZA":0.618267,"KR":2.95936,"ES":0.220308,"SE":0.414659,"CH":2.62814,"TZ":28.765,"TH":14.7868,"TR":7.79169,"UA":3.40457,"AE":0.273698,"GB":0.267252,"US":0.0999997,"UY":0.837701,"VE":4.79779,"VN":11.9892,"AF":21.8606,"AO":16.0263,"AL":20.8311,"AM":3.30572,"AZ":32.1563,"BI":37.4189,"BJ":20.1976,"BF":26.5522,"BG":0.187575,"BH":0.31999,"BS":0.332901,"BA":0.999137,"BY":2.47596,"BZ":4.76998,"BB":1.14726,"BN":0.568338,"BT":31.9218,"BW":2.24517,"CF":17.8148,"CI":17.3829,"CM":5.03496,"CD":21.1797,"CG":7.01103,"KM":3.81641,"CV":8.65745,"CR":0.83624,"CY":0.627853,"CZ":0.131739,"DJ":0.10253,"DO":1.03384,"DZ":1.2308,"ER":11.8764,"EE":0.163322,"FJ":17.6249,"GA":0.779208,"GE":14.68,"GN":15.2732,"GM":5.51546,"GW":19.6531,"GQ":2.94697,"GT":7.18443,"GY":0.0973564,"HN":5.43396,"HR":0.533923,"HT":24.4232,"HU":0.130207,"IS":0.0999127,"JM":0.512124,"KZ":0.098528,"KG":5.35032,"KH":9.40019,"KW":0.542062,"LA":22.2794,"LB":1.05511,"LR":8.43332,"LY":3.77683,"LC":1.63426,"LK":6.16638,"LS":0.833291,"LT":0.370447,"LU":1.72152,"LV":0.85599,"MD":2.66141,"MG":39.8748,"MV":0.430728,"MK":2.83989,"ML":27.8708,"MT":0.0999543,"MM":23.9323,"ME":1.28962,"MN":0.0962855,"MZ":13.3523,"MR":6.94259,"MU":1.03615,"MW":5.59277,"NA":4.69672,"NE":30.022,"NI":7.88084,"OM":1.24042,"PA":5.08485,"PG":21.1617,"KP":16.0123,"PY":5.35267,"PS":3.72807,"QA":0.34125,"RO":2.49145,"RW":1.69332,"SD":10.4872,"SN":12.2344,"SB":56.8906,"SL":5.74575,"SV":3.82174,"SO":10.5377,"RS":5.19619,"SS":43.2983,"ST":4.06627,"SR":3.97158,"SK":0.0999884,"SI":1.73214,"SZ":2.90683,"SY":8.48057,"TD":19.5447,"TG":15.0335,"TJ":14.3111,"TM":5.53795,"TL":32.1486,"TO":3.62941,"TT":0.468487,"TN":1.70177,"UG":6.44951,"UZ":1.63934,"VC":3.19379,"VU":1.43241,"WS":8.69193,"YE":14.5094,"ZM":2.14665,"ZW":0.683623},"years":{"UA":2021,"LB":2023,"PS":2022,"SD":2022,"SS":2023},"missing":{"AD":0,"AG":0,"DM":0,"FM":0,"GD":0,"KI":0,"KN":0,"LI":0,"MC":0,"MH":0,"NR":0,"PW":0,"SM":0,"SC":0,"TV":0,"VA":0}},
+  womenwork: {"name":"Women in work or looking for it","unit":"% of women 15+","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/SL.TLF.CACT.FE.ZS","year":2025,"values":{"AR":52.469,"AU":62.513,"AT":55.059,"BD":38.649,"BE":49.78,"BO":72.868,"BR":53.411,"CA":60.204,"CL":52.887,"CN":59.148,"CO":51.624,"CU":39.974,"DK":60.792,"EC":52.386,"EG":18.455,"ET":58.456,"FI":56.493,"FR":51.48,"DE":55.288,"GH":55.265,"GR":44.666,"IN":32.425,"ID":53.72,"IR":14.013,"IQ":10.937,"IE":59.755,"IL":62.278,"IT":40.806,"JP":55.905,"JO":16.029,"KE":63.036,"MY":51.643,"MX":47.45,"MA":19.696,"NP":27.473,"NL":62.71,"NZ":66.077,"NG":80.7,"NO":62.086,"PK":24.046,"PE":65.044,"PH":50.489,"PL":51.612,"PT":54.628,"RU":54.546,"SA":33.573,"SG":63.569,"ZA":49.881,"KR":56.782,"ES":52.825,"SE":61.537,"CH":62.223,"TZ":80.282,"TH":58.963,"TR":37.145,"UA":47.738,"AE":53.027,"GB":57.333,"US":56.343,"UY":57.255,"VE":37.098,"VN":68.551,"AF":5.086,"AO":72.224,"AL":58.567,"AM":51.057,"AZ":60.759,"BI":79.498,"BJ":75.164,"BF":64.074,"BG":50.376,"BH":42.294,"BS":70.728,"BA":39.241,"BY":56.769,"BZ":46.472,"BB":61.03,"BN":54.436,"BT":56.7,"BW":63.708,"CF":65.464,"CI":59.454,"CM":56.595,"CD":61.848,"CG":65.576,"KM":47.649,"CV":50.47,"CR":46.017,"CY":61.213,"CZ":53.456,"DJ":19.365,"DO":53.655,"DZ":14.142,"ER":72.838,"EE":60.984,"FJ":38.451,"GA":41.629,"GE":56.697,"GN":42.646,"GM":45.459,"GW":60.287,"GQ":52.616,"GT":38.324,"GY":47.35,"HN":39.59,"HR":47.377,"HT":58.337,"HU":54.312,"IS":70.012,"JM":63.033,"KZ":62.649,"KG":44.136,"KH":77.351,"KW":47.2,"LA":61.56,"LB":22.234,"LR":72.029,"LY":32.995,"LC":61.995,"LK":30.992,"LS":48.091,"LT":57.668,"LU":57.474,"LV":55.248,"MD":72.33,"MG":82.913,"MV":40.732,"MK":42.742,"ML":52.842,"MT":55.799,"MM":40.941,"ME":51.246,"MN":51.458,"MZ":77.09,"MR":26.18,"MU":47.462,"MW":58.18,"NA":54.918,"NE":72.776,"NI":51.253,"OM":29.958,"PA":54.936,"PG":50.822,"KP":77.713,"PY":59.011,"PS":18.934,"QA":61.85,"RO":41.807,"RW":57.304,"SD":14.452,"SN":38.216,"SB":82.337,"SL":51.604,"SV":49.052,"SO":20.7,"RS":52.629,"SS":70.393,"ST":22.749,"SR":44.915,"SK":55.127,"SI":52.297,"SZ":48.518,"SY":12.727,"TD":47.301,"TG":56.637,"TJ":21.897,"TM":38.242,"TL":61.676,"TO":42.347,"TT":47.77,"TN":26.497,"UG":75.595,"UZ":41.178,"VC":59.217,"VU":53.314,"WS":30.739,"YE":4.663,"ZM":56.426,"ZW":62.155},"years":{"UA":2021,"LB":2023,"PS":2022,"SD":2022,"SS":2023},"missing":{"AD":0,"AG":0,"DM":0,"FM":0,"GD":0,"KI":0,"KN":0,"LI":0,"MC":0,"MH":0,"NR":0,"PW":0,"SM":0,"SC":0,"TV":0,"VA":0}},
+  unemployment: {"name":"Unemployment","unit":"% of the labour force","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/SL.UEM.TOTL.ZS","year":2025,"values":{"AR":7.145,"AU":4.09,"AT":5.582,"BD":3.778,"BE":5.906,"BO":2.967,"BR":5.97,"CA":6.907,"CL":8.974,"CN":4.615,"CO":8.29,"CU":1.746,"DK":5.529,"EC":3.308,"EG":6.781,"ET":3.323,"FI":9.461,"FR":7.542,"DE":3.711,"GH":2.979,"GR":8.54,"IN":4.219,"ID":3.237,"IR":8.301,"IQ":15.485,"IE":4.632,"IL":3.489,"IT":6.391,"JP":2.451,"JO":16.535,"KE":5.449,"MY":3.764,"MX":2.673,"MA":9,"NP":10.465,"NL":3.874,"NZ":5.076,"NG":3.064,"NO":4.637,"PK":5.42,"PE":5.117,"PH":2.235,"PL":2.976,"PT":6.164,"RU":2.133,"SA":3.038,"SG":2.818,"ZA":32.391,"KR":2.683,"ES":10.376,"SE":8.694,"CH":4.873,"TZ":1.572,"TH":0.781,"TR":8.52,"UA":9.834,"AE":2.174,"GB":4.746,"US":4.198,"UY":7.516,"VE":5.307,"VN":1.523,"AF":13.351,"AO":14.108,"AL":10.926,"AM":12.871,"AZ":5.457,"BI":0.922,"BJ":1.589,"BF":3.477,"BG":3.536,"BH":1.102,"BS":9.207,"BA":11.037,"BY":3.38,"BZ":8.856,"BB":6.524,"BN":5.277,"BT":3.227,"BW":24.477,"CF":6.251,"CI":2.323,"CM":3.602,"CD":4.434,"CG":19.876,"KM":3.819,"CV":11.939,"CR":6.843,"CY":4.924,"CZ":2.825,"DJ":26.015,"DO":5.092,"DZ":11.633,"ER":5.978,"EE":8.313,"FJ":5.347,"GA":20.154,"GE":12.097,"GN":5.163,"GM":6.521,"GW":2.673,"GQ":8.337,"GT":2.604,"GY":11.962,"HN":4.92,"HR":5.002,"HT":14.944,"HU":4.521,"IS":3.625,"JM":3.286,"KZ":4.771,"KG":3.526,"KH":0.263,"KW":2.181,"LA":1.187,"LB":10.985,"LR":2.884,"LY":18.758,"LC":9.452,"LK":4.005,"LS":16.315,"LT":6.731,"LU":6.343,"LV":6.568,"MD":1.505,"MG":3.041,"MV":4.514,"MK":12.256,"ML":2.831,"MT":2.896,"MM":3.047,"ME":13.572,"MN":5.233,"MZ":6.628,"MR":10.319,"MU":5.635,"MW":5.072,"NA":19.291,"NE":0.394,"NI":5.04,"OM":3.251,"PA":8.36,"PG":2.571,"KP":3.545,"PY":4.803,"PS":24.42,"QA":0.13,"RO":5.992,"RW":11.363,"SD":7.53,"SN":2.735,"SB":1.431,"SL":3.15,"SV":3.303,"SO":18.948,"RS":7.123,"SS":12.374,"ST":9.132,"SR":7.834,"SK":5.359,"SI":3.175,"SZ":34.202,"SY":13.569,"TD":1.057,"TG":1.995,"TJ":6.931,"TM":4.267,"TL":1.592,"TO":2.008,"TT":3.329,"TN":15.108,"UG":2.746,"UZ":4.622,"VC":18.003,"VU":5.073,"WS":4.996,"YE":17.322,"ZM":5.918,"ZW":9.293},"years":{"UA":2021,"LB":2023,"PS":2022,"SD":2022,"SS":2023},"missing":{"AD":0,"AG":0,"DM":0,"FM":0,"GD":0,"KI":0,"KN":0,"LI":0,"MC":0,"MH":0,"NR":0,"PW":0,"SM":0,"SC":0,"TV":0,"VA":0}},
+  inflation: {"name":"Inflation","unit":"% a year","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/FP.CPI.TOTL.ZG","year":2025,"values":{"AR":219.884,"AU":2.87404,"AT":3.52719,"BD":8.76876,"BE":2.46606,"BO":19.5171,"BR":5.01675,"CA":2.07232,"CL":4.21294,"CN":0.0595647,"CO":5.14223,"DK":1.89006,"EC":0.710469,"EG":14.0735,"ET":13.2296,"FI":0.332787,"FR":0.943825,"DE":2.17179,"GH":14.2047,"GR":2.48163,"IN":2.39885,"ID":1.91333,"IR":42.1712,"IQ":0.303455,"IE":2.21045,"IL":3.04141,"IT":1.53167,"JP":3.17253,"JO":1.76646,"KE":4.06931,"MY":1.38061,"MX":3.80958,"MA":0.701902,"NP":2.65334,"NL":3.20364,"NZ":2.8398,"NG":23.0101,"NO":3.03967,"PK":3.54555,"PE":1.53125,"PH":1.65874,"PL":3.8142,"PT":2.33602,"RU":8.71987,"SA":2.0356,"SG":0.902998,"ZA":3.2055,"KR":2.12309,"ES":2.67327,"SE":0.679015,"CH":0.154377,"TZ":3.32697,"TH":-0.133634,"TR":34.8812,"UA":12.7303,"AE":1.25087,"GB":3.88307,"US":2.94953,"UY":4.65033,"VE":254.949,"VN":3.30999,"AF":-6.60119,"AO":20.162,"AL":2.14619,"AM":3.30693,"AG":1.36874,"AZ":5.62209,"BI":34.134,"BJ":1.10155,"BF":-0.586235,"BG":4.58084,"BH":-0.137709,"BS":1.1088,"BA":3.97821,"BY":6.59878,"BZ":1.06282,"BB":0.846577,"BN":-0.302994,"BT":3.55514,"BW":2.65985,"CF":1.00198,"CI":0.125039,"CM":3.40373,"CD":2.88585,"CG":2.4007,"KM":3.24909,"CV":2.34334,"CR":-0.0736714,"CY":0.126529,"CZ":2.45996,"DJ":-0.313732,"DM":2.53385,"DO":3.87312,"DZ":1.41835,"EE":4.82895,"FJ":-1.38327,"FM":5.40874,"GA":1.76767,"GE":3.86921,"GN":3.57097,"GM":11.5611,"GW":0.87493,"GQ":2.9214,"GD":0.610312,"GT":1.48842,"GY":3.32982,"HN":4.59658,"HR":3.69153,"HT":28.6428,"HU":4.41198,"IS":4.09085,"JM":4.00459,"KZ":11.3789,"KG":8.21496,"KH":2.35127,"KI":6.5113,"KN":3.55711,"KW":2.36196,"LA":7.74227,"LB":14.5976,"LR":8.31564,"LY":1.84167,"LC":2.0271,"LK":-4.76386,"LS":4.27011,"LT":3.79132,"LU":2.25724,"LV":3.74577,"MD":7.75904,"MG":8.05052,"MV":4.00578,"MK":4.07249,"ML":3.27824,"MT":2.36352,"MM":8.82507,"ME":3.89921,"MN":8.60536,"MZ":4.36847,"MR":1.54797,"MU":3.67359,"MW":28.3703,"NA":3.51075,"NE":-4.45471,"NI":2.08132,"NR":-0.12475,"OM":0.967742,"PA":-0.18795,"PW":-0.41841,"PG":4.42141,"PY":4.03806,"PS":9.8084,"QA":1.26734,"RO":7.18903,"RW":5.913,"SD":138.808,"SN":1.45901,"SB":3.36462,"SL":7.4875,"SV":0.257571,"SM":2.2952,"RS":3.89037,"SS":91.4408,"ST":11.0474,"SR":9.20547,"SK":4.00043,"SI":2.37421,"SZ":2.59802,"SC":0.29759,"SY":13.4176,"TD":-3.91198,"TG":0.433183,"TJ":3.38876,"TL":0.428323,"TO":5.59277,"TT":0.99449,"TN":5.151,"TV":0.500581,"UG":3.58083,"UZ":8.79631,"VC":0.815323,"VU":0.656455,"WS":2.21196,"YE":8.10473,"ZM":13.9099,"ZW":104.705},"years":{"AR":2024,"US":2024,"VE":2016,"AF":2024,"CD":2016,"FM":2022,"GM":2024,"GQ":2024,"KN":2023,"MM":2019,"NR":2012,"QA":2024,"SD":2022,"SS":2024,"SZ":2019,"SY":2019,"TV":2011,"YE":2014,"ZW":2022},"missing":{"CU":0,"AD":0,"ER":0,"LI":0,"MC":0,"MH":0,"KP":0,"SO":0,"TM":0,"VA":0}},
+  gdpgrowth: {"name":"Economic growth","unit":"% a year","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/NY.GDP.MKTP.KD.ZG","year":2025,"values":{"AR":4.36733,"AU":1.3504,"AT":0.615747,"BD":3.48991,"BE":0.983118,"BO":-1.58238,"BR":2.28575,"CA":1.74269,"CL":2.45925,"CN":4.95995,"CO":2.64202,"CU":-1.06173,"DK":2.92843,"EC":3.72595,"EG":4.39201,"ET":9.77152,"FI":0.173445,"FR":0.84095,"DE":0.239578,"GH":5.95442,"GR":2.07307,"IN":7.56666,"ID":5.10809,"IR":-2.82597,"IQ":-2.15574,"IE":12.3376,"IL":2.93115,"IT":0.539584,"JP":1.19311,"JO":2.82661,"KE":4.63261,"MY":5.17127,"MX":0.561683,"MA":4.59524,"NP":4.43073,"NL":1.78463,"NZ":0.462872,"NG":4.01336,"NO":1.08528,"PK":3.69843,"PE":3.43056,"PH":4.4024,"PL":3.57273,"PT":1.86448,"RU":1.00118,"SA":4.50247,"SG":5.02588,"ZA":1.11463,"KR":1.00702,"ES":2.82495,"SE":1.54316,"CH":1.30008,"TZ":5.85287,"TH":2.44247,"TR":3.60463,"UA":1.82152,"AE":3.99181,"GB":1.38844,"US":2.16138,"UY":1.78471,"VE":1.57068,"VN":8.01883,"AF":1.87319,"AO":3.13354,"AL":3.78894,"AD":3.86803,"AM":7.2,"AG":4.99804,"AZ":1.44986,"BI":4.24011,"BJ":8.07408,"BF":5.29462,"BG":3.09637,"BH":3.48138,"BS":3.37867,"BA":2.12862,"BY":1.3,"BZ":2.74832,"BB":2.7,"BN":0.669562,"BT":8.00503,"BW":-0.733898,"CF":4.4995,"CI":6.5,"CM":3.2,"CD":5.75924,"CG":3.08293,"KM":3.75444,"CV":6.29699,"CR":4.56034,"CY":3.77325,"CZ":2.58047,"DJ":6.49546,"DM":3.05244,"DO":2.11739,"DZ":3.81554,"ER":8.6798,"EE":0.584308,"FJ":3.19547,"FM":1.06261,"GA":2.47288,"GE":7.46162,"GN":7.4471,"GM":5.89309,"GW":5.81814,"GQ":-5.84679,"GD":4.41201,"GT":4.28003,"GY":19.336,"HN":3.75143,"HR":3.40308,"HT":-2.71291,"HU":0.509542,"IS":1.27946,"JM":0.0816455,"KZ":6.5,"KG":11.096,"KH":5.34932,"KI":4.22164,"KN":2.68858,"KW":2.73183,"LA":4.53761,"LB":-7.07989,"LR":5.01656,"LY":13.3717,"LC":-0.574075,"LK":4.95343,"LS":1.98256,"LT":2.92008,"LU":0.637878,"LV":2.13787,"MC":8.51054,"MD":2.4165,"MG":3.00257,"MV":6.31092,"MH":2.28311,"MK":3.48707,"ML":5.59947,"MT":3.96156,"MM":-2.01184,"ME":2.74455,"MN":6.84391,"MZ":-0.523485,"MR":4.02892,"MU":3.15157,"MW":1.88519,"NA":1.73018,"NE":7.00783,"NI":4.92353,"NR":2.14286,"OM":2.39787,"PA":4.3503,"PW":6.28638,"PG":5.63792,"PY":6.64263,"PS":4.34444,"QA":2.90166,"RO":0.67783,"RW":9.3758,"SD":3.06428,"SN":6.68228,"SB":3.61715,"SL":4.60865,"SV":3.90594,"SM":0.401932,"SO":2.99114,"RS":2.03039,"SS":-10.7934,"ST":1.02847,"SR":1.79169,"SK":0.807419,"SI":1.05993,"SZ":4.19392,"SC":5.79796,"SY":-0.202473,"TD":5.58988,"TG":6.31033,"TJ":8.4,"TM":6.3,"TL":6.97539,"TO":2.8,"TT":-0.787769,"TN":2.49311,"TV":1.63934,"UG":6.33181,"UZ":7.69962,"VC":3.39217,"VU":3.05358,"WS":4.20441,"YE":0.752448,"ZM":3.75773,"ZW":8.10671},"years":{"CU":2024,"AE":2024,"AF":2024,"BS":2024,"ER":2011,"LB":2024,"MC":2024,"SM":2023,"SS":2015,"SY":2022,"YE":2018},"missing":{"LI":2009,"KP":0,"VA":0}},
+  remittances: {"name":"Money sent home by migrants","unit":"% of GDP","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/BX.TRF.PWKR.DT.GD.ZS","year":2025,"values":{"AR":0.135094,"AU":0.111683,"AT":0.660818,"BD":7.42442,"BE":2.25329,"BO":1.92446,"BR":0.208696,"CA":0.0359503,"CL":0.0280632,"CN":0.153875,"CO":2.87037,"DK":0.365138,"EC":5.93352,"EG":11.3667,"ET":4.76671,"FI":0.27644,"FR":1.32299,"DE":0.47319,"GH":2.12143,"GR":0.207721,"IN":3.80963,"ID":1.21754,"IQ":0.297601,"IE":0.100603,"IL":0.189398,"IT":0.503087,"JP":0.106576,"JO":7.55928,"KE":3.7617,"MY":1.89225,"MX":3.55153,"MA":7.48822,"NP":32.3122,"NL":0.391879,"NZ":0.163063,"NG":7.83684,"NO":0.194367,"PK":9.93795,"PE":1.58258,"PH":8.5323,"PL":0.913672,"PT":0.781536,"RU":0.062919,"SA":0.0274538,"ZA":0.235201,"KR":0.377643,"ES":0.382752,"SE":0.809192,"CH":0.371088,"TZ":1.41762,"TH":2.06217,"TR":0.0476431,"UA":4.61039,"GB":0.134008,"US":0.0303708,"UY":0.17573,"VE":4.31963,"AF":3.9533,"AO":0.0423341,"AL":8.39083,"AD":0.889424,"AM":5.38121,"AG":0.942474,"AZ":1.96501,"BI":8.11527,"BJ":1.72082,"BF":2.57275,"BG":2.10469,"BS":0.416408,"BA":10.72,"BY":2.53639,"BZ":3.72258,"BB":1.45665,"BT":3.27509,"BW":0.827411,"CI":2.03272,"CM":1.29493,"CD":3.64522,"CG":0.29651,"KM":20.8445,"CV":11.6733,"CR":0.821654,"CY":2.0473,"CZ":1.25961,"DJ":1.34863,"DM":5.47527,"DO":9.7415,"DZ":0.589093,"EE":1.14035,"FJ":7.10765,"FM":7.38566,"GA":0.128331,"GE":11.1697,"GN":2.46482,"GM":23.7881,"GW":9.88177,"GD":3.34525,"GT":20.8226,"GY":3.22475,"HN":30.1185,"HR":6.8975,"HT":16.9486,"HU":2.31894,"IS":0.68589,"JM":16.2914,"KZ":0.0773126,"KG":17.6042,"KH":4.28773,"KI":6.47527,"KN":3.35583,"KW":0.0152219,"LA":2.58421,"LB":33.3498,"LR":21.2758,"LC":2.35197,"LK":7.63208,"LS":20.7885,"LT":1.44081,"LU":2.67394,"LV":2.96809,"MD":9.40637,"MG":3.14147,"MV":0.076668,"MH":23.4766,"MK":2.44882,"ML":3.99434,"MT":0.0625494,"MM":3.4013,"ME":9.71657,"MN":2.19831,"MZ":1.18794,"MR":0.869004,"MU":1.92043,"MW":2.04926,"NA":0.707387,"NE":3.29647,"NI":26.6324,"NR":1.33175,"OM":0.0355931,"PA":0.701344,"PW":0.803165,"PG":0.0125507,"PY":3.09651,"PS":4.03849,"QA":0.583582,"RO":2.48374,"RW":3.42162,"SD":0.0198472,"SN":10.6434,"SB":6.0089,"SL":4.60221,"SV":27.5113,"SM":1.09953,"RS":6.56068,"SS":9.49107,"ST":3.65953,"SR":3.89347,"SK":2.06838,"SI":1.36567,"SZ":0.749691,"SC":0.523919,"SY":2.64297,"TG":8.68799,"TJ":57.6648,"TL":9.98565,"TO":39.322,"TT":0.769221,"TN":6.74186,"TV":5.13501,"UG":4.51399,"UZ":14.3506,"VC":7.03656,"VU":17.1746,"WS":22.37,"YE":12.0397,"ZM":1.39726,"ZW":8.4531},"years":{"ET":2024,"JO":2024,"NZ":2022,"TZ":2024,"AF":2020,"BJ":2023,"BF":2024,"BS":2024,"BB":2017,"BT":2024,"CI":2024,"CM":2024,"CG":2021,"KM":2023,"DJ":2024,"FJ":2024,"FM":2014,"GA":2015,"GN":2024,"GW":2024,"GY":2023,"HT":2024,"KG":2024,"LB":2023,"LR":2024,"MH":2024,"ML":2024,"MT":2024,"MM":2019,"MR":2024,"MU":2024,"NA":2024,"NE":2024,"NI":2024,"NR":2024,"PW":2023,"PG":2024,"RW":2024,"SN":2023,"SB":2024,"SL":2024,"SM":2023,"SS":2015,"SY":2010,"TG":2020,"TV":2023,"VU":2022,"YE":2016,"ZW":2024},"missing":{"CU":0,"IR":2004,"SG":0,"AE":0,"VN":2004,"BH":0,"BN":0,"CF":1993,"ER":2000,"GQ":1996,"LY":2006,"LI":0,"MC":0,"KP":0,"SO":0,"TD":1994,"TM":1996,"VA":0}},
+  exports: {"name":"Exports","unit":"% of GDP","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/NE.EXP.GNFS.ZS","year":2025,"values":{"AR":15.5557,"AU":23.2444,"AT":54.7019,"BD":11.1161,"BE":75.4501,"BO":21.4351,"BR":17.8207,"CA":31.3324,"CL":34.5636,"CN":21.0712,"CO":14.984,"CU":42.4702,"DK":70.1171,"EC":31.4386,"EG":19.82,"ET":13.2838,"FI":42.3267,"FR":33.3928,"DE":40.4348,"GH":35.0558,"GR":39.4618,"IN":22.263,"ID":22.8465,"IR":25.7544,"IQ":39.7635,"IE":140.067,"IL":27.5584,"IT":32.227,"JP":21.9799,"KE":15.7641,"MY":70.9678,"MX":39.6453,"MA":41.9692,"NP":8.82763,"NL":80.6693,"NZ":24.7053,"NO":45.373,"PK":9.98521,"PE":29.9698,"PH":26.5503,"PL":49.9506,"PT":43.6581,"RU":18.2031,"SA":29.7449,"SG":177.851,"ZA":31.4102,"KR":45.763,"ES":36.6375,"SE":53.2286,"CH":78.0527,"TZ":18.9847,"TH":71.1481,"TR":24.8498,"UA":25.3335,"AE":106.846,"GB":30.597,"US":10.9747,"UY":27.0714,"VE":14.9032,"VN":98.2444,"AF":15.7028,"AO":22.9778,"AL":37.0141,"AM":48.0989,"AG":55.0023,"AZ":43.0222,"BJ":17.0524,"BF":34.9899,"BG":50.7385,"BH":87.4874,"BS":37.7836,"BA":41.0015,"BY":55.0806,"BZ":55.2234,"BN":71.5713,"BT":31.4949,"BW":32.0337,"CF":19.3448,"CI":29.7854,"CM":13.0892,"CD":43.4175,"CG":48.0226,"KM":9.2978,"CV":41.9761,"CR":38.8499,"CY":97.5738,"CZ":66.9451,"DJ":110.494,"DO":23.6399,"DZ":16.8348,"ER":18.1548,"EE":78.3624,"FJ":54.4059,"FM":22.1205,"GA":55.4926,"GE":47.4056,"GN":41.4119,"GM":12.7304,"GW":13.8663,"GQ":46.52,"GT":15.5592,"HN":34.9917,"HR":47.972,"HT":1.55997,"HU":72.6304,"IS":40.1138,"KZ":31.5872,"KG":26.8115,"KH":68.6465,"KI":4.51593,"KW":55.756,"LA":33.2094,"LB":23.3165,"LY":71.7135,"LK":18.9674,"LS":49.5308,"LT":72.984,"LU":190.522,"LV":62.573,"MD":31.7519,"MG":21.3333,"MV":78.2142,"MH":36.039,"MK":59.6493,"ML":22.0768,"MT":119.11,"ME":40.0627,"MN":68.0691,"MZ":41.3815,"MR":39.8529,"MU":65.0364,"MW":10.6489,"NA":44.6768,"NE":15.7618,"NI":41.5935,"NR":61.7647,"OM":66.0726,"PA":44.3578,"PW":32.6987,"PY":37.178,"PS":21.2278,"QA":68.5984,"RO":35.4843,"RW":21.5547,"SD":1.10304,"SN":32.4879,"SB":40.5685,"SL":20.8911,"SV":32.0466,"SM":185.993,"SO":29.2485,"RS":54.3131,"SS":36.6513,"ST":13.2637,"SR":52.5473,"SK":85.0946,"SI":78.6395,"SZ":53.7559,"SC":79.6188,"SY":6.77719,"TD":29.4141,"TG":24.5821,"TJ":11.2126,"TM":14.4706,"TL":10.5576,"TO":16.8991,"TN":46.6517,"UG":21.4396,"UZ":22.036,"VU":25.3486,"WS":27.619,"YE":8.7561,"ZM":34.9819,"ZW":18.0564},"years":{"BO":2024,"CU":2024,"GH":2024,"IQ":2024,"JP":2024,"NZ":2024,"AE":2023,"US":2024,"AF":2024,"AG":2022,"BH":2024,"BS":2024,"BZ":2024,"BT":2024,"ER":2011,"FJ":2024,"KZ":2024,"KI":2024,"KW":2024,"LA":2016,"LB":2024,"MV":2024,"OM":2024,"PA":2024,"PW":2024,"QA":2022,"SB":2024,"SM":2023,"SS":2015,"SR":2010,"SZ":2024,"SY":2022,"TG":2023,"TJ":2024,"TL":2024,"TO":2024,"VU":2024,"YE":2018,"ZM":2024,"ZW":2024},"missing":{"JO":2007,"NG":0,"AD":0,"BI":0,"BB":0,"DM":0,"GD":0,"GY":2005,"JM":0,"KN":0,"LR":0,"LC":0,"LI":0,"MC":0,"MM":0,"PG":2004,"KP":0,"TT":0,"TV":0,"VA":0,"VC":0}},
+  corruption: {"name":"Corruption Perceptions Index","unit":"points out of 100 (100 = very clean)","decimals":0,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/ti-corruption-perception-index","year":2024,"values":{"AR":37,"AU":77,"AT":67,"BD":23,"BE":69,"BO":28,"BR":34,"CA":75,"CL":63,"CN":43,"CO":39,"CU":41,"DK":90,"EC":32,"EG":30,"ET":37,"FI":88,"FR":67,"DE":75,"GH":42,"GR":49,"IN":38,"ID":37,"IR":23,"IQ":26,"IE":77,"IL":64,"IT":54,"JP":71,"JO":49,"KE":32,"MY":50,"MX":26,"MA":37,"NP":34,"NL":78,"NZ":83,"NG":26,"NO":81,"PK":27,"PE":31,"PH":33,"PL":53,"PT":57,"RU":22,"SA":59,"SG":84,"ZA":41,"KR":64,"ES":56,"SE":80,"CH":81,"TZ":41,"TH":34,"TR":34,"UA":35,"AE":68,"GB":71,"US":65,"UY":76,"VE":10,"VN":40,"AF":17,"AO":32,"AL":42,"AM":47,"AZ":22,"BI":17,"BJ":45,"BF":41,"BG":43,"BH":53,"BS":65,"BA":33,"BY":33,"BB":68,"BN":60,"BT":72,"BW":57,"CF":24,"CI":45,"CM":26,"CD":20,"CG":23,"KM":21,"CV":62,"CR":58,"CY":56,"CZ":56,"DJ":31,"DM":60,"DO":36,"DZ":34,"ER":13,"EE":76,"FJ":55,"GA":27,"GE":53,"GN":28,"GM":38,"GW":21,"GQ":13,"GD":56,"GT":25,"GY":39,"HN":22,"HR":47,"HT":16,"HU":41,"IS":77,"JM":44,"KZ":40,"KG":25,"KH":21,"KW":46,"LA":33,"LB":22,"LR":27,"LY":13,"LC":59,"LK":32,"LS":37,"LT":63,"LU":81,"LV":59,"MD":43,"MG":26,"MV":38,"MK":40,"ML":27,"MT":46,"MM":16,"ME":46,"MN":33,"MZ":25,"MR":30,"MU":51,"MW":34,"NA":49,"NE":34,"NI":14,"OM":55,"PA":33,"PG":31,"KP":15,"PY":24,"QA":59,"RO":46,"RW":57,"SD":15,"SN":45,"SB":43,"SL":33,"SV":30,"SO":9,"RS":35,"SS":8,"ST":45,"SR":40,"SK":49,"SI":60,"SZ":27,"SC":72,"SY":12,"TD":21,"TG":32,"TJ":19,"TM":17,"TL":44,"TT":41,"TN":39,"UG":26,"UZ":32,"VC":63,"VU":50,"YE":13,"ZM":39,"ZW":21},"years":{"BN":2020},"missing":{"AD":0,"AG":0,"BZ":0,"FM":0,"KI":0,"KN":0,"LI":0,"MC":0,"MH":0,"NR":0,"PW":0,"PS":0,"SM":0,"TO":0,"TV":0,"VA":0,"WS":0}},
+  householdspend: {"name":"Household spending per person","unit":"US$ a year (2015 prices)","decimals":0,"source":"World Bank","url":"https://data.worldbank.org/indicator/NE.CON.PRVT.PC.KD","year":2025,"values":{"AR":9022.13,"AU":33633.9,"AT":23439.9,"BD":1391.78,"BE":22972.4,"BO":2185.2,"BR":6275.9,"CA":26972,"CL":9482.38,"CN":5364.46,"CO":5355.74,"CU":4442.86,"DK":27336.3,"EC":3949.63,"EG":3747.25,"ET":671.95,"FI":23216.2,"FR":21275.6,"DE":24108,"GH":1728.42,"GR":15805.6,"IN":1502.64,"ID":2546.75,"IR":2552.79,"IQ":2596.36,"IE":24485.6,"IL":22007.3,"IT":19965.4,"JP":19750.8,"KE":1412.63,"MY":7491,"MX":7471.07,"MA":2114.5,"NP":1031.66,"NL":22581.2,"NZ":25485.8,"NO":39798.6,"PK":1563.97,"PE":4566.38,"PH":2904.87,"PL":10700.3,"PT":15031.9,"RU":6540.74,"SA":11864.9,"SG":25208.1,"ZA":3906.61,"KR":17853.4,"ES":16635.5,"SE":25437.8,"CH":46013,"TZ":601.372,"TH":4026.14,"TR":10915.4,"UA":2198.63,"AE":22906.4,"GB":29689.1,"US":46040.6,"UY":11445.5,"VN":2381.89,"AO":2830.94,"AL":4814.12,"AM":4094.54,"AZ":3118.24,"BI":195.178,"BJ":895.189,"BF":511.34,"BG":11851.2,"BH":11566.3,"BS":20956.5,"BA":5325.46,"BY":5004.69,"BZ":4119.37,"BN":9809.14,"BT":1579.16,"BW":3121.77,"CF":459.272,"CI":1531.61,"CM":1144.16,"CD":303.323,"CG":860.32,"KM":1416.16,"CV":3332.25,"CR":9720.86,"CY":20222.4,"CZ":9717.96,"DJ":2628.92,"DO":6427.39,"DZ":1968.94,"EE":11186.9,"FJ":3106.7,"GA":2285.62,"GE":5115.89,"GN":721.877,"GM":593.514,"GW":636.076,"GQ":3150.85,"GT":4205.34,"HN":2299.89,"HR":10985.2,"HT":1223.22,"HU":9566.39,"IS":31408.4,"KZ":6789.15,"KG":1995.1,"KH":1379.86,"KI":2665.29,"KW":11076.8,"LA":1554.76,"LB":6386.62,"LY":2614.42,"LK":3001.19,"LS":840.083,"LT":11253.8,"LU":38321.4,"LV":10022,"MD":3621.3,"MG":336.512,"MV":6071.75,"MH":4065.66,"MK":5084.49,"ML":682.926,"MT":16545.8,"ME":8585.08,"MN":3560.98,"MZ":415.908,"MR":1066.22,"MU":7877.73,"NA":3655.52,"NE":404.391,"NI":1878.46,"OM":7834.07,"PA":8494.39,"PW":10588.9,"PY":4563.35,"PS":2001.9,"QA":13470.1,"RO":9072.33,"RW":611.937,"SD":530.945,"SN":1001.28,"SB":1443.01,"SL":1023.4,"SV":3692.58,"SM":20791.5,"SO":625.339,"RS":5826.52,"ST":1787.1,"SK":11278.4,"SI":14294.6,"SZ":2279.69,"SC":12262.2,"SY":242.23,"TD":569.561,"TG":771.988,"TJ":1129.68,"TL":889.517,"TO":4873.88,"TN":3100.27,"UG":724.96,"UZ":3748.46,"VU":5724.11,"WS":3479.58,"YE":1248.03,"ZM":603.812,"ZW":858.502},"years":{"BO":2024,"CN":2024,"CU":2024,"GH":2024,"IQ":2024,"JP":2024,"NZ":2024,"AE":2023,"US":2024,"UY":2015,"AO":2024,"AZ":2015,"BH":2024,"BS":2024,"BZ":2024,"BT":2024,"FJ":2015,"KZ":2024,"KI":2024,"KW":2024,"LA":2016,"LB":2024,"MV":2024,"MH":2024,"OM":2024,"PA":2024,"PW":2024,"QA":2020,"SB":2024,"SM":2023,"SZ":2024,"SY":2022,"TG":2023,"TJ":2024,"TL":2024,"TO":2024,"VU":2024,"YE":2018,"ZM":2015,"ZW":2024},"missing":{"JO":0,"NG":0,"VE":0,"AF":0,"AD":0,"AG":0,"BB":0,"DM":0,"ER":0,"FM":0,"GD":0,"GY":0,"JM":0,"KN":0,"LR":0,"LC":0,"LI":0,"MC":0,"MM":0,"MW":0,"NR":0,"PG":0,"KP":0,"SS":0,"SR":0,"TM":0,"TT":0,"TV":0,"VA":0,"VC":0},"prefix":"$"},
+  paris: {"name":"Medals at Paris 2024","unit":"medals","decimals":0,"source":"Olympedia","url":"https://www.olympedia.org/editions/63","year":2024,"values":{"AR":3,"AU":53,"AT":5,"BD":0,"BE":10,"BO":0,"BR":20,"CA":27,"CL":2,"CN":91,"CO":4,"CU":9,"DK":9,"EC":5,"EG":3,"ET":4,"FI":0,"FR":64,"DE":33,"GH":0,"GR":8,"IN":6,"ID":3,"IR":12,"IQ":0,"IE":7,"IL":7,"IT":40,"JP":45,"JO":1,"KE":11,"MY":2,"MX":5,"MA":2,"NP":0,"NL":34,"NZ":20,"NG":0,"NO":8,"PK":1,"PE":1,"PH":4,"PL":10,"PT":4,"RU":0,"SA":0,"SG":1,"ZA":6,"KR":32,"ES":18,"SE":11,"CH":8,"TZ":0,"TH":6,"TR":8,"UA":12,"AE":0,"GB":65,"US":126,"UY":0,"VE":0,"VN":0,"AF":0,"AO":0,"AL":2,"AD":0,"AM":4,"AG":0,"AZ":7,"BI":0,"BJ":0,"BF":0,"BG":7,"BH":4,"BS":0,"BA":0,"BY":0,"BZ":0,"BB":0,"BN":0,"BT":0,"BW":2,"CF":0,"CI":1,"CM":0,"CD":0,"CG":0,"KM":0,"CV":1,"CR":0,"CY":1,"CZ":5,"DJ":0,"DM":1,"DO":3,"DZ":3,"ER":0,"EE":0,"FJ":1,"FM":0,"GA":0,"GE":7,"GN":0,"GM":0,"GW":0,"GQ":0,"GD":2,"GT":2,"GY":0,"HN":0,"HR":7,"HT":0,"HU":19,"IS":0,"JM":6,"KZ":7,"KG":6,"KH":0,"KI":0,"KN":0,"KW":0,"LA":0,"LB":0,"LR":0,"LY":0,"LC":2,"LI":0,"LK":0,"LS":0,"LT":4,"LU":0,"LV":0,"MC":0,"MD":4,"MG":0,"MV":0,"MH":0,"MK":0,"ML":0,"MT":0,"MM":0,"ME":0,"MN":1,"MZ":0,"MR":0,"MU":0,"MW":0,"NA":0,"NE":0,"NI":0,"NR":0,"OM":0,"PA":1,"PW":0,"PG":0,"KP":6,"PY":0,"PS":0,"QA":1,"RO":9,"RW":0,"SD":0,"SN":0,"SB":0,"SL":0,"SV":0,"SM":0,"SO":0,"RS":5,"SS":0,"ST":0,"SR":0,"SK":1,"SI":3,"SZ":0,"SC":0,"SY":0,"TD":0,"TG":0,"TJ":3,"TM":0,"TL":0,"TO":0,"TT":0,"TN":3,"TV":0,"UG":2,"UZ":13,"VA":0,"VC":0,"VU":0,"WS":0,"YE":0,"ZM":1,"ZW":0},"years":{},"missing":{}},
+  parispp: {"name":"Paris 2024 medals per million people","unit":"medals per million people","decimals":2,"source":"Olympedia and World Bank","url":"https://www.olympedia.org/editions/63","year":2025,"values":{"AR":0.0654288,"AU":1.91929,"AT":0.542996,"BD":0,"BE":0.837396,"BO":0,"BR":0.0939795,"CA":0.648234,"CL":0.100705,"CN":0.0646957,"CO":0.0748704,"CU":0.822879,"DK":1.49771,"EC":0.273375,"EG":0.0253451,"ET":0.0295264,"FI":0,"FR":0.931311,"DE":0.395251,"GH":0,"GR":0.768199,"IN":0.00409874,"ID":0.0104997,"IR":0.129845,"IQ":0,"IE":1.27636,"IL":0.691508,"IT":0.678937,"JP":0.364766,"JO":0.0868004,"KE":0.191196,"MY":0.0555898,"MX":0.037894,"MA":0.0520416,"NP":0,"NL":1.87974,"NZ":3.75608,"NG":0,"NO":1.4258,"PK":0.0039182,"PE":0.0289212,"PH":0.0342504,"PL":0.274455,"PT":0.370203,"RU":0,"SA":0,"SG":0.163635,"ZA":0.0926679,"KR":0.61914,"ES":0.364704,"SE":1.03807,"CH":0.879852,"TZ":0,"TH":0.0837756,"TR":0.0931548,"UA":0.307847,"AE":0,"GB":0.935427,"US":0.368653,"UY":0,"VE":0,"VN":0,"AF":0,"AO":0,"AL":0.851216,"AD":0,"AM":1.29588,"AG":0,"AZ":0.683127,"BI":0,"BJ":0,"BF":0,"BG":1.08809,"BH":2.49943,"BS":0,"BA":0,"BY":0,"BZ":0,"BB":0,"BN":0,"BT":0,"BW":0.780603,"CF":0,"CI":0.0305702,"CM":0,"CD":0,"CG":0,"KM":0,"CV":1.89636,"CR":0,"CY":0.729526,"CZ":0.459268,"DJ":0,"DM":15.1812,"DO":0.260406,"DZ":0.063244,"ER":0,"EE":0,"FJ":1.07163,"FM":0,"GA":0,"GE":1.77856,"GN":0,"GM":0,"GW":0,"GQ":0,"GD":17.0499,"GT":0.107021,"GY":0,"HN":0,"HR":1.80589,"HT":0,"HU":1.997,"IS":0,"JM":2.11485,"KZ":0.335832,"KG":0.817098,"KH":0,"KI":0,"KN":0,"KW":0,"LA":0,"LB":0,"LR":0,"LY":0,"LC":11.1019,"LI":0,"LK":0,"LS":0,"LT":1.38467,"LU":0,"LV":0,"MC":0,"MD":1.69454,"MG":0,"MV":0,"MH":0,"MK":0,"ML":0,"MT":0,"MM":0,"ME":0,"MN":0.280192,"MZ":0,"MR":0,"MU":0,"MW":0,"NA":0,"NE":0,"NI":0,"NR":0,"OM":0,"PA":0.218761,"PW":0,"PG":0,"KP":0.22581,"PY":0,"PS":0,"QA":0.336449,"RO":0.473179,"RW":0,"SD":0,"SN":0,"SB":0,"SL":0,"SV":0,"SM":0,"SO":0,"RS":0.763459,"SS":0,"ST":0,"SR":0,"SK":0.184713,"SI":1.4078,"SZ":0,"SC":0,"SY":0,"TD":0,"TG":0,"TJ":0.278119,"TM":0,"TL":0,"TO":0,"TT":0,"TN":0.242943,"TV":0,"UG":0.0389219,"UZ":0.350845,"VC":0,"VU":0,"WS":0,"YE":0,"ZM":0.0456332,"ZW":0},"years":{},"missing":{"VA":0}},
+  parisathletes: {"name":"Athletes at Paris 2024","unit":"athletes","decimals":0,"source":"Olympedia","url":"https://www.olympedia.org/editions/63/countries","year":2024,"values":{"AR":140,"AU":461,"AT":81,"BD":5,"BE":168,"BO":4,"BR":282,"CA":314,"CL":48,"CN":392,"CO":85,"CU":59,"DK":123,"EC":40,"EG":153,"ET":32,"FI":55,"FR":577,"DE":432,"GH":7,"GR":99,"IN":109,"ID":29,"IR":40,"IQ":22,"IE":136,"IL":87,"IT":377,"JP":418,"JO":12,"KE":70,"MY":26,"MX":108,"MA":59,"NP":7,"NL":274,"NZ":199,"NG":77,"NO":106,"PK":7,"PE":26,"PH":22,"PL":214,"PT":73,"SA":8,"SG":23,"ZA":139,"KR":144,"ES":384,"SE":119,"CH":125,"TZ":7,"TH":51,"TR":100,"UA":137,"AE":14,"GB":330,"US":597,"UY":27,"VE":32,"VN":16,"AF":6,"AO":24,"AL":8,"AD":2,"AM":15,"AG":5,"AZ":48,"BI":5,"BJ":5,"BF":8,"BG":46,"BH":13,"BS":17,"BA":5,"BZ":1,"BB":4,"BN":3,"BT":3,"BW":12,"CF":4,"CI":12,"CM":6,"CD":6,"CG":4,"KM":4,"CV":7,"CR":6,"CY":15,"CZ":111,"DJ":7,"DM":4,"DO":58,"DZ":45,"ER":11,"EE":24,"FJ":36,"FM":3,"GA":5,"GE":28,"GN":23,"GM":7,"GW":6,"GQ":3,"GD":6,"GT":16,"GY":5,"HN":4,"HR":73,"HT":7,"HU":177,"IS":5,"JM":63,"KZ":78,"KG":16,"KH":3,"KI":3,"KN":3,"KW":9,"LA":4,"LB":9,"LR":7,"LY":6,"LC":4,"LI":1,"LK":6,"LS":3,"LT":51,"LU":13,"LV":29,"MC":6,"MD":26,"MG":7,"MV":5,"MH":4,"MK":6,"ML":21,"MT":5,"MM":2,"ME":19,"MN":32,"MZ":7,"MR":2,"MU":13,"MW":3,"NA":4,"NE":7,"NI":7,"OM":4,"PA":8,"PW":3,"PG":7,"KP":14,"PY":28,"PS":8,"QA":13,"RO":96,"RW":8,"SD":4,"SN":11,"SB":2,"SL":4,"SV":8,"SM":5,"SO":1,"RS":113,"ST":3,"SR":5,"SK":27,"SI":91,"SZ":3,"SC":3,"SY":5,"TD":3,"TG":5,"TJ":14,"TM":6,"TL":4,"TO":4,"TT":16,"TN":26,"TV":2,"UG":24,"UZ":87,"VC":4,"VU":6,"WS":24,"YE":4,"ZM":27,"ZW":7},"years":{},"missing":{"RU":0,"BY":0,"NR":0,"SS":0,"VA":0}},
+  parisathletespp: {"name":"Paris 2024 athletes per million people","unit":"athletes per million people","decimals":1,"source":"Olympedia and World Bank","url":"https://www.olympedia.org/editions/63/countries","year":2025,"values":{"AR":3.05334,"AU":16.6942,"AT":8.79654,"BD":0.0284597,"BE":14.0683,"BO":0.317918,"BR":1.32511,"CA":7.53872,"CL":2.41693,"CN":0.278689,"CO":1.591,"CU":5.39443,"DK":20.4687,"EC":2.187,"EG":1.2926,"ET":0.236211,"FI":9.74066,"FR":8.39635,"DE":5.17419,"GH":0.199633,"GR":9.50647,"IN":0.0744604,"ID":0.101498,"IR":0.432818,"IQ":0.467878,"IE":24.7978,"IL":8.59446,"IT":6.39898,"JP":3.38827,"JO":1.0416,"KE":1.2167,"MY":0.722667,"MX":0.818511,"MA":1.53523,"NP":0.236342,"NL":15.1485,"NZ":37.373,"NG":0.324173,"NO":18.8919,"PK":0.0274274,"PE":0.751952,"PH":0.188377,"PL":5.87333,"PT":6.75621,"SA":0.216371,"SG":3.7636,"ZA":2.14681,"KR":2.78613,"ES":7.78034,"SE":11.23,"CH":13.7477,"TZ":0.0992262,"TH":0.712093,"TR":1.16444,"UA":3.51459,"AE":1.216,"GB":4.74909,"US":1.74671,"UY":7.9771,"VE":1.12214,"VN":0.157483,"AF":0.136848,"AO":0.614753,"AL":3.40486,"AD":24.1243,"AM":4.85956,"AG":53.0735,"AZ":4.6843,"BI":0.347463,"BJ":0.337508,"BF":0.332301,"BG":7.15029,"BH":8.12314,"BS":42.1802,"BA":1.59231,"BZ":2.36449,"BB":14.1531,"BN":6.43321,"BT":3.76562,"BW":4.68362,"CF":0.725521,"CI":0.366843,"CM":0.200808,"CD":0.0531762,"CG":0.616862,"KM":4.5308,"CV":13.2745,"CR":1.16438,"CY":10.9429,"CZ":10.1958,"DJ":5.91178,"DM":60.7247,"DO":5.03451,"DZ":0.94866,"ER":3.04962,"EE":17.5634,"FJ":38.5788,"FM":26.3892,"GA":1.92817,"GE":7.11424,"GN":1.52321,"GM":2.48043,"GW":2.66724,"GQ":1.54764,"GD":51.1496,"GT":0.85617,"GY":5.98096,"HN":0.363443,"HR":18.8329,"HT":0.587934,"HU":18.6037,"IS":12.742,"JM":22.206,"KZ":3.74213,"KG":2.17893,"KH":0.168086,"KI":21.98,"KN":63.9359,"KW":1.84984,"LA":0.508063,"LB":1.53861,"LR":1.22138,"LY":0.804445,"LC":22.2038,"LI":24.376,"LK":0.275786,"LS":1.2694,"LT":17.6545,"LU":18.9237,"LV":15.6945,"MC":156.49,"MD":11.0145,"MG":0.213801,"MV":9.43973,"MH":110.248,"MK":3.29506,"ML":0.833372,"MT":8.62509,"MM":0.0364627,"ME":30.4913,"MN":8.96615,"MZ":0.196455,"MR":0.376289,"MU":10.4523,"MW":0.135037,"NA":1.29332,"NE":0.250736,"NI":0.998929,"OM":0.727975,"PA":1.75009,"PW":169.847,"PG":0.650387,"KP":0.52689,"PY":3.99254,"PS":1.47776,"QA":4.37384,"RO":5.04725,"RW":0.549098,"SD":0.0774261,"SN":0.581028,"SB":2.3848,"SL":0.453525,"SV":1.25677,"SM":146.589,"SO":0.0508783,"RS":17.2542,"ST":12.4868,"SR":7.81433,"SK":4.98724,"SI":42.7032,"SZ":2.3882,"SC":24.4439,"SY":0.195157,"TD":0.142832,"TG":0.581962,"TJ":1.29789,"TM":0.787521,"TL":2.81985,"TO":38.5572,"TT":11.6979,"TN":2.10551,"TV":210.704,"UG":0.467063,"UZ":2.34796,"VC":40.0304,"VU":17.9014,"WS":109.436,"YE":0.0957536,"ZM":1.2321,"ZW":0.41296},"years":{},"missing":{"RU":0,"BY":0,"NR":0,"SS":0,"VA":0}},
+  beijing: {"name":"Medals at the Beijing 2022 Winter Olympics","unit":"medals","decimals":0,"source":"Olympedia","url":"https://www.olympedia.org/editions/62","year":2022,"values":{"AR":0,"AU":4,"AT":18,"BD":0,"BE":2,"BO":0,"BR":0,"CA":26,"CL":0,"CN":15,"CO":0,"CU":0,"DK":0,"EC":0,"EG":0,"ET":0,"FI":8,"FR":14,"DE":27,"GH":0,"GR":0,"IN":0,"ID":0,"IR":0,"IQ":0,"IE":0,"IL":0,"IT":17,"JP":18,"JO":0,"KE":0,"MY":0,"MX":0,"MA":0,"NP":0,"NL":17,"NZ":3,"NG":0,"NO":37,"PK":0,"PE":0,"PH":0,"PL":1,"PT":0,"RU":0,"SA":0,"SG":0,"ZA":0,"KR":9,"ES":1,"SE":18,"CH":15,"TZ":0,"TH":0,"TR":0,"UA":1,"AE":0,"GB":2,"US":25,"UY":0,"VE":0,"VN":0,"AF":0,"AO":0,"AL":0,"AD":0,"AM":0,"AG":0,"AZ":0,"BI":0,"BJ":0,"BF":0,"BG":0,"BH":0,"BS":0,"BA":0,"BY":2,"BZ":0,"BB":0,"BN":0,"BT":0,"BW":0,"CF":0,"CI":0,"CM":0,"CD":0,"CG":0,"KM":0,"CV":0,"CR":0,"CY":0,"CZ":2,"DJ":0,"DM":0,"DO":0,"DZ":0,"ER":0,"EE":1,"FJ":0,"FM":0,"GA":0,"GE":0,"GN":0,"GM":0,"GW":0,"GQ":0,"GD":0,"GT":0,"GY":0,"HN":0,"HR":0,"HT":0,"HU":3,"IS":0,"JM":0,"KZ":0,"KG":0,"KH":0,"KI":0,"KN":0,"KW":0,"LA":0,"LB":0,"LR":0,"LY":0,"LC":0,"LI":0,"LK":0,"LS":0,"LT":0,"LU":0,"LV":1,"MC":0,"MD":0,"MG":0,"MV":0,"MH":0,"MK":0,"ML":0,"MT":0,"MM":0,"ME":0,"MN":0,"MZ":0,"MR":0,"MU":0,"MW":0,"NA":0,"NE":0,"NI":0,"NR":0,"OM":0,"PA":0,"PW":0,"PG":0,"KP":0,"PY":0,"PS":0,"QA":0,"RO":0,"RW":0,"SD":0,"SN":0,"SB":0,"SL":0,"SV":0,"SM":0,"SO":0,"RS":0,"SS":0,"ST":0,"SR":0,"SK":2,"SI":7,"SZ":0,"SC":0,"SY":0,"TD":0,"TG":0,"TJ":0,"TM":0,"TL":0,"TO":0,"TT":0,"TN":0,"TV":0,"UG":0,"UZ":0,"VA":0,"VC":0,"VU":0,"WS":0,"YE":0,"ZM":0,"ZW":0},"years":{},"missing":{}},
+  inactive: {"name":"Adults who get too little exercise","unit":"% of adults","decimals":1,"source":"WHO","url":"https://www.who.int/data/gho/data/indicators/indicator-details/GHO/NCD_PAA","year":2022,"values":{"AR":38.506,"AU":25.4658,"AT":19.758,"BD":20.3001,"BE":25.4103,"BO":22.5743,"BR":40.3983,"CA":37.1804,"CL":38.2139,"CN":23.8348,"CO":34.4291,"CU":61.0756,"DK":12.1388,"EC":22.7777,"EG":33.8014,"ET":9.42976,"FI":9.57602,"FR":23.1791,"DE":11.9785,"GH":21.1622,"GR":35.1959,"IN":49.418,"ID":18.9987,"IR":46.278,"IQ":52.022,"IE":21.9225,"IL":26.5587,"IT":40.0855,"JP":44.7469,"JO":28.23,"KE":8.91724,"MY":39.9003,"MX":27.99,"MA":24.5091,"NP":8.23374,"NL":9.41288,"NZ":18.6782,"NG":18.0515,"NO":35.1152,"PK":45.6519,"PE":34.4739,"PH":45.4638,"PL":36.9679,"PT":51.6537,"RU":18.1064,"SA":51.5361,"SG":23.1749,"ZA":44.8029,"KR":58.0635,"ES":21.848,"SE":8.69547,"CH":19.0341,"TZ":4.29938,"TH":28.872,"TR":44.3882,"UA":12.7601,"AE":66.1378,"GB":18.9842,"US":33.737,"UY":33.8444,"VE":45.7295,"VN":30.319,"AF":33.3564,"AO":17.3299,"AL":24.2797,"AD":27.2085,"AM":26.5839,"AG":38.1179,"AZ":23.9207,"BI":14.2741,"BJ":18.024,"BF":16.9434,"BG":32.2809,"BH":38.6143,"BS":37.1674,"BA":21.0747,"BY":14.0178,"BZ":41.5193,"BB":44.0327,"BN":32.5321,"BT":9.90785,"BW":22.2755,"CF":16.5339,"CI":19.6778,"CM":18.8147,"CD":14.8684,"CG":15.9714,"KM":17.2008,"CV":31.2349,"CR":49.6588,"CY":40.8309,"CZ":23.3662,"DJ":16.9796,"DM":30.5158,"DO":37.0246,"DZ":29.0368,"ER":11.8186,"EE":15.9392,"FJ":15.5301,"FM":29.3122,"GA":20.8187,"GE":24.0193,"GN":16.7013,"GM":21.1542,"GW":17.6391,"GQ":19.5053,"GD":35.8695,"GT":36.8301,"GY":35.0818,"HN":36.7751,"HR":28.4452,"HT":28.2997,"HU":29.4135,"IS":25.9178,"JM":38.6144,"KZ":28.2298,"KG":19.8745,"KH":13.2726,"KI":31.8953,"KN":41.6949,"KW":63.3151,"LA":15.8367,"LB":58.6156,"LR":14.5837,"LY":45.5625,"LC":20.9498,"LK":37.1824,"LS":7.97757,"LT":20.2258,"LU":13.9188,"LV":14.489,"MD":10.7704,"MG":13.5906,"MV":24.6204,"MH":24.3763,"MK":26.1038,"ML":29.8201,"MT":40.7127,"MM":22.001,"ME":22.754,"MN":27.4616,"MZ":9.68482,"MR":38.5184,"MU":29.875,"MW":2.69523,"NA":25.3781,"NE":16.1961,"NI":38.7481,"NR":35.4515,"OM":40.8782,"PA":57.6386,"PW":25.9598,"PG":12.4715,"KP":26.9866,"PY":35.9618,"PS":29.7015,"QA":53.4826,"RO":36.7568,"RW":8.96994,"SD":19.1115,"SN":16.6404,"SB":17.4609,"SL":12.9607,"SV":39.2311,"SM":25.6631,"SO":18.0979,"RS":44.854,"SS":16.2574,"ST":18.1512,"SR":48.8555,"SK":23.2951,"SI":18.9728,"SZ":19.2218,"SC":20.4391,"SY":37.8404,"TD":17.8476,"TG":14.7754,"TJ":35.7426,"TM":12.0903,"TL":26.9256,"TO":30.6658,"TT":44.5109,"TN":33.3565,"TV":24.4419,"UG":5.54964,"UZ":31.7479,"VC":30.4579,"VU":7.51701,"WS":13.4747,"YE":29.1895,"ZM":14.089,"ZW":17.6988},"years":{},"missing":{"LI":0,"MC":0,"VA":0}}
 };
 
 return { STATS };
@@ -12011,7 +12149,7 @@ return { STATS };
 
 // ---- stat-citations.js
 __modules["stat-citations.js"] = (() => {
-// Generated by tools/build-citations.mjs on 2026-11-04. Do not edit by hand.
+// Generated by tools/build-citations.mjs on 2026-11-07. Do not edit by hand.
 // Where every stat in stats-data.js comes from: the original producer, what exactly is
 // measured, how the game works it out where it does, and links to check it.
 const CITATIONS = {
@@ -13625,6 +13763,562 @@ const CITATIONS = {
       }
     ],
     "note": "FAO works this figure out as what's left of the food supply after production, trade, stock changes, feed, seed and losses. It isn't measured eating, and for countries that export a lot of it the result can be implausibly low. Central African Republic is left out: FAO's 57 kg of coffee per person a year is more than twice any other country, and the team judged it a data error. The game shows FAO's kilograms per person a year as cups a day: kg × 1,000 ÷ 365 ÷ 7 g of coffee per cup (a common dose; FAO doesn't count cups)."
+  },
+  "rain": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: FAOSTAT, Food and Agriculture Organization of the United Nations (FAO), publisher: Food and Agriculture Organization of the United Nations (FAO)",
+    "what": "Average precipitation in depth (mm per year) (indicator AG.LND.PRCP.MM).",
+    "links": [
+      {
+        "label": "World Bank: Average precipitation in depth (mm per year)",
+        "url": "https://data.worldbank.org/indicator/AG.LND.PRCP.MM"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/AG.LND.PRCP.MM?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "tempmean": {
+    "short": "Copernicus ERA5, via Our World in Data",
+    "producer": "Copernicus Climate Change Service (ERA5 reanalysis); country averages by Our World in Data",
+    "what": "The average of the twelve monthly mean air temperatures (2 metres above the ground) over the country's land in the latest full year, worked out by the game from Copernicus ERA5 monthly means as published by Our World in Data.",
+    "links": [
+      {
+        "label": "Our World in Data: Average monthly surface temperature (Copernicus ERA5)",
+        "url": "https://ourworldindata.org/grapher/average-monthly-surface-temperature"
+      },
+      {
+        "label": "Copernicus Climate Change Service: ERA5",
+        "url": "https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means"
+      }
+    ],
+    "note": "ERA5 is a reanalysis: a weather model fed with observations, giving every country a value, also where there are few weather stations. Country values are averages over the whole land area, so a big country with mountains and coasts gets one number."
+  },
+  "tempmax": {
+    "short": "Copernicus ERA5, via Our World in Data",
+    "producer": "Copernicus Climate Change Service (ERA5 reanalysis); country averages by Our World in Data",
+    "what": "The mean air temperature of the country's warmest month in the latest full year, from Copernicus ERA5 monthly means (via Our World in Data).",
+    "links": [
+      {
+        "label": "Our World in Data: Average monthly surface temperature (Copernicus ERA5)",
+        "url": "https://ourworldindata.org/grapher/average-monthly-surface-temperature"
+      },
+      {
+        "label": "Copernicus Climate Change Service: ERA5",
+        "url": "https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means"
+      }
+    ],
+    "note": "ERA5 is a reanalysis: a weather model fed with observations, giving every country a value, also where there are few weather stations. Country values are averages over the whole land area, so a big country with mountains and coasts gets one number."
+  },
+  "tempmin": {
+    "short": "Copernicus ERA5, via Our World in Data",
+    "producer": "Copernicus Climate Change Service (ERA5 reanalysis); country averages by Our World in Data",
+    "what": "The mean air temperature of the country's coldest month in the latest full year, from Copernicus ERA5 monthly means (via Our World in Data).",
+    "links": [
+      {
+        "label": "Our World in Data: Average monthly surface temperature (Copernicus ERA5)",
+        "url": "https://ourworldindata.org/grapher/average-monthly-surface-temperature"
+      },
+      {
+        "label": "Copernicus Climate Change Service: ERA5",
+        "url": "https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means"
+      }
+    ],
+    "note": "ERA5 is a reanalysis: a weather model fed with observations, giving every country a value, also where there are few weather stations. Country values are averages over the whole land area, so a big country with mountains and coasts gets one number."
+  },
+  "temprange": {
+    "short": "Copernicus ERA5, via Our World in Data",
+    "producer": "Copernicus Climate Change Service (ERA5 reanalysis); country averages by Our World in Data",
+    "what": "The warmest month's mean temperature minus the coldest month's, in the latest full year, worked out by the game from Copernicus ERA5 monthly means (via Our World in Data).",
+    "links": [
+      {
+        "label": "Our World in Data: Average monthly surface temperature (Copernicus ERA5)",
+        "url": "https://ourworldindata.org/grapher/average-monthly-surface-temperature"
+      },
+      {
+        "label": "Copernicus Climate Change Service: ERA5",
+        "url": "https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means"
+      }
+    ],
+    "note": "ERA5 is a reanalysis: a weather model fed with observations, giving every country a value, also where there are few weather stations. Country values are averages over the whole land area, so a big country with mountains and coasts gets one number."
+  },
+  "tempanomaly": {
+    "short": "Contains modified Copernicus Climate Change Service information, via Our World in Data",
+    "producer": "Contains modified Copernicus Climate Change Service information (2026); processed by Our World in Data",
+    "what": "Temperature anomaly (°C). Difference of a specific year's average surface temperature from the 1991-2020 mean, in degrees Celsius.",
+    "links": [
+      {
+        "label": "Our World in Data: Annual temperature anomalies",
+        "url": "https://ourworldindata.org/grapher/annual-temperature-anomalies"
+      }
+    ],
+    "note": ""
+  },
+  "waterpp": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: AQUASTAT - FAO's Global Information System on Water and Agriculture, Food and Agriculture Organization of the United Nations (FAO)",
+    "what": "Renewable internal freshwater resources per capita (cubic meters) (indicator ER.H2O.INTR.PC).",
+    "links": [
+      {
+        "label": "World Bank: Renewable internal freshwater resources per capita (cubic meters)",
+        "url": "https://data.worldbank.org/indicator/ER.H2O.INTR.PC"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/ER.H2O.INTR.PC?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "wateruse": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: AQUASTAT - FAO's Global Information System on Water and Agriculture, Food and Agriculture Organization of the United Nations (FAO)",
+    "what": "Annual freshwater withdrawals, total (% of internal resources) (indicator ER.H2O.FWTL.ZS).",
+    "links": [
+      {
+        "label": "World Bank: Annual freshwater withdrawals, total (% of internal resources)",
+        "url": "https://data.worldbank.org/indicator/ER.H2O.FWTL.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/ER.H2O.FWTL.ZS?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "watertotal": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: AQUASTAT - FAO's Global Information System on Water and Agriculture, Food and Agriculture Organization of the United Nations (FAO)",
+    "what": "Annual freshwater withdrawals, total (billion cubic meters) (indicator ER.H2O.FWTL.K3).",
+    "links": [
+      {
+        "label": "World Bank: Annual freshwater withdrawals, total (billion cubic meters)",
+        "url": "https://data.worldbank.org/indicator/ER.H2O.FWTL.K3"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/ER.H2O.FWTL.K3?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "waterfarm": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: AQUASTAT - FAO's Global Information System on Water and Agriculture, Food and Agriculture Organization of the United Nations (FAO)",
+    "what": "Annual freshwater withdrawals, agriculture (% of total freshwater withdrawal) (indicator ER.H2O.FWAG.ZS).",
+    "links": [
+      {
+        "label": "World Bank: Annual freshwater withdrawals, agriculture (% of total freshwater withdrawal)",
+        "url": "https://data.worldbank.org/indicator/ER.H2O.FWAG.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/ER.H2O.FWAG.ZS?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "toilets": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: WHO/UNICEF Joint Monitoring Programme (JMP) for Water Supply, Sanitation and Hygiene, World Health Organization (WHO)",
+    "what": "People using at least basic sanitation services (% of population) (indicator SH.STA.BASS.ZS).",
+    "links": [
+      {
+        "label": "World Bank: People using at least basic sanitation services (% of population)",
+        "url": "https://data.worldbank.org/indicator/SH.STA.BASS.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SH.STA.BASS.ZS?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "waterproductivity": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: AQUASTAT - FAO's Global Information System on Water and Agriculture, Food and Agriculture Organization of the United Nations (FAO), publisher: Food and Agriculture Organization of the United Nations (FAO)",
+    "what": "Water productivity, total (constant 2015 US$ GDP per cubic meter of total freshwater withdrawal) (indicator ER.GDP.FWTL.M3.KD).",
+    "links": [
+      {
+        "label": "World Bank: Water productivity, total (constant 2015 US$ GDP per cubic meter of total freshwater withdrawal)",
+        "url": "https://data.worldbank.org/indicator/ER.GDP.FWTL.M3.KD"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/ER.GDP.FWTL.M3.KD?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "airpax": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: Civil Aviation Statistics of the World, International Civil Aviation Organization (ICAO)",
+    "what": "Air transport, passengers carried (indicator IS.AIR.PSGR).",
+    "links": [
+      {
+        "label": "World Bank: Air transport, passengers carried",
+        "url": "https://data.worldbank.org/indicator/IS.AIR.PSGR"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/IS.AIR.PSGR?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "airpaxpp": {
+    "short": "World Bank (ICAO)",
+    "producer": "International Civil Aviation Organization (ICAO), via the World Bank; population from the World Bank",
+    "what": "Passengers carried by the country's airlines (ICAO, via the World Bank, IS.AIR.PSGR) divided by the World Bank population (SP.POP.TOTL).",
+    "links": [
+      {
+        "label": "World Bank: Air transport, passengers carried",
+        "url": "https://data.worldbank.org/indicator/IS.AIR.PSGR"
+      },
+      {
+        "label": "World Bank: Population, total",
+        "url": "https://data.worldbank.org/indicator/SP.POP.TOTL"
+      }
+    ],
+    "note": "It counts passengers of airlines registered in the country, wherever they fly. Ireland is far ahead because Ryanair is registered there."
+  },
+  "airfreight": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: Civil Aviation Statistics of the World, International Civil Aviation Organization (ICAO)",
+    "what": "Air transport, freight (million ton-km) (indicator IS.AIR.GOOD.MT.K1).",
+    "links": [
+      {
+        "label": "World Bank: Air transport, freight (million ton-km)",
+        "url": "https://data.worldbank.org/indicator/IS.AIR.GOOD.MT.K1"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/IS.AIR.GOOD.MT.K1?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "tourismexports": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: Yearbook of Tourism Statistics, Compendium of Tourism Statistics and data files, UN Tourism",
+    "what": "International tourism, receipts (% of total exports) (indicator ST.INT.RCPT.XP.ZS).",
+    "links": [
+      {
+        "label": "World Bank: International tourism, receipts (% of total exports)",
+        "url": "https://data.worldbank.org/indicator/ST.INT.RCPT.XP.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/ST.INT.RCPT.XP.ZS?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "tourismspend": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: Yearbook of Tourism Statistics, Compendium of Tourism Statistics and data files, UN Tourism",
+    "what": "International tourism, expenditures (current US$) (indicator ST.INT.XPND.CD).",
+    "links": [
+      {
+        "label": "World Bank: International tourism, expenditures (current US$)",
+        "url": "https://data.worldbank.org/indicator/ST.INT.XPND.CD"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/ST.INT.XPND.CD?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "tourismimports": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: Yearbook of Tourism Statistics, Compendium of Tourism Statistics and data files, UN Tourism",
+    "what": "International tourism, expenditures (% of total imports) (indicator ST.INT.XPND.MP.ZS).",
+    "links": [
+      {
+        "label": "World Bank: International tourism, expenditures (% of total imports)",
+        "url": "https://data.worldbank.org/indicator/ST.INT.XPND.MP.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/ST.INT.XPND.MP.ZS?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "farmjobs": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: ILO Modelled Estimates database (ILOEST), International Labour Organization (ILO)",
+    "what": "Employment in agriculture (% of total employment) (modeled ILO estimate) (indicator SL.AGR.EMPL.ZS).",
+    "links": [
+      {
+        "label": "World Bank: Employment in agriculture (% of total employment) (modeled ILO estimate)",
+        "url": "https://data.worldbank.org/indicator/SL.AGR.EMPL.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SL.AGR.EMPL.ZS?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "servicejobs": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: ILO Modelled Estimates database (ILOEST), International Labour Organization (ILO)",
+    "what": "Employment in services (% of total employment) (modeled ILO estimate) (indicator SL.SRV.EMPL.ZS).",
+    "links": [
+      {
+        "label": "World Bank: Employment in services (% of total employment) (modeled ILO estimate)",
+        "url": "https://data.worldbank.org/indicator/SL.SRV.EMPL.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SL.SRV.EMPL.ZS?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "ownboss": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: ILO Modelled Estimates database (ILOEST), International Labour Organization (ILO)",
+    "what": "Self-employed, total (% of total employment) (modeled ILO estimate) (indicator SL.EMP.SELF.ZS).",
+    "links": [
+      {
+        "label": "World Bank: Self-employed, total (% of total employment) (modeled ILO estimate)",
+        "url": "https://data.worldbank.org/indicator/SL.EMP.SELF.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SL.EMP.SELF.ZS?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "familywork": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: ILO Modelled Estimates database (ILOEST), International Labour Organization (ILO)",
+    "what": "Contributing family workers, total (% of total employment) (modeled ILO estimate) (indicator SL.FAM.WORK.ZS).",
+    "links": [
+      {
+        "label": "World Bank: Contributing family workers, total (% of total employment) (modeled ILO estimate)",
+        "url": "https://data.worldbank.org/indicator/SL.FAM.WORK.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SL.FAM.WORK.ZS?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "womenwork": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: ILO Modelled Estimates database (ILOEST), International Labour Organization (ILO)",
+    "what": "Labor force participation rate, female (% of female population ages 15+) (modeled ILO estimate) (indicator SL.TLF.CACT.FE.ZS).",
+    "links": [
+      {
+        "label": "World Bank: Labor force participation rate, female (% of female population ages 15+) (modeled ILO estimate)",
+        "url": "https://data.worldbank.org/indicator/SL.TLF.CACT.FE.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SL.TLF.CACT.FE.ZS?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "unemployment": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: ILO Modelled Estimates database (ILOEST), International Labour Organization (ILO)",
+    "what": "Unemployment, total (% of total labor force) (modeled ILO estimate) (indicator SL.UEM.TOTL.ZS).",
+    "links": [
+      {
+        "label": "World Bank: Unemployment, total (% of total labor force) (modeled ILO estimate)",
+        "url": "https://data.worldbank.org/indicator/SL.UEM.TOTL.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SL.UEM.TOTL.ZS?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "inflation": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: International Financial Statistics database, International Monetary Fund (IMF)",
+    "what": "Inflation, consumer prices (annual %) (indicator FP.CPI.TOTL.ZG).",
+    "links": [
+      {
+        "label": "World Bank: Inflation, consumer prices (annual %)",
+        "url": "https://data.worldbank.org/indicator/FP.CPI.TOTL.ZG"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/FP.CPI.TOTL.ZG?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "gdpgrowth": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: Country official statistics, National Statistical Organizations and/or Central Banks",
+    "what": "GDP growth (annual %) (indicator NY.GDP.MKTP.KD.ZG).",
+    "links": [
+      {
+        "label": "World Bank: GDP growth (annual %)",
+        "url": "https://data.worldbank.org/indicator/NY.GDP.MKTP.KD.ZG"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.KD.ZG?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "remittances": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: Staff estimates, World Bank (WB)",
+    "what": "Personal remittances, received (% of GDP) (indicator BX.TRF.PWKR.DT.GD.ZS).",
+    "links": [
+      {
+        "label": "World Bank: Personal remittances, received (% of GDP)",
+        "url": "https://data.worldbank.org/indicator/BX.TRF.PWKR.DT.GD.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/BX.TRF.PWKR.DT.GD.ZS?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "exports": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: Country official statistics, National Statistical Offices (NSOs)",
+    "what": "Exports of goods and services (% of GDP) (indicator NE.EXP.GNFS.ZS).",
+    "links": [
+      {
+        "label": "World Bank: Exports of goods and services (% of GDP)",
+        "url": "https://data.worldbank.org/indicator/NE.EXP.GNFS.ZS"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/NE.EXP.GNFS.ZS?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "corruption": {
+    "short": "Transparency International, via Our World in Data",
+    "producer": "Transparency International (2024); processed by Our World in Data",
+    "what": "Corruption Perceptions Index (CPI) (). A country’s score, from 0 (most corrupt) to 100 (least corrupt), that reflects the average of expert surveys on public sector corruption, including misuse of office and bribery.",
+    "links": [
+      {
+        "label": "Our World in Data: Corruption Perceptions Index",
+        "url": "https://ourworldindata.org/grapher/ti-corruption-perception-index"
+      }
+    ],
+    "note": ""
+  },
+  "householdspend": {
+    "short": "World Bank",
+    "producer": "World Bank, World Development Indicators; original data: Country official statistics, National Statistical Offices (NSOs)",
+    "what": "Households and NPISHs Final consumption expenditure per capita (constant 2015 US$) (indicator NE.CON.PRVT.PC.KD).",
+    "links": [
+      {
+        "label": "World Bank: Households and NPISHs Final consumption expenditure per capita (constant 2015 US$)",
+        "url": "https://data.worldbank.org/indicator/NE.CON.PRVT.PC.KD"
+      },
+      {
+        "label": "The exact data the game uses (World Bank data service)",
+        "url": "https://api.worldbank.org/v2/country/all/indicator/NE.CON.PRVT.PC.KD?format=json&per_page=20000&date=2010:2026"
+      }
+    ],
+    "note": ""
+  },
+  "paris": {
+    "short": "Olympedia",
+    "producer": "Olympedia (the OlyMADMen database, used by the IOC)",
+    "what": "The number of medals (gold, silver and bronze) each country won at the Paris 2024 Olympic Games, from Olympedia's medal table. A country that won none counts as 0.",
+    "links": [
+      {
+        "label": "Olympedia: 2024 Summer Olympics, medal table",
+        "url": "https://www.olympedia.org/editions/63"
+      }
+    ],
+    "note": "Russia and Belarus did not compete as countries in Paris (their athletes were neutral), so they have 0."
+  },
+  "parispp": {
+    "short": "Olympedia and World Bank",
+    "producer": "Olympedia; population from the World Bank",
+    "what": "Paris 2024 medals (Olympedia) per million people (World Bank population, SP.POP.TOTL).",
+    "links": [
+      {
+        "label": "Olympedia: 2024 Summer Olympics, medal table",
+        "url": "https://www.olympedia.org/editions/63"
+      },
+      {
+        "label": "World Bank: Population, total",
+        "url": "https://data.worldbank.org/indicator/SP.POP.TOTL"
+      }
+    ],
+    "note": "A small country with one or two medals can top this list."
+  },
+  "parisathletes": {
+    "short": "Olympedia",
+    "producer": "Olympedia (the OlyMADMen database, used by the IOC)",
+    "what": "The number of athletes each country entered at the Paris 2024 Olympic Games, from Olympedia.",
+    "links": [
+      {
+        "label": "Olympedia: 2024 Summer Olympics, countries",
+        "url": "https://www.olympedia.org/editions/63/countries"
+      }
+    ],
+    "note": "Countries that sent no team (Russia and Belarus, whose athletes were neutral) have no figure."
+  },
+  "parisathletespp": {
+    "short": "Olympedia and World Bank",
+    "producer": "Olympedia; population from the World Bank",
+    "what": "Athletes at Paris 2024 (Olympedia) per million people (World Bank population, SP.POP.TOTL).",
+    "links": [
+      {
+        "label": "Olympedia: 2024 Summer Olympics, countries",
+        "url": "https://www.olympedia.org/editions/63/countries"
+      },
+      {
+        "label": "World Bank: Population, total",
+        "url": "https://data.worldbank.org/indicator/SP.POP.TOTL"
+      }
+    ],
+    "note": ""
+  },
+  "beijing": {
+    "short": "Olympedia",
+    "producer": "Olympedia (the OlyMADMen database, used by the IOC)",
+    "what": "The number of medals each country won at the Beijing 2022 Winter Olympic Games, from Olympedia's medal table. A country that won none counts as 0.",
+    "links": [
+      {
+        "label": "Olympedia: 2022 Winter Olympics, medal table",
+        "url": "https://www.olympedia.org/editions/62"
+      }
+    ],
+    "note": "Russia's athletes competed as \"ROC\" in Beijing; Olympedia lists them separately, so Russia has 0 here."
+  },
+  "inactive": {
+    "short": "WHO",
+    "producer": "World Health Organization (Global Health Observatory)",
+    "what": "The share of adults (18+) who don't get the WHO's recommended minimum of physical activity (150 minutes of moderate activity a week, or the equivalent), age-standardised, both sexes (WHO indicator NCD_PAA).",
+    "links": [
+      {
+        "label": "WHO Global Health Observatory: insufficient physical activity",
+        "url": "https://www.who.int/data/gho/data/indicators/indicator-details/GHO/prevalence-of-insufficient-physical-activity-among-adults-aged-18-years-(age-standardized-estimate)-(-)"
+      },
+      {
+        "label": "The exact data the game uses (WHO data service)",
+        "url": "https://ghoapi.azureedge.net/api/NCD_PAA"
+      }
+    ],
+    "note": "Modelled estimates from national surveys."
   }
 };
 
@@ -13750,6 +14444,43 @@ const STAT_WORDS = {
   broadband: ask("Home broadband", "Where do the most people have broadband at home?", "Where do the fewest people have broadband at home?"),
   powerpp: ask("Electricity generated per person", "Where is the most electricity generated per person?", "Where is the least electricity generated per person?"),
   itservices: ask("IT share of service exports", "Which country earns the largest share of its service exports from computers and IT?", "Which country earns the smallest share of its service exports from computers and IT?"),
+  // Added 2026-11-07 (six new days, in review).
+  rain: ask("Rain per year", "Where does it rain the most?", "Where does it rain the least?"),
+  tempmean: ask("Average temperature", "Which country was the warmest on average in 2025?", "Which country was the coldest on average in 2025?"),
+  tempmax: ask("Warmest month", "Where was the hottest month of 2025?", "Where was even the warmest month of 2025 cool?"),
+  tempmin: ask("Coldest month", "Where was even the coldest month of 2025 warm?", "Where was the coldest month of 2025?"),
+  temprange: ask("Summer vs winter", "Where is the gap between summer and winter the biggest?", "Where are summer and winter almost the same?"),
+  tempanomaly: ask("Warmer than normal", "Where was 2025 the most above normal?", "Where was 2025 the furthest below normal?"),
+  waterpp: ask("Fresh water per person", "Where is there the most fresh water per person?", "Where is there the least fresh water per person?"),
+  wateruse: ask("Water used vs water there is", "Which country uses far more water than nature gives it?", "Which country uses the smallest share of its water?"),
+  watertotal: ask("Fresh water used", "Which country uses the most fresh water in total?", "Which country uses the least fresh water in total?"),
+  waterfarm: ask("Water for farming", "Where does farming take the biggest share of the water?", "Where does farming take the smallest share of the water?"),
+  toilets: ask("Basic toilets", "Where do the most people have at least a basic toilet?", "Where do the fewest people have a basic toilet?"),
+  waterproductivity: ask("Economy per m³ of water", "Which country earns the most for every m³ of water it uses?", "Which country earns the least for every m³ of water it uses?"),
+  airpax: ask("Air passengers", "Whose airlines carry the most passengers?", "Whose airlines carry the fewest passengers?"),
+  airpaxpp: ask("Air passengers per person", "Whose airlines carry the most passengers for the size of the country?", "Whose airlines carry the fewest passengers for the size of the country?"),
+  airfreight: ask("Air freight", "Whose airlines fly the most cargo?", "Whose airlines fly the least cargo?"),
+  tourismexports: ask("Tourism's share of exports", "Where does tourism bring in the biggest share of all exports?", "Where does tourism bring in the smallest share of all exports?"),
+  tourismspend: ask("Spent by tourists abroad", "Which country's tourists spend the most abroad?", "Which country's tourists spend the least abroad?"),
+  tourismimports: ask("Travel abroad vs imports", "Where is travel abroad the biggest share of what the country buys from other countries?", "Where is travel abroad the smallest share of what the country buys from other countries?"),
+  farmjobs: ask("Farm workers", "Where do the most workers work on the land?", "Where do the fewest workers work on the land?"),
+  servicejobs: ask("Service workers", "Where do the most workers work in services (shops, offices, care…)?", "Where do the fewest workers work in services (shops, offices, care…)?"),
+  ownboss: ask("Own boss", "Where are the most workers their own boss?", "Where are the fewest workers their own boss?"),
+  familywork: ask("Unpaid family workers", "Where do the most people help out in a family business, unpaid?", "Where do the fewest people help out in a family business, unpaid?"),
+  womenwork: ask("Women at work", "Where do the most women go out to work?", "Where do the fewest women go out to work?"),
+  unemployment: ask("Unemployment", "Where is unemployment the highest?", "Where is unemployment the lowest?"),
+  inflation: ask("Inflation", "Where did prices rise the fastest?", "Where did prices rise the slowest (or fall)?"),
+  gdpgrowth: ask("Economic growth", "Whose economy grew the fastest?", "Whose economy shrank the most?"),
+  remittances: ask("Money sent home", "Where is money sent home by migrants the biggest share of the economy?", "Where is money sent home by migrants the smallest share of the economy?"),
+  exports: ask("Exports", "Which country exports the most for the size of its economy?", "Which country exports the least for the size of its economy?"),
+  corruption: ask("Corruption Perceptions Index", "Which country is seen as the least corrupt?", "Which country is seen as the most corrupt?"),
+  householdspend: ask("Household spending", "Where do households spend the most per person?", "Where do households spend the least per person?"),
+  paris: ask("Paris 2024 medals", "Which country won the most medals at Paris 2024?", "Which country won the fewest medals at Paris 2024?"),
+  parispp: ask("Paris 2024 medals per person", "Which country won the most Paris 2024 medals for its population?", "Which country won the fewest Paris 2024 medals for its population?"),
+  parisathletes: ask("Paris 2024 athletes", "Which country sent the most athletes to Paris 2024?", "Which country sent the fewest athletes to Paris 2024?"),
+  parisathletespp: ask("Paris 2024 athletes per person", "Which country sent the most athletes to Paris 2024 for its population?", "Which country sent the fewest athletes to Paris 2024 for its population?"),
+  beijing: ask("Beijing 2022 medals", "Which country won the most medals at the Beijing 2022 Winter Olympics?", "Which country won the fewest medals at the Beijing 2022 Winter Olympics?"),
+  inactive: ask("Too little exercise", "Where do the most adults get too little exercise?", "Where do the fewest adults get too little exercise?"),
   electricity: ask("People with electricity", "Where does the largest share of people have electricity?", "Where does the smallest share of people have electricity?"),
   renewables: ask("Energy from renewables", "Which country gets the largest share of its energy from renewables?", "Which country gets the smallest share of its energy from renewables?"),
   greenpower: ask("Green electricity", "Which country makes the largest share of its electricity from renewables?", "Which country makes the smallest share of its electricity from renewables?"),
@@ -17151,9 +17882,12 @@ function getPuzzleNumber(dateKey) {
 }
 
 // The preloaded run of puzzle dates, Day 1 first.
+// The first 30 days at least (later ones show as upcoming), and every day up to today, so
+// the archive keeps growing once Day 30 has passed.
 function getAllPuzzleDays() {
   const date = new Date(`${LAUNCH_DATE}T00:00:00Z`);
-  return Array.from({ length: PRELOADED_DAYS }, (_, index) => {
+  const sinceLaunch = Math.round((Date.parse(`${today}T00:00:00Z`) - date.getTime()) / 86400000) + 1;
+  return Array.from({ length: Math.max(PRELOADED_DAYS, sinceLaunch) }, (_, index) => {
     if (index > 0) date.setUTCDate(date.getUTCDate() + 1);
     return toUtcDateKey(date);
   });
@@ -19965,7 +20699,7 @@ function renderAccount(account) {
     document.getElementById("accountAvatar").replaceChildren(...(avatar ? [avatar.cloneNode()] : []));
   }
   // Before config.js is filled in, the buttons wait.
-  document.querySelectorAll(".account-provider, #accountEmailForm :is(input, button)").forEach(button => { button.disabled = !isAuthConfigured; });
+  document.querySelectorAll(".account-provider, #accountEmailToggle, #accountEmailForm :is(input, button)").forEach(button => { button.disabled = !isAuthConfigured; });
   // Signed in: the email form starts over for next time.
   if (account) resetEmailSignIn();
   if (!isAuthConfigured) setText("accountNote", "Accounts aren't switched on yet. Until then your days stay in this browser.");
@@ -20017,8 +20751,15 @@ function showEmailMessage(id, text, { noAccount = false } = {}) {
     box.append(" ", button);
   }
 }
+// The email form is folded away behind "Continue with email" (Google comes first).
+function setEmailOpen(open, { focus = false } = {}) {
+  document.getElementById("accountEmailForm").classList.toggle("hidden", !open);
+  document.getElementById("accountEmailToggle").setAttribute("aria-expanded", String(open));
+  if (open && focus) document.getElementById("accountEmail").focus();
+}
 function showEmailSent(sent) {
-  document.getElementById("accountEmailForm").classList.toggle("hidden", sent);
+  document.getElementById("accountEmailForm").classList.toggle("hidden", sent || document.getElementById("accountEmailToggle").getAttribute("aria-expanded") !== "true");
+  document.getElementById("accountEmailToggle").classList.toggle("hidden", sent);
   document.querySelector(".account-or").classList.toggle("hidden", sent);
   document.querySelector(".account-providers").classList.toggle("hidden", sent);
   document.getElementById("accountIntro").classList.toggle("hidden", sent);
@@ -20032,6 +20773,7 @@ function resetEmailSignIn() {
   document.getElementById("accountEmail").value = "";
   document.getElementById("accountCode").value = "";
   document.getElementById("accountEmail").removeAttribute("aria-invalid");
+  setEmailOpen(false);
   showEmailSent(false);
   setEmailMode("login");
 }
@@ -20068,6 +20810,11 @@ async function sendSignInEmail(email) {
     submit.textContent = label;
   }
 }
+document.getElementById("accountEmailToggle").addEventListener("click", event => {
+  sounds.playClick();
+  const open = event.currentTarget.getAttribute("aria-expanded") !== "true";
+  setEmailOpen(open, { focus: open && !onTouch });
+});
 document.querySelectorAll("[data-email-mode]").forEach(tab => tab.addEventListener("click", () => {
   sounds.playClick();
   setEmailMode(tab.dataset.emailMode);
@@ -20117,6 +20864,7 @@ document.getElementById("accountResend").addEventListener("click", () => {
 document.getElementById("accountBack").addEventListener("click", () => {
   sounds.playClick();
   clearInterval(resendTimer);
+  setEmailOpen(true);
   showEmailSent(false);
   document.getElementById("accountEmail").focus();
 });
@@ -20128,6 +20876,7 @@ document.getElementById("accountGuest").addEventListener("click", () => {
 const authRedirectError = takeAuthRedirectError();
 if (authRedirectError) {
   document.getElementById("accountModal").classList.remove("hidden");
+  setEmailOpen(true);
   showEmailMessage("accountEmailMessage", authRedirectError);
 }
 
