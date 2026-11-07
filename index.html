@@ -664,6 +664,24 @@ h1, h2, h3 { font-weight: normal; }
 .give-up:hover:not(:disabled) { color: var(--danger); }
 .give-up:disabled { opacity: 0.4; text-decoration: none; }
 
+/* Paint the Map's HUD (7 November 2026): the question, then progress as a count and a bar
+   with the misses left, and "I'm done" as a quiet text link. The globe does the rest. */
+.paint-hud { display: grid; gap: 10px; }
+.paint-progress { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 14px; }
+.paint-found strong { color: var(--text); font: 700 16px var(--font-mono); }
+.paint-misses { color: var(--faint); font-size: 12px; white-space: nowrap; }
+.paint-bar { height: 6px; overflow: hidden; border-radius: 999px; background: rgba(255, 255, 255, 0.08); }
+.paint-bar i { display: block; height: 100%; border-radius: inherit; background: var(--t-correct); transform: scaleX(0); transform-origin: left; transition: transform 0.3s ease-out; }
+.paint-done { justify-self: start; min-height: 32px; padding: 0; border: 0; background: none; color: var(--faint); font: 12px var(--font-body); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+@media (hover: hover) { .paint-done:hover:not(:disabled) { color: var(--text); } }
+.paint-done:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.paint-hud.is-done .paint-found strong { color: var(--t-hot); }
+.paint-hud.is-done .paint-bar i { background: var(--t-hot); }
+.paint-hud.is-done.is-perfect .paint-found strong { color: var(--t-correct); }
+.paint-hud.is-done.is-perfect .paint-bar i { background: var(--t-correct); }
+.paint-hud.is-done .paint-done { display: none; }
+.paint-painted .neighbour-list:empty, .paint-painted .attempt-list:empty { display: none; }
+
 /* Guesses */
 
 .guesses-panel { display: flex; flex: 0 1 auto; flex-direction: column; min-height: 0; }
@@ -2501,6 +2519,12 @@ h1, h2, h3 { font-weight: normal; }
   .game-view.is-globe-active .side-left,
   .game-view.is-globe-active .stage-chip { opacity: 0.15; }
 
+  /* Paint the Map: the HUD is small, so the sheet is too, and the globe gets the room. */
+  .game-view[data-round="paint"] .side-right { max-height: 44dvh; }
+  .paint-hud { gap: 8px; }
+  .paint-hud .round-question { font-size: 15px; }
+  .paint-done { min-height: 40px; }
+
   /* Rank 'Em: a smaller sheet (more globe), with SUBMIT as a small button beside the topic. */
   .game-view[data-round="rank"] .side-right { max-height: 58dvh; }
   .side-right .round-view[data-round="rank"] { position: relative; }
@@ -2632,6 +2656,13 @@ h1, h2, h3 { font-weight: normal; }
 .tour-go { margin-top: 14px; }
 .extreme-tour:not(.is-paused) .tour-go,
 .extreme-tour.is-paused .tour-skip { display: none; }
+/* The shared SKIP for long animations (showSkip in ui.js): the tour's quiet button, fixed
+   at the bottom centre over whatever is animating; top right on a phone, where the
+   bottom holds the sheet and NEXT. */
+.anim-skip { position: fixed; z-index: 450; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); margin: 0; translate: -50% 0; background: rgba(10, 15, 29, 0.82); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); animation: ui-arrive 0.25s ease-out both; }
+@media (max-width: 760px) {
+  .anim-skip { left: auto; right: 16px; bottom: auto; top: calc(env(safe-area-inset-top, 0px) + 12px); translate: none; background: rgb(10, 15, 29); border-color: var(--line-strong); color: var(--text); }
+}
 .extreme-tour .tour-value { color: var(--text); font-size: 14px; }
 /* Your guess turns out to be the answer: a short pulse round the tile and its label. */
 .extreme-tour.is-win { animation: tour-pop 0.42s cubic-bezier(0.2, 1.4, 0.4, 1), tour-win 1.4s ease-out 0.2s; }
@@ -3400,20 +3431,18 @@ h1, h2, h3 { font-weight: normal; }
         </div>
 
         <div class="round-view hidden" data-round="paint">
-          <section class="panel target-card">
+          <!-- One compact card: the question, progress, misses left and a quiet way out.
+               Clicking a country on the globe paints it straight away. -->
+          <section class="panel target-card paint-hud" id="paintHud">
             <p class="round-question" id="paintQuestion"></p>
-          </section>
-          <section class="pinpoint-pick" aria-live="polite">
-            <span class="field-label">SELECTED</span>
-            <div class="pinpoint-pick-country" id="paintSelection">Click a country on the globe</div>
-            <button class="btn btn-primary" id="paintConfirm" type="button" disabled>PAINT IT</button>
-          </section>
-          <button class="give-up" id="paintDone" type="button">I'm done, show the rest</button>
-          <section class="panel guesses-panel" aria-label="Painted countries">
-            <div class="panel-head">
-              <h2>PAINTED</h2>
-              <span class="panel-count" id="paintCount">0 / 0</span>
+            <div class="paint-progress" aria-live="polite">
+              <span class="paint-found"><strong id="paintCount">0 / 0</strong> <span id="paintCountWord">countries found</span></span>
+              <span class="paint-misses" id="paintMisses"></span>
             </div>
+            <div class="paint-bar" aria-hidden="true"><i id="paintBarFill"></i></div>
+            <button class="paint-done" id="paintDone" type="button">I'm done, show the rest</button>
+          </section>
+          <section class="panel guesses-panel paint-painted" id="paintPainted" aria-label="Painted countries">
             <ol class="neighbour-list" id="paintFound"></ol>
             <ol class="attempt-list" id="paintWrong"></ol>
           </section>
@@ -7723,9 +7752,15 @@ class PixelGlobe {
   // If the game asks to face somewhere meanwhile (rotateTo), that turn follows the landing. The canvas stays full screen during the flight, and the
   // camera ends up seeing exactly what it will show inside `containerId`, so moving the
   // canvas there at the end doesn't change a pixel. Resolves when the globe is in place.
+  // SKIP during the flight: the next frame lands the globe where the flight would end.
+  skipTransition() {
+    this.transitionSkipped = true;
+  }
+
   transitionToGame(containerId, duration = TRANSITION_MS) {
     this.mode = "transition";
     const token = ++this.transitionToken;
+    this.transitionSkipped = false;
     this.pendingRotation = null;
     this.rotationToken += 1;
     // No tiles wanted while flying: the menu's sharp tiles fade out.
@@ -7753,7 +7788,7 @@ class PixelGlobe {
           frame = document.getElementById(containerId).getBoundingClientRect();
           startTime = now;
         }
-        const progress = duration ? Math.min(1, (now - startTime) / duration) : 1;
+        const progress = duration && !this.transitionSkipped ? Math.min(1, (now - startTime) / duration) : 1;
         const ease = progress < 0.5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2;
 
         // Between the menu's projection and the game's, seen through the full screen. The
@@ -8694,7 +8729,8 @@ function createJourney(type, container, { summit = 6000 } = {}) {
     },
     // Plays the day's journey once: from the start through every round's stretch (a short
     // stop where each round ended), then stays where the score puts it. With reduced motion
-    // it just draws the end. Stops early once the drawing is hidden or gone, or on `stop()`.
+    // it just draws the end. Stops early once the drawing is hidden or gone, or on `stop()`;
+    // `finish()` (SKIP) jumps to the end. Returns how long it takes, in ms.
     replay({ stretches: travelled = [], total = travelled.at(-1)?.to || 0 } = {}, { speed = 2.2, pause = 320, hold = 2200, rest = 500 } = {}) {
       this.stop();
       const run = ++replaying;
@@ -8707,7 +8743,8 @@ function createJourney(type, container, { summit = 6000 } = {}) {
         time += length + pause;
       });
       const finish = () => this.draw(total, { stretches: travelled, stops: travelled.slice(0, -1).map(part => part.to) });
-      if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { finish(); return; }
+      this.finish = () => { if (run === replaying) { this.stop(); finish(); } };
+      if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { finish(); return 0; }
       const begin = performance.now();
       const frame = now => {
         if (run !== replaying || !svg.isConnected || svg.closest(".hidden")) return;
@@ -8723,7 +8760,10 @@ function createJourney(type, container, { summit = 6000 } = {}) {
         requestAnimationFrame(frame);
       };
       requestAnimationFrame(frame);
+      return time;
     },
+    // Jumps a replay to its end (set by replay()).
+    finish() {},
     stop() {
       replaying += 1;
     },
@@ -9041,7 +9081,7 @@ const ROUND_PICTURES = {
     mystery: {"src":"pictures/2026-10-21-mystery.webp","width":640,"height":389,"credit":"Rene Hernandez","license":"CC BY-SA 2.0","link":"https://commons.wikimedia.org/wiki/File:Ciudad_de_Guatemala,_CA.jpg","article":"Guatemala City","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Ciudad_de_Guatemala%2C_CA.jpg/960px-Ciudad_de_Guatemala%2C_CA.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     pinpoint: {"src":"pictures/2026-10-21-pinpoint.webp","width":640,"height":425,"credit":"Diliff","license":"CC BY 3.0","link":"https://commons.wikimedia.org/wiki/File:Trevi_Fountain,_Rome,_Italy_2_-_May_2007.jpg","article":"Rome","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Trevi_Fountain%2C_Rome%2C_Italy_2_-_May_2007.jpg/960px-Trevi_Fountain%2C_Rome%2C_Italy_2_-_May_2007.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     deepcut: {"src":"pictures/2026-10-21-deepcut.webp","width":640,"height":427,"credit":"kallerna","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Olympus_National_Park_30.jpg","article":"Mount Olympus","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Olympus_National_Park_30.jpg/960px-Olympus_National_Park_30.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    paint: {"src":"pictures/2026-10-21-paint.webp","width":640,"height":661,"credit":"Thoroe","license":"CC BY-SA 2.0","link":"https://commons.wikimedia.org/wiki/File:Panama_Canal_Map_EN.svg","article":"Panama Canal","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Panama_Canal_Map_EN.svg/960px-Panama_Canal_Map_EN.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    paint: {"src":"pictures/2026-10-21-paint.webp","width":640,"height":313,"credit":"Suicasmo","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:View_of_Mount_Fuji_from_%C5%8Cwakudani_20211202.jpg","article":"Mount Fuji","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/View_of_Mount_Fuji_from_%C5%8Cwakudani_20211202.jpg/960px-View_of_Mount_Fuji_from_%C5%8Cwakudani_20211202.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     rank: {"src":"pictures/2026-10-21-rank.webp","width":425,"height":580,"credit":"NASA","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:Death_Valley_from_space.JPG","article":"Death Valley","remote":"https://upload.wikimedia.org/wikipedia/commons/9/98/Death_Valley_from_space.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"}
   },
   "2026-10-22": {
@@ -9502,6 +9542,94 @@ const SHAPES = {
 };
 
 return { SHAPES };
+})();
+
+// ---- border-data.js
+__modules["border-data.js"] = (() => {
+// Generated by tools/build-border-data.mjs from Natural Earth 1:50m (world-atlas
+// countries-50m.json, the map the globe draws): the length of each land border in km,
+// summed along the shared arcs. Used to order generated Deep Cut answers; never shown.
+const BORDER_KM = {"AD":{"ES":41,"FR":38},"AE":{"OM":509,"SA":461},"AF":{"PK":2054,"TJ":1037,"IR":846,"TM":661,"UZ":122,"CN":74},"AL":{"GR":196,"ME":146,"MK":140},"AM":{"AZ":684,"TR":237,"GE":142,"IR":33},"AO":{"CD":2108,"NA":1286,"ZM":1035,"CG":153},"AR":{"CL":4610,"PY":1472,"BR":808,"BO":663,"UY":283},"AT":{"DE":560,"IT":302,"CZ":298,"HU":225,"SI":213,"CH":124,"SK":73,"LI":26},"AZ":{"AM":684,"IR":546,"GE":275,"RU":253,"TR":7},"BA":{"HR":697,"RS":253,"ME":178},"BD":{"IN":2007,"MM":199},"BE":{"FR":403,"NL":308,"DE":94,"LU":93},"BF":{"ML":1031,"NE":547,"GH":504,"CI":388,"BJ":224,"TG":112},"BG":{"RO":557,"GR":358,"RS":281,"TR":170,"MK":134},"BI":{"TZ":356,"RW":237,"CD":205},"BJ":{"NG":686,"TG":608,"BF":224,"NE":207},"BN":{"MY":370},"BO":{"BR":2450,"PE":893,"CL":786,"PY":743,"AR":663},"BR":{"BO":2450,"PE":1651,"VE":1456,"CO":1348,"PY":991,"GY":987,"AR":808,"UY":747,"FR":477,"SR":330},"BT":{"IN":533,"CN":372},"BW":{"ZA":1463,"NA":1331,"ZW":739},"BY":{"RU":811,"UA":745,"LT":427,"PL":316,"LV":124},"BZ":{"GT":251,"MX":144},"CA":{"US":7801},"CD":{"AO":2108,"ZM":1836,"CG":1389,"CF":1217,"UG":674,"SS":500,"TZ":471,"BI":205,"RW":194},"CF":{"CD":1217,"TD":1064,"CM":725,"SS":597,"CG":390,"SD":343},"CG":{"GA":1453,"CD":1389,"CM":410,"CF":390,"AO":153},"CH":{"IT":523,"FR":394,"DE":192,"AT":124,"LI":31},"CI":{"GH":574,"GN":484,"LR":472,"ML":433,"BF":388},"CL":{"AR":4610,"BO":786,"PE":160},"CM":{"NG":1432,"TD":941,"CF":725,"CG":410,"GA":238,"GQ":177},"CN":{"MN":4249,"RU":3130,"IN":2011,"MM":1445,"KZ":1427,"NP":921,"VN":916,"KP":826,"KG":785,"BT":372,"TJ":368,"LA":322,"PK":319,"AF":74},"CO":{"VE":1977,"BR":1348,"PE":1034,"EC":489,"PA":245},"CR":{"NI":266,"PA":250},"CZ":{"DE":514,"PL":502,"AT":298,"SK":192},"DE":{"AT":560,"CZ":514,"NL":410,"PL":371,"FR":332,"CH":192,"BE":94,"LU":91,"DK":73},"DJ":{"ET":314,"ER":105},"DK":{"DE":73},"DO":{"HT":232},"DZ":{"MA":1445,"ML":1239,"NE":952,"LY":938,"TN":869,"MR":462},"EC":{"PE":1224,"CO":489},"EE":{"RU":253,"LV":221},"EG":{"SD":1266,"LY":1095,"IL":203,"PS":13},"ER":{"ET":839,"SD":546,"DJ":105},"ES":{"PT":940,"FR":486,"AD":41},"ET":{"KE":899,"SO":854,"ER":839,"SD":670,"SS":654,"DJ":314},"FI":{"RU":1176,"NO":628,"SE":447},"FR":{"ES":486,"BR":477,"BE":403,"SR":398,"CH":394,"IT":362,"DE":332,"LU":47,"AD":38,"NL":12,"MC":9},"GA":{"CG":1453,"GQ":332,"CM":238},"GB":{"IE":310},"GE":{"RU":665,"AZ":275,"TR":205,"AM":142},"GH":{"TG":720,"CI":574,"BF":504},"GM":{"SN":686},"GN":{"ML":738,"SL":573,"CI":484,"LR":374,"GW":320,"SN":280},"GQ":{"GA":332,"CM":177},"GR":{"BG":358,"AL":196,"MK":193,"TR":149},"GT":{"MX":818,"BZ":251,"HN":208,"SV":131},"GW":{"SN":332,"GN":320},"GY":{"BR":987,"VE":574,"SR":569},"HN":{"NI":638,"SV":271,"GT":208},"HR":{"BA":697,"SI":368,"HU":225,"RS":182,"ME":16},"HT":{"DO":232},"HU":{"SK":447,"RO":327,"AT":225,"HR":225,"RS":117,"UA":87,"SI":60},"ID":{"MY":1332,"PG":730,"TL":176},"IE":{"GB":310},"IL":{"PS":325,"JO":273,"EG":203,"LB":95,"SY":84},"IN":{"PK":2467,"CN":2011,"BD":2007,"NP":1305,"MM":1141,"BT":533},"IQ":{"IR":1135,"SA":812,"SY":593,"TR":269,"KW":203,"JO":180},"IR":{"IQ":1135,"TM":886,"AF":846,"PK":780,"AZ":546,"TR":406,"AM":33},"IT":{"CH":523,"FR":362,"AT":302,"SI":164,"SM":32,"VA":4},"JO":{"SA":727,"SY":330,"IL":273,"IQ":180,"PS":105},"KE":{"ET":899,"TZ":753,"SO":688,"UG":677,"SS":201},"KG":{"KZ":934,"UZ":883,"CN":785,"TJ":732},"KH":{"VN":868,"TH":601,"LA":386},"KP":{"CN":826,"KR":204,"RU":30},"KR":{"KP":204},"KW":{"SA":221,"IQ":203},"KZ":{"RU":5448,"UZ":2114,"CN":1427,"KG":934,"TM":363},"LA":{"VN":1471,"TH":1430,"KH":386,"CN":322,"MM":209},"LB":{"SY":251,"IL":95},"LI":{"CH":31,"AT":26},"LR":{"CI":472,"GN":374,"SL":234},"LS":{"ZA":692},"LT":{"BY":427,"LV":401,"RU":182,"PL":81},"LU":{"BE":93,"DE":91,"FR":47},"LV":{"LT":401,"EE":221,"RU":193,"BY":124},"LY":{"EG":1095,"TD":1051,"DZ":938,"TN":435,"SD":382,"NE":346},"MA":{"DZ":1445},"MC":{"FR":9},"MD":{"UA":725,"RO":369},"ME":{"BA":178,"AL":146,"RS":129,"HR":16},"MK":{"GR":193,"AL":140,"BG":134,"RS":69},"ML":{"MR":2113,"DZ":1239,"BF":1031,"NE":827,"GN":738,"CI":433,"SN":336},"MM":{"TH":1616,"CN":1445,"IN":1141,"LA":209,"BD":199},"MN":{"CN":4249,"RU":2770},"MR":{"ML":2113,"SN":629,"DZ":462},"MW":{"MZ":1374,"ZM":711,"TZ":422},"MX":{"US":2478,"GT":818,"BZ":144},"MY":{"ID":1332,"TH":386,"BN":370},"MZ":{"MW":1374,"ZW":1065,"TZ":679,"ZA":487,"ZM":414,"SZ":106},"NA":{"BW":1331,"AO":1286,"ZA":879,"ZM":212},"NE":{"NG":1368,"TD":1152,"DZ":952,"ML":827,"BF":547,"LY":346,"BJ":207},"NG":{"CM":1432,"NE":1368,"BJ":686,"TD":85},"NI":{"HN":638,"CR":266},"NL":{"DE":410,"BE":308,"FR":12},"NO":{"SE":1555,"FI":628,"RU":151},"NP":{"IN":1305,"CN":921},"OM":{"SA":658,"AE":509,"YE":288},"PA":{"CR":250,"CO":245},"PE":{"BR":1651,"EC":1224,"CO":1034,"BO":893,"CL":160},"PG":{"ID":730},"PK":{"IN":2467,"AF":2054,"IR":780,"CN":319},"PL":{"CZ":502,"DE":371,"UA":368,"SK":357,"BY":316,"RU":205,"LT":81},"PS":{"IL":325,"JO":105,"EG":13},"PT":{"ES":940},"PY":{"AR":1472,"BR":991,"BO":743},"QA":{"SA":61},"RO":{"BG":557,"UA":470,"RS":413,"MD":369,"HU":327},"RS":{"RO":413,"BG":281,"BA":253,"HR":182,"ME":129,"HU":117,"MK":69},"RU":{"KZ":5448,"CN":3130,"MN":2770,"UA":1479,"FI":1176,"BY":811,"GE":665,"AZ":253,"EE":253,"PL":205,"LV":193,"LT":182,"NO":151,"KP":30},"RW":{"BI":237,"CD":194,"TZ":193,"UG":132},"SA":{"YE":1187,"IQ":812,"JO":727,"OM":658,"AE":461,"KW":221,"QA":61},"SD":{"SS":1894,"EG":1266,"TD":1214,"ET":670,"ER":546,"LY":382,"CF":343},"SE":{"NO":1555,"FI":447},"SI":{"HR":368,"AT":213,"IT":164,"HU":60},"SK":{"HU":447,"PL":357,"CZ":192,"UA":82,"AT":73},"SL":{"GN":573,"LR":234},"SM":{"IT":32},"SN":{"GM":686,"MR":629,"ML":336,"GW":332,"GN":280},"SO":{"ET":854,"KE":688},"SR":{"GY":569,"FR":398,"BR":330},"SS":{"SD":1894,"ET":654,"CF":597,"CD":500,"UG":419,"KE":201},"SV":{"HN":271,"GT":131},"SY":{"TR":719,"IQ":593,"JO":330,"LB":251,"IL":84},"SZ":{"ZA":411,"MZ":106},"TD":{"SD":1214,"NE":1152,"CF":1064,"LY":1051,"CM":941,"NG":85},"TG":{"GH":720,"BJ":608,"BF":112},"TH":{"MM":1616,"LA":1430,"KH":601,"MY":386},"TJ":{"AF":1037,"UZ":1000,"KG":732,"CN":368},"TL":{"ID":176},"TM":{"UZ":1491,"IR":886,"AF":661,"KZ":363},"TN":{"DZ":869,"LY":435},"TR":{"SY":719,"IR":406,"IQ":269,"AM":237,"GE":205,"BG":170,"GR":149,"AZ":7},"TZ":{"KE":753,"MZ":679,"CD":471,"MW":422,"UG":380,"BI":356,"ZM":300,"RW":193},"UA":{"RU":1479,"BY":745,"MD":725,"RO":470,"PL":368,"HU":87,"SK":82},"UG":{"KE":677,"CD":674,"SS":419,"TZ":380,"RW":132},"US":{"CA":7801,"MX":2478},"UY":{"BR":747,"AR":283},"UZ":{"KZ":2114,"TM":1491,"TJ":1000,"KG":883,"AF":122},"VA":{"IT":4},"VE":{"CO":1977,"BR":1456,"GY":574},"VN":{"LA":1471,"CN":916,"KH":868},"YE":{"SA":1187,"OM":288},"ZA":{"BW":1463,"NA":879,"LS":692,"MZ":487,"SZ":411,"ZW":204},"ZM":{"CD":1836,"AO":1035,"MW":711,"ZW":680,"MZ":414,"TZ":300,"NA":212},"ZW":{"MZ":1065,"BW":739,"ZM":680,"ZA":204}};
+
+return { BORDER_KM };
+})();
+
+// ---- paint-pool.js
+__modules["paint-pool.js"] = (() => {
+// Paint the Map for generated days (the dates after the hand-made calendar in days.js).
+// Until 7 November 2026 these asked "Click every country that borders X." with X glowing on
+// the globe, so the map showed the way: just click around the lit-up country. These ask
+// for knowledge the map doesn't give away. Generated days have no theme, so the questions
+// are general. Every list is complete and checkable, uses only countries big enough to click
+// (no microstates or small islands), and none repeats a question from days.js.
+// `difficulty` (1-5) is a judgement, as for the hand-made rounds. The days go through the
+// list in order (getPaintPoolEntry in daily.js), so no question comes back within 12 days.
+const PAINT_POOL = [
+  {
+    question: "Click the three Baltic states.",
+    answers: ["EE", "LV", "LT"],
+    difficulty: 1
+  },
+  {
+    question: "Click the six founding members of the European Coal and Steel Community (1951), where today's EU began.",
+    answers: ["BE", "FR", "DE", "IT", "LU", "NL"],
+    difficulty: 2
+  },
+  {
+    question: "Click every country the Mekong River flows through or along.",
+    answers: ["CN", "MM", "LA", "TH", "KH", "VN"],
+    difficulty: 4
+  },
+  {
+    question: "Click every country in Asia that has hosted the Olympic Games, summer or winter. (Russia counts as Europe.)",
+    answers: ["JP", "KR", "CN"],
+    difficulty: 2
+  },
+  {
+    question: "Click the eight member countries of the Arctic Council.",
+    answers: ["CA", "DK", "FI", "IS", "NO", "RU", "SE", "US"],
+    difficulty: 4
+  },
+  {
+    question: "Click the four countries of the Visegrád Group.",
+    answers: ["CZ", "HU", "PL", "SK"],
+    difficulty: 3
+  },
+  {
+    question: "Click every country the Prime Meridian (0° longitude) crosses.",
+    answers: ["GB", "FR", "ES", "DZ", "ML", "BF", "TG", "GH"],
+    difficulty: 5
+  },
+  {
+    question: "Click the three Benelux countries.",
+    answers: ["BE", "NL", "LU"],
+    difficulty: 1
+  },
+  {
+    question: "Click every country that has won the men's European Championship (EURO) since 1980.",
+    answers: ["DE", "FR", "NL", "DK", "GR", "ES", "PT", "IT"],
+    labels: { DE: "1980, 1996", FR: "1984, 2000", NL: "1988", DK: "1992", GR: "2004", ES: "2008, 2012, 2024", PT: "2016", IT: "2020" },
+    difficulty: 3
+  },
+  {
+    question: "Click the four members of the Andean Community.",
+    answers: ["BO", "CO", "EC", "PE"],
+    difficulty: 4
+  },
+  {
+    question: "Click every European country that has hosted the Summer Olympics since 1990.",
+    answers: ["ES", "GR", "GB", "FR"],
+    labels: { ES: "Barcelona 1992", GR: "Athens 2004", GB: "London 2012", FR: "Paris 2024" },
+    difficulty: 3
+  },
+  {
+    question: "Click the seven countries that claim part of Antarctica.",
+    answers: ["AR", "AU", "CL", "FR", "NZ", "NO", "GB"],
+    difficulty: 5
+  }
+];
+
+return { PAINT_POOL };
 })();
 
 // ---- days.js
@@ -10713,10 +10841,12 @@ const DAYS = {
       }
     },
     paint: {
-      question: "Click every country in Central America.",
-      answers: ["GT", "BZ", "SV", "HN", "NI", "CR", "PA"],
-      view: [13, -85],
-      picture: "Panama Canal"
+      // 7 November 2026: was "Click every country in Central America.", which the map
+      // gives away (everything between Mexico and Colombia).
+      question: "Click the country each of these volcanoes is in: Krakatoa, Mount Fuji, Kilimanjaro, Popocatépetl, Eyjafjallajökull, Pinatubo and Mount St. Helens.",
+      answers: ["ID", "JP", "TZ", "MX", "IS", "PH", "US"],
+      labels: { ID: "Krakatoa", JP: "Mount Fuji", TZ: "Kilimanjaro", MX: "Popocatépetl", IS: "Eyjafjallajökull", PH: "Pinatubo", US: "Mount St. Helens" },
+      picture: "Mount Fuji"
     },
     rank: {
       topic: "Hottest temperature ever recorded",
@@ -13623,6 +13753,8 @@ __modules["daily.js"] = (() => {
 // player gets the same day.
 const { COUNTRIES, buildRoundClues, createSeededRandom, getClueSeed, hashStringToSeed } = __modules["countries.js"];
 const { SHAPES } = __modules["shape-data.js"];
+const { BORDER_KM } = __modules["border-data.js"];
+const { PAINT_POOL } = __modules["paint-pool.js"];
 const { DAYS } = __modules["days.js"];
 const { EXTREME_DAYS } = __modules["extremes-days.js"];
 const { EXTREME_MAX_DAY, MODE_NAME, scorePick } = __modules["extremes.js"];
@@ -13849,6 +13981,29 @@ function pickByTier(candidates, hardness, tier, random, used) {
   return slice[Math.floor(random() * slice.length)].country;
 }
 
+// How niche a neighbour is as an answer to "Name a country that borders X". Until
+// 7 November 2026 neighbours were ranked by population, biggest first, and the biggest got
+// the 1,000 (China for Kazakhstan, the most obvious one 200 points too low). Now two
+// things count: how well known the neighbour is (its difficulty, 1-5, from countries.js)
+// and how much of X's land border it takes (border-data.js, measured on the globe's own
+// map): Russia holds over half of Kazakhstan's border, so it's the most obvious answer.
+// A neighbour only through a far-off territory (France for Brazil, via French Guiana) is
+// the most niche of all. A rule of thumb, not a measured fact: see CLAUDE.md.
+const FAR_NEIGHBOUR_KM = 5000;
+function getNeighbourHardness(country, neighbour) {
+  const lengths = BORDER_KM[country.iso] || {};
+  const total = Object.values(lengths).reduce((sum, km) => sum + km, 0);
+  const share = total ? (lengths[neighbour.iso] || 0) / total : 0;
+  const far = getDistanceKm(country.lat, country.lon, neighbour.lat, neighbour.lon) > FAR_NEIGHBOUR_KM;
+  return neighbour.difficulty - 4 * share + (far ? 10 : 0);
+}
+
+// The pool question for a date: the day's number (days since 1 January 1970) down the list.
+function getPaintPoolEntry(dateKey) {
+  const dayNumber = Math.round(Date.parse(`${dateKey}T00:00:00Z`) / 86400000);
+  return PAINT_POOL[((dayNumber % PAINT_POOL.length) + PAINT_POOL.length) % PAINT_POOL.length];
+}
+
 const averageDifficulty = isos => isos.reduce((sum, iso) => sum + getCountry(iso).difficulty, 0) / Math.max(1, isos.length);
 
 const BUILDERS = {
@@ -13863,26 +14018,27 @@ const BUILDERS = {
     const hardness = country => country.difficulty * 2 + (country.area < 30000 ? 1.5 : 0) - (country.area > 1e6 ? 1 : 0);
     return { answer: pickByTier(candidates, hardness, tier, random, used).iso };
   },
-  // Generated days: name a neighbour, scored by how small (so how niche) it is.
+  // Generated days: name a neighbour, scored by how niche it is (getNeighbourHardness).
   deepcut(tier, random, used) {
     const candidates = COUNTRIES.filter(country => country.borders.length >= 5);
     const country = pickByTier(candidates, candidate => candidate.difficulty, tier, random, used);
-    const bySize = country.borders.filter(getCountry).sort((left, right) => getCountry(right).population - getCountry(left).population);
+    const byHardness = [...new Set(country.borders.filter(getCountry))]
+      .map(iso => ({ iso, hardness: getNeighbourHardness(country, getCountry(iso)) }))
+      .sort((left, right) => left.hardness - right.hardness || left.iso.localeCompare(right.iso))
+      .map(entry => entry.iso);
     const answers = {};
-    bySize.forEach((iso, position) => {
-      const points = DEEP_CUT_TIERS[Math.min(4, Math.floor(position * 5 / bySize.length))];
+    // Most obvious first: 200 for the first fifth, up to 1,000 for the most niche.
+    byHardness.forEach((iso, position) => {
+      const points = DEEP_CUT_TIERS[4 - Math.min(4, Math.floor(position * 5 / byHardness.length))];
       (answers[points] ||= []).push(getCountry(iso).name);
     });
     return { countries: [country.iso], question: `Name a country that borders ${country.name}.`, answers, aliases: {}, info: null };
   },
-  // Generated days: click every neighbour.
-  paint(tier, random, used) {
-    const candidates = COUNTRIES.filter(country => country.borders.length >= 2 && country.borders.length <= 10);
-    const hardness = country => country.borders.length + averageDifficulty(country.borders) * 0.8;
-    const country = pickByTier(candidates, hardness, tier, random, used);
-    // Only playable countries (a border with French Guiana is a border with France).
-    const answers = [...new Set(country.borders.filter(getCountry))];
-    return { question: `Click every country that borders ${country.name}.`, answers, view: [country.lat, country.lon], highlight: country.iso };
+  // Generated days: a knowledge question from paint-pool.js, one day after another down the
+  // list (no more "borders X" with X lit up on the globe, which the map gave away).
+  paint(tier, random, used, dateKey) {
+    const entry = getPaintPoolEntry(dateKey);
+    return { question: entry.question, answers: entry.answers, labels: entry.labels || null, view: null, highlight: null, subject: null, difficulty: entry.difficulty };
   },
   rank(tier, random, used) {
     const metricKey = pickFrom(Object.keys(RANK_METRICS), random);
@@ -14219,7 +14375,7 @@ function getDayScore(plan, states) {
   };
 }
 
-return { MODES, MAIN_MODE, MODE_INFO, ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, SPEED_WINDOW_MS, getSpeedWindow, MAX_SPEED_BONUS, getSpeedMultiplier, getMaxScore, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, resolveRound, resolvePlan, getDayInfo, getDailyPlan, hasExtremeDay, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
+return { MODES, MAIN_MODE, MODE_INFO, ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, SPEED_WINDOW_MS, getSpeedWindow, MAX_SPEED_BONUS, getSpeedMultiplier, getMaxScore, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, getNeighbourHardness, getPaintPoolEntry, resolveRound, resolvePlan, getDayInfo, getDailyPlan, hasExtremeDay, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
 })();
 
 // ---- community.js
@@ -14655,6 +14811,39 @@ function drawCountryOutline(polygons, label) {
   return svg;
 }
 
+// One SKIP button for every animation longer than half a second (the flight from the menu,
+// reveal cards, the score card's count-up, the end of the day), in the corner of the
+// screen, in the style of the Highs & Lows tour's SKIP. showSkip(onSkip) shows it and
+// returns a function that hides it again; a newer animation takes it over. Escape skips
+// too. Skipping jumps to the animation's end state; anything that waits for the player
+// (NEXT, a reveal card's button) still waits.
+let skipOwner = null;
+let skipButton = null;
+function showSkip(onSkip) {
+  if (!skipButton) {
+    skipButton = Object.assign(document.createElement("button"), { type: "button", className: "tour-skip anim-skip hidden", id: "animSkip", textContent: "SKIP ›" });
+    skipButton.setAttribute("aria-label", "Skip the animation");
+    skipButton.addEventListener("click", event => { event.stopPropagation(); skipOwner?.skip(); });
+    window.addEventListener("keydown", event => {
+      if (event.key !== "Escape" || !skipOwner) return;
+      event.preventDefault();
+      skipOwner.skip();
+    });
+    document.body.appendChild(skipButton);
+  }
+  const owner = {
+    skip: () => { hide(); onSkip(); }
+  };
+  const hide = () => {
+    if (skipOwner !== owner) return;
+    skipOwner = null;
+    skipButton.classList.add("hidden");
+  };
+  skipOwner = owner;
+  skipButton.classList.remove("hidden");
+  return hide;
+}
+
 // A card in the middle of the screen that opens like a pack: its steps (elements already
 // in the card, each with a status) start face down and turn over one at a time, matches
 // popping with a chime. It then waits for its button (a click or Enter); a click while
@@ -14687,7 +14876,9 @@ function playRevealCard({ card, steps, nextLabel, land, sound = () => {}, onTurn
     // The verdict (right or wrong) has its own sound, played by onVerdict.
     if (!quiet && !step.verdict) sound(step.status === "clue" ? "hint" : step.status, streak - 1);
   };
+  let advance = () => {};
   const complete = () => {
+    hideSkip();
     card.classList.add("is-complete");
     next.focus({ preventScroll: true });
     if (autoContinue) {
@@ -14709,6 +14900,8 @@ function playRevealCard({ card, steps, nextLabel, land, sound = () => {}, onTurn
   };
   steps[0].element.classList.add("is-next");
   timer = setTimeout(showNext, REVEAL_FIRST_MS);
+  // While steps are still turning (650 ms and more), SKIP turns them all at once.
+  const hideSkip = showSkip(() => advance());
 
   return new Promise(resolve => {
     let landed = false;
@@ -14716,6 +14909,7 @@ function playRevealCard({ card, steps, nextLabel, land, sound = () => {}, onTurn
       if (landed) return;
       landed = true;
       clearTimeout(timer);
+      hideSkip();
       window.removeEventListener("keydown", onKey, true);
       const row = land();
       const from = card.getBoundingClientRect();
@@ -14735,7 +14929,7 @@ function playRevealCard({ card, steps, nextLabel, land, sound = () => {}, onTurn
       }, REVEAL_FLY_MS);
     };
     // A click or Enter: show the remaining steps at once, or, once all are shown, go on.
-    const advance = () => {
+    advance = () => {
       if (shown >= steps.length) { finish(); return; }
       clearTimeout(timer);
       steps.slice(shown).forEach(step => turnOver(step, true));
@@ -15549,7 +15743,7 @@ function setGuessHighlight(index, active) {
 }
 
 
-return { redactCountryName, showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, renderProgressiveHints, renderGlobeMarkerTooltip, showHowToSet, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight };
+return { redactCountryName, showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, showSkip, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, renderProgressiveHints, renderGlobeMarkerTooltip, showHowToSet, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight };
 })();
 
 // ---- screens.js
@@ -16693,7 +16887,7 @@ const { createBadge } = __modules["badges.js"];
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
 const { hasExtremeDay, MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MAIN_MODE, MODES, MODE_INFO, getSpeedWindow, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
-const { showHowToSet, createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, showToastNotice, updateDailyScoreUI } = __modules["ui.js"];
+const { showHowToSet, createFlagImage, createGuessRow, initializeCountryInput, initializeMainMenu, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, showToastNotice, showSkip, updateDailyScoreUI } = __modules["ui.js"];
 
 // v3: Deep Cut and Paint the Map replaced Capital Call and Border Patrol (October 2026).
 const DAY_STORAGE_PREFIX = "daily-geography:day:v3:";
@@ -16750,10 +16944,11 @@ let isAnimating = false;
 let markerGuesses = [];
 // Country clicked in Pinpoint but not yet confirmed as a guess.
 let pinpointSelection = null;
+// Paint the Map: the country painted last, for the chip under the globe.
+let lastPainted = null;
 // Casual Mystery Country: the country clicked on the globe, put in the answer box.
 let mysterySelection = null;
 // The country clicked in Paint the Map, waiting to be painted.
-let paintSelection = null;
 // The globe mode: the country clicked, waiting to be locked in, and whether the globe still
 // has to make its reveal turn (right after locking in).
 let extremeSelection = null;
@@ -16938,7 +17133,6 @@ function goToRound(index) {
     if (index !== viewIndex) setSheetStep(1);
     viewIndex = index;
     pinpointSelection = null;
-    paintSelection = null;
     render();
   };
   // A round starting for the first time gets the title: the cards slide out with the
@@ -17445,23 +17639,47 @@ function showScoreBurst(index, { keepCardsOut = false } = {}) {
   climb.stop();
   climb.draw(before, { stretches, stops });
   const burst = ++burstRun;
-  const climbStart = performance.now();
+  let climbStart = 0;
+  let settled = false;
   const rise = now => {
+    if (settled || burst !== burstRun) return;
     const progress = Math.min(1, (now - climbStart) / 1400);
     climb.draw(before + result.points * (1 - (1 - progress) ** 3), { stretches, stops });
     // It rises once, then stays at the day's new total.
-    if (progress < 1 && burst === burstRun) requestAnimationFrame(rise);
+    if (progress < 1) requestAnimationFrame(rise);
   };
-  setTimeout(() => requestAnimationFrame(rise), 250);
-  setTimeout(() => {
-    countUp(document.getElementById("scoreBurstPoints"), result.points, { duration: 1400 });
-    countUp(document.getElementById("scoreBurstTotal"), dayScore.total, { from: before, duration: 1400 });
-    countUp(document.getElementById("dailyTotalScore"), dayScore.total, { from: before, duration: 1400 });
+  let counters = [];
+  const startTimer = setTimeout(() => {
+    climbStart = performance.now();
+    requestAnimationFrame(rise);
+    counters = [
+      countUp(document.getElementById("scoreBurstPoints"), result.points, { duration: 1400 }),
+      countUp(document.getElementById("scoreBurstTotal"), dayScore.total, { from: before, duration: 1400 }),
+      countUp(document.getElementById("dailyTotalScore"), dayScore.total, { from: before, duration: 1400 })
+    ];
   }, 250);
+  // The count-up takes 1.65 s; SKIP shows the end at once (the card still waits for NEXT).
+  const settle = () => {
+    if (settled) return;
+    settled = true;
+    clearTimeout(startTimer);
+    clearTimeout(settleTimer);
+    hideSkip();
+    if (burst !== burstRun) return;
+    climb.draw(dayScore.total, { stretches, stops });
+    counters.forEach(finish => finish());
+    setText("scoreBurstPoints", result.points.toLocaleString());
+    setText("scoreBurstTotal", dayScore.total.toLocaleString());
+    setText("dailyTotalScore", dayScore.total.toLocaleString());
+  };
+  // Nothing counts up without points, so no SKIP then.
+  const hideSkip = result.points ? showSkip(settle) : () => {};
+  const settleTimer = setTimeout(() => { hideSkip(); settled = true; }, 1700);
 
   return new Promise(resolve => {
     endScoreBurst = () => {
       endScoreBurst = null;
+      settle();
       overlay.classList.add("is-leaving");
       setText("dailyTotalScore", dayScore.total.toLocaleString());
       if (!keepCardsOut) slideCardsIn();
@@ -17780,7 +17998,7 @@ function render({ animateGlobe = true } = {}) {
   const clicking = ["pinpoint", "paint", "extreme"].includes(round.type) && !progress.done;
   globe.setClickable(clicking);
   if (clicking) {
-    setText("stageHint", "Click a country to select it · drag to rotate");
+    setText("stageHint", round.type === "paint" ? "Click a country to paint it · drag to rotate" : "Click a country to select it · drag to rotate");
   } else {
     setText("stageHint", "Drag to rotate · hover a marker for details");
   }
@@ -17900,14 +18118,21 @@ function getStretches(dayScore, count = dayScore.rounds.length) {
   });
 }
 
+// Counts a number up; returns a function that jumps to the end (SKIP).
 function countUp(element, target, { from = 0, duration = 700 } = {}) {
   const start = performance.now();
+  let finished = false;
   const step = now => {
+    if (finished) return;
     const progress = Math.min(1, (now - start) / duration);
     element.textContent = Math.round(from + (target - from) * (1 - (1 - progress) ** 3)).toLocaleString();
     if (progress < 1 && element.isConnected) requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
+  return () => {
+    finished = true;
+    element.textContent = target.toLocaleString();
+  };
 }
 
 function getAnswerText(round) {
@@ -18028,12 +18253,17 @@ const ROUND_RENDERERS = {
     document.getElementById("pinpointGiveUp").disabled = progress.done;
 
     // Clicking the globe selects a country and shows its name; the button makes it a guess.
+    // In casual the selection stays nameless until it's locked in: the target's name and
+    // flag can be on screen (days without fun clues), so a name would let you click around
+    // until it matches.
     if (progress.done) pinpointSelection = null;
     const selected = pinpointSelection && getCountry(pinpointSelection);
     const selection = document.getElementById("pinpointSelection");
     selection.classList.toggle("is-chosen", Boolean(selected));
     selection.replaceChildren(...(selected
-      ? [createFlagImage(selected, "pinpoint-pick-flag"), Object.assign(document.createElement("span"), { className: "pick-name", textContent: selected.name })]
+      ? (round.mode === "casual"
+        ? [Object.assign(document.createElement("span"), { className: "pick-name", textContent: "Country selected" })]
+        : [createFlagImage(selected, "pinpoint-pick-flag"), Object.assign(document.createElement("span"), { className: "pick-name", textContent: selected.name })])
       : [progress.done ? "Round finished" : tapWords("Click a country")]));
     document.getElementById("pinpointConfirm").disabled = !selected || progress.done;
 
@@ -18098,28 +18328,27 @@ const ROUND_RENDERERS = {
 
   paint(round, state, progress) {
     const total = round.answers.length;
-    setText("paintQuestion", round.question);
+    setText("paintQuestion", tapWords(round.question));
+    // The HUD: how many found (with a bar), how many misses are left, and once the round is
+    // over, how it went. Clicking the globe paints straight away (handleGlobeClick).
+    const hud = document.getElementById("paintHud");
+    hud.classList.toggle("is-done", progress.done);
+    hud.classList.toggle("is-perfect", progress.done && progress.solved);
     setText("paintCount", `${state.found.length} / ${total}`);
+    setText("paintCountWord", progress.done ? (progress.solved ? "found · round complete" : "found · round over") : `${total === 1 ? "country" : "countries"} found`);
+    document.getElementById("paintBarFill").style.transform = `scaleX(${state.found.length / total})`;
+    const missesLeft = MAX_GUESSES - state.wrong.length;
+    setText("paintMisses", progress.done ? "" : state.wrong.length ? `${missesLeft} ${missesLeft === 1 ? "miss" : "misses"} left` : `${MAX_GUESSES} misses allowed`);
     document.getElementById("paintDone").disabled = progress.done;
 
-    // Clicking selects a country and shows its name; PAINT IT (or Enter) commits it.
-    if (progress.done) paintSelection = null;
-    const selected = paintSelection && getCountry(paintSelection);
-    const selection = document.getElementById("paintSelection");
-    selection.classList.toggle("is-chosen", Boolean(selected));
-    selection.replaceChildren(...(selected
-      ? [createFlagImage(selected, "pinpoint-pick-flag"), Object.assign(document.createElement("span"), { className: "pick-name", textContent: selected.name })]
-      : [progress.done ? "Round finished" : tapWords("Click a country on the globe")]));
-    document.getElementById("paintConfirm").disabled = !selected || progress.done;
-
+    // Painted so far (no slots for the ones still to find); the rest once the round is over.
     const missing = round.answers.filter(iso => !state.found.includes(iso));
     document.getElementById("paintFound").replaceChildren(
       ...state.found.map(iso => createNeighbourItem(getCountry(iso), "is-found")),
-      ...(progress.done
-        ? missing.map(iso => createNeighbourItem(getCountry(iso), "is-missed"))
-        : missing.map(() => Object.assign(document.createElement("li"), { className: "neighbour is-hidden", textContent: "?" })))
+      ...(progress.done ? missing.map(iso => createNeighbourItem(getCountry(iso), "is-missed")) : [])
     );
     document.getElementById("paintWrong").replaceChildren(...state.wrong.map(iso => createMissRow(getCountry(iso)?.name || iso, "not one of them")));
+    document.getElementById("paintPainted").classList.toggle("hidden", !state.found.length && !state.wrong.length && !progress.done);
 
     markerGuesses = [];
     globe.clearMarkers();
@@ -18129,12 +18358,12 @@ const ROUND_RENDERERS = {
       // Painted countries are tinted too, so one inside painted neighbours still shows.
       ...state.found.map(iso => ({ country: getCountry(iso), color: 0x5cf28a, fill: true })),
       ...state.wrong.map(iso => ({ country: getCountry(iso), color: 0xff6b7d, fill: true })),
-      ...(progress.done ? missing.map(iso => ({ country: getCountry(iso), color: 0xff8a3d, fill: true })) : []),
-      // Gold, so a selection between painted (green) neighbours doesn't look painted already.
-      ...(selected ? [{ country: selected, color: 0xffd45c, pulse: true, focus: true }] : [])
+      ...(progress.done ? missing.map(iso => ({ country: getCountry(iso), color: 0xff8a3d, fill: true })) : [])
     ]);
     // The globe stays where it is: turning it to the right region gave the answer away.
-    const last = state.found.length || state.wrong.length ? getCountry([...state.found, ...state.wrong].at(-1)) : null;
+    // The country painted last (this visit), or else the last one in the saved lists.
+    const lastIso = [...state.found, ...state.wrong].includes(lastPainted) ? lastPainted : [...state.found, ...state.wrong].at(-1);
+    const last = lastIso ? getCountry(lastIso) : null;
     // The count is in the chip under the globe too, as the list can be out of sight on a phone.
     setStageChip(`${state.found.length}/${total} PAINTED · LAST`, last);
   },
@@ -18405,7 +18634,7 @@ function flashMiss(target) {
 }
 
 const answerBox = id => document.getElementById(id).closest(".input-group");
-const pickCard = round => document.querySelector(`.round-view[data-round="${round}"] .pinpoint-pick`);
+const pickCard = round => document.querySelector(`.round-view[data-round="${round}"] :is(.pinpoint-pick, .paint-hud)`);
 
 function submitMysteryGuess(value, selectedCountry) {
   if (!isPlaying("mystery")) return { status: "locked" };
@@ -18448,11 +18677,10 @@ function handleGlobeClick({ ccn3 }) {
     render({ animateGlobe: false });
     return;
   }
+  // Paint the Map: a click paints the country straight away.
   if (painting) {
     if (state.found.includes(country.iso) || state.wrong.includes(country.iso)) { showProblem(`You already painted ${country.name}.`, pickCard("paint")); return; }
-    paintSelection = country.iso;
-    sounds.playClick();
-    render({ animateGlobe: false });
+    paintCountry(country);
     return;
   }
   if (state.guesses.includes(country.iso)) { showProblem(`You already tried ${country.name}.`, pickCard("pinpoint")); return; }
@@ -18849,13 +19077,12 @@ document.addEventListener("keydown", event => {
   }
 });
 
-// Paint the Map: paint the selected country, right (green) or wrong (red, -200).
-function confirmPaint() {
-  if (!isPlaying("paint") || !paintSelection) return;
+// Paint the Map: paint a clicked country, right (green) or wrong (red, -200).
+function paintCountry(country) {
+  if (!isPlaying("paint")) return;
+  lastPainted = country.iso;
   const round = plan[viewIndex];
   const state = day.rounds[viewIndex];
-  const country = getCountry(paintSelection);
-  paintSelection = null;
   const isRight = round.answers.includes(country.iso);
   if (isRight) {
     state.found.push(country.iso);
@@ -18995,6 +19222,8 @@ function continueFromResult() {
 
 // The end-of-day summary. Each round row opens that round's answer for review.
 let endClimb = null;
+// Hides the end screen's SKIP, if it's still up (also when the screen is left early).
+let endSkip = () => {};
 function showFinalModal() {
   const dayScore = getDayScore(plan, day.rounds);
   const perfect = dayScore.rounds.filter(round => round.isPerfect).length;
@@ -19009,8 +19238,16 @@ function showFinalModal() {
   const stretches = getStretches(dayScore);
   // Played once, then it stays at the day's total.
   endClimb.draw(0, { stretches });
-  endClimb.replay({ stretches });
-  countUp(document.getElementById("modalScore"), dayScore.total, { duration: 1800 });
+  const replayMs = endClimb.replay({ stretches });
+  const finishCount = countUp(document.getElementById("modalScore"), dayScore.total, { duration: 1800 });
+  // The replay and the count-up take a few seconds; SKIP shows the day's end at once.
+  endSkip = showSkip(() => {
+    clearTimeout(skipTimer);
+    endClimb.finish();
+    finishCount();
+  });
+  const hideSkip = endSkip;
+  const skipTimer = setTimeout(hideSkip, Math.max(1800, replayMs || 0));
 
   // You against everyone who played today (sample numbers for now).
   const stats = getDayStats(activeDate, activeMode);
@@ -19042,7 +19279,7 @@ function showFinalModal() {
     );
     row.addEventListener("click", () => {
       sounds.playClick();
-      document.getElementById("victoryModal").classList.add("hidden");
+      { endSkip(); document.getElementById("victoryModal").classList.add("hidden"); }
       goToRound(index);
     });
     item.appendChild(row);
@@ -19248,6 +19485,8 @@ function flyFromMenu() {
   globe.mountTo("globeTransition");
 
   const flight = globe.transitionToGame("globeCanvasContainer", reduceMotion ? 0 : undefined);
+  // The flight takes 2.6 s; SKIP lands the globe at once.
+  const hideSkip = reduceMotion ? () => {} : showSkip(() => globe.skipTransition());
   // Halfway through, narrow the overlay to the globe's area (on small screens the globe
   // sits in a box; on large ones it is the whole window, so nothing narrows).
   setTimeout(() => {
@@ -19255,6 +19494,7 @@ function flyFromMenu() {
     overlay.style.clipPath = `inset(${frame.top}px ${innerWidth - frame.right}px ${innerHeight - frame.bottom}px ${frame.left}px)`;
   }, reduceMotion ? 0 : 1300);
   return flight.then(() => {
+    hideSkip();
     gameView.classList.remove("is-arriving");
     if (globe.mode !== "game") return; // back to the menu mid-flight
     overlay.classList.add("hidden");
@@ -19341,13 +19581,12 @@ function enterGameView(dateKey = today, mode = "competitive") {
     plan = resolvePlan(getDailyPlan(activeDate, activeMode), day.rounds);
     hasFinishedDay = getDayScore(plan, day.rounds).completed;
     pinpointSelection = null;
-    paintSelection = null;
     mysterySelection = null;
     resetCountryInput({ focus: false });
     document.getElementById("deepcutInput").value = "";
     deepcutSuggestion = null;
   }
-  document.getElementById("victoryModal").classList.add("hidden");
+  { endSkip(); document.getElementById("victoryModal").classList.add("hidden"); }
   isGameViewVisible = true;
   // Highs & Lows writes every country's name on the globe; the country puzzles don't.
   globe.setLabels(activeMode === "extremes" ? COUNTRIES : null);
@@ -19381,16 +19620,14 @@ document.getElementById("deepcutSubmit").addEventListener("click", () => { sound
 document.getElementById("deepcutInput").addEventListener("keydown", event => {
   if (event.key === "Enter") { event.preventDefault(); submitDeepCut(); }
 });
-document.getElementById("paintConfirm").addEventListener("click", () => { sounds.playClick(); confirmPaint(); });
 document.getElementById("pinpointConfirm").addEventListener("click", () => { sounds.playClick(); confirmPinpointGuess(); });
-// In Pinpoint and Paint the Map, Enter confirms the selected country (when not typing).
+// In Pinpoint and Highs & Lows, Enter confirms the selected country (when not typing).
 document.addEventListener("keydown", event => {
-  if (event.key !== "Enter" || event.target.closest?.("input, textarea") || !(pinpointSelection || paintSelection || extremeSelection)) return;
+  if (event.key !== "Enter" || event.target.closest?.("input, textarea") || !(pinpointSelection || extremeSelection)) return;
   if (!document.getElementById("roundIntro").classList.contains("hidden")) return;
   event.preventDefault();
   if (pinpointSelection) confirmPinpointGuess();
-  else if (extremeSelection) confirmExtremePick();
-  else confirmPaint();
+  else confirmExtremePick();
 });
 document.getElementById("extremeConfirm").addEventListener("click", () => { sounds.playClick(); confirmExtremePick(); });
 ["pinpointGiveUp", "deepcutGiveUp", "paintDone"].forEach(id => document.getElementById(id).addEventListener("click", giveUpRound));
@@ -19425,7 +19662,7 @@ document.addEventListener("keydown", event => {
 }
 
 // The archive opens over the game; the end screen steps aside for it.
-document.getElementById("endArchiveButton").addEventListener("click", () => document.getElementById("victoryModal").classList.add("hidden"));
+document.getElementById("endArchiveButton").addEventListener("click", () => { endSkip(); document.getElementById("victoryModal").classList.add("hidden"); });
 document.getElementById("copyResultBtn").addEventListener("click", () => { sounds.playClick(); copyResult(); });
 document.getElementById("backToResultsButton").addEventListener("click", () => { sounds.playClick(); showFinalModal(); });
 document.getElementById("roundIntro").addEventListener("click", hideRoundIntro);
@@ -19454,7 +19691,7 @@ document.addEventListener("keydown", event => {
 }, true);
 document.getElementById("reviewRoundsButton").addEventListener("click", () => {
   sounds.playClick();
-  document.getElementById("victoryModal").classList.add("hidden");
+  { endSkip(); document.getElementById("victoryModal").classList.add("hidden"); }
   goToRound(0);
 });
 
@@ -19678,7 +19915,7 @@ phoneFrameObserver.observe(document.querySelector(".side-right"));
 phoneLayout.addEventListener("change", updatePhoneFrame);
 window.addEventListener("resize", updatePhoneFrame);
 // The few "Click" texts written in the page itself.
-if (onTouch) document.querySelectorAll("#pinpointSelection, #paintSelection, .round-intro-start, .climb-hint").forEach(node => { node.textContent = tapWords(node.textContent); });
+if (onTouch) document.querySelectorAll("#pinpointSelection, .round-intro-start, .climb-hint").forEach(node => { node.textContent = tapWords(node.textContent); });
 
 // The round's sheet on a phone has two heights: the round (the default, after every new
 // round) and the globe (the sheet tucked down). Swipe the handle, or tap it, to switch.
