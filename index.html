@@ -6921,7 +6921,10 @@ const EN = {
   "transit.offCity": "off {city}, {code}",
   "transit.near": "near ",
   "transit.onSea": "on the {sea}",
-  "transit.fleetNote": "Part of the Expedition fleet: its names and flight numbers are the game's own. The places are real.",
+  "transit.madeUp.plane": "Flight numbers are made up.",
+  "transit.madeUp.train": "Line names are made up.",
+  "transit.madeUp.ship": "Ship names are made up.",
+  "transit.madeUp.balloon": "Balloon names are made up.",
   "transit.asDrawn": "along the line on the globe",
   "hud.current": "CURRENT LOCATION",
   "hud.campShort": "Everest Base Camp",
@@ -7841,7 +7844,10 @@ const NL = {
   "transit.offCity": "voor de kust van {city}, {code}",
   "transit.near": "bij ",
   "transit.onSea": "op de {sea}",
-  "transit.fleetNote": "Hoort bij de Expedition-vloot: de namen en vluchtnummers zijn van het spel zelf. De plaatsen zijn echt.",
+  "transit.madeUp.plane": "Vluchtnummers zijn verzonnen.",
+  "transit.madeUp.train": "Lijnnamen zijn verzonnen.",
+  "transit.madeUp.ship": "Scheepsnamen zijn verzonnen.",
+  "transit.madeUp.balloon": "Ballonnamen zijn verzonnen.",
   "transit.asDrawn": "langs de lijn op de globe",
   "hud.current": "HUIDIGE PLEK",
   "hud.campShort": "Everest-basiskamp",
@@ -27164,7 +27170,8 @@ function fillTransitCard(card, info, onClose) {
   } else where = t("transit.overCountry", { country: countryName(info.now.country) });
   now.append(element("span", "field-label", t("transit.now")), " ", where);
   card.appendChild(now);
-  if (vehicle.fleet) card.appendChild(element("p", "transit-fleet-note", t("transit.fleetNote")));
+  // Only the names the game made up get a word (a car's "Overland through …" invents nothing).
+  if (vehicle.fleet && info.kind !== "car") card.appendChild(element("p", "transit-fleet-note", t(`transit.madeUp.${info.kind}`)));
   return card;
 }
 
