@@ -3754,6 +3754,12 @@ canvas.place-hud-icon:not(.place-hud-tent) { width: 26px; height: 26px; }
 .archive-globe-foot { margin: 0; color: var(--muted); font: 14px var(--font-body); text-align: center; }
 @media (max-width: 760px) { .archive-globe-foot { font-size: 12px; } }
 
+/* ---------- Today's game done: the tile turns green (refreshPlayTiles in ui.js) ---------- */
+.play-tile[data-state="done"] { --tile: #5cf28a !important; }
+.play-tile[data-state="done"] .play-tile-ribbon { background: #5cf28a; color: #04121a; }
+.play-tile[data-state="done"] small { color: #5cf28a; }
+.play-tile[data-state="done"].is-main { animation: none; }
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -3781,7 +3787,7 @@ canvas.place-hud-icon:not(.place-hud-tent) { width: 26px; height: 26px; }
             <span data-i18n="menu.extremesText">A daily ranking quiz. Earn badges and reach the world's top 1%.</span>
             <small id="menuExtremesStatus"></small>
           </span>
-          <span class="play-tile-go" aria-hidden="true" data-i18n="menu.playNow">▶ PLAY</span>
+          <span class="play-tile-go" aria-hidden="true">▶ PLAY</span>
         </button>
       </div>
     </div>
@@ -6181,6 +6187,8 @@ const EN = {
   "menu.howTo": "HOW TO PLAY",
   "menu.account": "MY ACCOUNT",
   "menu.noDay": "No reviewed day for today yet",
+  "menu.seeResults": "✓ SEE RESULTS",
+  "menu.continueGo": "▶ CONTINUE",
   "menu.played": "✓ Played today",
   "menu.continue": "Continue · round {n} of {total}",
 
@@ -7081,6 +7089,8 @@ const NL = {
   "menu.howTo": "UITLEG",
   "menu.account": "MIJN ACCOUNT",
   "menu.noDay": "Nog geen goedgekeurde dag voor vandaag",
+  "menu.seeResults": "✓ BEKIJK UITSLAG",
+  "menu.continueGo": "▶ VERDER",
   "menu.played": "✓ Vandaag gespeeld",
   "menu.continue": "Verder · ronde {n} van {total}",
 
@@ -22907,7 +22917,7 @@ document.getElementById("howToSkip").addEventListener("click", () => {
 });
 phoneScreen.addEventListener("change", updateHowToPager);
 
-function initializeMainMenu({ onPlay, onHome, describeMode = () => "", isModeAvailable = () => true }) {
+function initializeMainMenu({ onPlay, onHome, describeMode = () => "", modeState = () => "new", isModeAvailable = () => true }) {
   const menu = document.getElementById("mainMenu");
   const menuOptions = menu.querySelector(".menu-secondary");
   const menuButtons = [...menuOptions.querySelectorAll(".menu-option")];
@@ -22967,6 +22977,14 @@ function initializeMainMenu({ onPlay, onHome, describeMode = () => "", isModeAva
     document.getElementById("drawerExtremesStatus").textContent = describeMode("extremes");
     document.getElementById("menuExtremesButton").disabled = !isModeAvailable("extremes");
     document.getElementById("drawerExtremesButton").disabled = !isModeAvailable("extremes");
+    // Done today: the tile turns green and offers the results; started: CONTINUE.
+    [["menuExtremesButton", "extremes"], ["drawerExtremesButton", "extremes"], ["menuCasualButton", "casual"]].forEach(([id, mode]) => {
+      const tile = document.getElementById(id);
+      const state = modeState(mode);
+      tile.dataset.state = state;
+      const go = tile.querySelector(".play-tile-go");
+      if (go) go.textContent = t(state === "done" ? "menu.seeResults" : state === "started" ? "menu.continueGo" : "menu.playNow");
+    });
   }
   refreshPlayTiles();
   onLangChange(refreshPlayTiles);
@@ -28794,13 +28812,19 @@ const ROUND_RENDERERS = {
     if (extremeRevealPending) {
       extremeRevealPending = false;
       const roundIndex = viewIndex;
+      const token = revealToken;
       // The score card waits for the flight and then the tour (see commit).
       extremeFlightDone = flyToPick(roundIndex).then(() => {
-        if (activeMode !== "extremes" || viewIndex !== roundIndex) return null;
+        if (token !== revealToken || activeMode !== "extremes" || viewIndex !== roundIndex || !isGameViewVisible || globe.mode !== "game") return null;
         showHeat();
         playExtremeTour(round, state);
         return extremeTour?.done;
       });
+    } else if (quietArrival) {
+      // Flying in from the menu to a finished round: a clean globe (the results card comes up
+      // on landing); the heat map waits until you open a round.
+      globe.setHeatMap([]);
+      globe.setHighlights([]);
     } else {
       showHeat();
       if (options.animateGlobe) globe.rotateTo(winner.lat, winner.lon, 1100);
@@ -29141,6 +29165,15 @@ const PICK_FLIGHT_MS = 950;
 const PICK_ZOOM_OUT_MS = 550; // zooming out first, when you'd zoomed in to pick
 // The flight in progress, then the tour (the score card waits for both).
 let extremeFlightDone = null;
+// Bumped when you leave a game: a reveal still on its way (the plane to your pick) is dropped
+// then, instead of finishing later and painting the heat map over whatever is on screen.
+let revealToken = 0;
+function cancelPendingReveal() {
+  revealToken += 1;
+  if (pickFlight) { const { resolve } = pickFlight; pickFlight = null; resolve(); }
+  extremeFlightDone = null;
+  extremeRevealPending = false;
+}
 let pickFlight = null; // { roundIndex, track, start, resolve }
 const legTracks = new Map();
 function legTrack(from, to) {
@@ -29982,6 +30015,8 @@ startAmbient(menuTravel, {
       const spot = globe.projectLonLat(pin.lonLat);
       if (!spot.visible) return;
       const box = drawMenuPin(layer.ctx, spot.x, spot.y, SIGN_ICONS[pin.kind], PIN_COLORS[pin.kind], pin.kind === menuFocus || pin.kind === openPin);
+      // Done today: a green tick on the pin's corner.
+      if (pin.kind !== "camp" && cachedModeState(pin.kind) === "done") drawPinTick(layer.ctx, box.right - 6, box.top + 2);
       menuMarks.push({ x: spot.x, y: spot.y, kind: pin.kind, country: pin.country, box });
     });
     layer.placeLabels();
@@ -30063,6 +30098,24 @@ const bigScreen = () => window.matchMedia("(min-width: 761px)").matches;
 // A game's name as players see it (Highs & Lows keeps its English name in every language).
 const gameName = mode => (mode === "extremes" ? "Highs & Lows" : t("mode.casual"));
 
+// Whether today's game is done, looked up at most every two seconds (the pins draw every frame).
+const modeStates = {};
+function cachedModeState(mode) {
+  const now = performance.now();
+  if (!modeStates[mode] || now - modeStates[mode].at > 2000) modeStates[mode] = { at: now, state: modeState(mode) };
+  return modeStates[mode].state;
+}
+// A pixel tick in a green square.
+function drawPinTick(ctx, x, y) {
+  x = Math.round(x);
+  y = Math.round(y);
+  ctx.fillStyle = "#0b1020";
+  ctx.fillRect(x - 10, y - 10, 20, 20);
+  ctx.fillStyle = "#5cf28a";
+  ctx.fillRect(x - 8, y - 8, 16, 16);
+  ctx.fillStyle = "#0b1020";
+  [[-5, 0], [-3, 2], [-1, 4], [1, 2], [3, 0], [5, -2], [7, -4]].forEach(([dx, dy]) => ctx.fillRect(x + dx - 1, y + dy - 1, 2, 2));
+}
 // What the menu looks at: today's main game (featured), or whatever you point at in the
 // Expedition menu (a game, or Base Camp). Each has its place on the globe.
 const featuredMode = () => (hasExtremeDay(today) ? "extremes" : "casual");
@@ -30518,7 +30571,9 @@ function closeGameIntro() {
 }
 
 // Opens the game on a day and mode: today by default, or a past day from the archive.
+let quietArrival = false;
 function enterGameView(dateKey = today, mode = "competitive") {
+  cancelPendingReveal();
   // The globe mode's heat map gives small islands their waters; work those out ahead.
   if (mode === "extremes") globe.prepareWaterZones(COUNTRIES);
   if (dateKey !== activeDate || mode !== activeMode) {
@@ -30545,9 +30600,12 @@ function enterGameView(dateKey = today, mode = "competitive") {
     globe.setMode("game");
   }
   viewIndex = getActiveRoundIndex();
+  // A finished day flies in to a clean globe; its results card comes up on landing.
+  quietArrival = Boolean(flight) && isDayComplete();
   render();
   requestAnimationFrame(() => { updatePhoneFrame(); globe.resize(); });
   const begin = () => {
+    quietArrival = false;
     if (!isGameViewVisible) return; // went back home during the flight
     if (isDayComplete()) { slideCardsIn(); setTimeout(showFinalModal, 400); }
     else showGameIntro(() => showRoundIntro(viewIndex));
@@ -30649,6 +30707,12 @@ document.getElementById("soundToggle").addEventListener("click", () => {
   document.getElementById("soundToggle").setAttribute("aria-label", t(sounds.enabled ? "game.mute" : "game.unmute"));
 });
 
+// How today's game of a mode stands: "done", "started" or "new" (the menu's tiles and pins).
+function modeState(mode) {
+  if (mode === "extremes" && !hasExtremeDay(today)) return "none";
+  const record = getDayRecord(today, mode);
+  return record.completed ? "done" : record.started ? "started" : "new";
+}
 // Under each game in PLAY: how today's game stands.
 function describeMode(mode) {
   if (mode === "extremes" && !hasExtremeDay(today)) return t("menu.noDay");
@@ -30677,6 +30741,7 @@ function askForBase() {
 initializeMainMenu({
   onPlay: mode => enterGameView(today, mode),
   onHome: () => {
+    cancelPendingReveal();
     stopExtremeTour({ all: true });
     extremeHeldRound = null;
     document.getElementById("gameView").classList.remove("is-revealing");
@@ -30688,6 +30753,7 @@ initializeMainMenu({
     if (hasFinishedDay) checkTentUpgrade().then(celebrated => { if (!celebrated) askForBase(); });
   },
   describeMode,
+  modeState,
   isModeAvailable: mode => mode !== "extremes" || hasExtremeDay(today)
 });
 // ---------------------------------------------------------------------------
