@@ -3501,7 +3501,7 @@ h1, h2, h3 { font-weight: normal; }
 .base-later { justify-self: center; background: none; border: 0; padding: 4px 8px; color: var(--muted); font: 9px "Press Start 2P", monospace; letter-spacing: var(--ls-pixel); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .base-later:hover, .base-later:focus-visible { color: var(--text); }
 .base-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.base-line .field-label { flex-basis: 100%; }
+.base-line > .field-label { flex-basis: 100%; }
 .base-where { display: inline-flex; flex: 1; align-items: center; gap: 8px; min-width: 0; }
 .base-where strong { overflow: hidden; font: 600 14px var(--font-body); text-overflow: ellipsis; white-space: nowrap; }
 .base-where small { color: var(--muted); font-size: 14px; }
@@ -3759,6 +3759,40 @@ canvas.place-hud-icon:not(.place-hud-tent) { width: 26px; height: 26px; }
 .play-tile[data-state="done"] .play-tile-ribbon { background: #5cf28a; color: #04121a; }
 .play-tile[data-state="done"] small { color: #5cf28a; }
 .play-tile[data-state="done"].is-main { animation: none; }
+
+/* Your tent's pin colour (base.js createBaseLine): pixel swatches with stepped corners. */
+.tent-colors { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 4px; }
+.tent-colors .field-label { margin-right: 4px; }
+.tent-swatch {
+  width: 22px; height: 22px; padding: 0; border: 0; cursor: pointer;
+  background: var(--swatch);
+  clip-path: polygon(0 3px, 3px 3px, 3px 0, calc(100% - 3px) 0, calc(100% - 3px) 3px, 100% 3px, 100% calc(100% - 3px), calc(100% - 3px) calc(100% - 3px), calc(100% - 3px) 100%, 3px 100%, 3px calc(100% - 3px), 0 calc(100% - 3px));
+  box-shadow: inset 0 0 0 3px #0b1020;
+  transition: transform 0.12s;
+}
+.tent-swatch:hover, .tent-swatch:focus-visible { transform: translateY(-2px); outline: none; }
+.tent-swatch[aria-checked="true"] { box-shadow: inset 0 0 0 3px #0b1020, inset 0 0 0 5px #f4f1e8; }
+
+/* The trip card (ui.js showTripCard): from your tent to a game or Base Camp, with flags and
+   the distance. It stays through the flight in, so the names can be read. */
+.trip-card {
+  position: fixed; top: calc(env(safe-area-inset-top, 0px) + 22px); left: 50%; z-index: 440;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  max-width: calc(100vw - 32px); padding: 10px 18px 12px; translate: -50% 0;
+  border-radius: 10px; background: #0b1020; box-shadow: inset 0 0 0 2px #f4f1e8, 4px 4px 0 rgba(0, 0, 0, 0.45);
+  pointer-events: none; animation: ui-arrive 0.3s ease-out both;
+  transition: opacity 0.4s ease, translate 0.4s ease;
+}
+.trip-card.is-leaving { opacity: 0; translate: -50% -8px; }
+.trip-card-label { color: var(--gold); }
+.trip-card-route { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 10px; }
+.trip-card-place { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.trip-card-place strong { color: var(--text); font: 600 16px var(--font-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.trip-card-flag { width: 24px; height: 16px; object-fit: cover; box-shadow: 0 0 0 1px rgba(244, 241, 232, 0.35); }
+.trip-card-arrow { color: var(--gold); font: 12px var(--font-display); }
+.trip-card-km { color: var(--muted, rgba(244, 241, 232, 0.7)); font: 12px var(--font-mono); }
+@media (max-width: 760px) { .trip-card { top: calc(env(safe-area-inset-top, 0px) + 64px); } }
+@media (prefers-reduced-motion: reduce) { .trip-card { animation: none; transition: none; } }
 
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -6866,6 +6900,8 @@ const EN = {
   "base.cityLabel": "IN",
   "base.note": "Your base shows on your account, and the menu's globe opens over it. You can move it any time under My account.",
   "base.label": "YOUR BASE",
+  "base.color": "PIN COLOUR",
+  "base.colorN": "Colour {n}",
   "base.change": "CHANGE",
   "base.choose": "CHOOSE",
   "menu.tipStarts": p => `${p.game} starts in ${p.country} today`,
@@ -7791,6 +7827,8 @@ const NL = {
   "base.cityLabel": "IN",
   "base.note": "Je basis staat bij je account, en de globe in het menu opent erboven. Verplaatsen kan altijd onder Mijn account.",
   "base.label": "JOUW BASIS",
+  "base.color": "KLEUR PIN",
+  "base.colorN": "Kleur {n}",
   "base.change": "WIJZIG",
   "base.choose": "KIES",
   "menu.tipStarts": p => `${p.game} begint vandaag in ${p.country}`,
@@ -14756,6 +14794,15 @@ async function saveTent(tent) {
   else if (data?.user) user = data.user;
 }
 
+// Your tent pin's colour (base.js TENT_COLORS), kept in the account like the tent.
+async function saveTentColor(tentColor) {
+  const supabase = await getClient();
+  if (!supabase || !user || user.user_metadata?.tentColor === tentColor) return;
+  const { data, error } = await supabase.auth.updateUser({ data: { tentColor } });
+  if (error) console.warn("Couldn't save your tent colour to your account.", error);
+  else if (data?.user) user = data.user;
+}
+
 // Whether Atlas (Base Camp's guide) keeps quiet, kept in the account like the language.
 async function saveAtlasQuiet(atlasQuiet) {
   const supabase = await getClient();
@@ -14822,7 +14869,7 @@ const getGroups = () => call("my_groups");
 // Rows of { user_id, display_name, date, score } for the group's finished days.
 const getGroupBoard = (groupId, from, to) => call("group_board", { group_ref: groupId, from_date: from, to_date: to });
 
-return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, saveBase, saveTent, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, addToGroup, leaveGroup, getGroups, getGroupBoard };
+return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, saveBase, saveTent, saveTentColor, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, addToGroup, leaveGroup, getGroups, getGroupBoard };
 })();
 
 // ---- round-pictures.js
@@ -22461,6 +22508,45 @@ function showSkip(onSkip) {
   return hide;
 }
 
+// The trip card over a flight from your tent to a game or Base Camp: where from and where
+// to, each with its flag, and how far. It sits at the top of the screen and stays through the
+// flight and the flight in, so there's time to read it; leave(ms) fades it out after ms.
+function showTripCard({ label = "", from, to, km = null }) {
+  const card = document.createElement("div");
+  card.className = "trip-card";
+  card.setAttribute("role", "status");
+  const place = ({ name, country }) => {
+    const wrap = document.createElement("span");
+    wrap.className = "trip-card-place";
+    if (country) {
+      const flag = createFlagImage(country, "trip-card-flag");
+      flag.loading = "eager";
+      wrap.appendChild(flag);
+    }
+    wrap.appendChild(Object.assign(document.createElement("strong"), { textContent: name }));
+    return wrap;
+  };
+  if (label) card.appendChild(Object.assign(document.createElement("span"), { className: "field-label trip-card-label", textContent: label }));
+  const route = document.createElement("span");
+  route.className = "trip-card-route";
+  route.append(place(from), Object.assign(document.createElement("span"), { className: "trip-card-arrow", textContent: "›" }), place(to));
+  card.appendChild(route);
+  if (km) card.appendChild(Object.assign(document.createElement("span"), { className: "trip-card-km", textContent: `${km} km` }));
+  document.body.appendChild(card);
+  let timer = 0;
+  const remove = () => { clearTimeout(timer); card.remove(); };
+  return {
+    remove,
+    leave(ms = 0) {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        card.classList.add("is-leaving");
+        timer = setTimeout(remove, 400);
+      }, ms);
+    }
+  };
+}
+
 // A card in the middle of the screen that opens like a pack: its steps (elements already
 // in the card, each with a status) start face down and turn over one at a time, matches
 // popping with a chime. It then waits for its button (a click or Enter); a click while
@@ -23375,7 +23461,7 @@ function setGuessHighlight(index, active) {
 }
 
 
-return { redactCountryName, showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, showSkip, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, renderProgressiveHints, renderGlobeMarkerTooltip, PLAY_ART, PLAY_ART_COLORS, showHowToSet, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight };
+return { redactCountryName, showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, showSkip, showTripCard, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, renderProgressiveHints, renderGlobeMarkerTooltip, PLAY_ART, PLAY_ART_COLORS, showHowToSet, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, renderGuessHistory, setGuessHighlight };
 })();
 
 // ---- archive-map.js
@@ -24894,7 +24980,7 @@ __modules["base.js"] = (() => {
 // first visit (pickBase); you can change it under My account. Kept in this browser and,
 // signed in, in the account (user metadata "base"; the account wins when you sign in).
 const { sounds } = __modules["audio.js"];
-const { getUser, saveBase, saveLanguage, saveTent } = __modules["auth.js"];
+const { getUser, saveBase, saveLanguage, saveTent, saveTentColor } = __modules["auth.js"];
 const { CAPITALS } = __modules["capital-data.js"];
 const { CITIES } = __modules["place-data.js"];
 const { createAtlasSprite } = __modules["atlas.js"];
@@ -24907,6 +24993,21 @@ const BASE_KEY = "daily-geography:base:v1";
 // The tent's spot in that country: a real city (place-data.js), the capital by default.
 const TENT_KEY = "daily-geography:tent:v1";
 const listeners = new Set();
+// Your tent's pin colour on the globe (and its place in the HUD): one of TENT_COLORS,
+// picked under My account. Kept in this browser and, signed in, in the account (user
+// metadata "tentColor"; the account wins when you sign in).
+const COLOR_KEY = "daily-geography:tent-color:v1";
+const TENT_COLORS = ["#ff9f43", "#ff5a5a", "#b48cff", "#5b8cff", "#36d6b0", "#a8f060", "#f4f1e8"];
+let tentColor = (() => { try { return localStorage.getItem(COLOR_KEY); } catch { return null; } })();
+if (!TENT_COLORS.includes(tentColor)) tentColor = TENT_COLORS[0];
+const getTentColor = () => tentColor;
+function setTentColor(color, { save = true } = {}) {
+  if (!TENT_COLORS.includes(color) || color === tentColor) return;
+  tentColor = color;
+  try { localStorage.setItem(COLOR_KEY, color); } catch { /* storage off */ }
+  if (save && getUser()) saveTentColor(color);
+  listeners.forEach(listener => listener(getBase()));
+}
 let baseIso = (() => { try { return localStorage.getItem(BASE_KEY) || null; } catch { return null; } })();
 if (baseIso && !getCountry(baseIso)) baseIso = null;
 let tent = (() => { try { return JSON.parse(localStorage.getItem(TENT_KEY) || "null"); } catch { return null; } })();
@@ -24953,6 +25054,9 @@ function setBase(iso, { save = true, spot = null } = {}) {
 // After signing in: the account's tent (or older base) wins; an account without one gets
 // this browser's.
 function syncBase(account) {
+  const storedColor = account?.user_metadata?.tentColor;
+  if (TENT_COLORS.includes(storedColor)) setTentColor(storedColor, { save: false });
+  else if (account) saveTentColor(tentColor);
   const storedTent = account?.user_metadata?.tent;
   const stored = account?.user_metadata?.base;
   if (isTent(storedTent)) {
@@ -25133,13 +25237,31 @@ function createBaseLine({ onChange = null } = {}) {
       onChange?.();
     });
     line.append(where, change);
+    // The pin's colour: a row of pixel swatches (only with a tent to colour).
+    if (base) {
+      const colors = document.createElement("div");
+      colors.className = "tent-colors";
+      colors.setAttribute("role", "radiogroup");
+      colors.setAttribute("aria-label", t("base.color"));
+      colors.appendChild(Object.assign(document.createElement("span"), { className: "field-label", textContent: t("base.color") }));
+      TENT_COLORS.forEach((color, index) => {
+        const swatch = Object.assign(document.createElement("button"), { type: "button", className: "tent-swatch" });
+        swatch.style.setProperty("--swatch", color);
+        swatch.setAttribute("role", "radio");
+        swatch.setAttribute("aria-checked", String(color === tentColor));
+        swatch.setAttribute("aria-label", t("base.colorN", { n: index + 1 }));
+        swatch.addEventListener("click", () => { sounds.playClick(); setTentColor(color); });
+        colors.appendChild(swatch);
+      });
+      line.appendChild(colors);
+    }
   };
   render();
   listeners.add(render);
   return line;
 }
 
-return { getBase, onBaseChange, tentSpots, getTent, tentLonLat, setBase, syncBase, pickBase, createBaseLine };
+return { TENT_COLORS, getTentColor, setTentColor, getBase, onBaseChange, tentSpots, getTent, tentLonLat, setBase, syncBase, pickBase, createBaseLine };
 })();
 
 // ---- travel.js
@@ -25816,9 +25938,13 @@ function describeRoute(route, countryOf) {
 // ---------- Playing a journey ----------
 
 const ease = t => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
-// Milliseconds per leg: planes take longer the farther they fly; ground legs are short. A
-// direct flight (directFlight) is a quick sweep: under 1.8 s whatever the distance.
-const legDuration = leg => leg.direct ? Math.min(1800, Math.max(900, 800 + leg.track.km * 0.1))
+// Every flight from one place to another in the menu (your tent to a game, to Base Camp,
+// and the flight into the game or back to the menu) takes FLIGHT_MS, eased in and out
+// (ease-in-out cubic): a direct flight is DIRECT_LIFT_MS of lift-off plus the rest.
+const FLIGHT_MS = 1400;
+const DIRECT_LIFT_MS = 300;
+// Milliseconds per leg: planes take longer the farther they fly; ground legs are short.
+const legDuration = leg => leg.direct ? FLIGHT_MS - DIRECT_LIFT_MS
   : leg.kind === "plane" ? Math.min(2600, Math.max(1000, 900 + leg.track.km * 0.25)) : leg.kind === "hiker" ? 1300 : 1200;
 
 // One plane, straight from one place to another on its great circle: every trip from your
@@ -25920,7 +26046,7 @@ function shortest(from, to) {
   return ((to - from + 540) % 360) - 180;
 }
 
-return { SPRITES, drawSprite, spriteCanvas, spriteIcon, distance, interpolate, makeTrack, AMBIENT, BASE_CAMP_POINT, placeOf, baseCampJourney, planJourney, getDayPlace, createTravelLayer, localTraffic, createWorldTraffic, startAmbient, TYPICAL_KMH, describeRoute, legDuration, directFlight, playJourney };
+return { SPRITES, drawSprite, spriteCanvas, spriteIcon, distance, interpolate, makeTrack, AMBIENT, BASE_CAMP_POINT, placeOf, baseCampJourney, planJourney, getDayPlace, createTravelLayer, localTraffic, createWorldTraffic, startAmbient, TYPICAL_KMH, describeRoute, FLIGHT_MS, DIRECT_LIFT_MS, legDuration, directFlight, playJourney };
 })();
 
 // ---- social.js
@@ -25945,9 +26071,10 @@ const { addFriend, addToGroup, createGroup, getFriends, getGroupBoard, getGroups
 const { createAtlas, createAtlasSprite, createFlag, createTent, isAtlasQuiet, onAtlasQuietChange, setAtlasQuiet, syncAtlasQuiet } = __modules["atlas.js"];
 const { createBadge, createMedal, getGroupMedal } = __modules["badges.js"];
 const { createBaseLine } = __modules["base.js"];
-const { BASE_CAMP_POINT, createTravelLayer, directFlight, playJourney, spriteIcon } = __modules["travel.js"];
+const { BASE_CAMP_POINT, DIRECT_LIFT_MS, FLIGHT_MS, createTravelLayer, directFlight, playJourney } = __modules["travel.js"];
+const { getCountry } = __modules["daily.js"];
 const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getTopPercent } = __modules["community.js"];
-const { showSkip, showToastNotice } = __modules["ui.js"];
+const { showSkip, showToastNotice, showTripCard } = __modules["ui.js"];
 const { countryName, locale, onLangChange, t } = __modules["i18n.js"];
 
 const PENDING_INVITE_KEY = "daily-geography:pending-invite:v1";
@@ -26206,14 +26333,12 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     globe.startJourney();
     const layer = createTravelLayer(modal, point => globe.projectLonLat(point));
     modal.insertBefore(layer.canvas, modal.firstChild);
-    const banner = element("div", "travel-banner");
     const camp = { get name() { return t("menu.community"); }, iso: "NP" };
     const legs = directFlight(origin?.lonLat || [85.32, 27.71], BASE_CAMP_POINT, { fromStation: origin ? { name: origin.short, iso: origin.country.iso } : null, toStation: camp });
-    const showLeg = () => banner.replaceChildren(spriteIcon("plane", 2), element("strong", "", `${origin?.short || ""} › ${camp.name}`));
-    modal.appendChild(banner);
-    journey = playJourney(globe, layer, legs, { onLeg: showLeg, liftMs: 500 });
+    // The trip card stays until the page opens, so there's time to read it.
+    const tripCard = origin ? showTripCard({ from: { name: origin.short, country: origin.country }, to: { name: camp.name, country: getCountry("NP") } }) : null;
+    journey = playJourney(globe, layer, legs, { liftMs: DIRECT_LIFT_MS });
     if (!skipped) await journey.done;
-    banner.remove();
 
     // Arrived: the mountain scene opens straight away (over the trip's last tags, which stay
     // until it covers them), then the page.
@@ -26222,6 +26347,8 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
       const at = (ms, fn) => timers.push(setTimeout(fn, ms));
       finishLanding = () => {
         timers.forEach(clearTimeout);
+        if (skipped) tripCard?.remove();
+        else tripCard?.leave(300);
         hideSkip();
         landing = null;
         layer.remove();
@@ -26231,7 +26358,7 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
       };
       if (skipped) { finishLanding(); return; }
       at(LANDING.iris, () => { modal.classList.add("is-iris"); sounds.playReveal("match", 0); });
-      at(LANDING.page, () => modal.classList.add("is-open"));
+      at(LANDING.page, () => { modal.classList.add("is-open"); });
       at(LANDING.done, finishLanding);
     });
   }
@@ -26251,7 +26378,7 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     modal.classList.remove("is-closing");
     if (dove) {
       dove = false;
-      const rise = globe.riseToMenu(reduceMotion ? 0 : undefined);
+      const rise = globe.riseToMenu(reduceMotion ? 0 : FLIGHT_MS);
       // The menu fades back in over the last part of the flight.
       setTimeout(() => menu.classList.remove("is-camp"), reduceMotion ? 0 : MENU_BACK_MS);
       await rise;
@@ -27208,9 +27335,9 @@ const { sounds } = __modules["audio.js"];
 const { createDistributionChart, initializeHistoryScreens } = __modules["screens.js"];
 const { RANK_TIERS, formatTopPercent, getDayStats, getTopPercent } = __modules["community.js"];
 const { initializeCommunity } = __modules["social.js"];
-const { createBaseLine, getBase, getTent, onBaseChange, pickBase, syncBase, tentLonLat } = __modules["base.js"];
+const { createBaseLine, getBase, getTent, getTentColor, onBaseChange, pickBase, syncBase, tentLonLat } = __modules["base.js"];
 const { celebrateTent, createTentCanvas, tentLevel, tentToCelebrate } = __modules["tents.js"];
-const { createTravelLayer, createWorldTraffic, describeRoute, directFlight, distance: distanceOnGlobe, drawSprite, getDayPlace, localTraffic, makeTrack, placeOf, playJourney, spriteCanvas, startAmbient } = __modules["travel.js"];
+const { DIRECT_LIFT_MS, FLIGHT_MS, createTravelLayer, createWorldTraffic, describeRoute, directFlight, distance: distanceOnGlobe, drawSprite, getDayPlace, localTraffic, makeTrack, placeOf, playJourney, spriteCanvas, startAmbient } = __modules["travel.js"];
 const { fillTransitCard } = __modules["transit-card.js"];
 const { CAPITALS } = __modules["capital-data.js"];
 const { FIND_LABELS, askQuestion, formatValue, getStandings, getStat, missingReason, scorePick } = __modules["extremes.js"];
@@ -27219,7 +27346,7 @@ const { LANGUAGES, applyI18n, clueText, countryName, getLang, localNames, locale
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
 const { hasExtremeDay, MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MAIN_MODE, MODES, MODE_INFO, getSpeedWindow, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
-const { showHowToSet, createFlagImage, PLAY_ART, PLAY_ART_COLORS, createGuessRow, initializeCountryInput, initializeMainMenu, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, showToastNotice, showSkip, updateDailyScoreUI } = __modules["ui.js"];
+const { showHowToSet, createFlagImage, PLAY_ART, PLAY_ART_COLORS, createGuessRow, initializeCountryInput, initializeMainMenu, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, showToastNotice, showSkip, showTripCard, updateDailyScoreUI } = __modules["ui.js"];
 
 // v3: Deep Cut and Paint the Map replaced Capital Call and Border Patrol (October 2026).
 const DAY_STORAGE_PREFIX = "daily-geography:day:v3:";
@@ -29997,9 +30124,10 @@ startAmbient(menuTravel, {
     const base = getBase();
     if (base) {
       const here = globe.projectLonLat(tentLonLat());
+      // Your tent: a pin like the others, framed in the colour you picked (My account).
       if (here.visible) {
-        drawSprite(layer.ctx, tentSprite(), here.x, here.y - 14, { scale: 2 });
-        menuMarks.push({ x: here.x, y: here.y - 14, kind: "base" });
+        const box = drawMenuPin(layer.ctx, here.x, here.y, tentPinIcon(), getTentColor(), false);
+        menuMarks.push({ x: here.x, y: here.y, kind: "base", box });
       }
     }
     // The places as pins with their own logo (no words): Highs & Lows' bars, Casual's
@@ -30424,19 +30552,14 @@ const TRAVELLED_KEY = "daily-geography:travelled:v1";
 const hasTravelled = dateKey => { try { return localStorage.getItem(TRAVELLED_KEY) === dateKey; } catch { return true; } };
 const markTravelled = dateKey => { try { localStorage.setItem(TRAVELLED_KEY, dateKey); } catch { /* storage off */ } };
 
-// A small banner over a trip: from your base to where it goes.
-function showTravelBanner(host, text, label = t("travel.today")) {
-  const banner = Object.assign(document.createElement("div"), { className: "travel-banner" });
-  banner.append(Object.assign(document.createElement("span"), { className: "field-label", textContent: label }), Object.assign(document.createElement("strong"), { textContent: text }));
-  host.appendChild(banner);
-  return banner;
-}
-
 // From the menu, the globe flies out from the horizon into its place in the game while
 // the menu box drifts away; the game's cards fade in around the globe as it lands. Each
 // day the game starts over the day's place (getDayPlace). The first game of the day travels
 // there first, from your base: a short leg over land or water, a plane, and a short leg in
 // (travel.js), with SKIP.
+// The trip card of the flight from your tent (showTripCard), and how long it stays after landing.
+let tripCard = null;
+const TRIP_CARD_HOLD_MS = 1600;
 function flyFromMenu() {
   const menu = document.getElementById("mainMenu");
   const overlay = document.getElementById("globeTransition");
@@ -30468,14 +30591,20 @@ function flyFromMenu() {
       markTravelled(today);
       globe.startJourney();
       const layer = createTravelLayer(overlay, point => globe.projectLonLat(point));
-      const banner = showTravelBanner(overlay, `${origin.short} › ${targetName} · ${num(Math.round(kmBetween(origin.lonLat, target) / 50) * 50)} km`, activeDate === today ? t("travel.today") : t("common.day", { n: getPuzzleNumber(activeDate) }).toUpperCase());
+      // The trip card stays through the flight in and a moment after landing (TRIP_CARD_HOLD_MS).
+      tripCard?.remove();
+      tripCard = showTripCard({
+        label: activeDate === today ? t("travel.today") : t("common.day", { n: getPuzzleNumber(activeDate) }).toUpperCase(),
+        from: { name: origin.short, country: origin.country },
+        to: { name: targetName, country: place },
+        km: num(Math.round(kmBetween(origin.lonLat, target) / 50) * 50)
+      });
       const legs = directFlight(origin.lonLat, target, { fromStation: { name: origin.short, iso: origin.country.iso }, toStation: { name: targetName, iso: place.iso } });
-      const journey = playJourney(globe, layer, legs, { liftMs: 500 });
+      const journey = playJourney(globe, layer, legs, { liftMs: DIRECT_LIFT_MS });
       const hideJourneySkip = showSkip(() => journey.skip());
       await journey.done;
       hideJourneySkip();
       layer.remove();
-      banner.remove();
       fromJourney = true;
     }
     gameView.classList.add("is-arriving");
@@ -30483,8 +30612,8 @@ function flyFromMenu() {
     const arrived = cinematicArrival;
     cinematicArrival = false;
     const [startLon, startLat] = startLonLat(activeMode, activeDate);
-    const flight = globe.transitionToGame("globeCanvasContainer", reduceMotion ? 0 : fromJourney || arrived ? 1600 : undefined, { view: { lat: startLat, lon: startLon }, fromJourney });
-    // The flight takes 2.6 s (1.6 s after a trip); SKIP lands the globe at once.
+    const flight = globe.transitionToGame("globeCanvasContainer", reduceMotion ? 0 : FLIGHT_MS, { view: { lat: startLat, lon: startLon }, fromJourney });
+    // The flight takes FLIGHT_MS (1.4 s); SKIP lands the globe at once.
     const hideSkip = reduceMotion ? () => {} : showSkip(() => globe.skipTransition());
     // Halfway through, narrow the overlay to the globe's area (on small screens the globe
     // sits in a box; on large ones it is the whole window, so nothing narrows).
@@ -30495,7 +30624,8 @@ function flyFromMenu() {
     await flight;
     hideSkip();
     gameView.classList.remove("is-arriving");
-    if (globe.mode !== "game") return; // back to the menu mid-flight
+    if (globe.mode !== "game") { tripCard?.remove(); tripCard = null; return; } // back to the menu mid-flight
+    tripCard?.leave(TRIP_CARD_HOLD_MS);
     overlay.classList.add("hidden");
     menu.classList.add("hidden");
     menu.classList.remove("is-leaving");
@@ -30741,6 +30871,8 @@ function askForBase() {
 initializeMainMenu({
   onPlay: mode => enterGameView(today, mode),
   onHome: () => {
+    tripCard?.remove();
+    tripCard = null;
     cancelPendingReveal();
     stopExtremeTour({ all: true });
     extremeHeldRound = null;
@@ -31196,6 +31328,25 @@ async function checkTentUpgrade() {
 }
 // The base's flag on the menu globe is your tent now.
 const tentSprite = () => `tent${currentTentLevel()}`;
+const tentPinIcons = {};
+// The tent's pin icon, made once per tent level: the sprite centred in a 16×16 square
+// (the small first tents sit low in their sprite), like the other pins' logos.
+function tentPinIcon() {
+  const name = tentSprite();
+  if (tentPinIcons[name]) return tentPinIcons[name];
+  const sprite = spriteCanvas(name);
+  const pixels = sprite.getContext("2d").getImageData(0, 0, sprite.width, sprite.height).data;
+  let top = sprite.height;
+  let bottom = -1;
+  for (let y = 0; y < sprite.height; y += 1) for (let x = 0; x < sprite.width; x += 1) {
+    if (pixels[(y * sprite.width + x) * 4 + 3]) { top = Math.min(top, y); bottom = Math.max(bottom, y); }
+  }
+  const icon = document.createElement("canvas");
+  icon.width = icon.height = 16;
+  const offset = bottom < 0 ? 0 : Math.floor((16 - (bottom - top + 1)) / 2) - top;
+  icon.getContext("2d").drawImage(sprite, (16 - sprite.width) / 2, offset);
+  return (tentPinIcons[name] = icon);
+}
 
 // ---------------------------------------------------------------------------
 // Where you are: a small card in the top-right corner of the home screen (only there). It
@@ -31254,7 +31405,7 @@ function updatePlaceHud() {
   const target = homeTarget();
   const km = kmBetween(origin.lonLat, target.lonLat);
   const label = t(origin.tent ? "hud.tent" : "hud.current");
-  const key = [label, origin.name, target.key, target.label, target.country.iso, km, currentTentLevel()].join("|");
+  const key = [label, origin.name, target.key, target.label, target.country.iso, km, currentTentLevel(), getTentColor()].join("|");
   if (key === hudKey) return;
   const targetChanged = hudKey && hudKey.split("|")[2] !== target.key;
   hudKey = key;
@@ -31277,7 +31428,7 @@ function updatePlaceHud() {
     Object.assign(document.createElement("em"), { textContent: km < 30 ? t("hud.here") : `${num(km < 1000 ? Math.round(km / 10) * 10 : Math.round(km / 50) * 50)} km` }));
   text.append(Object.assign(document.createElement("span"), { className: "field-label", textContent: label }), where, trip);
   placeHud.replaceChildren(icon, text);
-  placeHud.style.setProperty("--hud", origin.tent ? "#ffd45c" : PIN_COLORS.extremes);
+  placeHud.style.setProperty("--hud", origin.tent ? getTentColor() : PIN_COLORS.extremes);
   placeHud.title = t("hud.show");
   placeHud.setAttribute("aria-label", t("hud.aria", { from: origin.name, to: `${target.label} ${toName}`, km: num(km) }));
   hudTarget = origin.lonLat;
