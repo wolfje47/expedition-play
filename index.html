@@ -3123,6 +3123,8 @@ h1, h2, h3 { font-weight: normal; }
 /* A date without a game: like a future day, but crossed out. */
 .day-cell.is-nogame { background: none; color: var(--faint); opacity: 0.5; cursor: default; text-decoration: line-through; }
 .day-cell.is-nogame:not(.is-today) { border: 0; }
+/* Tapping a day that can't be played says why, just above it. */
+.day-cell-tip { position: fixed; z-index: 400; transform: translateY(-100%); padding: 8px 12px; border: 1px solid var(--glass-line-soft); border-radius: 10px; background: rgba(10, 15, 29, 0.96); color: var(--text); font: 14px/1.4 var(--font-body); text-align: center; pointer-events: none; }
 .day-cell.is-progress { border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); background: rgba(10, 15, 29, 0.95); color: var(--text); }
 .day-cell-ring { width: 18px; height: 18px; border-radius: 50%; background: conic-gradient(var(--accent) var(--done), var(--line) 0); -webkit-mask: radial-gradient(circle, transparent 5px, #000 6px); mask: radial-gradient(circle, transparent 5px, #000 6px); }
 .day-cell.is-today { box-shadow: 0 0 0 2px var(--text); }
@@ -23149,6 +23151,26 @@ function groupByWeek(days) {
 const heatOf = topPercent => topPercent <= 10 ? 1 : topPercent <= 25 ? 2 : topPercent <= 50 ? 3 : 4;
 const todayKey = () => new Date().toISOString().slice(0, 10);
 
+// A short note above a calendar cell that can't be played, gone after a moment.
+let cellTip = null;
+let cellTipTimer = 0;
+function showCellTip(cell, text) {
+  if (!cellTip) {
+    cellTip = element("div", "day-cell-tip");
+    cellTip.setAttribute("role", "status");
+  }
+  cellTip.textContent = text;
+  (cell.closest(".modal-overlay") || document.body).appendChild(cellTip);
+  const box = cell.getBoundingClientRect();
+  const width = Math.min(260, window.innerWidth - 32);
+  cellTip.style.width = `${width}px`;
+  cellTip.style.left = `${Math.max(16, Math.min(window.innerWidth - 16 - width, box.left + box.width / 2 - width / 2))}px`;
+  cellTip.style.top = `${Math.max(8, box.top - 8)}px`;
+  cellTip.classList.remove("hidden");
+  clearTimeout(cellTipTimer);
+  cellTipTimer = setTimeout(() => cellTip.classList.add("hidden"), 2400);
+}
+
 function createDayCell(day, { isSelected, onSelect }) {
   const cell = element("button", "day-cell");
   cell.type = "button";
@@ -23158,10 +23180,12 @@ function createDayCell(day, { isSelected, onSelect }) {
   if (state === "played") cell.classList.add(`heat-${heatOf(day.topPercent)}`);
   if (state === "progress") cell.style.setProperty("--done", `${roundsDone / day.rounds.length * 360}deg`);
   if (state === "future" || state === "nogame") {
-    cell.disabled = true;
+    // Not playable, but a tap says why (phones have no hover for the title).
+    cell.setAttribute("aria-disabled", "true");
     cell.classList.toggle("is-today", day.isToday);
     cell.appendChild(element("span", "day-cell-number", String(day.puzzleNumber)));
     cell.title = t(state === "future" ? "archive.cellFuture" : "archive.cellNoGame", { n: day.puzzleNumber });
+    cell.addEventListener("click", () => showCellTip(cell, cell.title));
     return cell;
   }
   cell.classList.toggle("is-today", day.isToday);
