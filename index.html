@@ -3513,25 +3513,24 @@ h1, h2, h3 { font-weight: normal; }
 .base-lang[aria-pressed="true"] { background: var(--cyan); color: #04121a; }
 .travel-banner:empty { display: none; }
 
-/* ---------- The menu as a hub (8 November 2026) ----------
-   The globe with your base fills the screen; the menu is one calm hub at the bottom centre
-   so the globe stays in view. Highs & Lows is the big, glowing button in the middle (the
-   thing to click); Casual and Base Camp sit small beside it; one quiet row of icons under
-   them (Archive, Stats, How to play, My account, Language). At the top only the word
-   EXPEDITION, nothing covering the globe. A phone: the same, stacked, nothing to swipe:
-   Highs & Lows full width, Casual and Base Camp side by side, then the five icons. */
+/* ---------- The menu: a hero card and the Expedition menu (9 November 2026) ----------
+   The globe fills the screen and looks at today's main game. At the top only the menu
+   button (≡) and the word EXPEDITION; at the bottom one hero card: Highs & Lows with ▶ PLAY,
+   one click to play. Everything else is in the Expedition menu, a drawer from the left:
+   today's games, Base Camp (the week at a glance) and a footer of icons (Archive, Stats,
+   How to play, My account, Language). Pointing at a game or Base Camp turns the globe to
+   it (engine.js, focusMenuStop); while the drawer is open the hero steps aside. */
 .main-menu { display: block; min-height: 100dvh; padding: 0; }
 .main-menu .menu-cabinet {
   position: fixed;
   inset: 0;
   z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 220px) minmax(0, 440px) minmax(0, 220px) minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr) auto auto;
-  column-gap: 12px;
-  row-gap: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
   width: auto;
-  padding: calc(env(safe-area-inset-top, 0px) + 20px) 24px calc(env(safe-area-inset-bottom, 0px) + 20px);
+  padding: calc(env(safe-area-inset-top, 0px) + 16px) 20px calc(env(safe-area-inset-bottom, 0px) + 20px);
   border: 0;
   border-radius: 0;
   background: none;
@@ -3541,67 +3540,99 @@ h1, h2, h3 { font-weight: normal; }
   text-align: left;
   pointer-events: none;
 }
-.main-menu .menu-cabinet > *,
-.main-menu #menuPlayOptions > * { pointer-events: auto; }
-/* Only the word at the top: no box, no icons over the globe. */
-.main-menu .menu-marquee { grid-column: 1 / -1; grid-row: 1; justify-self: start; display: block; padding: 0; border: 0; background: none; }
+.main-menu .menu-cabinet > * > * { pointer-events: auto; }
+/* The top: the menu button and the word, nothing else over the globe. */
+.main-menu .menu-marquee { display: flex; align-items: center; gap: 12px; justify-self: start; padding: 0; border: 0; background: none; }
 .main-menu .menu-logo,
 .main-menu .menu-tagline { display: none; }
 .main-menu .menu-marquee h1 { font: 12px/1.4 var(--font-display); letter-spacing: var(--ls-pixel); text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 18px color-mix(in srgb, var(--accent) 40%, transparent); }
-/* The games and Base Camp in one row. */
-.main-menu #menuPlayOptions { display: contents; }
-.main-menu .play-tile,
-.main-menu .menu-community-card,
-.main-menu .menu-secondary .menu-option { -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); box-shadow: var(--glass-shine), 0 10px 26px rgba(0, 0, 0, 0.4); }
-.main-menu .play-tile { background-color: rgba(10, 15, 30, 0.74); }
-.main-menu #menuExtremesButton { grid-column: 3; grid-row: 3; align-self: stretch; padding: 1.1rem 1rem; }
-.main-menu #menuCasualButton { grid-column: 2; grid-row: 3; align-self: end; grid-template-columns: 44px 1fr; gap: 0.6rem; padding: 0.6rem; }
-.main-menu .menu-community-card { grid-column: 4; grid-row: 3; align-self: end; display: grid; padding: 0.5rem; border: 1px solid var(--glass-line); border-radius: 16px; background: rgba(10, 15, 30, 0.74); transition: opacity 0.35s ease, transform 0.35s ease; }
-/* Casual and Base Camp small: a name and one line. */
-.main-menu #menuCasualButton .play-tile-art { height: 44px; }
-.main-menu #menuCasualButton .play-tile-art svg { width: 32px; height: 32px; }
-.main-menu #menuCasualButton .play-tile-text > span { display: none; }
-.main-menu .menu-community-card :is(.glance-board, .glance-text, .glance-extra, .glance-more, .glance-call, .glance-group) { display: none; }
-.main-menu .menu-community-card .glance-open { gap: 4px; padding: 0.2rem; }
-.main-menu .menu-community-card .glance-head .atlas-sprite { width: 32px; height: 32px; }
-.main-menu .menu-community-card .glance-head small { display: none; }
-.glance-line { display: none; }
-.main-menu .glance-line { display: block; color: var(--muted); font: 12px/1.3 var(--font-body); }
-/* One quiet row of icons under the games. */
-.main-menu .menu-secondary { grid-column: 2 / 5; grid-row: 4; justify-self: center; display: flex; gap: 6px; margin: 0; }
-.main-menu .menu-secondary .community-open-button { display: none; }
-.main-menu .menu-secondary .menu-option,
-.main-menu .menu-secondary #menuStatsButton { position: static; grid-column: auto; order: 0; flex-direction: row; justify-content: center; gap: 6px; width: auto; height: auto; min-width: 0; min-height: 34px; padding: 4px 10px 4px 5px; border-radius: 10px; background: rgba(10, 15, 30, 0.6); font-size: 9px; text-align: left; }
-.main-menu .menu-secondary .menu-option-note { display: none; }
-.main-menu .menu-secondary .menu-pixel-icon,
-.main-menu .menu-secondary .lang-button-icon { width: 24px; height: 24px; padding: 4px; flex: none; }
-.main-menu .menu-secondary .lang-button-icon { box-sizing: border-box; border-radius: 7px; background: #04121a; }
+.menu-drawer-toggle { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 1px solid var(--glass-line); border-radius: 10px; background: rgba(10, 15, 30, 0.74); color: var(--text); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); box-shadow: var(--glass-shine), 0 8px 20px rgba(0, 0, 0, 0.4); cursor: pointer; transition: border-color 0.15s ease, color 0.15s ease, opacity 0.3s ease; }
+.menu-drawer-toggle svg { width: 20px; height: 20px; }
+.menu-drawer-toggle:hover,
+.menu-drawer-toggle:focus-visible { border-color: var(--cyan); color: var(--cyan); outline: none; }
+.main-menu.is-drawer-open .menu-drawer-toggle { opacity: 0; pointer-events: none; }
 
-@media (max-width: 760px) {
-  .main-menu .menu-cabinet {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr) auto auto auto;
-    gap: 8px;
-    padding: calc(env(safe-area-inset-top, 0px) + 14px) 12px calc(env(safe-area-inset-bottom, 0px) + 12px);
-  }
-  .main-menu #menuExtremesButton { grid-column: 1 / 3; grid-row: 3; }
-  .main-menu #menuCasualButton { grid-column: 1; grid-row: 4; align-self: stretch; grid-template-columns: 38px 1fr; padding: 0.5rem; }
-  .main-menu #menuCasualButton .play-tile-art { height: 38px; }
-  .main-menu .menu-community-card { grid-column: 2; grid-row: 4; align-self: stretch; padding: 0.4rem; }
-  .main-menu .menu-community-card .glance-head .atlas-sprite { width: 26px; height: 26px; }
-  .main-menu .menu-secondary { grid-column: 1 / 3; grid-row: 5; justify-self: stretch; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
-  .main-menu .menu-secondary .menu-option,
-  .main-menu .menu-secondary #menuStatsButton { flex-direction: column; gap: 3px; padding: 5px 2px; font-size: 8px; text-align: center; }
-  .main-menu .menu-secondary .menu-option span { max-width: 100%; font-size: 7px; letter-spacing: 0; line-height: 1.4; white-space: normal; overflow-wrap: normal; }
-  .main-menu .menu-secondary .menu-option .menu-pixel-icon,
-  .main-menu .menu-secondary #menuStatsButton .menu-pixel-icon,
-  .main-menu .menu-secondary .lang-button-icon { width: 24px; height: 24px; padding: 4px; }
+/* The hero: today's main game, one click to play. */
+.main-menu .menu-hero { align-self: center; width: min(100%, 460px); transition: opacity 0.3s ease, transform 0.3s ease; }
+.main-menu .menu-hero .play-tile { width: 100%; background-color: rgba(10, 15, 30, 0.78); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); }
+.play-tile-go { display: none; }
+.menu-hero .play-tile-go { display: block; grid-column: 1 / -1; padding: 12px; border-radius: 10px; background: var(--tile); color: #0a0f1e; font: 12px var(--font-display); letter-spacing: var(--ls-pixel); text-align: center; box-shadow: 0 4px 0 color-mix(in srgb, var(--tile) 55%, #000), 0 0 20px color-mix(in srgb, var(--tile) 35%, transparent); }
+.menu-hero .play-tile:disabled .play-tile-go { display: none; }
+.main-menu.is-travelling .menu-hero,
+.main-menu.is-travelling .menu-drawer-toggle { opacity: 0; pointer-events: none; }
+.main-menu.is-drawer-open .menu-hero { opacity: 0; transform: translateY(24px); pointer-events: none; }
+.main-menu.is-drawer-open .menu-hero * { pointer-events: none; }
+
+/* The Expedition menu. */
+.expedition-drawer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: min(360px, 88vw);
+  padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(env(safe-area-inset-bottom, 0px) + 16px);
+  overflow-y: auto;
+  border-right: 1px solid var(--glass-line);
+  background: rgba(10, 15, 30, 0.86);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: 12px 0 40px rgba(0, 0, 0, 0.45);
+  transform: translateX(-104%);
+  visibility: hidden;
+  transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.2, 1), visibility 0s linear 0.35s;
 }
+.expedition-drawer.is-open { transform: none; visibility: visible; transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.2, 1), visibility 0s; }
+.main-menu.is-camp .expedition-drawer,
+.main-menu.is-leaving .expedition-drawer { display: none; }
+.drawer-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.drawer-head h2 { font: 12px/1.4 var(--font-display); letter-spacing: var(--ls-pixel); }
+.drawer-section { display: grid; gap: 8px; }
+.drawer-section > .field-label { color: var(--muted); }
+.expedition-drawer .menu-play-options { display: grid; gap: 8px; }
+.expedition-drawer .drawer-mode { grid-template-columns: 52px 1fr; gap: 0.75rem; padding: 0.6rem; border-radius: 14px; background-color: rgba(10, 15, 30, 0.5); }
+.expedition-drawer .drawer-mode .play-tile-art { height: 52px; }
+.expedition-drawer .drawer-mode .play-tile-art svg { width: 36px; height: 36px; }
+.expedition-drawer .drawer-mode .play-tile-text span { color: var(--muted); }
+.expedition-drawer .drawer-mode .play-tile-text small { color: var(--gold); }
+/* Base Camp: the week at a glance, the whole card. */
+.expedition-drawer .menu-community-card { display: grid; padding: 0.4rem; border: 1px solid var(--glass-line); border-radius: 14px; background: rgba(10, 15, 30, 0.5); }
+.expedition-drawer .menu-community-card .glance-head .atlas-sprite { width: 36px; height: 36px; }
+.glance-line { display: none; }
+/* The footer: the rest as a row of icons. */
+.main-menu .expedition-drawer .menu-secondary { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin: auto 0 0; padding-top: 14px; border-top: 1px solid var(--glass-line-soft); }
+.main-menu .expedition-drawer .menu-secondary .community-open-button { display: none; }
+.main-menu .expedition-drawer .menu-secondary .menu-option,
+.main-menu .expedition-drawer .menu-secondary #menuStatsButton { position: static; grid-column: auto; order: 0; flex-direction: column; justify-content: flex-start; gap: 4px; width: auto; height: auto; min-width: 0; min-height: 0; padding: 6px 2px; border-radius: 10px; background: rgba(255, 255, 255, 0.03); font-size: 8px; text-align: center; }
+.main-menu .expedition-drawer .menu-secondary .menu-option span { max-width: 100%; font-size: 7px; letter-spacing: 0; line-height: 1.4; white-space: normal; overflow-wrap: normal; }
+.main-menu .expedition-drawer .menu-secondary .menu-option-note { display: none; }
+.main-menu .expedition-drawer .menu-secondary .menu-pixel-icon,
+.main-menu .expedition-drawer .menu-secondary #menuStatsButton .menu-pixel-icon,
+.main-menu .expedition-drawer .menu-secondary .lang-button-icon { width: 28px; height: 28px; padding: 5px; flex: none; }
+.main-menu .expedition-drawer .menu-secondary #menuAccountLabel { display: block; overflow: visible; overflow-wrap: normal; -webkit-line-clamp: none; }
+.main-menu .expedition-drawer .menu-secondary .lang-button-icon { box-sizing: border-box; border-radius: 7px; background: #04121a; }
 .main-menu .menu-secondary .lang-button span { text-transform: uppercase; }
 
+@media (max-width: 760px) {
+  .main-menu .menu-cabinet { padding: calc(env(safe-area-inset-top, 0px) + 12px) 12px calc(env(safe-area-inset-bottom, 0px) + 12px); }
+  .main-menu .menu-hero { width: 100%; }
+  .main-menu .menu-hero .play-tile.is-main { grid-template-columns: 72px 1fr; padding: 0.9rem 0.8rem; }
+  .main-menu .menu-hero .play-tile-art { height: 72px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .expedition-drawer, .expedition-drawer.is-open, .main-menu .menu-hero { transition: none; }
+}
+
 /* The menu globe's tag: what's under the pointer (a country, a vehicle, one of the places). */
-.menu-tip { position: fixed; z-index: 5; display: flex; align-items: center; gap: 8px; max-width: 240px; padding: 6px 10px; border-radius: 8px; background: #0b1020; box-shadow: inset 0 0 0 2px #f4f1e8, 3px 3px 0 rgba(0, 0, 0, 0.45); pointer-events: none; }
+.menu-tip { position: fixed; z-index: 5; display: flex; align-items: center; gap: 8px; max-width: 260px; padding: 6px 10px; border-radius: 8px; background: #0b1020; box-shadow: inset 0 0 0 2px var(--tip, #f4f1e8), 3px 3px 0 rgba(0, 0, 0, 0.45); pointer-events: none; }
 .menu-tip span { display: grid; gap: 2px; }
+.menu-tip.has-go { pointer-events: auto; }
+.menu-tip-go { justify-self: start; margin-top: 6px; padding: 8px 12px; border: 0; border-radius: 6px; background: var(--tip, var(--cyan)); color: #0a0f1e; font: 9px var(--font-display); letter-spacing: var(--ls-pixel); box-shadow: 0 3px 0 color-mix(in srgb, var(--tip, var(--cyan)) 55%, #000); cursor: pointer; }
+.menu-tip-go:hover,
+.menu-tip-go:focus-visible { filter: brightness(1.12); outline: 2px solid #f4f1e8; outline-offset: 2px; }
 .menu-tip strong { color: var(--text); font: 9px/1.5 var(--font-display); letter-spacing: var(--ls-pixel); }
 .menu-tip small { color: var(--gold); font: 12px var(--font-body); }
 .menu-tip-flag { width: 24px; height: 16px; flex: none; border: 1px solid var(--line-strong); object-fit: cover; }
@@ -3617,13 +3648,16 @@ h1, h2, h3 { font-weight: normal; }
     <div id="menuGlobe" class="menu-globe" aria-hidden="true"></div>
     <div class="menu-cabinet">
       <div class="menu-marquee">
+        <!-- The Expedition menu (a drawer): every game, Base Camp and the rest. -->
+        <button class="menu-drawer-toggle" id="menuDrawerToggle" type="button" aria-controls="expeditionDrawer" aria-expanded="false" data-i18n-attr="title:menu.drawerOpen;aria-label:menu.drawerOpen">
+          <svg viewBox="0 0 16 16" aria-hidden="true" shape-rendering="crispEdges"><path d="M2 3h12v2H2zm0 4h12v2H2zm0 4h12v2H2z" fill="currentColor"/></svg>
+        </button>
         <span class="brand-mark menu-logo" aria-hidden="true"></span>
         <h1 id="menuTitle">EXPEDITION</h1>
         <p class="menu-tagline" data-i18n="menu.tagline">The daily geography challenge</p>
       </div>
-      <!-- The day's games, straight away: Highs & Lows (the main game) and Casual. -->
-      <nav class="menu-options menu-play-options" id="menuPlayOptions" aria-label="Play" data-i18n-attr="aria-label:menu.play">
-        <!-- The main game, made unmistakable: first, bigger, glowing, marked MAIN GAME. -->
+      <!-- Today's main game, one click away: the hero at the bottom. -->
+      <div class="menu-hero" id="menuHero">
         <button class="play-tile menu-mode is-main" id="menuExtremesButton" type="button" data-mode="extremes" style="--tile: #ff6b9d">
           <span class="play-tile-ribbon" data-i18n="menu.mainGame">MAIN GAME</span>
           <span class="play-tile-art" data-art="extremes" aria-hidden="true"></span>
@@ -3632,35 +3666,62 @@ h1, h2, h3 { font-weight: normal; }
             <span data-i18n="menu.extremesText">A daily ranking quiz. Earn badges and reach the world's top 1%.</span>
             <small id="menuExtremesStatus"></small>
           </span>
+          <span class="play-tile-go" aria-hidden="true" data-i18n="menu.playNow">▶ PLAY</span>
         </button>
-        <button class="play-tile menu-mode" id="menuCasualButton" type="button" data-mode="casual" style="--tile: var(--gold)">
-          <span class="play-tile-art" data-art="casual" aria-hidden="true"></span>
-          <span class="play-tile-text">
-            <strong data-i18n="mode.casual.short">CASUAL</strong>
-            <span data-i18n="menu.casualText">Five country puzzles a day.</span>
-            <small id="menuCasualStatus"></small>
-          </span>
-        </button>
-        <!-- Competitive and Puzzles are kept in reserve, out of sight. -->
-        <button class="play-tile menu-mode" id="menuCompetitiveButton" hidden type="button" data-mode="competitive" style="--tile: var(--accent)">
-          <span class="play-tile-art" data-art="competitive" aria-hidden="true"></span>
-          <span class="play-tile-text">
-            <strong data-i18n="mode.competitive.short">COMPETITIVE</strong>
-            <span data-i18n="menu.competitiveText">30 seconds a round, 45 for Rank 'Em. Answer fast for up to ×1.5.</span>
-            <small id="menuCompetitiveStatus"></small>
-          </span>
-        </button>
-        <button class="play-tile menu-mode" id="menuPuzzlesButton" hidden type="button" disabled style="--tile: #c58cff">
-          <span class="play-tile-art" data-art="puzzles" aria-hidden="true"></span>
-          <span class="play-tile-text">
-            <strong data-i18n="menu.puzzles">PUZZLES</strong>
-            <span data-i18n="menu.puzzlesText">Brain teasers about the world.</span>
-            <small data-i18n="menu.comingSoon">Coming soon</small>
-          </span>
-        </button>
-      </nav>
-      <!-- Everything else, smaller and quieter, under the games. -->
-      <nav class="menu-options menu-secondary" aria-label="Main menu" data-i18n-attr="aria-label:menu.mainMenu">
+      </div>
+    </div>
+    <!-- The Expedition menu: today's games, Base Camp, and the rest in a footer. Hovering a
+         game or Base Camp turns the globe to it (engine.js, focusMenuStop). -->
+    <aside class="expedition-drawer" id="expeditionDrawer" aria-labelledby="drawerTitle" inert>
+      <div class="drawer-head">
+        <h2 id="drawerTitle" data-i18n="menu.drawerTitle">EXPEDITION MENU</h2>
+        <button class="modal-close" id="menuDrawerClose" type="button" data-i18n-attr="aria-label:menu.drawerClose">×</button>
+      </div>
+      <section class="drawer-section">
+        <h3 class="field-label" data-i18n="menu.drawerToday">TODAY'S GAMES</h3>
+        <nav class="menu-play-options" id="menuPlayOptions" aria-label="Play" data-i18n-attr="aria-label:menu.play">
+          <button class="play-tile menu-mode drawer-mode" id="drawerExtremesButton" type="button" data-mode="extremes" data-focus="extremes" style="--tile: #ff6b9d">
+            <span class="play-tile-art" data-art="extremes" aria-hidden="true"></span>
+            <span class="play-tile-text">
+              <strong>HIGHS &amp; LOWS</strong>
+              <span data-i18n="menu.extremesLine">Six ranking questions a day.</span>
+              <small id="drawerExtremesStatus"></small>
+            </span>
+          </button>
+          <button class="play-tile menu-mode drawer-mode" id="menuCasualButton" data-focus="casual" type="button" data-mode="casual" style="--tile: var(--gold)">
+            <span class="play-tile-art" data-art="casual" aria-hidden="true"></span>
+            <span class="play-tile-text">
+              <strong data-i18n="mode.casual.short">CASUAL</strong>
+              <span data-i18n="menu.casualText">Five country puzzles a day.</span>
+              <small id="menuCasualStatus"></small>
+            </span>
+          </button>
+          <!-- Competitive and Puzzles are kept in reserve, out of sight. -->
+          <button class="play-tile menu-mode" id="menuCompetitiveButton" hidden type="button" data-mode="competitive" style="--tile: var(--accent)">
+            <span class="play-tile-art" data-art="competitive" aria-hidden="true"></span>
+            <span class="play-tile-text">
+              <strong data-i18n="mode.competitive.short">COMPETITIVE</strong>
+              <span data-i18n="menu.competitiveText">30 seconds a round, 45 for Rank 'Em. Answer fast for up to ×1.5.</span>
+              <small id="menuCompetitiveStatus"></small>
+            </span>
+          </button>
+          <button class="play-tile menu-mode" id="menuPuzzlesButton" hidden type="button" disabled style="--tile: #c58cff">
+            <span class="play-tile-art" data-art="puzzles" aria-hidden="true"></span>
+            <span class="play-tile-text">
+              <strong data-i18n="menu.puzzles">PUZZLES</strong>
+              <span data-i18n="menu.puzzlesText">Brain teasers about the world.</span>
+              <small data-i18n="menu.comingSoon">Coming soon</small>
+            </span>
+          </button>
+        </nav>
+      </section>
+      <section class="drawer-section drawer-camp" data-focus="camp">
+        <h3 class="field-label" data-i18n="menu.community">BASE CAMP</h3>
+        <!-- Base Camp at a glance: your group's week, an invite to climb together, or a quiet
+             sign-in (social.js, renderGlance). -->
+        <div class="menu-community-card" id="menuCommunityCard" aria-label="Base Camp" data-i18n-attr="aria-label:menu.community"></div>
+      </section>
+      <nav class="menu-options menu-secondary drawer-footer" aria-label="Main menu" data-i18n-attr="aria-label:menu.mainMenu">
         <button class="menu-option" id="menuArchiveButton" type="button">
           <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
             <path d="M5 4h4v3h14V4h4v4h2v21H3V8h2zm1 6v16h18V10zm3 2h12v3H9zm0 6h9v3H9z" fill="currentColor"/>
@@ -3703,10 +3764,7 @@ h1, h2, h3 { font-weight: normal; }
           <span data-i18n="lang.label">Language</span>
         </button>
       </nav>
-      <!-- Base Camp at a glance, in the dock beside the games: your group's week, an invite
-           to climb together, or a quiet sign-in (social.js, renderGlance). -->
-      <aside class="menu-community-card" id="menuCommunityCard" aria-label="Base Camp" data-i18n-attr="aria-label:menu.community"></aside>
-    </div>
+    </aside>
   </section>
 
   <!-- Holds the globe while it flies from the menu horizon into the game. -->
@@ -6668,6 +6726,15 @@ const EN = {
   "base.change": "CHANGE",
   "base.choose": "CHOOSE",
   "menu.tipStarts": p => `${p.game} starts in ${p.country} today`,
+  "menu.playNow": "▶ PLAY",
+  "menu.drawerOpen": "Expedition menu",
+  "menu.drawerClose": "Close the menu",
+  "menu.drawerTitle": "EXPEDITION MENU",
+  "menu.drawerToday": "TODAY'S GAMES",
+  "menu.extremesLine": "Six ranking questions a day.",
+  "menu.pinToday": "Today: {name}",
+  "menu.pinStarts": "Starts in {country}",
+  "menu.pinGoCamp": "GO TO BASE CAMP ›",
   "menu.tipPlay": "Tap to play",
   "menu.countryFacts": p => `${p.continent} · ${p.people} people · ${p.area} km²`,
   "menu.tipBase": "Tap to move your base",
@@ -7512,6 +7579,15 @@ const NL = {
   "base.change": "WIJZIG",
   "base.choose": "KIES",
   "menu.tipStarts": p => `${p.game} begint vandaag in ${p.country}`,
+  "menu.playNow": "▶ SPELEN",
+  "menu.drawerOpen": "Expeditiemenu",
+  "menu.drawerClose": "Menu sluiten",
+  "menu.drawerTitle": "EXPEDITIEMENU",
+  "menu.drawerToday": "SPELLEN VAN VANDAAG",
+  "menu.extremesLine": "Zes ranglijstvragen per dag.",
+  "menu.pinToday": "Vandaag: {name}",
+  "menu.pinStarts": "Begint in {country}",
+  "menu.pinGoCamp": "NAAR HET BASISKAMP ›",
   "menu.tipPlay": "Tik om te spelen",
   "menu.countryFacts": p => `${p.continent} · ${p.people} inwoners · ${p.area} km²`,
   "menu.tipBase": "Tik om je basis te verplaatsen",
@@ -12045,8 +12121,8 @@ const DEFAULT_CAMERA_DISTANCE = 330;
 // and the game: the camera at MENU_CAMERA_DISTANCE, your base low on the screen (under the
 // dock, MENU_BASE_Y of the height down; higher on a tall phone screen), drifting gently.
 const MENU_CAMERA_DISTANCE = 150;
-const MENU_BASE_Y = 0.45; // above the hub at the bottom
-const MENU_BASE_Y_TALL = 0.36; // a phone: above the stacked hub
+const MENU_BASE_Y = 0.45; // above the hero card at the bottom
+const MENU_BASE_Y_TALL = 0.4; // a phone: above the hero card
 // Radians; the horizon is about 50°N, so flying out shows mid-latitudes rather than the pole.
 // The menu's gentle drift round your base: how far (radians) and how slowly (seconds a sway).
 const MENU_DRIFT = { lon: 0.04, lat: 0.015, lonSeconds: 46, latSeconds: 33 };
@@ -12798,13 +12874,31 @@ class PixelGlobe {
     const width = this.container.clientWidth || 500;
     const height = this.container.clientHeight || 240;
     const shiftY = this.mode === "menu" ? this.getHorizonShift(height) : this.mode === "game" ? this.viewShiftY : 0;
-    if (this.viewShift || shiftY) this.camera.setViewOffset(width, height, -this.viewShift, -shiftY, width, height);
+    const shiftX = this.mode === "menu" ? this.menuShiftX || 0 : this.viewShift;
+    if (shiftX || shiftY) this.camera.setViewOffset(width, height, -shiftX, -shiftY, width, height);
     else this.camera.clearViewOffset();
     this.camera.updateProjectionMatrix();
     this.requestRender();
   }
 
-  // Pixels the menu pushes the globe down, so your base sits low on the screen.
+  // The menu's globe slides sideways (px, eased) to make room for the Expedition menu, so the
+  // place in focus stays in the middle of the open part of the screen.
+  setMenuShiftX(target, duration = 450) {
+    const token = this.menuShiftToken = (this.menuShiftToken || 0) + 1;
+    const from = this.menuShiftX || 0;
+    const start = performance.now();
+    const step = now => {
+      if (token !== this.menuShiftToken) return;
+      const progress = Math.min(1, (now - start) / duration);
+      const ease = 1 - (1 - progress) ** 3;
+      this.menuShiftX = from + (target - from) * ease;
+      this.updateViewOffset();
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  // Pixels the menu pushes the globe down, so the place in focus sits above the hero card.
   getHorizonShift(height) {
     const width = this.container.clientWidth || 1;
     return Math.round(height * ((height > width ? MENU_BASE_Y_TALL : MENU_BASE_Y) - 0.5));
@@ -12904,7 +12998,8 @@ class PixelGlobe {
   // has just travelled there (setJourneyView), so it starts from that view, already lit,
   // without the menu's extra turn.
   transitionToGame(containerId, duration = TRANSITION_MS, { view = START_VIEW, fromJourney = false } = {}) {
-    const startZ = fromJourney ? this.camera.position.z : MENU_CAMERA_DISTANCE;
+    // From where the camera is (the menu may have zoomed in on the day's place first).
+    const startZ = this.camera.position.z || MENU_CAMERA_DISTANCE;
     this.mode = "transition";
     const token = ++this.transitionToken;
     this.transitionSkipped = false;
@@ -13092,13 +13187,23 @@ class PixelGlobe {
     this.menuTouchedUntil = performance.now() + MENU_IDLE_MS;
     this.requestRender();
   }
+  // The drift waits while something on the menu globe is open (a pin's card), and carries
+  // on from where it was.
+  holdMenu(on) {
+    const now = performance.now();
+    if (on && !this.menuHeldAt) this.menuHeldAt = now;
+    if (!on && this.menuHeldAt) {
+      this.menuSince = (this.menuSince || now) + (now - this.menuHeldAt);
+      this.menuHeldAt = 0;
+    }
+  }
   isMenuTouched() {
     return Boolean(this.menuTouchedUntil) || this.isDragging;
   }
 
   // The menu glides to another place (the tour, or back after you looked around): like a
   // short trip, pulling back a little on the way, then drifting round it again.
-  glideMenuTo(lat, lon, duration = MENU_GLIDE_MS) {
+  glideMenuTo(lat, lon, duration = MENU_GLIDE_MS, { distance = MENU_CAMERA_DISTANCE } = {}) {
     this.menuPlace = { lat, lon };
     if (this.mode !== "menu") { this.menuAnchor = this.anchorFor(lat, lon); return; }
     const token = this.menuGlideToken = (this.menuGlideToken || 0) + 1;
@@ -13115,7 +13220,7 @@ class PixelGlobe {
       const ease = progress < 0.5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2;
       this.globeGroup.rotation.x = startX + (target.x - startX) * ease;
       this.globeGroup.rotation.y = startY + (target.y - startY) * ease;
-      this.camera.position.z = startZ + (MENU_CAMERA_DISTANCE - startZ) * ease + arc * Math.sin(Math.PI * ease);
+      this.camera.position.z = startZ + (distance - startZ) * ease + arc * Math.sin(Math.PI * ease);
       this.targetCameraDistance = this.camera.position.z;
       this.requestRender();
       if (progress < 1) { requestAnimationFrame(step); return; }
@@ -13733,7 +13838,7 @@ class PixelGlobe {
       this.menuTouchedUntil = 0;
       if (this.menuPlace) this.glideMenuTo(this.menuPlace.lat, this.menuPlace.lon);
     }
-    if (this.mode === "menu" && this.menuAnchor && !this.menuGliding && !this.menuTouchedUntil && !this.isDragging) {
+    if (this.mode === "menu" && this.menuAnchor && !this.menuGliding && !this.menuTouchedUntil && !this.isDragging && !this.menuHeldAt) {
       const t = (now - (this.menuSince || now)) / 1000;
       this.globeGroup.rotation.y = this.menuAnchor.y + MENU_DRIFT.lon * Math.sin(t * 2 * Math.PI / MENU_DRIFT.lonSeconds);
       this.globeGroup.rotation.x = this.menuAnchor.x + MENU_DRIFT.lat * Math.sin(t * 2 * Math.PI / MENU_DRIFT.latSeconds);
@@ -22584,7 +22689,9 @@ function initializeMainMenu({ onPlay, onHome, describeMode = () => "", isModeAva
     document.getElementById("menuCompetitiveStatus").textContent = describeMode("competitive");
     document.getElementById("menuCasualStatus").textContent = describeMode("casual");
     document.getElementById("menuExtremesStatus").textContent = describeMode("extremes");
+    document.getElementById("drawerExtremesStatus").textContent = describeMode("extremes");
     document.getElementById("menuExtremesButton").disabled = !isModeAvailable("extremes");
+    document.getElementById("drawerExtremesButton").disabled = !isModeAvailable("extremes");
   }
   refreshPlayTiles();
   onLangChange(refreshPlayTiles);
@@ -24587,9 +24694,10 @@ function createTravelLayer(host, project) {
       const tagWidth = 12 + flagWidth + ctx.measureText(tag.label).width + 12;
       const sides = tag.side === "left" ? ["left", "right"] : ["right", "left"];
       const remembered = spotOf.get(tag.label);
-      const spots = [...(remembered ? [remembered] : []), ...[0, -40, 40, -80, 80].flatMap(dy => sides.map(side => ({ side, dy })))];
+      // Last, centred over or under the dot (a narrow phone screen has no room beside it).
+      const spots = [...(remembered ? [remembered] : []), ...[0, -40, 40, -80, 80].flatMap(dy => sides.map(side => ({ side, dy }))), { side: "centre", dy: -44 }, { side: "centre", dy: 44 }];
       const box = ({ side, dy }) => {
-        const left = side === "left" ? tag.x - 14 - tagWidth : tag.x + 14;
+        const left = side === "centre" ? Math.round(tag.x - tagWidth / 2) : side === "left" ? tag.x - 14 - tagWidth : tag.x + 14;
         return { left: left - 4, right: left + tagWidth + 4, top: tag.y + dy - 19, bottom: tag.y + dy + 19, tagLeft: left, cy: tag.y + dy };
       };
       const index = spots.map(box).findIndex(b => b.left > 0 && b.right < width && b.top > 0 && b.bottom < height
@@ -24602,7 +24710,7 @@ function createTravelLayer(host, project) {
       if (spot.cy !== tag.y) {
         // A short line from the dot to a tag that moved up or down.
         ctx.fillStyle = "#f4f1e8";
-        const lineX = spot.tagLeft > tag.x ? spot.tagLeft : spot.tagLeft + tagWidth;
+        const lineX = spot.tagLeft > tag.x ? spot.tagLeft : spot.tagLeft + tagWidth < tag.x ? spot.tagLeft + tagWidth : tag.x;
         ctx.fillRect(Math.min(tag.x, lineX), tag.y - 1, Math.abs(lineX - tag.x), 2);
         ctx.fillRect(lineX - 1, Math.min(tag.y, spot.cy), 2, Math.abs(spot.cy - tag.y));
       }
@@ -25884,7 +25992,7 @@ const { sounds } = __modules["audio.js"];
 const { createDistributionChart, initializeHistoryScreens } = __modules["screens.js"];
 const { RANK_TIERS, formatTopPercent, getDayStats, getTopPercent } = __modules["community.js"];
 const { initializeCommunity } = __modules["social.js"];
-const { createBaseLine, getBase, onBaseChange, pickBase, syncBase } = __modules["base.js"];
+const { createBaseLine, getBase, pickBase, syncBase } = __modules["base.js"];
 const { createTravelLayer, createWorldTraffic, drawSprite, getDayPlace, localTraffic, makeTrack, placeOf, planJourney, playJourney, spriteCanvas, startAmbient } = __modules["travel.js"];
 const { FIND_LABELS, askQuestion, formatValue, getStandings, getStat, missingReason, scorePick } = __modules["extremes.js"];
 const { createBadge } = __modules["badges.js"];
@@ -28603,11 +28711,12 @@ function showMenuGlobe() {
   globe.mountTo("menuGlobe");
   globe.setMode("menu");
   globe.setBorderStrength(0);
-  // The menu opens over your base (the first stop of its tour).
-  const base = getBase();
-  if (base) globe.faceOnMenu(base.lat, base.lon);
-  tourIndex = 0;
-  tourNext = performance.now() + MENU_TOUR_MS;
+  // The menu opens over today's main game, its Play button one click away; the Expedition
+  // menu stays closed.
+  closeDrawerNow();
+  menuFocus = featuredMode();
+  const stop = stopOf(menuFocus);
+  globe.faceOnMenu(stop.lat, stop.lon);
 }
 
 // ---------------------------------------------------------------------------
@@ -28645,20 +28754,20 @@ startAmbient(menuTravel, {
         menuMarks.push({ x: here.x + 8, y: here.y - 18, kind: "base" });
       }
     }
-    // Base Camp: the tent, and its sign with the tent icon and its height.
-    const camp = globe.projectLonLat(BASE_CAMP_LONLAT);
-    if (camp.visible) {
-      drawSprite(layer.ctx, "tent", camp.x, camp.y - 12, { scale: 2 });
-      layer.station(BASE_CAMP_LONLAT, t("camp.pinLabel", { m: (5364).toLocaleString(locale()) }), false, null, "right", 2, { icon: SIGN_ICONS.camp, color: "#45e3ff", dot: false, key: "camp" });
-      menuMarks.push({ x: camp.x, y: camp.y - 10, kind: "camp" });
-    }
-    // Where today's games start: a sign with the game's own icon from the menu.
-    ["extremes", "casual"].forEach((mode, index) => {
-      const place = todayPlace(mode);
-      const spot = globe.projectLonLat(placeOf(place));
+    // The places as pins with their own logo (no words): Highs & Lows' bars, Casual's
+    // coffee cup, Base Camp's tent. The one in focus is bigger. A click on a pin tells you
+    // what it is (pinInfo); the games are played from the hero card and the Expedition menu.
+    const pins = [
+      { kind: "camp", lonLat: BASE_CAMP_LONLAT },
+      { kind: "casual", lonLat: placeOf(todayPlace("casual")), country: todayPlace("casual") },
+      { kind: "extremes", lonLat: placeOf(todayPlace("extremes")), country: todayPlace("extremes") }
+    ];
+    // The focused pin last, so it sits on top.
+    pins.sort((a, b) => (a.kind === menuFocus) - (b.kind === menuFocus)).forEach(pin => {
+      const spot = globe.projectLonLat(pin.lonLat);
       if (!spot.visible) return;
-      layer.station(placeOf(place), gameName(mode).toUpperCase(), true, null, "right", index, { icon: SIGN_ICONS[mode], color: mode === "extremes" ? "#ff6b9d" : "#ffd45c", key: mode });
-      menuMarks.push({ x: spot.x, y: spot.y, kind: mode, country: place });
+      const box = drawMenuPin(layer.ctx, spot.x, spot.y, SIGN_ICONS[pin.kind], PIN_COLORS[pin.kind], pin.kind === menuFocus || pin.kind === openPin);
+      menuMarks.push({ x: spot.x, y: spot.y, kind: pin.kind, country: pin.country, box });
     });
     layer.placeLabels();
   }
@@ -28695,39 +28804,169 @@ const SIGN_ICONS = {
   casual: artIcon(PLAY_ART.casual, PLAY_ART_COLORS),
   camp: spriteCanvas("tent")
 };
+const PIN_COLORS = { extremes: "#ff6b9d", casual: "#ffd45c", camp: "#45e3ff" };
+// A pin: a framed pixel badge with the logo, on a short stem down to its spot. Returns the
+// box a click counts in.
+function drawMenuPin(ctx, x, y, icon, color, big) {
+  // Whole pixels only: the 16-pixel logos at ×3 (in focus) or ×2.
+  const size = big ? 52 : 36;
+  const iconSize = big ? 48 : 32;
+  x = Math.round(x);
+  y = Math.round(y);
+  const top = y - 10 - size;
+  const left = x - size / 2;
+  ctx.imageSmoothingEnabled = false;
+  if (big) {
+    ctx.fillStyle = `${color}55`;
+    ctx.fillRect(left - 4, top - 4, size + 8, size + 8);
+  }
+  ctx.fillStyle = "#0b1020";
+  ctx.fillRect(x - 3, y - 12, 6, 12);
+  ctx.fillRect(x - 5, y - 3, 10, 6);
+  ctx.fillStyle = color;
+  ctx.fillRect(x - 1, y - 12, 2, 11);
+  ctx.fillRect(x - 3, y - 1, 6, 2);
+  ctx.fillRect(left - 2, top - 2, size + 4, size + 4);
+  ctx.fillStyle = "#0b1020";
+  ctx.fillRect(left, top, size, size);
+  ctx.drawImage(icon, x - iconSize / 2, top + (size - iconSize) / 2, iconSize, iconSize);
+  return { left: left - 4, right: left + size + 4, top: top - 4, bottom: y + 4 };
+}
 const bigScreen = () => window.matchMedia("(min-width: 761px)").matches;
 // A game's name as players see it (Highs & Lows keeps its English name in every language).
 const gameName = mode => (mode === "extremes" ? "Highs & Lows" : t("mode.casual"));
 
-// The tour: your base, then where Highs & Lows and Casual start today, then Base Camp, and round again, a
-// stop every MENU_TOUR_MS. It waits while you look around yourself.
-const MENU_TOUR_MS = 12000;
-let tourIndex = 0;
-let tourNext = performance.now() + MENU_TOUR_MS;
-function tourStops() {
-  const base = getBase();
-  const main = todayPlace("extremes");
-  const casual = todayPlace("casual");
-  return [
-    ...(base ? [{ lat: base.lat, lon: base.lon }] : []),
-    { lat: main.lat, lon: main.lon },
-    { lat: casual.lat, lon: casual.lon },
-    { lat: BASE_CAMP_LONLAT[1], lon: BASE_CAMP_LONLAT[0] }
-  ];
+// What the menu looks at: today's main game (featured), or whatever you point at in the
+// Expedition menu (a game, or Base Camp). Each has its place on the globe.
+const featuredMode = () => (hasExtremeDay(today) ? "extremes" : "casual");
+let menuFocus = "extremes";
+function stopOf(key) {
+  if (key === "camp") return { lat: BASE_CAMP_LONLAT[1], lon: BASE_CAMP_LONLAT[0] };
+  const place = todayPlace(key);
+  return { lat: place.lat, lon: place.lon };
 }
-setInterval(() => {
-  const now = performance.now();
-  const onMenu = globe.mode === "menu" && !document.getElementById("mainMenu").classList.contains("hidden");
-  if (!onMenu || selectedCountry || globe.isMenuTouched() || globe.menuGliding || document.querySelector(".modal-overlay:not(.hidden), .base-overlay")) {
-    tourNext = Math.max(tourNext, now + MENU_TOUR_MS / 2);
-    return;
-  }
-  if (now < tourNext) return;
-  const stops = tourStops();
-  tourIndex = (tourIndex + 1) % stops.length;
-  globe.glideMenuTo(stops[tourIndex].lat, stops[tourIndex].lon);
-  tourNext = now + MENU_TOUR_MS;
-}, 400);
+const MENU_FOCUS_MS = 1400; // a glide to the place you point at
+function focusMenuStop(key) {
+  if (key === menuFocus) return;
+  menuFocus = key;
+  if (globe.mode !== "menu") return;
+  const stop = stopOf(key);
+  globe.glideMenuTo(stop.lat, stop.lon, MENU_FOCUS_MS);
+}
+
+// The Expedition menu: a drawer from the top corner with today's games, Base Camp and the
+// rest (Stats, Archive, How to play, My account, Language). Closed by default; the hero card
+// plays today's main game in one click. Pointing at a game or Base Camp turns the globe to
+// its place; a click on the globe closes the drawer so you can look around.
+const drawer = document.getElementById("expeditionDrawer");
+const drawerToggle = document.getElementById("menuDrawerToggle");
+let drawerOpen = false;
+let focusBackTimer = null;
+function setDrawer(open, { refocus = true } = {}) {
+  if (open === drawerOpen) return;
+  drawerOpen = open;
+  drawer.classList.toggle("is-open", open);
+  drawer.inert = !open;
+  drawerToggle.setAttribute("aria-expanded", String(open));
+  document.getElementById("mainMenu").classList.toggle("is-drawer-open", open);
+  // On a big screen the globe moves over, so its place stays in the open part.
+  globe.setMenuShiftX(open && bigScreen() ? Math.round(drawer.offsetWidth / 2) : 0);
+  clearTimeout(focusBackTimer);
+  if (open) {
+    showMenuTip(null);
+    document.getElementById("menuDrawerClose").focus({ preventScroll: true });
+  } else if (refocus) focusMenuStop(featuredMode());
+}
+function closeDrawerNow() {
+  setDrawer(false, { refocus: false });
+}
+drawerToggle.addEventListener("click", () => { sounds.playClick(); setDrawer(!drawerOpen); });
+document.getElementById("menuDrawerClose").addEventListener("click", () => {
+  sounds.playClick();
+  setDrawer(false);
+  drawerToggle.focus({ preventScroll: true });
+});
+drawer.querySelectorAll("[data-focus]").forEach(item => {
+  const point = () => { clearTimeout(focusBackTimer); focusMenuStop(item.dataset.focus); };
+  const leave = () => {
+    clearTimeout(focusBackTimer);
+    focusBackTimer = setTimeout(() => { if (drawerOpen) focusMenuStop(featuredMode()); }, 700);
+  };
+  item.addEventListener("pointerenter", event => { if (event.pointerType === "mouse") point(); });
+  item.addEventListener("pointerleave", event => { if (event.pointerType === "mouse") leave(); });
+  item.addEventListener("focusin", point);
+  item.addEventListener("focusout", leave);
+});
+// Choosing a game in the drawer: the drawer folds away, the camera travels to where that game
+// starts today (a glide that zooms in, MENU_CINEMATIC_MS, with SKIP), and only then does
+// the game start, with a short flight in. When the day's first trip from your base is due,
+// that trip is the travel. The hero's PLAY starts at once.
+const MENU_CINEMATIC_MS = 1800;
+let cinematicArrival = false;
+let cinematicGo = false;
+drawer.querySelectorAll(".menu-mode").forEach(button => button.addEventListener("click", event => {
+  if (cinematicGo || button.disabled || !travelFirst(button.dataset.mode)) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  travelThenPlay(button);
+}, true));
+// Whether a game chosen in the drawer or on its pin travels there first (not when the day's
+// trip from your base will do that, or with reduced motion).
+function travelFirst(mode) {
+  const place = todayPlace(mode);
+  const base = getBase();
+  const tripDue = base && base.iso !== place.iso && !hasTravelled(today) && Boolean(globe.countryFeatures?.length);
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  return !tripDue && !reduceMotion && globe.mode === "menu";
+}
+function travelThenPlay(button) {
+  const mode = button.dataset.mode;
+  const place = todayPlace(mode);
+  sounds.playClick();
+  closeDrawerNow();
+  selectMenuCountry(null);
+  closePin();
+  const menu = document.getElementById("mainMenu");
+  menu.classList.add("is-travelling");
+  menuFocus = mode;
+  globe.glideMenuTo(place.lat, place.lon, MENU_CINEMATIC_MS, { distance: 112 });
+  let done = false;
+  const go = () => {
+    if (done) return;
+    done = true;
+    hideSkip();
+    menu.classList.remove("is-travelling");
+    cinematicArrival = true;
+    cinematicGo = true;
+    button.click();
+    cinematicGo = false;
+  };
+  const hideSkip = showSkip(go);
+  setTimeout(go, MENU_CINEMATIC_MS + 120);
+}
+// Playing a game from its pin (its button, or a second click on the pin): the same travel.
+function playFromPin(kind) {
+  closePin();
+  if (kind === "camp") { selectMenuCountry(null); document.getElementById("menuCommunityButton").click(); return; }
+  const button = document.getElementById(kind === "extremes" ? "drawerExtremesButton" : "menuCasualButton");
+  if (button.disabled) return;
+  if (travelFirst(kind)) travelThenPlay(button);
+  else { cinematicGo = true; button.click(); cinematicGo = false; }
+}
+// Choosing a game or Base Camp folds the drawer away (the flight or the landing takes over).
+drawer.querySelectorAll(".menu-mode, #menuCommunityCard").forEach(item => item.addEventListener("click", () => closeDrawerNow(), true));
+// A click on the globe closes the drawer, and that click does nothing else: look around freely.
+let drawerClosedByGlobe = false;
+document.getElementById("menuGlobe").addEventListener("pointerdown", () => {
+  drawerClosedByGlobe = drawerOpen;
+  if (drawerOpen) setDrawer(false);
+});
+document.addEventListener("keydown", event => {
+  if (event.key !== "Escape" || !drawerOpen || document.querySelector(".modal-overlay:not(.hidden), .base-overlay")) return;
+  setDrawer(false);
+  drawerToggle.focus({ preventScroll: true });
+});
+window.addEventListener("resize", () => { if (drawerOpen) globe.setMenuShiftX(bigScreen() ? Math.round(drawer.offsetWidth / 2) : 0, 0); });
 
 // What's under the pointer on the menu globe: one of the places, a vehicle, or a country.
 function countryByCcn3(ccn3) {
@@ -28738,16 +28977,14 @@ function countryByCcn3(ccn3) {
 function menuHit(event, { countries = false } = {}) {
   const x = event.clientX;
   const y = event.clientY;
-  // A whole sign counts, not only its dot.
-  const tag = menuTravel.tagBoxes.find(box => x >= box.left && x <= box.right && y >= box.top && y <= box.bottom);
-  const mark = (tag && menuMarks.find(item => item.kind === tag.key)) || menuMarks.find(item => Math.hypot(item.x - x, item.y - y) < 26);
+  // A whole pin counts, not only its spot (the focused pin first: it is drawn on top).
+  const inBox = item => item.box && x >= item.box.left && x <= item.box.right && y >= item.box.top && y <= item.box.bottom;
+  const mark = [...menuMarks].reverse().find(inBox) || menuMarks.find(item => !item.box && Math.hypot(item.x - x, item.y - y) < 26);
   if (mark) {
     const base = getBase();
-    if (mark.kind === "base") return { title: `${t("base.label")} · ${countryName(base)}`, hint: t("menu.tipBase"), iso: base.iso, action: () => pickBase() };
-    if (mark.kind === "camp") return { title: t("camp.pinLabel", { m: (5364).toLocaleString(locale()) }), hint: t("menu.tipCamp"), iso: "NP", action: () => document.getElementById("menuCommunityButton").click() };
-    const button = document.getElementById(mark.kind === "extremes" ? "menuExtremesButton" : "menuCasualButton");
-    const game = gameName(mark.kind);
-    return { title: t("menu.tipStarts", { game, country: countryName(mark.country) }), hint: t("menu.tipPlay"), iso: mark.country.iso, action: () => { if (!button.disabled) button.click(); } };
+    if (mark.kind === "base") return { kind: "base", title: `${t("base.label")} · ${countryName(base)}`, hint: t("menu.tipBase"), iso: base.iso, action: () => pickBase() };
+    // The pins tell you what they are; the games start from the hero card or the menu.
+    return { kind: mark.kind, pin: true, box: mark.box, ...pinInfo(mark) };
   }
   const ride = menuTravel.hits.find(item => Math.hypot(item.x - x, item.y - y) < 16);
   if (ride) {
@@ -28767,12 +29004,27 @@ function menuHit(event, { countries = false } = {}) {
   return country ? { country } : { sea: true };
 }
 
+// What a pin says when you click it: the name, today's day (its title, never a question or
+// an answer) and the country where it is.
+function pinInfo(mark) {
+  if (mark.kind === "camp") return { title: t("camp.pinLabel", { m: (5364).toLocaleString(locale()) }), lines: [countryName(getCountry("NP"))], iso: "NP", color: PIN_COLORS.camp, go: t("menu.pinGoCamp") };
+  const day = getDayInfo(today, mark.kind)?.name;
+  const playable = mark.kind !== "extremes" || hasExtremeDay(today);
+  return {
+    title: gameName(mark.kind).toUpperCase(),
+    lines: [day ? t("menu.pinToday", { name: day }) : null, t("menu.pinStarts", { country: countryName(mark.country) })].filter(Boolean),
+    iso: mark.country.iso,
+    color: PIN_COLORS[mark.kind],
+    go: playable ? t("menu.playNow") : null
+  };
+}
+
 // A small tag next to the pointer (hover on a computer, a tap on a phone).
 const menuTip = Object.assign(document.createElement("div"), { className: "menu-tip hidden" });
 menuTip.setAttribute("role", "status");
 document.getElementById("menuGlobe").appendChild(menuTip);
 let menuTipTimer = null;
-function showMenuTip(info, event, { linger = 0 } = {}) {
+function showMenuTip(info, event, { linger = 0, anchor = null } = {}) {
   clearTimeout(menuTipTimer);
   if (!info) { menuTip.classList.add("hidden"); return; }
   menuTip.replaceChildren();
@@ -28780,23 +29032,85 @@ function showMenuTip(info, event, { linger = 0 } = {}) {
   const text = document.createElement("span");
   text.append(Object.assign(document.createElement("strong"), { textContent: info.title }));
   if (info.hint) text.append(Object.assign(document.createElement("small"), { textContent: info.hint }));
+  (info.lines || []).forEach(line => text.append(Object.assign(document.createElement("small"), { textContent: line })));
+  menuTip.style.setProperty("--tip", info.color || "#f4f1e8");
+  // An open pin's card has its button: PLAY, or GO TO BASE CAMP.
+  menuTip.classList.toggle("has-go", Boolean(info.go));
+  if (info.go) {
+    const kind = info.kind;
+    const go = Object.assign(document.createElement("button"), { type: "button", className: "menu-tip-go", textContent: info.go });
+    go.addEventListener("click", event => { event.stopPropagation(); playFromPin(kind); });
+    text.append(go);
+  }
   menuTip.appendChild(text);
-  menuTip.style.left = `${Math.min(innerWidth - 240, event.clientX + 14)}px`;
-  menuTip.style.top = `${Math.max(8, event.clientY - 46)}px`;
   menuTip.classList.remove("hidden");
+  if (anchor) placeTipBeside(anchor);
+  else {
+    menuTip.style.left = `${Math.min(innerWidth - 240, event.clientX + 14)}px`;
+    menuTip.style.top = `${Math.max(8, event.clientY - 46)}px`;
+  }
   if (linger) menuTipTimer = setTimeout(() => menuTip.classList.add("hidden"), linger);
 }
+// A pin's card never covers its pin: beside it on the right, else on the left, else under it,
+// else above (the first that fits on screen), touching the pin so the pointer can move across.
+function placeTipBeside(box) {
+  const width = menuTip.offsetWidth;
+  const height = menuTip.offsetHeight;
+  const margin = 8;
+  const middleX = (box.left + box.right) / 2;
+  const top = Math.min(innerHeight - margin - height, Math.max(margin, box.top));
+  // Above and under may slide sideways to stay on screen.
+  const slide = left => Math.min(innerWidth - margin - width, Math.max(margin, left));
+  const spots = [
+    { left: box.right, top },
+    { left: box.left - width, top },
+    { left: slide(middleX - width / 2), top: box.bottom },
+    { left: slide(middleX - width / 2), top: box.top - height }
+  ];
+  const onScreen = spot => spot.left >= margin && spot.left + width <= innerWidth - margin && spot.top >= margin && spot.top + height <= innerHeight - margin;
+  // Rather not over another pin either: the spot that covers the least of them.
+  const covered = spot => menuMarks.reduce((sum, mark) => {
+    if (!mark.box || mark.box === box) return sum;
+    const x = Math.min(spot.left + width, mark.box.right) - Math.max(spot.left, mark.box.left);
+    const y = Math.min(spot.top + height, mark.box.bottom) - Math.max(spot.top, mark.box.top);
+    return sum + (x > 0 && y > 0 ? x * y : 0);
+  }, 0);
+  const candidates = spots.filter(onScreen);
+  const spot = candidates.length ? candidates.reduce((best, item) => (covered(item) < covered(best) ? item : best)) : spots[2];
+  menuTip.style.left = `${Math.round(Math.min(innerWidth - margin - width, Math.max(margin, spot.left)))}px`;
+  menuTip.style.top = `${Math.round(Math.min(innerHeight - margin - height, Math.max(margin, spot.top)))}px`;
+}
+
+// Hovering: vehicles say what they are; pins only show a hand (a click opens them). Moving
+// off an open pin, or off a selected country, closes its card.
+let openPin = null;
 globe.onMenuHover = event => {
-  if (!bigScreen() || selectedCountry) return;
-  const info = menuHit(event);
-  showMenuTip(info, event);
-  document.getElementById("menuGlobe").classList.toggle("is-pointing", Boolean(info?.action));
+  if (!bigScreen() || drawerOpen) return;
+  const info = menuHit(event, { countries: Boolean(selectedCountry) });
+  if (openPin && info?.kind !== openPin) closePin();
+  if (selectedCountry && info?.country !== selectedCountry) selectMenuCountry(null);
+  if (openPin || selectedCountry) return;
+  showMenuTip(info && !info.pin && !info.country && !info.sea ? info : null, event);
+  document.getElementById("menuGlobe").classList.toggle("is-pointing", Boolean(info?.action || info?.pin));
 };
+function openPinCard(info, event) {
+  selectMenuCountry(null);
+  openPin = info.kind;
+  globe.holdMenu(true);
+  sounds.playClick();
+  showMenuTip(info, event, { anchor: info.box });
+}
+function closePin() {
+  openPin = null;
+  globe.holdMenu(false);
+  showMenuTip(null);
+}
 // Tapping a country (just for fun) selects it: its borders light up and a card tells you
 // what it is. Tapping the sea (or the same country again) lets go.
 let selectedCountry = null;
 function selectMenuCountry(country, event) {
   selectedCountry = country;
+  if (country && openPin) { openPin = null; globe.holdMenu(false); }
   globe.setHighlights(country ? [{ country, color: 0xffd45c, focus: true }] : []);
   if (!country) { showMenuTip(null); return; }
   sounds.playClick();
@@ -28807,13 +29121,16 @@ function selectMenuCountry(country, event) {
   }, event);
 }
 globe.onMenuTap = event => {
+  if (drawerClosedByGlobe) { drawerClosedByGlobe = false; return; }
   const info = menuHit(event, { countries: true });
-  if (info?.action) { sounds.playClick(); selectMenuCountry(null); info.action(); return; }
+  if (info?.action) { sounds.playClick(); selectMenuCountry(null); closePin(); info.action(); return; }
+  if (info?.pin) { if (openPin === info.kind) playFromPin(info.kind); else openPinCard(info, event); return; }
+  if (openPin) closePin();
   if (info?.title) { showMenuTip(info, event, { linger: 2600 }); return; }
   if (info?.country && info.country !== selectedCountry) selectMenuCountry(info.country, event);
   else selectMenuCountry(null);
 };
-document.getElementById("menuGlobe").addEventListener("pointerleave", () => showMenuTip(null));
+document.getElementById("menuGlobe").addEventListener("pointerleave", () => closePin());
 // Opening Base Camp from the menu lets go of a selected country first.
 document.querySelectorAll(".community-open-button, #menuCommunityCard").forEach(node => node.addEventListener("click", () => selectMenuCountry(null), true));
 
@@ -28873,7 +29190,10 @@ function flyFromMenu() {
       fromJourney = true;
     }
     gameView.classList.add("is-arriving");
-    const flight = globe.transitionToGame("globeCanvasContainer", reduceMotion ? 0 : fromJourney ? 1600 : undefined, { view: { lat: place.lat, lon: place.lon }, fromJourney });
+    // After the menu's travel to the place (cinematicArrival) the flight in is short too.
+    const arrived = cinematicArrival;
+    cinematicArrival = false;
+    const flight = globe.transitionToGame("globeCanvasContainer", reduceMotion ? 0 : fromJourney || arrived ? 1600 : undefined, { view: { lat: place.lat, lon: place.lon }, fromJourney });
     // The flight takes 2.6 s (1.6 s after a trip); SKIP lands the globe at once.
     const hideSkip = reduceMotion ? () => {} : showSkip(() => globe.skipTransition());
     // Halfway through, narrow the overlay to the globe's area (on small screens the globe
@@ -28881,7 +29201,7 @@ function flyFromMenu() {
     setTimeout(() => {
       const frame = document.getElementById("globeCanvasContainer").getBoundingClientRect();
       overlay.style.clipPath = `inset(${frame.top}px ${innerWidth - frame.right}px ${innerHeight - frame.bottom}px ${frame.left}px)`;
-    }, reduceMotion ? 0 : fromJourney ? 800 : 1300);
+    }, reduceMotion ? 0 : fromJourney || arrived ? 800 : 1300);
     await flight;
     hideSkip();
     gameView.classList.remove("is-arriving");
@@ -29612,7 +29932,6 @@ showMenuGlobe();
 // Your base under My account. Nobody is asked for one on arrival (it isn't needed to play):
 // Atlas asks when you come back to the menu after a finished game (askForBase).
 document.getElementById("accountBase").appendChild(createBaseLine());
-onBaseChange(base => { if (base) globe.faceOnMenu(base.lat, base.lon); });
 
 
 return { getPuzzleNumber, getAllPuzzleDays, getAnswerText };
