@@ -3794,6 +3794,31 @@ canvas.place-hud-icon:not(.place-hud-tent) { width: 26px; height: 26px; }
 @media (max-width: 760px) { .trip-card { top: calc(env(safe-area-inset-top, 0px) + 64px); } }
 @media (prefers-reduced-motion: reduce) { .trip-card { animation: none; transition: none; } }
 
+/* My Tent in the Expedition menu (engine.js renderTentTile): your tent as it stands, its
+   place, and your name (or a guest line). Opening it flies the globe to your tent. */
+.menu-tent-card {
+  display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 12px;
+  width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--glass-line); border-radius: 14px;
+  background: rgba(10, 15, 30, 0.5); color: var(--text); text-align: left; cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.menu-tent-card:hover, .menu-tent-card:focus-visible { border-color: var(--cyan); background: color-mix(in srgb, var(--cyan) 10%, rgba(10, 15, 30, 0.5)); outline: none; }
+.menu-tent-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 8px; background: #1b2440; }
+.menu-tent-canvas { width: 32px; height: 32px; image-rendering: pixelated; }
+.menu-tent-text { display: grid; gap: 3px; min-width: 0; }
+.menu-tent-text strong { font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.menu-tent-text small { overflow: hidden; color: var(--muted); font: 12px var(--font-body); white-space: nowrap; text-overflow: ellipsis; }
+.menu-tent-go { color: var(--muted); font: 12px var(--font-display); }
+.menu-tent-card .account-avatar img { width: 24px; height: 24px; }
+
+/* The tent's look under My Tent (base.js lookPicker): styles and explorers drawn as your tent. */
+.tent-looks { gap: 6px; }
+.tent-look { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 2px solid transparent; border-radius: 8px; background: #1b2440; cursor: pointer; transition: border-color 0.12s, transform 0.12s; }
+.tent-look:hover:not(:disabled), .tent-look:focus-visible { transform: translateY(-2px); border-color: var(--muted); outline: none; }
+.tent-look[aria-checked="true"] { border-color: var(--text); }
+.tent-look.is-locked { cursor: not-allowed; opacity: 0.35; filter: grayscale(1); }
+.tent-look-icon { width: 32px; height: 32px; image-rendering: pixelated; }
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -3870,11 +3895,23 @@ canvas.place-hud-icon:not(.place-hud-tent) { width: 26px; height: 26px; }
           </button>
         </nav>
       </section>
-      <section class="drawer-section drawer-camp" data-focus="camp">
-        <h3 class="field-label" data-i18n="menu.community">BASE CAMP</h3>
+      <section class="drawer-section drawer-camp">
+        <h3 class="field-label" data-i18n="menu.drawerCamp">CAMP &amp; COMMUNITY</h3>
         <!-- Base Camp at a glance: your group's week, an invite to climb together, or a quiet
              sign-in (social.js, renderGlance). -->
-        <div class="menu-community-card" id="menuCommunityCard" aria-label="Base Camp" data-i18n-attr="aria-label:menu.community"></div>
+        <div class="menu-community-card" id="menuCommunityCard" data-focus="camp" aria-label="Base Camp" data-i18n-attr="aria-label:menu.community"></div>
+        <!-- My Tent: your account and your tent (its place, style and explorer). Opening it
+             flies the globe to your tent (engine.js). -->
+        <button class="menu-tent-card" id="menuAccountButton" data-focus="tent" type="button">
+          <span class="menu-tent-icon" id="menuTentIcon" aria-hidden="true"></span>
+          <span class="menu-tent-text">
+            <strong data-i18n="menu.account">MY TENT</strong>
+            <small id="menuTentWhere"></small>
+            <small id="menuAccountLabel"></small>
+          </span>
+          <span class="account-avatar" id="menuAccountAvatar" aria-hidden="true" hidden></span>
+          <span class="menu-tent-go" aria-hidden="true">›</span>
+        </button>
       </section>
       <nav class="menu-options menu-secondary drawer-footer" aria-label="Main menu" data-i18n-attr="aria-label:menu.mainMenu">
         <button class="menu-option" id="menuArchiveButton" type="button">
@@ -3900,14 +3937,6 @@ canvas.place-hud-icon:not(.place-hud-tent) { width: 26px; height: 26px; }
             <path d="M10 4h12v3h3v8h-3v3h-4v4h-4v-6h3v-3h3V8h-8v3H8V7h2zm4 21h4v4h-4z" fill="currentColor"/>
           </svg>
           <span data-i18n="menu.howTo">HOW TO PLAY</span>
-        </button>
-        <button class="menu-option menu-account" id="menuAccountButton" type="button">
-          <span class="account-avatar" id="menuAccountAvatar" aria-hidden="true">
-            <svg class="menu-pixel-icon" viewBox="0 0 32 32" shape-rendering="crispEdges">
-              <path d="M12 3h8v2h2v2h2v8h-2v2h-2v2h-8v-2h-2v-2H8V7h2V5h2zM8 21h16v2h3v3h2v4H3v-4h2v-3h3z" fill="currentColor"/>
-            </svg>
-          </span>
-          <span id="menuAccountLabel">MY ACCOUNT</span>
         </button>
         <!-- The language: opens the language window. -->
         <button class="menu-option lang-button" id="langButton" type="button" aria-haspopup="dialog" data-i18n-attr="title:lang.label;aria-label:lang.open">
@@ -4464,7 +4493,7 @@ canvas.place-hud-icon:not(.place-hud-tent) { width: 26px; height: 26px; }
   <div id="accountModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
     <div class="modal account-modal">
       <div class="modal-head">
-        <h2 id="accountTitle" data-i18n="account.title">YOUR ACCOUNT</h2>
+        <h2 id="accountTitle" data-i18n="account.title">MY TENT</h2>
         <button class="modal-close" id="closeAccountButton" type="button" aria-label="Close account" data-i18n-attr="aria-label:account.close">×</button>
       </div>
       <!-- Your base (base.js): where your expedition starts, for guests and accounts alike. -->
@@ -6219,7 +6248,7 @@ const EN = {
   "menu.stats": "STATS",
   "menu.statsNote": "Your best days, streaks and more.",
   "menu.howTo": "HOW TO PLAY",
-  "menu.account": "MY ACCOUNT",
+  "menu.account": "MY TENT",
   "menu.noDay": "No reviewed day for today yet",
   "menu.seeResults": "✓ SEE RESULTS",
   "menu.continueGo": "▶ CONTINUE",
@@ -6890,7 +6919,7 @@ const EN = {
   "base.askFirst": "Every expedition needs a base. Where shall we pitch your tent? Pick a country, and every trip starts from there.",
   "base.askAgain": "Moving camp? Pick the country for your new base.",
   "base.askAfterGame": "Well climbed! An explorer like you deserves a camp of your own. Where shall we pitch your tent? Pick a country, and every trip starts from there.",
-  "base.later": "LATER",
+  "base.later": "SKIP FOR NOW",
   "base.nice": p => `${p.name}. Good ground for a tent.`,
   "base.placeholder": "Type a country…",
   "base.pick": "PICK",
@@ -6898,10 +6927,24 @@ const EN = {
   "base.none": "No base yet",
   "base.city": "City for your tent",
   "base.cityLabel": "IN",
-  "base.note": "Your base shows on your account, and the menu's globe opens over it. You can move it any time under My account.",
+  "base.note": "Your base shows on your account, and the menu's globe opens over it. You can move it any time under My Tent.",
   "base.label": "YOUR BASE",
   "base.color": "PIN COLOUR",
   "base.colorN": "Colour {n}",
+  "menu.drawerCamp": "CAMP & COMMUNITY",
+  "menu.tentGuest": "Guest · sign in to keep your days",
+  "menu.tentNone": "No tent pitched yet",
+  "base.style": "TENT",
+  "base.avatar": "EXPLORER",
+  "base.lockedBy": "unlocks with the {badge} badge",
+  "base.defaulted": "Your tent is pitched in {city} for now. Move it any time under My Tent.",
+  "tent.style.aframe": "A-frame tent",
+  "tent.style.dome": "Dome tent",
+  "tent.style.popup": "Pop-up tent",
+  "tent.style.summit": "Summit shelter",
+  "tent.avatar.none": "Nobody",
+  "tent.avatar.boy": "Boy",
+  "tent.avatar.girl": "Girl",
   "base.change": "CHANGE",
   "base.choose": "CHOOSE",
   "menu.tipStarts": p => `${p.game} starts in ${p.country} today`,
@@ -6909,7 +6952,7 @@ const EN = {
   "menu.drawerOpen": "Expedition menu",
   "menu.drawerClose": "Close the menu",
   "menu.drawerTitle": "EXPEDITION MENU",
-  "menu.drawerToday": "TODAY'S GAMES",
+  "menu.drawerToday": "DAILY OPERATIONS",
   "menu.extremesLine": "Six ranking questions a day.",
   "menu.pinToday": "Today: {name}",
   "menu.pinStarts": "Starts in {country}",
@@ -6978,10 +7021,10 @@ const EN = {
   "hud.tent": "YOUR TENT",
   "hud.capital": "{city}, {country}",
   "hud.show": "Show it on the globe",
-  "tent.kicker": "NEW TENT UNLOCKED",
+  "tent.kicker": "NEW TENT STYLE UNLOCKED",
   "tent.title": "Your camp levelled up",
   "tent.earned": "Earned with your {badge} badge",
-  "tent.atlas": "Now that's a proper tent. It's waiting for you at your base.",
+  "tent.atlas": "Now that's a proper tent. Pick it under My Tent whenever you like.",
   "tent.atlasNoBase": "A fine new tent! Tell me where to pitch it.",
   "tent.go": "BACK TO THE MAP",
   "tent.pitch": "PITCH IT",
@@ -7035,7 +7078,7 @@ const EN = {
   "glance.noteLeader": p => `${p.name} leads this week.`,
 
   // Account
-  "account.title": "YOUR ACCOUNT",
+  "account.title": "MY TENT",
   "account.close": "Close account",
   "account.intro": "Save your progress, protect your streak and take your Expedition account anywhere.",
   "account.google": "Continue with Google",
@@ -7123,7 +7166,7 @@ const NL = {
   "menu.stats": "STATS",
   "menu.statsNote": "Je beste dagen, reeksen en meer.",
   "menu.howTo": "UITLEG",
-  "menu.account": "MIJN ACCOUNT",
+  "menu.account": "MIJN TENT",
   "menu.noDay": "Nog geen goedgekeurde dag voor vandaag",
   "menu.seeResults": "✓ BEKIJK UITSLAG",
   "menu.continueGo": "▶ VERDER",
@@ -7817,7 +7860,7 @@ const NL = {
   "base.askFirst": "Elke expeditie heeft een basis nodig. Waar zullen we je tent opzetten? Kies een land, en daar begint elke reis.",
   "base.askAgain": "Verhuizen? Kies het land voor je nieuwe basis.",
   "base.askAfterGame": "Mooi geklommen! Een ontdekker als jij verdient een eigen kamp. Waar zullen we je tent opzetten? Kies een land, en daar begint elke reis.",
-  "base.later": "LATER",
+  "base.later": "SLA NU OVER",
   "base.nice": p => `${p.name}. Goede grond voor een tent.`,
   "base.placeholder": "Typ een land…",
   "base.pick": "KIES",
@@ -7825,10 +7868,24 @@ const NL = {
   "base.none": "Nog geen basis",
   "base.city": "Stad voor je tent",
   "base.cityLabel": "IN",
-  "base.note": "Je basis staat bij je account, en de globe in het menu opent erboven. Verplaatsen kan altijd onder Mijn account.",
+  "base.note": "Je basis staat bij je account, en de globe in het menu opent erboven. Verplaatsen kan altijd onder Mijn tent.",
   "base.label": "JOUW BASIS",
   "base.color": "KLEUR PIN",
   "base.colorN": "Kleur {n}",
+  "menu.drawerCamp": "KAMP & COMMUNITY",
+  "menu.tentGuest": "Gast · log in om je dagen te bewaren",
+  "menu.tentNone": "Nog geen tent opgezet",
+  "base.style": "TENT",
+  "base.avatar": "ONTDEKKER",
+  "base.lockedBy": "komt vrij met de badge {badge}",
+  "base.defaulted": "Je tent staat voorlopig in {city}. Verplaatsen kan altijd onder Mijn tent.",
+  "tent.style.aframe": "Driehoekstent",
+  "tent.style.dome": "Koepeltent",
+  "tent.style.popup": "Pop-uptent",
+  "tent.style.summit": "Toppentent",
+  "tent.avatar.none": "Niemand",
+  "tent.avatar.boy": "Jongen",
+  "tent.avatar.girl": "Meisje",
   "base.change": "WIJZIG",
   "base.choose": "KIES",
   "menu.tipStarts": p => `${p.game} begint vandaag in ${p.country}`,
@@ -7836,7 +7893,7 @@ const NL = {
   "menu.drawerOpen": "Expeditiemenu",
   "menu.drawerClose": "Menu sluiten",
   "menu.drawerTitle": "EXPEDITIEMENU",
-  "menu.drawerToday": "SPELLEN VAN VANDAAG",
+  "menu.drawerToday": "DAGELIJKSE OPERATIES",
   "menu.extremesLine": "Zes ranglijstvragen per dag.",
   "menu.pinToday": "Vandaag: {name}",
   "menu.pinStarts": "Begint in {country}",
@@ -7905,10 +7962,10 @@ const NL = {
   "hud.tent": "JOUW TENT",
   "hud.capital": "{city}, {country}",
   "hud.show": "Laat het zien op de globe",
-  "tent.kicker": "NIEUWE TENT",
+  "tent.kicker": "NIEUWE TENTSTIJL",
   "tent.title": "Je kamp is gegroeid",
   "tent.earned": "Verdiend met je badge {badge}",
-  "tent.atlas": "Dat is pas een tent. Hij staat klaar op je basis.",
+  "tent.atlas": "Dat is pas een tent. Kies hem onder Mijn tent wanneer je wilt.",
   "tent.atlasNoBase": "Een prachtige nieuwe tent! Zeg maar waar hij moet staan.",
   "tent.go": "TERUG NAAR DE KAART",
   "tent.pitch": "ZET HEM OP",
@@ -7962,7 +8019,7 @@ const NL = {
   "glance.noteLeader": p => `${p.name} leidt deze week.`,
 
   // Account
-  "account.title": "JE ACCOUNT",
+  "account.title": "MIJN TENT",
   "account.close": "Account sluiten",
   "account.intro": "Bewaar je voortgang, bescherm je reeks en neem je Expedition-account overal mee.",
   "account.google": "Verder met Google",
@@ -14803,6 +14860,16 @@ async function saveTentColor(tentColor) {
   else if (data?.user) user = data.user;
 }
 
+// Your tent's style and explorer (base.js), kept in the account like the tent.
+async function saveTentLook(tentLook) {
+  const supabase = await getClient();
+  const stored = user?.user_metadata?.tentLook;
+  if (!supabase || !user || (stored && stored.style === tentLook.style && stored.avatar === tentLook.avatar)) return;
+  const { data, error } = await supabase.auth.updateUser({ data: { tentLook } });
+  if (error) console.warn("Couldn't save your tent to your account.", error);
+  else if (data?.user) user = data.user;
+}
+
 // Whether Atlas (Base Camp's guide) keeps quiet, kept in the account like the language.
 async function saveAtlasQuiet(atlasQuiet) {
   const supabase = await getClient();
@@ -14869,7 +14936,7 @@ const getGroups = () => call("my_groups");
 // Rows of { user_id, display_name, date, score } for the group's finished days.
 const getGroupBoard = (groupId, from, to) => call("group_board", { group_ref: groupId, from_date: from, to_date: to });
 
-return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, saveBase, saveTent, saveTentColor, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, addToGroup, leaveGroup, getGroups, getGroupBoard };
+return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, saveBase, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, addToGroup, leaveGroup, getGroups, getGroupBoard };
 })();
 
 // ---- round-pictures.js
@@ -24941,6 +25008,176 @@ function createAtlas({ size = 96, onPoke = () => {} } = {}) {
 return { ATLAS_COLORS, POSES, createAtlasSprite, createTent, createFlag, isAtlasQuiet, setAtlasQuiet, onAtlasQuietChange, syncAtlasQuiet, createAtlas };
 })();
 
+// ---- tents.js
+__modules["tents.js"] = (() => {
+// Your tent: your own marker on the globe, distinct from Base Camp (the shared camp with its
+// mountain and flag). You choose its look under My Tent (base.js createBaseLine): a tent
+// style, an explorer standing beside it (or nobody), and a colour for its fabric and pin.
+//
+// Tent styles unlock with your explorer rank (RANK_TIERS in community.js): the best monthly
+// badge you've ever earned, so a style never locks again. Level 0 before any badge, then
+// Tourist (1) up to Mr. Worldwide (6). The A-frame is free; the dome comes with Tourist, the
+// pop-up with Navigator and the summit shelter with Pioneer. A newly unlocked style is
+// celebrated once (celebrateTent), back on the menu after a game; the highest level
+// celebrated is kept in this browser (TENT_KEY), and the first time it's only noted, so
+// nobody gets a party for old badges.
+const { sounds } = __modules["audio.js"];
+const { createAtlasSprite } = __modules["atlas.js"];
+const { createBadge } = __modules["badges.js"];
+const { RANK_TIERS, getMonthBadge } = __modules["community.js"];
+const { t } = __modules["i18n.js"];
+
+const TENT_KEY = "daily-geography:tent-level:v1";
+
+// The styles, in the order they unlock (level = the rank that unlocks it).
+const TENT_STYLES = [
+  { id: "aframe", level: 0 },
+  { id: "dome", level: 1 },
+  { id: "popup", level: 3 },
+  { id: "summit", level: 5 }
+];
+const AVATARS = ["none", "boy", "girl"];
+const isStyleUnlocked = (style, level) => (TENT_STYLES.find(item => item.id === style)?.level ?? 99) <= level;
+// The style to draw: your choice if you've unlocked it, else the A-frame.
+const styleFor = (style, level) => (isStyleUnlocked(style, level) ? style : "aframe");
+
+// The rank of a level (null for 0).
+const tierOf = level => (level ? RANK_TIERS[RANK_TIERS.length - level] : null);
+const levelOf = tier => (tier ? RANK_TIERS.length - RANK_TIERS.indexOf(tier) : 0);
+
+// The best rank of any month, from archive records of the main game (screens.js loadDays).
+function tentLevel(days) {
+  const months = [...new Set(days.filter(day => day.completed).map(day => day.dateKey.slice(0, 7)))];
+  return months.reduce((best, month) => Math.max(best, levelOf(getMonthBadge(days, month).tier)), 0);
+}
+
+// ---------- The pixel art: 11-wide tents and 5-wide explorers ----------
+// C and c are the fabric in your colour (and its shade); the rest are fixed.
+const PALETTE = {
+  K: "#0b1020", n: "#2b313b", W: "#f4f1e8", w: "#c9c3b5", S: "#e8ecf6", s: "#9aa6c4",
+  Y: "#ffd45c", y: "#c99a2e", P: "#ff6b9d", p: "#c2456f", T: "#2bb3a3", t: "#1c7a70",
+  B: "#8a5a32", b: "#5c3a1f", F: "#f2c29b", f: "#c98f6a"
+};
+const STYLE_ROWS = {
+  // A classic ridge tent seen from the front, its pole sticking out on top.
+  aframe: [".....K.....", ".....K.....", "....KCK....", "...KCCcK...", "..KCCKccK..", ".KCCKnKccK.", "KCCKnnnKccK", "KKKKKKKKKKK"],
+  // A round dome with a little window.
+  dome: ["...KKKKK...", "..KCCCCcK..", ".KCCWCCccK.", ".KCCCCCccK.", "KCCCKKKcccK", "KCCKnnnKccK", "KCCKnnnKccK", "KKKKKKKKKKK"],
+  // A pop-up: low and boxy, with a bright band.
+  popup: ["..KKKKKKK..", ".KCCCCCCcK.", "KCYYYYYYYcK", "KCCCKKKCccK", "KCCKnnnKccK", "KCCKnnnKccK", "KKKKKKKKKKK"],
+  // A high-altitude summit shelter: snow on its peak and a gold pennant.
+  summit: [".....KYYY..", ".....KYY...", ".....K.....", "....KSK....", "...KSSsK...", "..KCCSccK..", ".KCCKnKccK.", "KCCKnnnKccK", "KKKKKKKKKKK"]
+};
+const AVATAR_ROWS = {
+  boy: [".KKK.", "KBBBK", "KFFFK", ".KFK.", "KTTTK", "KtttK", "KbKbK", "KK.KK"],
+  girl: [".KKK.", "KbbbK", "KFFFK", "KbFbK", "KPPPK", "KpppK", "KFKFK", "KK.KK"]
+};
+
+// A colour a third of the way to black, for the fabric's shade.
+function shade(hex) {
+  const value = parseInt(hex.slice(1), 16);
+  const part = shift => Math.round(((value >> shift) & 255) * 0.62);
+  return `rgb(${part(16)}, ${part(8)}, ${part(0)})`;
+}
+function paint(ctx, rows, left, top, scale, colors) {
+  rows.forEach((row, y) => [...row].forEach((key, x) => {
+    const color = colors[key];
+    if (!color) return;
+    ctx.fillStyle = color;
+    ctx.fillRect(left + x * scale, top + y * scale, scale, scale);
+  }));
+}
+// Your tent's look on a 16×16 grid (left, top: its corner; scale: pixels per cell): the
+// tent standing on the bottom, the explorer beside it on the right.
+function drawTentLook(ctx, { style = "aframe", avatar = "none", color = "#ff9f43" } = {}, left = 0, top = 0, scale = 1) {
+  const tent = STYLE_ROWS[style] || STYLE_ROWS.aframe;
+  const person = AVATAR_ROWS[avatar];
+  const colors = { ...PALETTE, C: color, c: shade(color) };
+  const bottom = 13; // the ground's row
+  const tentLeft = person ? 0 : 2;
+  paint(ctx, tent, left + tentLeft * scale, top + (bottom - tent.length + 1) * scale, scale, colors);
+  if (person) paint(ctx, person, left + 11 * scale, top + (bottom - person.length + 1) * scale, scale, colors);
+}
+// A canvas with the look at a whole-pixel scale (crisp at any size).
+function createTentCanvas(look, scale = 3, className = "tent-icon") {
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 16 * scale;
+  canvas.className = className;
+  drawTentLook(canvas.getContext("2d"), look, 0, 0, scale);
+  return canvas;
+}
+
+// ---------- Unlocking ----------
+
+const readCelebrated = () => { try { const value = localStorage.getItem(TENT_KEY); return value === null ? null : Number(value) || 0; } catch { return null; } };
+const writeCelebrated = level => { try { localStorage.setItem(TENT_KEY, String(level)); } catch { /* storage off */ } };
+
+// The style to celebrate now (unlocked since the last check), or null. The first check in a
+// browser only notes where you are; a new rank that unlocks no style is noted quietly.
+function tentToCelebrate(level) {
+  const seen = readCelebrated();
+  if (seen === null) { writeCelebrated(level); return null; }
+  if (level <= seen) return null;
+  const fresh = TENT_STYLES.filter(item => item.level > seen && item.level <= level).pop();
+  if (!fresh) { writeCelebrated(level); return null; }
+  return { ...fresh, rank: level };
+}
+const markTentCelebrated = level => writeCelebrated(Math.max(level, readCelebrated() || 0));
+
+// The celebration: Atlas cheers, the new tent style pops up with the badge that unlocked it.
+// `unlocked` is tentToCelebrate()'s result; `look` your current look (shown in the new
+// style). `hasBase` false: the button pitches it first (onPitch). Resolves once closed.
+function celebrateTent(unlocked, { look = {}, hasBase = true, onPitch = null } = {}) {
+  markTentCelebrated(unlocked.rank);
+  const tier = tierOf(unlocked.level);
+  return new Promise(resolve => {
+    const overlay = document.createElement("div");
+    overlay.className = "modal-overlay base-overlay tent-overlay";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-labelledby", "tentTitle");
+    const modal = document.createElement("div");
+    modal.className = "modal base-modal tent-modal";
+    if (tier) modal.style.setProperty("--tier", tier.color);
+
+    const label = Object.assign(document.createElement("span"), { className: "tent-kicker", textContent: t("tent.kicker") });
+    const title = Object.assign(document.createElement("h2"), { id: "tentTitle", textContent: t(`tent.style.${unlocked.id}`) });
+
+    // The tent on its little patch of ground, with rays behind it.
+    const stage = document.createElement("div");
+    stage.className = "tent-stage";
+    stage.append(Object.assign(document.createElement("i"), { className: "tent-rays" }), createTentCanvas({ ...look, style: unlocked.id }, 8, "tent-big"));
+
+    const earned = document.createElement("p");
+    earned.className = "tent-earned";
+    if (tier) earned.append(createBadge(tier, 30), Object.assign(document.createElement("span"), { textContent: t("tent.earned", { badge: tier.name }) }));
+
+    const talk = document.createElement("div");
+    talk.className = "base-talk tent-talk";
+    const bubble = document.createElement("div");
+    bubble.className = "atlas-bubble base-bubble";
+    bubble.append(Object.assign(document.createElement("span"), { className: "atlas-bubble-name", textContent: "ATLAS" }),
+      Object.assign(document.createElement("p"), { textContent: t(hasBase ? "tent.atlas" : "tent.atlasNoBase") }));
+    talk.append(createAtlasSprite(72, "cheer"), bubble);
+
+    const go = Object.assign(document.createElement("button"), { type: "button", className: "btn btn-primary btn-block tent-go", textContent: t(hasBase ? "tent.go" : "tent.pitch") });
+    go.addEventListener("click", async () => {
+      sounds.playClick();
+      overlay.remove();
+      if (!hasBase && onPitch) await onPitch();
+      resolve();
+    });
+    modal.append(label, title, stage, earned, talk, go);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    sounds.playReveal?.("match", 2);
+    setTimeout(() => go.focus({ preventScroll: true }), 50);
+  });
+}
+
+return { TENT_STYLES, AVATARS, isStyleUnlocked, styleFor, tentLevel, drawTentLook, createTentCanvas, tentToCelebrate, markTentCelebrated, celebrateTent };
+})();
+
 // ---- capital-data.js
 __modules["capital-data.js"] = (() => {
 // Generated by tools/build-capitals.mjs on 2026-11-09. Do not edit by hand.
@@ -24980,7 +25217,8 @@ __modules["base.js"] = (() => {
 // first visit (pickBase); you can change it under My account. Kept in this browser and,
 // signed in, in the account (user metadata "base"; the account wins when you sign in).
 const { sounds } = __modules["audio.js"];
-const { getUser, saveBase, saveLanguage, saveTent, saveTentColor } = __modules["auth.js"];
+const { getUser, saveBase, saveLanguage, saveTent, saveTentColor, saveTentLook } = __modules["auth.js"];
+const { AVATARS, TENT_STYLES, createTentCanvas, isStyleUnlocked, styleFor } = __modules["tents.js"];
 const { CAPITALS } = __modules["capital-data.js"];
 const { CITIES } = __modules["place-data.js"];
 const { createAtlasSprite } = __modules["atlas.js"];
@@ -24988,6 +25226,9 @@ const { COUNTRIES } = __modules["countries.js"];
 const { getCountry } = __modules["daily.js"];
 const { LANGUAGES, countryName, getLang, onLangChange, setLang, t } = __modules["i18n.js"];
 const { createCountryInput, createFlagImage } = __modules["ui.js"];
+const { RANK_TIERS } = __modules["community.js"];
+// The rank names by level (1 Tourist … 6 Mr. Worldwide).
+const RANK_NAMES = () => [null, ...RANK_TIERS.slice().reverse().map(tier => tier.name)];
 
 const BASE_KEY = "daily-geography:base:v1";
 // The tent's spot in that country: a real city (place-data.js), the capital by default.
@@ -25001,6 +25242,39 @@ const TENT_COLORS = ["#ff9f43", "#ff5a5a", "#b48cff", "#5b8cff", "#36d6b0", "#a8
 let tentColor = (() => { try { return localStorage.getItem(COLOR_KEY); } catch { return null; } })();
 if (!TENT_COLORS.includes(tentColor)) tentColor = TENT_COLORS[0];
 const getTentColor = () => tentColor;
+// Your tent's style and the explorer beside it (tents.js), picked under My Tent. A style
+// you haven't unlocked yet (a new browser before your days have loaded) draws as an A-frame.
+const LOOK_KEY = "daily-geography:tent-look:v1";
+const cleanLook = value => ({
+  style: TENT_STYLES.some(item => item.id === value?.style) ? value.style : "aframe",
+  avatar: AVATARS.includes(value?.avatar) ? value.avatar : "none"
+});
+let tentLook = cleanLook((() => { try { return JSON.parse(localStorage.getItem(LOOK_KEY) || "null"); } catch { return null; } })());
+// The explorer rank that unlocks styles, from engine.js (it knows your days).
+let levelSource = () => 0;
+const setTentLevelSource = source => { levelSource = source; };
+// Everything to draw your tent: { style, avatar, color }.
+const getTentLook = () => ({ style: styleFor(tentLook.style, levelSource()), avatar: tentLook.avatar, color: tentColor });
+function setTentLook(patch, { save = true } = {}) {
+  const next = cleanLook({ ...tentLook, ...patch });
+  if (next.style === tentLook.style && next.avatar === tentLook.avatar) return;
+  tentLook = next;
+  try { localStorage.setItem(LOOK_KEY, JSON.stringify(tentLook)); } catch { /* storage off */ }
+  if (save && getUser()) saveTentLook(tentLook);
+  listeners.forEach(listener => listener(getBase()));
+}
+
+// Where a tent goes when you skip the question: the capital of the country of your browser's
+// language setting (nl-BE: Brussels), or else `fallbackIso`.
+function defaultBaseIso(fallbackIso = null) {
+  const tags = [...(navigator.languages || []), navigator.language].filter(Boolean);
+  for (const tag of tags) {
+    let region = null;
+    try { region = new Intl.Locale(tag).maximize().region; } catch { /* odd tag */ }
+    if (region && getCountry(region)) return region;
+  }
+  return fallbackIso && getCountry(fallbackIso) ? fallbackIso : null;
+}
 function setTentColor(color, { save = true } = {}) {
   if (!TENT_COLORS.includes(color) || color === tentColor) return;
   tentColor = color;
@@ -25057,6 +25331,9 @@ function syncBase(account) {
   const storedColor = account?.user_metadata?.tentColor;
   if (TENT_COLORS.includes(storedColor)) setTentColor(storedColor, { save: false });
   else if (account) saveTentColor(tentColor);
+  const storedLook = account?.user_metadata?.tentLook;
+  if (storedLook) setTentLook(storedLook, { save: false });
+  else if (account) saveTentLook(tentLook);
   const storedTent = account?.user_metadata?.tent;
   const stored = account?.user_metadata?.base;
   if (isTent(storedTent)) {
@@ -25179,7 +25456,8 @@ function pickBase({ first = false, afterGame = false } = {}) {
 
     const note = Object.assign(document.createElement("p"), { className: "base-note", textContent: t("base.note") });
     modal.append(head, talk, group, chosen, confirm, note);
-    // After a game the question can wait: LATER asks again after the next finished game.
+    // After a game the question can be skipped: the tent then goes up in a default capital
+    // (engine.js askForBase), and My Tent moves it.
     const later = afterGame ? Object.assign(document.createElement("button"), { type: "button", className: "base-later", textContent: t("base.later") }) : null;
     if (later) {
       later.addEventListener("click", () => { sounds.playClick(); finish(null); });
@@ -25254,14 +25532,44 @@ function createBaseLine({ onChange = null } = {}) {
         colors.appendChild(swatch);
       });
       line.appendChild(colors);
+      line.append(lookPicker("style"), lookPicker("avatar"));
     }
+  };
+  // A row of choices drawn as your tent: the styles (locked ones say which badge opens
+  // them), or the explorers.
+  const lookPicker = kind => {
+    const row = document.createElement("div");
+    row.className = "tent-colors tent-looks";
+    row.setAttribute("role", "radiogroup");
+    row.setAttribute("aria-label", t(`base.${kind}`));
+    row.appendChild(Object.assign(document.createElement("span"), { className: "field-label", textContent: t(`base.${kind}`) }));
+    const level = levelSource();
+    const options = kind === "style" ? TENT_STYLES.map(item => item.id) : AVATARS;
+    const current = kind === "style" ? styleFor(tentLook.style, level) : tentLook.avatar;
+    options.forEach(id => {
+      const locked = kind === "style" && !isStyleUnlocked(id, level);
+      const look = { ...getTentLook(), [kind]: id };
+      const choice = Object.assign(document.createElement("button"), { type: "button", className: "tent-look" });
+      choice.appendChild(createTentCanvas(look, 2, "tent-look-icon"));
+      const name = t(kind === "style" ? `tent.style.${id}` : `tent.avatar.${id}`);
+      const lockedBy = locked ? TENT_STYLES.find(item => item.id === id).level : 0;
+      const note = locked ? t("base.lockedBy", { badge: RANK_NAMES()[lockedBy] }) : "";
+      choice.title = locked ? `${name} · ${note}` : name;
+      choice.setAttribute("role", "radio");
+      choice.setAttribute("aria-checked", String(id === current));
+      choice.setAttribute("aria-label", choice.title);
+      if (locked) { choice.disabled = true; choice.classList.add("is-locked"); }
+      choice.addEventListener("click", () => { sounds.playClick(); setTentLook({ [kind]: id }); });
+      row.appendChild(choice);
+    });
+    return row;
   };
   render();
   listeners.add(render);
   return line;
 }
 
-return { TENT_COLORS, getTentColor, setTentColor, getBase, onBaseChange, tentSpots, getTent, tentLonLat, setBase, syncBase, pickBase, createBaseLine };
+return { TENT_COLORS, getTentColor, setTentLevelSource, getTentLook, setTentLook, defaultBaseIso, setTentColor, getBase, onBaseChange, tentSpots, getTent, tentLonLat, setBase, syncBase, pickBase, createBaseLine };
 })();
 
 // ---- travel.js
@@ -25314,15 +25622,6 @@ const SPRITES = {
   hiker: ["................", "......KK........", ".....KRRK.......", ".....KRRK.KK....", ".....KWWKKBBK...", "......KSSK.KBK..", ".....KTTTTKKBK..", "....KTTTTTTKBK..", ".....KTTTTK.KK..", "......KttK...K..", ".....KtKKtK..K..", ".....KbK.KbK.K.."],
   flag: ["WKKKK", "WPPPK", "WPYPK", "WPPPK", "WKKKK", "W....", "W....", "W...."],
   // Base Camp: a snowy peak with the tent in front and a pink flag on top.
-  // Your tent, one per explorer rank you've ever earned (tents.js): 0 before any badge,
-  // then Tourist, Backpacker, Navigator, Pathfinder, Pioneer and Mr. Worldwide.
-  tent0: ["................", "................", "................", "................", ".......KK.......", "......KSsK......", ".....KSSssK.....", "....KSSKKssK....", "...KSSKbbKssK...", "..KSSKbbbbKssK..", ".KKKKKKKKKKKKKK.", "................"],
-  tent1: ["................", "................", "................", ".......KK.......", "......KRrK......", ".....KRRrrK.....", "....KRRKKrrK....", "...KRRKyyKrrK...", "..KRRKyyyyKrrK..", ".KRRKyyyyyyKrrK.", "KKKKKKKKKKKKKKKK", "................"],
-  tent2: [".......KPP......", ".......KPPP.....", ".......KP.......", ".......KK.......", "......KLlK......", ".....KLLllK.....", "....KLLKKllK....", "...KLLKyyKllK...", "..KLLKyyyyKllK..", ".KLLKyyyyyyKllK.", "KKKKKKKKKKKKKKKK", "................"],
-  tent3: ["..........KYY...", "..........KYYY..", "..........KY....", ".....KKKKKK.....", "....KGGGGggK....", "...KGWGGGgggK...", "..KGGGGGGggggK..", "..KGGGKKKKgggK..", ".KGGGKyyyyKgggK.", ".KGGKyyyyyyKggK.", "KKKKKKKKKKKKKKKK", "................"],
-  tent4: ["................", "......KKKK......", ".....KVVVVK.....", "....KVVVVVVK....", "...KVVVVVVVVK...", "..KvvvvvvvvvvK..", "..KVVKKKKKKVVK..", "K.KVVKyyyyKVVK..", "Y.KVVKyyyyKVVK..", "y.KvvKyyyyKvvK..", "KKKKKKKKKKKKKKKK", "................"],
-  tent5: ["......KYY.......", "......KYYY......", "......KY........", ".....KKKKK......", "...KKOOOOOKK....", ".KKOOOOOOOOOKK..", "KooooooooooooooK", "KOOKKOOOOOOKKOOK", "KOOKGKOKKOKGKOOK", "KOOOOOKyyKOOOOOK", "KKKKKKKKKKKKKKKK", "................"],
-  tent6: [".......KY.......", "......KYYK......", ".P....KYyK....P.", ".PP..KYYyyK..PP.", ".K..KYYYyyyK..K.", ".K.KYYYYyyyyK.K.", ".KKYPYPYPYPYPKK.", ".KYYYKKKKKKyyyK.", ".KYYKyyyyyyKyyK.", ".KYYKyyRRyyKyyK.", ".KYYKyyRRyyKyyK.", "KKKKKKKKKKKKKKKK"],
   tent: ["..........K.....", "..........KPP...", ".....KK...KPPP..", "....KSSK..K.....", "...KSSsMK.K.....", "..KSMMsMMKK.....", "..KMMMKYYKMK....", ".KMMMKYYYyKMK...", ".KMMKYYYYyyKMK..", "KMMKYYKKKyyyKMK.", "KMKYYKKKKKyyyKK.", "KKKKKKKKKKKKKKKK"]
 };
 const FLYING = new Set(["plane", "balloon"]);
@@ -27007,111 +27306,6 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
 return { initializeCommunity };
 })();
 
-// ---- tents.js
-__modules["tents.js"] = (() => {
-// Your tent grows with you: one tent per explorer rank (RANK_TIERS in community.js) you've
-// ever earned, in any month, so it never gets smaller again. Level 0 before any badge, then
-// Tourist (1) up to Mr. Worldwide (6); the sprites are tent0–tent6 in travel.js. What comes
-// next is never shown: a new tent is a surprise, celebrated once (celebrateTent) when a
-// higher rank is unlocked. The highest level celebrated is kept in this browser
-// (TENT_KEY); the first time it's only noted, so nobody gets a party for old badges.
-const { sounds } = __modules["audio.js"];
-const { createAtlasSprite } = __modules["atlas.js"];
-const { createBadge } = __modules["badges.js"];
-const { RANK_TIERS, getMonthBadge } = __modules["community.js"];
-const { t } = __modules["i18n.js"];
-const { drawSprite } = __modules["travel.js"];
-
-const TENT_KEY = "daily-geography:tent-level:v1";
-const TENT_LEVELS = RANK_TIERS.length; // 6 ranks, so levels 0–6
-
-// The rank of a level (null for 0).
-const tierOf = level => (level ? RANK_TIERS[RANK_TIERS.length - level] : null);
-const levelOf = tier => (tier ? RANK_TIERS.length - RANK_TIERS.indexOf(tier) : 0);
-
-// The best rank of any month, from archive records of the main game (screens.js loadDays).
-function tentLevel(days) {
-  const months = [...new Set(days.filter(day => day.completed).map(day => day.dateKey.slice(0, 7)))];
-  return months.reduce((best, month) => Math.max(best, levelOf(getMonthBadge(days, month).tier)), 0);
-}
-
-const readCelebrated = () => { try { const value = localStorage.getItem(TENT_KEY); return value === null ? null : Number(value) || 0; } catch { return null; } };
-const writeCelebrated = level => { try { localStorage.setItem(TENT_KEY, String(level)); } catch { /* storage off */ } };
-
-// The level to celebrate now (higher than any celebrated before), or 0. The first check in
-// a browser only notes where you are.
-function tentToCelebrate(level) {
-  const seen = readCelebrated();
-  if (seen === null) { writeCelebrated(level); return 0; }
-  if (level > seen) return level;
-  return 0;
-}
-const markTentCelebrated = level => writeCelebrated(Math.max(level, readCelebrated() || 0));
-
-// A canvas with a tent at a whole-pixel scale (crisp at any size).
-function createTentCanvas(level, scale = 3, className = "tent-icon") {
-  const canvas = document.createElement("canvas");
-  canvas.width = 18 * scale;
-  canvas.height = 14 * scale;
-  canvas.className = className;
-  canvas.getContext("2d").imageSmoothingEnabled = false;
-  drawSprite(canvas.getContext("2d"), `tent${Math.max(0, Math.min(TENT_LEVELS, level))}`, canvas.width / 2, canvas.height / 2, { scale });
-  return canvas;
-}
-
-// The celebration: Atlas cheers, the new tent pops up with the badge that earned it.
-// `hasBase` false: the button pitches it first (onPitch). Resolves once closed.
-function celebrateTent(level, { hasBase = true, onPitch = null } = {}) {
-  markTentCelebrated(level);
-  const tier = tierOf(level);
-  return new Promise(resolve => {
-    const overlay = document.createElement("div");
-    overlay.className = "modal-overlay base-overlay tent-overlay";
-    overlay.setAttribute("role", "dialog");
-    overlay.setAttribute("aria-modal", "true");
-    overlay.setAttribute("aria-labelledby", "tentTitle");
-    const modal = document.createElement("div");
-    modal.className = "modal base-modal tent-modal";
-    if (tier) modal.style.setProperty("--tier", tier.color);
-
-    const label = Object.assign(document.createElement("span"), { className: "tent-kicker", textContent: t("tent.kicker") });
-    const title = Object.assign(document.createElement("h2"), { id: "tentTitle", textContent: t("tent.title") });
-
-    // The tent on its little patch of ground, with rays behind it.
-    const stage = document.createElement("div");
-    stage.className = "tent-stage";
-    stage.append(Object.assign(document.createElement("i"), { className: "tent-rays" }), createTentCanvas(level, 8, "tent-big"));
-
-    const earned = document.createElement("p");
-    earned.className = "tent-earned";
-    if (tier) earned.append(createBadge(tier, 30), Object.assign(document.createElement("span"), { textContent: t("tent.earned", { badge: tier.name }) }));
-
-    const talk = document.createElement("div");
-    talk.className = "base-talk tent-talk";
-    const bubble = document.createElement("div");
-    bubble.className = "atlas-bubble base-bubble";
-    bubble.append(Object.assign(document.createElement("span"), { className: "atlas-bubble-name", textContent: "ATLAS" }),
-      Object.assign(document.createElement("p"), { textContent: t(hasBase ? "tent.atlas" : "tent.atlasNoBase") }));
-    talk.append(createAtlasSprite(72, "cheer"), bubble);
-
-    const go = Object.assign(document.createElement("button"), { type: "button", className: "btn btn-primary btn-block tent-go", textContent: t(hasBase ? "tent.go" : "tent.pitch") });
-    go.addEventListener("click", async () => {
-      sounds.playClick();
-      overlay.remove();
-      if (!hasBase && onPitch) await onPitch();
-      resolve();
-    });
-    modal.append(label, title, stage, earned, talk, go);
-    overlay.appendChild(modal);
-    document.body.appendChild(overlay);
-    sounds.playReveal?.("match", 2);
-    setTimeout(() => go.focus({ preventScroll: true }), 50);
-  });
-}
-
-return { TENT_LEVELS, tentLevel, tentToCelebrate, markTentCelebrated, createTentCanvas, celebrateTent };
-})();
-
 // ---- transit-card.js
 __modules["transit-card.js"] = (() => {
 // The card of a vehicle on the menu globe: what it is (its line or route, its type), where it
@@ -27335,7 +27529,7 @@ const { sounds } = __modules["audio.js"];
 const { createDistributionChart, initializeHistoryScreens } = __modules["screens.js"];
 const { RANK_TIERS, formatTopPercent, getDayStats, getTopPercent } = __modules["community.js"];
 const { initializeCommunity } = __modules["social.js"];
-const { createBaseLine, getBase, getTent, getTentColor, onBaseChange, pickBase, syncBase, tentLonLat } = __modules["base.js"];
+const { createBaseLine, defaultBaseIso, getBase, getTent, getTentColor, getTentLook, onBaseChange, pickBase, setBase, setTentLevelSource, syncBase, tentLonLat } = __modules["base.js"];
 const { celebrateTent, createTentCanvas, tentLevel, tentToCelebrate } = __modules["tents.js"];
 const { DIRECT_LIFT_MS, FLIGHT_MS, createTravelLayer, createWorldTraffic, describeRoute, directFlight, distance: distanceOnGlobe, drawSprite, getDayPlace, localTraffic, makeTrack, placeOf, playJourney, spriteCanvas, startAmbient } = __modules["travel.js"];
 const { fillTransitCard } = __modules["transit-card.js"];
@@ -30250,6 +30444,8 @@ const featuredMode = () => (hasExtremeDay(today) ? "extremes" : "casual");
 let menuFocus = "extremes";
 function stopOf(key) {
   if (key === "camp") return { lat: BASE_CAMP_LONLAT[1], lon: BASE_CAMP_LONLAT[0] };
+  // My Tent: your tent, or without one where you'd start (the capital of today's country).
+  if (key === "tent") { const [lon, lat] = homeOrigin().lonLat; return { lat, lon }; }
   const [lon, lat] = startLonLat(key);
   return { lat, lon };
 }
@@ -30863,7 +31059,19 @@ function askForBase() {
   askingBase = true;
   setTimeout(async () => {
     const menuShown = !document.getElementById("mainMenu").classList.contains("hidden");
-    if (!getBase() && menuShown && !document.querySelector(".modal-overlay:not(.hidden)")) await pickBase({ first: true, afterGame: true });
+    if (!getBase() && menuShown && !document.querySelector(".modal-overlay:not(.hidden)")) {
+      await pickBase({ first: true, afterGame: true });
+      // Skipped (NOT NOW): the tent goes up in the capital of the browser's country (or of
+      // today's starting country) for now; My Tent moves it.
+      const iso = getBase() ? null : defaultBaseIso(todayPlace(featuredMode()).iso);
+      if (iso) {
+        setBase(iso);
+        const spot = getTent();
+        showToastNotice(t("base.defaulted", { city: spot?.city || countryName(getCountry(iso)) }));
+        const stop = stopOf("tent");
+        if (globe.mode === "menu") globe.glideMenuTo(stop.lat, stop.lon, FLIGHT_MS);
+      }
+    }
     askingBase = false;
   }, 1400);
 }
@@ -31006,8 +31214,10 @@ let community = null;
 function renderAccount(account) {
   const profile = account ? getProfile(account) : null;
   const avatar = profile?.avatar ? Object.assign(document.createElement("img"), { src: profile.avatar, alt: "", referrerPolicy: "no-referrer" }) : null;
-  setText("menuAccountLabel", profile ? profile.name.toUpperCase() : t("menu.account"));
-  if (avatar) document.getElementById("menuAccountAvatar").replaceChildren(avatar);
+  setText("menuAccountLabel", profile ? profile.name : t("menu.tentGuest"));
+  const menuAvatar = document.getElementById("menuAccountAvatar");
+  menuAvatar.hidden = !avatar;
+  if (avatar) menuAvatar.replaceChildren(avatar);
   document.getElementById("accountSignedOut").classList.toggle("hidden", Boolean(account));
   document.getElementById("accountSignedIn").classList.toggle("hidden", !account);
   if (profile) {
@@ -31022,10 +31232,30 @@ function renderAccount(account) {
   setText("accountNote", t(isAuthConfigured ? "account.note" : "account.notOn"));
 }
 
+// My Tent (your account and your tent): from the menu, the globe flies to your tent first,
+// a quick sweep (FLIGHT_MS) with your tent in the middle, then the window opens over it.
 document.getElementById("menuAccountButton").addEventListener("click", () => {
   sounds.playClick();
-  document.getElementById("accountModal").classList.remove("hidden");
+  const fromMenu = globe.mode === "menu" && !document.getElementById("mainMenu").classList.contains("hidden");
+  closeDrawerNow();
+  if (!fromMenu || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.getElementById("accountModal").classList.remove("hidden");
+    return;
+  }
+  menuFocus = "tent";
+  queueHudUpdate();
+  const stop = stopOf("tent");
+  globe.glideMenuTo(stop.lat, stop.lon, FLIGHT_MS, { distance: 120 });
+  setTimeout(() => document.getElementById("accountModal").classList.remove("hidden"), FLIGHT_MS * 0.7);
 });
+// The My Tent tile in the Expedition menu: your tent as it stands, and where.
+function renderTentTile() {
+  const spot = getTent();
+  document.getElementById("menuTentIcon").replaceChildren(createTentCanvas(getTentLook(), 2, "menu-tent-canvas"));
+  setText("menuTentWhere", spot ? (spot.city ? t("hud.capital", { city: spot.city, country: countryName(getCountry(spot.iso)) }) : countryName(getCountry(spot.iso))) : t("menu.tentNone"));
+}
+onBaseChange(renderTentTile);
+onLangChange(renderTentTile);
 document.getElementById("closeAccountButton").addEventListener("click", () => {
   sounds.playClick();
   document.getElementById("accountModal").classList.add("hidden");
@@ -31292,7 +31522,7 @@ const archive = initializeHistoryScreens({
   // The archive's map: the game globe's countries, where each day's game started, and your
   // tent as the hub every trip leaves from.
   getCountryFeatures: () => globe.countryFeatures,
-  getAnchor: () => { const lonLat = tentLonLat(); return lonLat ? { lonLat, icon: spriteCanvas(tentSprite()) } : null; },
+  getAnchor: () => { const lonLat = tentLonLat(); return lonLat ? { lonLat, icon: createTentCanvas(getTentLook(), 1, "tent-pin-icon") } : null; },
   getDayStart: (dateKey, mode) => {
     const country = getDayPlace(dateKey, mode).country;
     const capital = startCapital(mode, dateKey);
@@ -31321,32 +31551,17 @@ async function checkTentUpgrade() {
   await new Promise(resolve => setTimeout(resolve, 1400)); // once the globe has settled
   const menuShown = !document.getElementById("mainMenu").classList.contains("hidden");
   if (!menuShown || document.querySelector(".modal-overlay:not(.hidden), .base-overlay")) { celebratingTent = false; return false; }
-  await celebrateTent(due, { hasBase: Boolean(getBase()), onPitch: () => pickBase({ first: true, afterGame: true }) });
+  await celebrateTent(due, { look: getTentLook(), hasBase: Boolean(getBase()), onPitch: () => pickBase({ first: true, afterGame: true }) });
   celebratingTent = false;
   updatePlaceHud();
   return true;
 }
-// The base's flag on the menu globe is your tent now.
-const tentSprite = () => `tent${currentTentLevel()}`;
+// Your tent on the menu globe: its look (style, explorer, colour) as a pin icon, made once per look.
+const tentLookKey = () => JSON.stringify(getTentLook());
 const tentPinIcons = {};
-// The tent's pin icon, made once per tent level: the sprite centred in a 16×16 square
-// (the small first tents sit low in their sprite), like the other pins' logos.
-function tentPinIcon() {
-  const name = tentSprite();
-  if (tentPinIcons[name]) return tentPinIcons[name];
-  const sprite = spriteCanvas(name);
-  const pixels = sprite.getContext("2d").getImageData(0, 0, sprite.width, sprite.height).data;
-  let top = sprite.height;
-  let bottom = -1;
-  for (let y = 0; y < sprite.height; y += 1) for (let x = 0; x < sprite.width; x += 1) {
-    if (pixels[(y * sprite.width + x) * 4 + 3]) { top = Math.min(top, y); bottom = Math.max(bottom, y); }
-  }
-  const icon = document.createElement("canvas");
-  icon.width = icon.height = 16;
-  const offset = bottom < 0 ? 0 : Math.floor((16 - (bottom - top + 1)) / 2) - top;
-  icon.getContext("2d").drawImage(sprite, (16 - sprite.width) / 2, offset);
-  return (tentPinIcons[name] = icon);
-}
+const tentPinIcon = () => (tentPinIcons[tentLookKey()] ||= createTentCanvas(getTentLook(), 1, "tent-pin-icon"));
+setTentLevelSource(() => currentTentLevel());
+renderTentTile();
 
 // ---------------------------------------------------------------------------
 // Where you are: a small card in the top-right corner of the home screen (only there). It
@@ -31380,7 +31595,8 @@ function gameOrigin(mode, dateKey) {
 }
 // Where you're heading: what the menu looks at (menuFocus), or an open pin.
 function homeTarget() {
-  const key = openPin || menuFocus;
+  // Pointing at My Tent: the trip card still shows today's game.
+  const key = (openPin || menuFocus) === "tent" ? featuredMode() : openPin || menuFocus;
   if (key === "camp") return { key, label: t("hud.camp"), country: getCountry("NP"), lonLat: BASE_CAMP_LONLAT, color: PIN_COLORS.camp };
   const country = todayPlace(key);
   const capital = startCapital(key);
@@ -31405,11 +31621,11 @@ function updatePlaceHud() {
   const target = homeTarget();
   const km = kmBetween(origin.lonLat, target.lonLat);
   const label = t(origin.tent ? "hud.tent" : "hud.current");
-  const key = [label, origin.name, target.key, target.label, target.country.iso, km, currentTentLevel(), getTentColor()].join("|");
+  const key = [label, origin.name, target.key, target.label, target.country.iso, km, tentLookKey()].join("|");
   if (key === hudKey) return;
   const targetChanged = hudKey && hudKey.split("|")[2] !== target.key;
   hudKey = key;
-  const icon = origin.tent ? createTentCanvas(currentTentLevel(), 2, "place-hud-tent") : artIcon(PLAY_ART.extremes, PLAY_ART_COLORS);
+  const icon = origin.tent ? createTentCanvas(getTentLook(), 2, "place-hud-tent") : artIcon(PLAY_ART.extremes, PLAY_ART_COLORS);
   icon.classList.add("place-hud-icon");
   const text = document.createElement("span");
   text.className = "place-hud-text";
