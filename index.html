@@ -14187,6 +14187,37 @@ class PixelGlobe {
     requestAnimationFrame(animateRotation);
   }
 
+  // The game globe rides along with something moving (Highs & Lows' plane to your pick):
+  // at(e) gives [lon, lat] for e from 0 to 1, eased in and out like the plane (quadratic),
+  // over `duration` ms after `delay` ms. The camera first catches up with it from where it
+  // looks now (over the first `catchUp` share of the trip), then keeps it in the middle.
+  // Dragging the globe or a newer turn stops it. Resolves when the trip is over.
+  followPath(at, { duration, delay = 0, catchUp = 0.35 } = {}) {
+    if (this.mode !== "game") return Promise.resolve();
+    const token = ++this.rotationToken;
+    const startX = this.globeGroup.rotation.x;
+    const startY = this.globeGroup.rotation.y;
+    const startTime = performance.now();
+    return new Promise(resolve => {
+      const step = now => {
+        if (token !== this.rotationToken || this.mode !== "game" || this.isDragging) { resolve(); return; }
+        const t = Math.max(0, Math.min(1, (now - startTime - delay) / duration));
+        const e = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+        const [lon, lat] = at(e);
+        const target = this.anchorFor(lat, lon);
+        // Catching up: from the start view to the plane, smoothly (it doesn't jump).
+        const c = Math.min(1, (now - startTime) / (delay + duration * catchUp));
+        const w = c * c * (3 - 2 * c);
+        this.globeGroup.rotation.x = startX + (target.x - startX) * w;
+        this.globeGroup.rotation.y = startY + (target.y - startY) * w;
+        this.requestRender();
+        if (t < 1) { requestAnimationFrame(step); return; }
+        resolve();
+      };
+      requestAnimationFrame(step);
+    });
+  }
+
   // How far the camera is, as a share of the usual distance (1.2 = a little further out).
   zoomTo(factor) {
     this.targetCameraDistance = DEFAULT_CAMERA_DISTANCE * factor;
@@ -29577,7 +29608,7 @@ function editDistance(left, right) {
 // that), leaving a gold dotted trail; the trails of the day's picks stay on the globe, so
 // over six rounds they draw your route. Drawn on a canvas over the game's globe.
 const gameTravel = createTravelLayer(document.getElementById("globeCanvasContainer"), point => globe.projectLonLat(point));
-const PICK_FLIGHT_MS = 950;
+const PICK_FLIGHT_MS = FLIGHT_MS; // 1.4 s, like every flight between two places
 const PICK_ZOOM_OUT_MS = 550; // zooming out first, when you'd zoomed in to pick
 // The flight in progress, then the tour (the score card waits for both).
 let extremeFlightDone = null;
@@ -29613,13 +29644,14 @@ function flyToPick(roundIndex) {
   const from = route.at(-2);
   const to = route.at(-1);
   const track = legTrack(from, to);
-  // First zoom out (if you'd zoomed in to pick) and turn the globe so the whole flight is
-  // in view; the plane waits at the start until then.
+  // First zoom out (if you'd zoomed in to pick); the plane waits at the start until then.
+  // The camera then rides along with the plane (followPath), so it stays in the middle of
+  // the screen; a long flight pulls back a little to show more of the way.
   const zoomedIn = globe.getZoomFactor() < 0.95;
-  if (zoomedIn) globe.zoomTo(1);
-  const middle = track.at(0.5);
   const settle = zoomedIn ? PICK_ZOOM_OUT_MS : 0;
-  globe.rotateTo(middle[1], middle[0], settle + PICK_FLIGHT_MS * 0.6);
+  const km = track.total * 6371;
+  globe.zoomTo(1 + Math.min(0.25, km / 24000));
+  globe.followPath(e => track.at(e), { duration: PICK_FLIGHT_MS, delay: settle });
   return new Promise(resolve => { pickFlight = { roundIndex, track, start: performance.now() + settle, resolve }; });
 }
 (function drawGameTravel(now) {
