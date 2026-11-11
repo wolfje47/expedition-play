@@ -894,7 +894,6 @@ h1, h2, h3 { font-weight: normal; }
 .score-tile-total strong { color: var(--gold); font: 700 44px/1 var(--font-mono); text-shadow: 0 0 26px rgba(255, 212, 92, 0.35); font-variant-numeric: tabular-nums; }
 .score-tile-total span { color: var(--muted); font: 14px var(--font-mono); }
 .score-tile-climb { max-width: 170px; justify-self: end; width: 100%; }
-.score-tile .journey-label { display: none; }
 .score-tile-round { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--glass-line-soft); color: var(--muted); font-size: 14px; }
 .score-tile-round strong { color: var(--text); font: 700 16px var(--font-mono); }
 
@@ -1491,37 +1490,10 @@ h1, h2, h3 { font-weight: normal; }
 .score-burst-points span:first-child { opacity: 0.6; font-size: 0.6em; vertical-align: 0.3em; }
 .score-burst-points small { margin-left: 0.15em; font-size: 0.35em; opacity: 0.75; }
 
-/* The day's journey (see journeys.js): climb, dive, launch, balloon or trek. */
+/* The day's journey (see journeys.js): a pixel scene on a canvas, scaled in whole pixels.
+   A capped height keeps its shape (object-fit) instead of stretching it. */
 .score-burst-climb { width: min(420px, 78vw); margin: 0.2rem 0 -0.1rem; }
-.journey { display: block; width: 100%; height: auto; overflow: visible; }
-.journey-scale path { fill: none; stroke: rgba(255, 255, 255, 0.22); stroke-width: 1; stroke-dasharray: 3 4; }
-.journey-label { fill: var(--faint); font: 700 12px var(--font-mono); }
-.journey-route { fill: none; stroke: rgba(255, 255, 255, 0.28); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1 5; }
-.journey-route.is-travelled { stroke: var(--gold); stroke-width: 3.5; stroke-dasharray: none; filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.6)); }
-.journey-marks circle { fill: #04121a; stroke: var(--text); stroke-width: 1.5; }
-/* The travellers' own movements: the balloon sways, the climber and camel bob, the
-   rocket's flame flickers, the diver's bubbles rise. */
-.journey-traveller { filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55)); }
-.journey-sprite { transform-box: fill-box; }
-.journey-sprite.is-balloon { transform-origin: 50% 100%; animation: balloon-sway 3s ease-in-out infinite; }
-.journey-sprite.is-climb,
-.journey-sprite.is-trek { animation: traveller-bob 0.7s ease-in-out infinite; }
-.journey-flame { transform-box: fill-box; transform-origin: 100% 50%; animation: flame-flicker 0.14s ease-in-out infinite alternate; }
-.journey-bubble { fill: none; stroke: #bff4ff; stroke-width: 0.7; animation: bubble-rise 1.6s ease-out infinite; }
-.journey-bubble.is-2 { animation-delay: 0.5s; }
-.journey-bubble.is-3 { animation-delay: 1s; }
-.journey-sprite.is-dive { animation: traveller-bob 1.4s ease-in-out infinite; }
-@keyframes balloon-sway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
-@keyframes traveller-bob { 50% { transform: translateY(-1.2px); } }
-@keyframes flame-flicker { from { transform: scaleX(0.75); } to { transform: scaleX(1.15); } }
-@keyframes bubble-rise { from { transform: translateY(4px); opacity: 0.9; } to { transform: translateY(-6px); opacity: 0; } }
-/* The goal stays dim until it's reached. */
-.journey-goal line { stroke: var(--muted); stroke-width: 1.5; }
-.journey-goal :is(polygon, rect) { fill: var(--faint); }
-.journey-goal .journey-goal-line { fill: none; stroke: var(--faint); stroke-width: 1.5; }
-.journey-goal .journey-goal-panel { fill: color-mix(in srgb, var(--accent) 35%, transparent); }
-.journey.is-goal .journey-goal :is(polygon, rect) { fill: var(--gold); }
-.journey.is-goal .journey-goal .journey-goal-line { stroke: var(--gold); }
+.journey { display: block; width: 100%; height: auto; aspect-ratio: 176 / 80; object-fit: contain; border-radius: 6px; }
 
 .score-burst.is-zero .score-burst-points { color: var(--muted); text-shadow: none; }
 .score-burst-streak { padding: 3px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font: 700 14px var(--font-mono); }
@@ -2087,15 +2059,6 @@ h1, h2, h3 { font-weight: normal; }
 .rank-badge-svg { display: block; image-rendering: pixelated; }
 
 
-.journey-pin circle { fill: var(--glass-strong); stroke: var(--text); stroke-width: 1.5; }
-.journey-pin text { fill: var(--text); font: 700 12px var(--font-mono); paint-order: stroke; stroke: rgba(4, 18, 26, 0.85); stroke-width: 3px; }
-.journey-pin.is-gold circle { stroke: var(--gold); }
-.journey-pin.is-gold text { fill: var(--gold); }
-.journey-pin.is-accent circle { stroke: var(--accent); }
-.journey-pin.is-accent text { fill: var(--accent); }
-.journey-pin.is-muted text { fill: var(--muted); }
-.journey-pin.is-you circle { r: 5.5; fill: var(--gold); stroke: #04121a; }
-.journey-pin.is-you text { fill: #fff; font-size: 12px; }
 
 
 .tier-ladder { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.25rem; margin-top: auto; list-style: none; }
@@ -2495,7 +2458,7 @@ h1, h2, h3 { font-weight: normal; }
      list scrolling underneath never shows past it. */
   .score-burst-card #scoreBurstNext { position: sticky; bottom: 0; z-index: 2; order: 9; box-shadow: 0 0 0 12px rgb(10, 15, 29), 0 60px 0 12px rgb(10, 15, 29); }
   .score-burst-points { font-size: clamp(3rem, 16vw, 4.2rem); }
-  .score-burst-climb svg { max-height: 120px; }
+  .score-burst-climb .journey { max-height: 120px; }
   .score-burst-card:not(.is-info-open) .burst-info { display: none; }
   /* MORE ABOUT IT is a peek of the info card: its photo, title and first line, and a +. */
   .burst-more:not(.hidden) { display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.5rem 0.75rem 0.5rem 0.5rem; border: 1px solid var(--glass-line); border-radius: 12px; background: rgba(255, 255, 255, 0.05); color: var(--text); text-align: left; }
@@ -2586,7 +2549,7 @@ h1, h2, h3 { font-weight: normal; }
   .end-screen .end-page { flex: 0 0 100%; align-content: start; gap: 0.5rem; overflow-y: auto; scroll-snap-align: start; }
   .end-screen .end-score .score-display { font-size: 2.6rem; }
   .end-screen .end-percent { font-size: 2rem; }
-  .end-screen .end-climb-chart svg { max-height: 150px; }
+  .end-screen .end-climb-chart .journey { max-height: 150px; }
   .end-screen .end-next-page { display: block; justify-self: end; padding: 0.4rem 0; color: var(--accent); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
   .end-screen .end-dots { display: flex; justify-content: center; gap: 6px; }
   .end-dots i { width: 7px; height: 7px; border-radius: 2px; background: var(--glass-line); }
@@ -3071,7 +3034,7 @@ h1, h2, h3 { font-weight: normal; }
 .score-burst-card.is-extreme .pecking-end { font-size: 9px; }
 @media (min-width: 761px) {
   .score-burst-card.is-extreme.has-info { width: min(1040px, 94vw); }
-  .score-burst-card.is-extreme .score-burst-climb svg { max-height: none; }
+  .score-burst-card.is-extreme .score-burst-climb .journey { max-height: none; }
 }
 /* Highs & Lows results: the round card's type throughout. Pixel labels in white, the stat
    as the round card's pink pill, the country in its Space Grotesk 600, points in the accent. */
@@ -3506,6 +3469,14 @@ h1, h2, h3 { font-weight: normal; }
 .base-where strong { overflow: hidden; font: 600 14px var(--font-body); text-overflow: ellipsis; white-space: nowrap; }
 .base-where small { color: var(--muted); font-size: 14px; }
 .account-base { padding: 10px 12px; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: var(--glass-fill); }
+/* Your stats, in My Tent: a tile like the My Tent tile in the drawer, with the main game's
+   days and average under the title. */
+.account-stats { --tile: #ff6b9d; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; width: 100%; padding: 10px 12px; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: var(--glass-fill); color: var(--text); text-align: left; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+.account-stats:hover, .account-stats:focus-visible { border-color: var(--cyan); background: color-mix(in srgb, var(--cyan) 10%, var(--glass-fill)); outline: none; }
+.account-stats-icon { box-sizing: border-box; width: 40px; height: 40px; padding: 9px; border-radius: 9px; color: var(--tile); background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0 2px, transparent 2px 4px), radial-gradient(circle, color-mix(in srgb, var(--tile) 20%, #04121a), #04121a 75%); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tile) 50%, transparent); }
+.account-stats-text { display: grid; gap: 4px; min-width: 0; }
+.account-stats-text strong { font: 9px/1.4 var(--font-display); letter-spacing: var(--ls-pixel); }
+.account-stats-text small { overflow: hidden; color: var(--muted); font: 12px var(--font-body); text-overflow: ellipsis; white-space: nowrap; }
 /* The base picker's language switch, top right: EN / NL. */
 .base-modal .modal-head { gap: 10px; }
 .base-modal .modal-head h2 { flex: 1; }
@@ -3630,18 +3601,15 @@ h1, h2, h3 { font-weight: normal; }
 .expedition-drawer .menu-community-card { display: grid; padding: 0.4rem; border: 1px solid var(--glass-line); border-radius: 14px; background: rgba(10, 15, 30, 0.5); }
 .expedition-drawer .menu-community-card .glance-head .atlas-sprite { width: 36px; height: 36px; }
 .glance-line { display: none; }
-/* The footer: the rest as a row of icons. */
-.main-menu .expedition-drawer .menu-secondary { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin: auto 0 0; padding-top: 14px; border-top: 1px solid var(--glass-line-soft); }
+/* The footer: the rest as a row of equal tiles (Archive, How to play, Language), spread over
+   the whole width, each an icon on the same small scanline screen over its name. */
+.main-menu .expedition-drawer .menu-secondary { display: grid; grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; margin: auto 0 0; padding-top: 14px; border-top: 1px solid var(--glass-line-soft); }
 .main-menu .expedition-drawer .menu-secondary .community-open-button { display: none; }
-.main-menu .expedition-drawer .menu-secondary .menu-option,
-.main-menu .expedition-drawer .menu-secondary #menuStatsButton { position: static; grid-column: auto; order: 0; flex-direction: column; justify-content: flex-start; gap: 4px; width: auto; height: auto; min-width: 0; min-height: 0; padding: 6px 2px; border-radius: 10px; background: rgba(255, 255, 255, 0.03); font-size: 8px; text-align: center; }
-.main-menu .expedition-drawer .menu-secondary .menu-option span { max-width: 100%; font-size: 7px; letter-spacing: 0; line-height: 1.4; white-space: normal; overflow-wrap: normal; }
+.main-menu .expedition-drawer .menu-secondary .menu-option { position: static; grid-column: auto; order: 0; flex-direction: column; justify-content: flex-start; align-items: center; gap: 8px; width: auto; height: auto; min-width: 0; min-height: 0; padding: 10px 4px 9px; border-radius: 10px; text-align: center; }
+.main-menu .expedition-drawer .menu-secondary .menu-option span { display: flex; align-items: center; justify-content: center; max-width: 100%; min-height: 2.8em; font: 9px/1.4 var(--font-display); letter-spacing: var(--ls-pixel); white-space: normal; overflow-wrap: normal; }
 .main-menu .expedition-drawer .menu-secondary .menu-option-note { display: none; }
 .main-menu .expedition-drawer .menu-secondary .menu-pixel-icon,
-.main-menu .expedition-drawer .menu-secondary #menuStatsButton .menu-pixel-icon,
-.main-menu .expedition-drawer .menu-secondary .lang-button-icon { width: 28px; height: 28px; padding: 5px; flex: none; }
-.main-menu .expedition-drawer .menu-secondary #menuAccountLabel { display: block; overflow: visible; overflow-wrap: normal; -webkit-line-clamp: none; }
-.main-menu .expedition-drawer .menu-secondary .lang-button-icon { box-sizing: border-box; border-radius: 7px; background: #04121a; }
+.main-menu .expedition-drawer .menu-secondary .lang-button-icon { box-sizing: border-box; width: 34px; height: 34px; padding: 7px; flex: none; border-radius: 9px; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0 2px, transparent 2px 4px), radial-gradient(circle, color-mix(in srgb, var(--tile) 20%, #04121a), #04121a 75%); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tile) 50%, transparent); }
 .main-menu .menu-secondary .lang-button span { text-transform: uppercase; }
 
 @media (max-width: 760px) {
@@ -3700,7 +3668,7 @@ h1, h2, h3 { font-weight: normal; }
 }
 
 /* ---------- Where you are: the home screen's top-right card (updatePlaceHud in engine.js) ---------- */
-.place-hud { position: fixed; z-index: 4; top: calc(16px + env(safe-area-inset-top)); right: 16px; display: flex; align-items: center; gap: 10px; max-width: min(360px, calc(100vw - 200px)); padding: 7px 12px 7px 8px; border: 0; border-radius: 10px; background: var(--glass-strong); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); box-shadow: inset 0 0 0 1px var(--glass-line), inset 3px 0 0 var(--hud, var(--gold)), var(--glass-shine), 3px 3px 0 rgba(0, 0, 0, 0.4); color: var(--text); text-align: left; cursor: pointer; animation: transit-in 0.2s ease-out; }
+.place-hud { position: fixed; z-index: 4; top: calc(16px + env(safe-area-inset-top)); right: calc(16px + env(safe-area-inset-right)); display: flex; align-items: center; gap: 10px; max-width: min(360px, calc(100vw - 200px - env(safe-area-inset-left) - env(safe-area-inset-right)), var(--hud-room, 360px)); padding: 7px 12px 7px 8px; border: 0; border-radius: 10px; background: var(--glass-strong); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); box-shadow: inset 0 0 0 1px var(--glass-line), inset 3px 0 0 var(--hud, var(--gold)), var(--glass-shine), 3px 3px 0 rgba(0, 0, 0, 0.4); color: var(--text); text-align: left; cursor: pointer; animation: transit-in 0.2s ease-out; }
 .place-hud.hidden { display: none; }
 .place-hud:hover,
 .place-hud:focus-visible { box-shadow: inset 0 0 0 2px var(--hud, var(--gold)), var(--glass-shine), 3px 3px 0 rgba(0, 0, 0, 0.4); outline: none; }
@@ -3721,7 +3689,7 @@ canvas.place-hud-icon:not(.place-hud-tent) { width: 26px; height: 26px; }
 @keyframes hud-trip { from { opacity: 0; transform: translateX(10px); } }
 @media (max-width: 760px) {
   /* Under the header row (the menu button and EXPEDITION have the top). */
-  .place-hud { top: calc(62px + env(safe-area-inset-top)); right: 10px; max-width: calc(100vw - 20px); padding: 5px 8px 5px 6px; gap: 6px; }
+  .place-hud { top: calc(68px + env(safe-area-inset-top)); right: calc(12px + env(safe-area-inset-right)); max-width: calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)); padding: 5px 8px 5px 6px; gap: 6px; }
   .place-hud-icon { width: 24px; }
   canvas.place-hud-icon:not(.place-hud-tent) { width: 20px; height: 20px; }
   .place-hud-where strong { font-size: 12px; }
@@ -3962,12 +3930,6 @@ canvas.place-hud-icon:not(.place-hud-tent) { width: 26px; height: 26px; }
             <path d="M8 5h6v6H8zm10 0h6v6h-6zM5 13h12v3H5zm12 0h10v3H17zM5 16h3v11H5zm9 0h3v11h-3zm10 0h3v11h-3zM8 22h6v3H8zm9 0h7v3h-7z" fill="currentColor"/>
           </svg>
           <span class="menu-option-text"><span data-i18n="menu.community">BASE CAMP</span><small class="menu-option-note" data-i18n="menu.communityNote">Play with friends in groups.</small></span>
-        </button>
-        <button class="menu-option" id="menuStatsButton" type="button">
-          <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
-            <path d="M3 27h26v3H1V5h3zm4-3h5V15H7zm8 0h5V9h-5zm8 0h5V3h-5z" fill="currentColor"/>
-          </svg>
-          <span class="menu-option-text"><span data-i18n="menu.stats">STATS</span><small class="menu-option-note" data-i18n="menu.statsNote">Your best days, streaks and more.</small></span>
         </button>
         <button class="menu-option" id="menuHowToButton" type="button">
           <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
@@ -4535,6 +4497,18 @@ canvas.place-hud-icon:not(.place-hud-tent) { width: 26px; height: 26px; }
       </div>
       <!-- Your base (base.js): where your expedition starts, for guests and accounts alike. -->
       <div class="account-base" id="accountBase"></div>
+      <!-- Your stats live in My Tent (screens.js initializePlayerStats); the line under the
+           name sums them up (days played, average). -->
+      <button class="account-stats stats-open-button" id="accountStatsButton" type="button">
+        <svg class="account-stats-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
+          <path d="M3 27h26v3H1V5h3zm4-3h5V15H7zm8 0h5V9h-5zm8 0h5V3h-5z" fill="currentColor"/>
+        </svg>
+        <span class="account-stats-text">
+          <strong data-i18n="stats.title">YOUR STATS</strong>
+          <small id="accountStatsNote" data-i18n="menu.statsNote">Your best days, streaks and more.</small>
+        </span>
+        <span class="menu-tent-go" aria-hidden="true">›</span>
+      </button>
       <div class="account-signed-out" id="accountSignedOut">
         <p class="account-lead" id="accountIntro" data-i18n="account.intro">Save your progress, protect your streak and take your Expedition account anywhere.</p>
         <div class="account-providers">
@@ -6764,9 +6738,10 @@ const EN = {
   // The journeys (the score as a climb, a dive…)
   "journey.climb.name": "Climb", "journey.climb.measure": "Altitude", "journey.climb.goal": "summit", "journey.climb.verb": "climbed",
   "journey.dive.name": "Dive", "journey.dive.measure": "Depth", "journey.dive.goal": "seabed", "journey.dive.verb": "dived",
-  "journey.rocket.name": "Launch", "journey.rocket.measure": "Altitude", "journey.rocket.goal": "orbit", "journey.rocket.verb": "flown",
+  "journey.mine.name": "Mine", "journey.mine.measure": "Depth", "journey.mine.goal": "diamonds", "journey.mine.verb": "dug",
+  "journey.train.name": "Train", "journey.train.measure": "Distance", "journey.train.goal": "station", "journey.train.verb": "travelled",
+  "journey.sled.name": "Dog sled", "journey.sled.measure": "Distance", "journey.sled.goal": "North Pole", "journey.sled.verb": "sledded",
   "journey.balloon.name": "Balloon", "journey.balloon.measure": "Altitude", "journey.balloon.goal": "top", "journey.balloon.verb": "risen",
-  "journey.trek.name": "Trek", "journey.trek.measure": "Distance", "journey.trek.goal": "oasis", "journey.trek.verb": "trekked",
 
   // Badges and medals
   "badge.legend": "Mr. Worldwide", "badge.legend.range": "Top 1%",
@@ -7049,6 +7024,21 @@ const EN = {
   "live.ship.passenger": "Passenger ship",
   "live.ship.cargo": "Cargo ship",
   "live.ship.tanker": "Tanker",
+  "travel.kind.train": "Train",
+  "live.train.freight": "Freight train",
+  "live.train.long": "Long-distance train",
+  "live.train.commuter": "Commuter train",
+  "live.train.passenger": "Passenger train",
+  "live.inCountry": "in {country}",
+  "live.noOrigin": "Not given",
+  "live.trainNoFrom": "the feed doesn't say",
+  "live.stillOrUnknown": "not sent",
+  "live.trainNumber": "TRAIN NO.",
+  "live.source.fi": "Live GPS from Digitraffic (Fintraffic), last fix {time}. Route: Fintraffic's timetable.",
+  "live.source.no": "Live from Entur, last fix {time}.",
+  "live.source.ie": "Live from Irish Rail, last fix {time}.",
+  "live.source.am": "Live from Amtraker (Amtrak, VIA Rail and Brightline's own trackers), last fix {time}.",
+  "live.computed": "worked out from its last two fixes",
   "hud.current": "CURRENT LOCATION",
   "hud.campShort": "Everest Base Camp",
   "hud.here": "right here",
@@ -7115,6 +7105,7 @@ const EN = {
 
   // Account
   "account.title": "MY TENT",
+  "account.statsLine": p => `${p.n} ${plural(p.n, "day", "days")} played · average ${p.avg}`,
   "account.close": "Close account",
   "account.intro": "Save your progress, protect your streak and take your Expedition account anywhere.",
   "account.google": "Continue with Google",
@@ -7704,9 +7695,10 @@ const NL = {
   // De tochten
   "journey.climb.name": "Klim", "journey.climb.measure": "Hoogte", "journey.climb.goal": "top", "journey.climb.verb": "geklommen",
   "journey.dive.name": "Duik", "journey.dive.measure": "Diepte", "journey.dive.goal": "zeebodem", "journey.dive.verb": "gedoken",
-  "journey.rocket.name": "Lancering", "journey.rocket.measure": "Hoogte", "journey.rocket.goal": "baan", "journey.rocket.verb": "gevlogen",
+  "journey.mine.name": "Mijnschacht", "journey.mine.measure": "Diepte", "journey.mine.goal": "diamanten", "journey.mine.verb": "gegraven",
+  "journey.train.name": "Trein", "journey.train.measure": "Afstand", "journey.train.goal": "station", "journey.train.verb": "gereisd",
+  "journey.sled.name": "Hondenslee", "journey.sled.measure": "Afstand", "journey.sled.goal": "Noordpool", "journey.sled.verb": "gesleed",
   "journey.balloon.name": "Ballon", "journey.balloon.measure": "Hoogte", "journey.balloon.goal": "top", "journey.balloon.verb": "gestegen",
-  "journey.trek.name": "Tocht", "journey.trek.measure": "Afstand", "journey.trek.goal": "oase", "journey.trek.verb": "getrokken",
 
   // Badges en medailles
   "badge.legend": "Mr. Worldwide", "badge.legend.range": "Top 1%",
@@ -7989,6 +7981,21 @@ const NL = {
   "live.ship.passenger": "Passagiersschip",
   "live.ship.cargo": "Vrachtschip",
   "live.ship.tanker": "Tanker",
+  "travel.kind.train": "Trein",
+  "live.train.freight": "Goederentrein",
+  "live.train.long": "Langeafstandstrein",
+  "live.train.commuter": "Forensentrein",
+  "live.train.passenger": "Passagierstrein",
+  "live.inCountry": "in {country}",
+  "live.noOrigin": "Niet opgegeven",
+  "live.trainNoFrom": "de bron zegt het niet",
+  "live.stillOrUnknown": "niet doorgegeven",
+  "live.trainNumber": "TREINNR.",
+  "live.source.fi": "Live gps van Digitraffic (Fintraffic), laatste positie {time}. Route: de dienstregeling van Fintraffic.",
+  "live.source.no": "Live van Entur, laatste positie {time}.",
+  "live.source.ie": "Live van Irish Rail, laatste positie {time}.",
+  "live.source.am": "Live van Amtraker (de eigen trackers van Amtrak, VIA Rail en Brightline), laatste positie {time}.",
+  "live.computed": "berekend uit de laatste twee posities",
   "hud.current": "HUIDIGE PLEK",
   "hud.campShort": "Everest-basiskamp",
   "hud.here": "precies hier",
@@ -8055,6 +8062,7 @@ const NL = {
 
   // Account
   "account.title": "MIJN TENT",
+  "account.statsLine": p => `${p.n} ${plural(p.n, "dag", "dagen")} gespeeld · gemiddeld ${p.avg}`,
   "account.close": "Account sluiten",
   "account.intro": "Bewaar je voortgang, bescherm je reeks en neem je Expedition-account overal mee.",
   "account.google": "Verder met Google",
@@ -14352,437 +14360,229 @@ class PixelGlobe {
 return { PixelGlobe };
 })();
 
-// ---- journeys.js
-__modules["journeys.js"] = (() => {
-const { t } = __modules["i18n.js"];
-// The day's score as a journey: every point takes you one unit further, and a full day of
-// 6,000 reaches the goal. Each day has its own journey (see getJourney in daily.js):
-//
-//   climb    up a mountain, 6,000 m to the summit
-//   dive     down into the sea, 6,000 m to the seabed
-//   rocket   up from the launch pad, 6,000 km into space
-//   balloon  up in a hot-air balloon, 6,000 m into the sky
-//   trek     across the desert, 6,000 km to the oasis
-//
-// Every journey is a small SVG with the same parts: a scene, scale lines every 1,000, the
-// route travelled so far in one colour per round, a marker where each round ended, the
-// traveller, and the goal, which lights up once it's reached.
+// ---- audio.js
+__modules["audio.js"] = (() => {
+// The game's sounds, made in the browser (no sound files). A mix of soft, natural sounds
+// (a wooden tick, a marimba, a bell chord, a whoosh) and a few of the original 8-bit
+// beeps the player liked. Everything goes through one master volume and a gentle
+// compressor, so loud and quiet sounds end up at about the same level; the marimba and
+// bells also get a short room echo.
+const MASTER_VOLUME = 1;
 
-const SVG_NS = "http://www.w3.org/2000/svg";
-const WIDTH = 420;
-const HEIGHT = 190;
-// A day has five rounds; room for a few more just in case.
-const MAX_STRETCHES = 8;
+class SoundEngine {
+  constructor() {
+    this.ctx = null;
+    this.enabled = true;
+  }
 
-// One colour per round, for its stretch of the route and its dot in the rounds list.
-// One colour per round; the sixth is for the globe mode, which has six rounds.
-const ROUND_COLORS = ["#45e3ff", "#ffd45c", "#ff8a3d", "#c58cff", "#5cf28a", "#ff6b9d"];
-
-// The words each journey uses for its score: "+800 m", "Depth 2,400 m · seabed 6,000 m".
-// The words are in the language on screen (i18n.js), read when shown.
-const journeyWords = (type, emoji, unit) => ({
-  emoji,
-  unit,
-  get name() { return t(`journey.${type}.name`); },
-  get measure() { return t(`journey.${type}.measure`); },
-  get goal() { return t(`journey.${type}.goal`); },
-  get verb() { return t(`journey.${type}.verb`); }
-});
-const JOURNEYS = {
-  climb: journeyWords("climb", "🏔️", "m"),
-  dive: journeyWords("dive", "🌊", "m"),
-  rocket: journeyWords("rocket", "🚀", "km"),
-  balloon: journeyWords("balloon", "🎈", "m"),
-  trek: journeyWords("trek", "🐪", "km")
-};
-
-const element = (name, attributes = {}) => {
-  const node = document.createElementNS(SVG_NS, name);
-  Object.entries(attributes).forEach(([key, value]) => node.setAttribute(key, value));
-  return node;
-};
-const pointsOf = list => list.map(([x, y]) => `${x},${y}`).join(" ");
-const gradient = (id, stops, vertical = true) => {
-  const node = element("linearGradient", { id, x1: 0, y1: 0, x2: vertical ? 0 : 1, y2: vertical ? 1 : 0 });
-  stops.forEach(([offset, color, opacity = 1]) => node.append(element("stop", { offset, "stop-color": color, "stop-opacity": opacity })));
-  return node;
-};
-
-// How each journey looks. `start` and `end` are where value 0 and the goal sit on its
-// axis ("y" for up and down, "x" for across); `route` runs from start to end and only
-// ever moves one way along that axis, so every value maps to one place on it.
-const SPECS = {
-  climb: {
-    axis: "y", start: 182, end: 16,
-    route: [[10, 182], [44, 166], [72, 156], [98, 134], [124, 126], [150, 102], [174, 92], [200, 68], [224, 60], [250, 40], [272, 32], [300, 16]],
-    scene(layer, defs, id) {
-      const outline = [[10, 182], [44, 166], [72, 156], [98, 134], [124, 126], [150, 102], [174, 92], [200, 68], [224, 60], [250, 40], [272, 32], [300, 16],
-        [318, 32], [332, 28], [352, 62], [368, 58], [386, 98], [406, 124], [420, 150], [420, 190], [0, 190], [0, 182]];
-      defs.append(gradient(`${id}-rock`, [["0%", "#e9eefb", 0.95], ["22%", "#8f9bbd", 0.55], ["60%", "#3a4a7d", 0.5], ["100%", "#172041", 0.35]]));
-      layer.append(element("polygon", { points: pointsOf(outline), fill: `url(#${id}-rock)` }));
-      return { clip: pointsOf(outline) };
-    },
-    goal(group) {
-      group.append(element("line", { x1: 0, y1: 0, x2: 0, y2: -14 }), element("polygon", { points: "0,-14 11,-10 0,-6" }));
+  init() {
+    if (this.ctx) {
+      if (this.ctx.state === "suspended") this.ctx.resume();
+      return;
     }
-  },
-
-  dive: {
-    axis: "y", start: 26, end: 172,
-    route: [[64, 26], [92, 42], [74, 58], [112, 76], [94, 94], [138, 112], [118, 128], [164, 146], [150, 160], [196, 172]],
-    scene(layer, defs, id) {
-      defs.append(
-        gradient(`${id}-sky`, [["0%", "#7fd3ff", 0.35], ["100%", "#bfeaff", 0.5]]),
-        gradient(`${id}-water`, [["0%", "#3fc4f0", 0.75], ["35%", "#1667a8", 0.7], ["75%", "#0a2a5c", 0.75], ["100%", "#040d24", 0.9]])
-      );
-      layer.append(
-        element("rect", { x: 0, y: 0, width: WIDTH, height: 26, fill: `url(#${id}-sky)` }),
-        element("path", { d: `M0 26 Q 26 21 52 26 T 104 26 T 156 26 T 208 26 T 260 26 T 312 26 T 364 26 T 420 26 V190 H0 Z`, fill: `url(#${id}-water)` })
-      );
-      // Sunlight reaching down, fading with depth.
-      [[150, 0.12], [230, 0.08], [300, 0.1]].forEach(([x, opacity]) => layer.append(element("polygon", { points: `${x},26 ${x + 26},26 ${x + 60},120 ${x + 20},120`, fill: "#bff4ff", opacity })));
-      // A few fish near the top, a jellyfish lower down.
-      [[300, 52, 1], [330, 60, 0.8], [250, 78, 0.9], [360, 96, 0.7]].forEach(([x, y, scale]) => {
-        const fish = element("g", { transform: `translate(${x} ${y}) scale(${scale})`, opacity: 0.75 });
-        fish.append(element("ellipse", { cx: 0, cy: 0, rx: 8, ry: 3.5, fill: "#ffd45c" }), element("polygon", { points: "7,0 13,-4 13,4", fill: "#ffd45c" }));
-        layer.append(fish);
-      });
-      const jelly = element("g", { transform: "translate(330 140)", opacity: 0.55 });
-      jelly.append(element("path", { d: "M-7 0 A7 6 0 0 1 7 0 Z", fill: "#c58cff" }), element("path", { d: "M-4 0 q2 6 -1 11 M0 0 q2 6 -1 12 M4 0 q2 6 -1 10", stroke: "#c58cff", "stroke-width": 1, fill: "none" }));
-      layer.append(jelly);
-      // Bubbles rising from the diver's line.
-      [[60, 50, 2], [70, 40, 1.4], [86, 70, 1.8], [104, 100, 1.2]].forEach(([cx, cy, r]) => layer.append(element("circle", { cx, cy, r, fill: "none", stroke: "#bff4ff", "stroke-width": 0.8, opacity: 0.6 })));
-      // The seabed.
-      layer.append(element("path", { d: "M0 182 Q 60 172 120 178 T 240 176 T 340 180 T 420 174 V190 H0 Z", fill: "#3b3424", opacity: 0.9 }));
-      [[260, 176], [276, 178], [380, 175]].forEach(([x, y]) => layer.append(element("path", { d: `M${x} ${y} q-3 -10 2 -18 M${x + 4} ${y} q3 -8 -1 -14`, stroke: "#5cf28a", "stroke-width": 1.4, fill: "none", opacity: 0.6 })));
-      return { clip: `0,26 ${WIDTH},26 ${WIDTH},${HEIGHT} 0,${HEIGHT}` };
-    },
-    // A treasure chest on the seabed.
-    goal(group) {
-      group.append(element("rect", { x: -7, y: -9, width: 14, height: 9, rx: 1.5 }), element("path", { d: "M-7 -9 Q0 -15 7 -9", class: "journey-goal-line" }));
+    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const compressor = this.ctx.createDynamicsCompressor();
+    compressor.threshold.value = -18;
+    compressor.ratio.value = 4;
+    this.master = this.ctx.createGain();
+    this.master.gain.value = MASTER_VOLUME;
+    this.master.connect(compressor);
+    compressor.connect(this.ctx.destination);
+    // The echo: a second of fading noise as a room's impulse, mixed in quietly.
+    const length = this.ctx.sampleRate * 1.2;
+    const impulse = this.ctx.createBuffer(2, length, this.ctx.sampleRate);
+    for (let channel = 0; channel < 2; channel += 1) {
+      const data = impulse.getChannelData(channel);
+      for (let index = 0; index < length; index += 1) data[index] = (Math.random() * 2 - 1) * (1 - index / length) ** 3;
     }
-  },
+    this.reverb = this.ctx.createConvolver();
+    this.reverb.buffer = impulse;
+    const wet = this.ctx.createGain();
+    wet.gain.value = 0.22;
+    this.reverb.connect(wet);
+    wet.connect(this.master);
+  }
 
-  rocket: {
-    axis: "y", start: 172, end: 18,
-    route: [[70, 172], [72, 150], [78, 128], [88, 106], [104, 86], [126, 68], [154, 52], [190, 38], [234, 28], [290, 21], [350, 18]],
-    scene(layer, defs, id) {
-      defs.append(gradient(`${id}-sky`, [["0%", "#02030a", 0.9], ["45%", "#0c1a44", 0.75], ["80%", "#2f6fb8", 0.55], ["100%", "#8fd0ff", 0.5]]));
-      layer.append(element("rect", { x: 0, y: 0, width: WIDTH, height: HEIGHT, rx: 6, fill: `url(#${id}-sky)` }));
-      // Stars where the air runs out.
-      [[30, 14], [120, 22], [180, 10], [260, 46], [330, 34], [395, 12], [400, 58], [60, 40], [220, 8], [150, 70]].forEach(([cx, cy], index) =>
-        layer.append(element("circle", { cx, cy, r: index % 3 ? 0.9 : 1.4, fill: "#fff", opacity: 0.8 })));
-      // Clouds low down.
-      [[150, 150, 1], [300, 138, 1.3], [40, 128, 0.8]].forEach(([x, y, scale]) => {
-        const cloud = element("g", { transform: `translate(${x} ${y}) scale(${scale})`, fill: "#fff", opacity: 0.35 });
-        cloud.append(element("ellipse", { cx: 0, cy: 0, rx: 16, ry: 5 }), element("ellipse", { cx: -6, cy: -4, rx: 8, ry: 5 }), element("ellipse", { cx: 6, cy: -5, rx: 9, ry: 6 }));
-        layer.append(cloud);
-      });
-      // The ground and the launch tower.
-      layer.append(
-        element("rect", { x: 0, y: 176, width: WIDTH, height: 14, fill: "#1b2a22", opacity: 0.9 }),
-        element("path", { d: "M58 176 V140 M58 146 H66 M58 158 H66 M58 170 H66", stroke: "#8f9bbd", "stroke-width": 1.5, fill: "none" })
-      );
-      return { clip: `0,0 ${WIDTH},0 ${WIDTH},${HEIGHT} 0,${HEIGHT}` };
-    },
-    // A satellite in orbit.
-    goal(group) {
-      group.append(element("rect", { x: -3, y: -3, width: 6, height: 6 }), element("rect", { x: -14, y: -2, width: 9, height: 4, class: "journey-goal-panel" }), element("rect", { x: 5, y: -2, width: 9, height: 4, class: "journey-goal-panel" }));
-    }
-  },
+  // A sound starting soon, or null when sound is off.
+  start() {
+    if (!this.enabled) return null;
+    this.init();
+    return this.ctx.currentTime + 0.01;
+  }
 
-  balloon: {
-    axis: "y", start: 168, end: 20,
-    route: [[90, 168], [104, 150], [96, 132], [118, 114], [112, 96], [142, 80], [138, 64], [172, 50], [176, 36], [214, 26], [240, 20]],
-    scene(layer, defs, id) {
-      defs.append(gradient(`${id}-sky`, [["0%", "#2c5ea8", 0.55], ["60%", "#7fc0ff", 0.45], ["100%", "#ffd9a8", 0.5]]));
-      layer.append(element("rect", { x: 0, y: 0, width: WIDTH, height: HEIGHT, rx: 6, fill: `url(#${id}-sky)` }));
-      layer.append(element("circle", { cx: 360, cy: 46, r: 16, fill: "#ffd45c", opacity: 0.8 }));
-      [[60, 70, 1.1], [300, 100, 1.4], [200, 140, 0.9], [380, 150, 1]].forEach(([x, y, scale]) => {
-        const cloud = element("g", { transform: `translate(${x} ${y}) scale(${scale})`, fill: "#fff", opacity: 0.55 });
-        cloud.append(element("ellipse", { cx: 0, cy: 0, rx: 18, ry: 6 }), element("ellipse", { cx: -7, cy: -5, rx: 9, ry: 6 }), element("ellipse", { cx: 7, cy: -6, rx: 10, ry: 7 }));
-        layer.append(cloud);
-      });
-      // Birds.
-      [[260, 60], [276, 66], [250, 70]].forEach(([x, y]) => layer.append(element("path", { d: `M${x - 4} ${y} q4 -4 4 0 q0 -4 4 0`, stroke: "#04121a", "stroke-width": 1, fill: "none", opacity: 0.6 })));
-      // Rolling hills.
-      layer.append(
-        element("path", { d: "M0 170 Q 80 150 160 166 T 320 160 T 420 164 V190 H0 Z", fill: "#2fb35e", opacity: 0.7 }),
-        element("path", { d: "M0 180 Q 100 168 200 178 T 420 176 V190 H0 Z", fill: "#1d7a40", opacity: 0.85 })
-      );
-      return { clip: `0,0 ${WIDTH},0 ${WIDTH},${HEIGHT} 0,${HEIGHT}` };
-    },
-    // A star at the top of the sky.
-    goal(group) {
-      group.append(element("polygon", { points: "0,-8 2.4,-2.5 8,-2.5 3.5,1 5.2,7 0,3.5 -5.2,7 -3.5,1 -8,-2.5 -2.4,-2.5" }));
-    }
-  },
+  send(node, echo) {
+    node.connect(this.master);
+    if (echo) node.connect(this.reverb);
+  }
 
-  trek: {
-    axis: "x", start: 16, end: 372,
-    route: [[16, 156], [52, 148], [88, 156], [124, 142], [160, 150], [196, 136], [232, 144], [268, 130], [304, 138], [340, 126], [372, 132]],
-    scene(layer, defs, id) {
-      defs.append(
-        gradient(`${id}-sky`, [["0%", "#ff9a5c", 0.35], ["100%", "#ffd9a8", 0.45]]),
-        gradient(`${id}-sand`, [["0%", "#e8b864", 0.8], ["100%", "#a8743a", 0.85]])
-      );
-      layer.append(element("rect", { x: 0, y: 0, width: WIDTH, height: HEIGHT, rx: 6, fill: `url(#${id}-sky)` }));
-      layer.append(element("circle", { cx: 70, cy: 46, r: 20, fill: "#ffd45c", opacity: 0.85 }));
-      // Dunes, far to near.
-      layer.append(
-        element("path", { d: "M0 120 Q 60 96 130 116 T 260 108 T 420 112 V190 H0 Z", fill: "#d9a35a", opacity: 0.55 }),
-        element("path", { d: "M0 150 Q 70 128 150 146 T 300 134 T 420 138 V190 H0 Z", fill: `url(#${id}-sand)` })
-      );
-      // A camel on the way.
-      const camel = element("g", { transform: "translate(210 112)", fill: "#5a3a1a", opacity: 0.7 });
-      camel.append(element("path", { d: "M-10 0 Q-6 -8 -2 -2 Q2 -9 6 -2 L10 -6 L12 -4 L9 1 Z" }), element("path", { d: "M-8 0 V6 M-3 0 V6 M3 0 V6 M7 0 V6", stroke: "#5a3a1a", "stroke-width": 1.2 }));
-      layer.append(camel);
-      // The oasis: water and a palm.
-      layer.append(
-        element("ellipse", { cx: 392, cy: 140, rx: 22, ry: 5, fill: "#3fc4f0", opacity: 0.8 }),
-        element("path", { d: "M398 138 Q 396 120 402 106", stroke: "#6b4a24", "stroke-width": 2.2, fill: "none" }),
-        element("path", { d: "M402 106 q-12 -2 -18 6 M402 106 q12 -3 16 6 M402 106 q-6 -9 -14 -8 M402 106 q8 -8 14 -6", stroke: "#2fb35e", "stroke-width": 2.4, fill: "none", "stroke-linecap": "round" })
-      );
-      return { clip: `0,0 ${WIDTH},0 ${WIDTH},${HEIGHT} 0,${HEIGHT}` };
-    },
-    goal(group) {
-      group.append(element("line", { x1: 0, y1: 0, x2: 0, y2: -14 }), element("polygon", { points: "0,-14 11,-10 0,-6" }));
+  // A soft tone: quick fade in, smooth fade out (optionally gliding to another pitch).
+  tone(frequency, at, duration, { type = "sine", volume = 0.1, to = null, attack = 0.005, echo = false } = {}) {
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(frequency, at);
+    if (to) osc.frequency.exponentialRampToValueAtTime(to, at + duration);
+    gain.gain.setValueAtTime(0.0001, at);
+    gain.gain.exponentialRampToValueAtTime(volume, at + attack);
+    gain.gain.exponentialRampToValueAtTime(0.0001, at + duration);
+    osc.connect(gain);
+    this.send(gain, echo);
+    osc.start(at);
+    osc.stop(at + duration + 0.05);
+  }
+
+  // A retro beep: straight on, fading out in a line (the original 8-bit sounds).
+  beep(frequency, at, duration, { type = "square", volume = 0.05, to = null } = {}) {
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(frequency, at);
+    if (to) osc.frequency.exponentialRampToValueAtTime(to, at + duration);
+    gain.gain.setValueAtTime(volume, at);
+    gain.gain.linearRampToValueAtTime(0.0001, at + duration);
+    osc.connect(gain);
+    this.send(gain, false);
+    osc.start(at);
+    osc.stop(at + duration);
+  }
+
+  // A marimba note: the tone and two quick overtones of a struck wooden bar.
+  marimba(frequency, at, volume = 0.16, echo = true) {
+    this.tone(frequency, at, 0.9, { volume, echo });
+    this.tone(frequency * 4, at, 0.18, { volume: volume * 0.25, echo });
+    this.tone(frequency * 10, at, 0.05, { volume: volume * 0.08, echo });
+  }
+
+  // Filtered noise: ticks, knocks and whooshes.
+  noise(at, duration, { filter = "bandpass", frequency = 1000, to = null, q = 1, volume = 0.2, attack = 0.003, echo = false } = {}) {
+    const length = Math.ceil(this.ctx.sampleRate * duration);
+    const buffer = this.ctx.createBuffer(1, length, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let index = 0; index < length; index += 1) data[index] = Math.random() * 2 - 1;
+    const source = this.ctx.createBufferSource();
+    source.buffer = buffer;
+    const shape = this.ctx.createBiquadFilter();
+    shape.type = filter;
+    shape.frequency.setValueAtTime(frequency, at);
+    if (to) shape.frequency.exponentialRampToValueAtTime(to, at + duration);
+    shape.Q.value = q;
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, at);
+    gain.gain.exponentialRampToValueAtTime(volume, at + attack);
+    gain.gain.exponentialRampToValueAtTime(0.0001, at + duration);
+    source.connect(shape);
+    shape.connect(gain);
+    this.send(gain, echo);
+    source.start(at);
+    source.stop(at + duration);
+  }
+
+  // Buttons: a soft wooden tick.
+  playClick() {
+    const at = this.start();
+    if (at === null) return;
+    this.noise(at, 0.03, { frequency: 2600, q: 6, volume: 2.2 });
+    this.tone(1800, at, 0.03, { volume: 0.2 });
+  }
+
+  // A guess card flying in: an airy whoosh.
+  playFlyTo() {
+    const at = this.start();
+    if (at === null) return;
+    this.noise(at, 0.35, { frequency: 500, to: 2400, q: 1.5, volume: 0.8, attack: 0.12, echo: true });
+  }
+
+  // A right answer that doesn't end the round (Deep Cut, painting a country): the
+  // original quick 8-bit arpeggio.
+  playGuess() {
+    const at = this.start();
+    if (at === null) return;
+    [261.63, 329.63, 392].forEach((frequency, index) => this.beep(frequency, at + index * 0.06, 0.08, { volume: 0.18 }));
+  }
+
+  // The right answer: a warm bell chord, C–E–G and the octave, with a little echo.
+  playVictory() {
+    const at = this.start();
+    if (at === null) return;
+    [523.25, 659.25, 783.99].forEach((frequency, index) => this.marimba(frequency, at + index * 0.09, 0.28));
+    this.marimba(1046.5, at + 0.3, 0.3);
+    this.tone(2093, at + 0.3, 1.2, { volume: 0.05, attack: 0.02, echo: true });
+  }
+
+  // A wrong answer: two soft low marimba notes, falling.
+  playError() {
+    const at = this.start();
+    if (at === null) return;
+    this.marimba(220, at, 0.32);
+    this.marimba(174.61, at + 0.16, 0.32);
+  }
+
+  // One country passing by as the globe mode's ranking climbs: a short wooden tick,
+  // rising in pitch as it nears the top (progress 0 → 1).
+  playTick(progress = 0) {
+    const at = this.start();
+    if (at === null) return;
+    this.tone(700 + progress * 700, at, 0.035, { type: "triangle", volume: 0.12, attack: 0.002 });
+  }
+
+  // A round's points landing on the score card's journey, by tier (scoreTier in
+  // journeys.js): from neutral to celebratory.
+  //   0  no points: a soft, low wooden knock
+  //   1  a single quiet marimba note
+  //   2  two notes, rising
+  //   3  a major arpeggio
+  //   4  the arpeggio up to the octave, with a bell on top
+  //   5  a full 1,000: a quick 8-bit fanfare, a bell chord and a sparkle
+  playScoreTier(tier = 0) {
+    const at = this.start();
+    if (at === null) return;
+    const C5 = 523.25, E5 = 659.25, G5 = 783.99, C6 = 1046.5;
+    switch (tier) {
+      case 0:
+        this.noise(at, 0.06, { filter: "lowpass", frequency: 600, volume: 0.5 });
+        this.marimba(196, at + 0.02, 0.18, false);
+        break;
+      case 1:
+        this.marimba(C5, at, 0.2);
+        break;
+      case 2:
+        this.marimba(C5, at, 0.22);
+        this.marimba(E5, at + 0.11, 0.22);
+        break;
+      case 3:
+        [C5, E5, G5].forEach((frequency, index) => this.marimba(frequency, at + index * 0.09, 0.24));
+        break;
+      case 4:
+        [C5, E5, G5, C6].forEach((frequency, index) => this.marimba(frequency, at + index * 0.08, 0.26));
+        this.tone(C6 * 2, at + 0.3, 1.1, { volume: 0.05, attack: 0.02, echo: true });
+        break;
+      default:
+        [C5, E5, G5, C6].forEach((frequency, index) => this.beep(frequency, at + index * 0.07, 0.09, { volume: 0.14 }));
+        this.noise(at + 0.28, 0.12, { filter: "highpass", frequency: 5000, volume: 0.25 });
+        [C6, C6 * 1.26, C6 * 1.5].forEach(frequency => this.marimba(frequency, at + 0.3, 0.2));
+        this.tone(C6 * 2, at + 0.3, 1.4, { volume: 0.06, attack: 0.02, echo: true });
+        [2637, 3136, 3951, 3136, 3951].forEach((frequency, index) => this.tone(frequency, at + 0.45 + index * 0.06, 0.12, { volume: 0.04, echo: true }));
     }
   }
-};
 
-// Who travels each journey, drawn around (0, 0), the point on the route. Each sits in an
-// inner group the stylesheet animates (sway, bob, flicker, bubbles); the rocket is drawn
-// pointing right and turned to follow its route.
-const TRAVELLER_SCALE = 1.4;
-const TRAVELLERS = {
-  // A climber with a backpack and an ice axe, standing on the route.
-  climb(group) {
-    group.append(
-      element("path", { d: "M-1 -5 L-2.6 0 M1 -5 L2.6 0", stroke: "#04121a", "stroke-width": 1.8, "stroke-linecap": "round" }),
-      element("rect", { x: -4.8, y: -12, width: 3, height: 6, rx: 1, fill: "#45e3ff" }),
-      element("rect", { x: -2.2, y: -12.5, width: 4.6, height: 8, rx: 1.4, fill: "#ff8a3d" }),
-      element("circle", { cx: 0.2, cy: -15.4, r: 2.6, fill: "#ffe0bd" }),
-      element("path", { d: "M-2.4 -16.2 Q0.2 -19.6 2.8 -16.2 Z", fill: "#ff4d6d" }),
-      element("path", { d: "M2 -10 L5.6 -12.6", stroke: "#ff8a3d", "stroke-width": 1.6, "stroke-linecap": "round" }),
-      element("path", { d: "M5.6 -17 V-7 M3.8 -16.6 H7.6", stroke: "#e9eefb", "stroke-width": 1.2, "stroke-linecap": "round" })
-    );
-  },
-  // A diver heading down, with fins, a tank and bubbles.
-  dive(group) {
-    const body = element("g", { transform: "rotate(40)" });
-    body.append(
-      element("path", { d: "M-8 -2.4 L-13 -5 L-11.5 0 L-13 5 L-8 2.4 Z", fill: "#45e3ff" }),
-      element("rect", { x: -8.5, y: -2.6, width: 14, height: 5.2, rx: 2.6, fill: "#1a2238", stroke: "#04121a", "stroke-width": 0.6 }),
-      element("rect", { x: -6, y: -5.4, width: 8, height: 2.8, rx: 1.4, fill: "#ffd45c" }),
-      element("circle", { cx: 7, cy: 0, r: 3, fill: "#ffe0bd" }),
-      element("rect", { x: 7.4, y: -1.8, width: 2.8, height: 2.2, rx: 0.6, fill: "#45e3ff" })
-    );
-    group.append(body);
-    [[1, -9, 1.3], [3, -15, 1], [0, -21, 0.8]].forEach(([cx, cy, r], index) =>
-      group.append(element("circle", { cx, cy, r, class: `journey-bubble is-${index + 1}` })));
-  },
-  // A rocket with a flickering flame.
-  rocket(group) {
-    group.append(
-      element("path", { d: "M-9 0 L-17 -3 L-14 0 L-17 3 Z", fill: "#ff8a3d", class: "journey-flame" }),
-      element("path", { d: "M-9 0 L-13 -1.5 L-12 0 L-13 1.5 Z", fill: "#ffd45c", class: "journey-flame" }),
-      element("path", { d: "M-9 -3.4 L-13 -7 L-5 -3.4 Z M-9 3.4 L-13 7 L-5 3.4 Z", fill: "#ff4d6d" }),
-      element("path", { d: "M-9 -3.4 H3 Q10 -3.4 13 0 Q10 3.4 3 3.4 H-9 Z", fill: "#e9eefb", stroke: "#04121a", "stroke-width": 0.6 }),
-      element("circle", { cx: 3.5, cy: 0, r: 1.6, fill: "#45e3ff", stroke: "#04121a", "stroke-width": 0.5 })
-    );
-  },
-  // A striped hot-air balloon, centred on the route.
-  balloon(group) {
-    const balloon = element("g", { transform: "translate(0 14)" });
-    group.append(balloon);
-    balloon.append(
-      element("path", { d: "M-4 -10 L-2.6 -3.4 M4 -10 L2.6 -3.4", stroke: "#3a2a1a", "stroke-width": 0.8 }),
-      element("rect", { x: -3.4, y: -3.6, width: 6.8, height: 4.2, rx: 0.8, fill: "#8a5a2b", stroke: "#04121a", "stroke-width": 0.5 }),
-      element("path", { d: "M0 -33 C 13 -33 15 -19 8 -12 L4.5 -9.5 H-4.5 L-8 -12 C -15 -19 -13 -33 0 -33 Z", fill: "#ff8a3d", stroke: "#04121a", "stroke-width": 0.7 }),
-      element("path", { d: "M0 -33 C 6 -28 6 -14 2.2 -9.5 H-2.2 C -6 -14 -6 -28 0 -33 Z", fill: "#ffd45c" }),
-      element("path", { d: "M-11.5 -21 Q0 -18 11.5 -21", stroke: "#ff4d6d", "stroke-width": 1.4, fill: "none" }),
-      element("rect", { x: -4.5, y: -10.4, width: 9, height: 1.4, fill: "#ff4d6d" })
-    );
-  },
-  // A camel walking towards the oasis.
-  trek(group) {
-    group.append(
-      element("path", { d: "M-6 -4.5 V0 M-3 -4.5 V0 M2.5 -4.5 V0 M5.5 -4.5 V0", stroke: "#7a4f24", "stroke-width": 1.5, "stroke-linecap": "round", class: "journey-legs" }),
-      element("ellipse", { cx: 0, cy: -7, rx: 8, ry: 3.4, fill: "#c98a46" }),
-      element("path", { d: "M-6 -9 Q-3.8 -15 -1.2 -9 Q1.4 -15 3.8 -9 Z", fill: "#c98a46" }),
-      element("path", { d: "M6 -8 L9.6 -13.4", stroke: "#c98a46", "stroke-width": 2.8, "stroke-linecap": "round" }),
-      element("ellipse", { cx: 11, cy: -14, rx: 2.6, ry: 1.6, fill: "#c98a46" }),
-      element("rect", { x: -3.6, y: -12, width: 5.6, height: 2.2, rx: 0.6, fill: "#45e3ff" })
-    );
-  }
-};
-
-function createJourney(type, container, { summit = 6000 } = {}) {
-  const spec = SPECS[type] || SPECS.climb;
-  const across = spec.axis === "x";
-  const at = value => spec.start + (Math.min(Math.max(value, 0), summit) / summit) * (spec.end - spec.start);
-  // Where on the route a place along the axis is.
-  const pointAt = position => {
-    const key = across ? 0 : 1;
-    for (let index = 1; index < spec.route.length; index += 1) {
-      const a = spec.route[index - 1];
-      const b = spec.route[index];
-      const low = Math.min(a[key], b[key]);
-      const high = Math.max(a[key], b[key]);
-      if (position >= low && position <= high) {
-        const t = a[key] === b[key] ? 0 : (position - a[key]) / (b[key] - a[key]);
-        return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI];
-      }
+  // One hint turning over on the guess card: a bright chime for a match (higher with each
+  // match in a row), a soft blip for a pointer, a muted wooden knock for a no.
+  playReveal(status, streak = 0) {
+    const at = this.start();
+    if (at === null) return;
+    if (status === "miss") {
+      this.tone(160, at, 0.18, { volume: 0.8, to: 90 });
+      this.noise(at, 0.04, { filter: "lowpass", frequency: 500, volume: 0.35 });
+      return;
     }
-    const [first, second] = spec.route;
-    const [last, beforeLast] = [spec.route.at(-1), spec.route.at(-2)];
-    return Math.abs(position - spec.start) < Math.abs(position - spec.end)
-      ? [...first, Math.atan2(second[1] - first[1], second[0] - first[0]) * 180 / Math.PI]
-      : [...last, Math.atan2(last[1] - beforeLast[1], last[0] - beforeLast[0]) * 180 / Math.PI];
-  };
-
-  const svg = element("svg", { viewBox: `0 0 ${WIDTH} ${HEIGHT}`, class: `journey journey-${type}`, "aria-hidden": "true" });
-  const id = `journey-${Math.random().toString(36).slice(2, 8)}`;
-  const defs = element("defs");
-  svg.append(defs);
-  const scene = element("g", { class: "journey-scene" });
-  svg.append(scene);
-  const { clip } = spec.scene(scene, defs, id);
-  const shape = element("clipPath", { id: `${id}-shape` });
-  shape.append(element("polygon", { points: clip }));
-  defs.append(shape);
-
-  // Scale lines every 1,000, like contour lines on a map.
-  const scale = element("g", { "clip-path": `url(#${id}-shape)`, class: "journey-scale" });
-  for (let value = 1000; value < summit; value += 1000) {
-    const p = at(value);
-    scale.append(element("path", { d: across ? `M${p} 0 V${HEIGHT}` : `M0 ${p} Q105 ${p - 5} 210 ${p} T420 ${p}` }));
-    const label = element("text", across ? { x: p + 2, y: HEIGHT - 4, class: "journey-label" } : { x: 4, y: p - 3, class: "journey-label" });
-    label.textContent = `${value / 1000}k`;
-    svg.append(label);
+    const notes = status === "match" ? [660 * 2 ** (streak / 6), 990 * 2 ** (streak / 6)] : [520];
+    notes.forEach((frequency, index) => this.tone(frequency, at + index * 0.07, status === "match" ? 0.35 : 0.15, { volume: status === "match" ? 0.31 : 0.6, attack: 0.01 }));
   }
-  svg.append(scale);
-
-  // One clip per round: its stretch of the route is the band between where it started
-  // and where it ended.
-  const routePoints = pointsOf(spec.route);
-  svg.append(element("polyline", { points: routePoints, class: "journey-route" }));
-  const stretches = Array.from({ length: MAX_STRETCHES }, (_, index) => {
-    const clipPath = element("clipPath", { id: `${id}-stretch-${index}` });
-    const band = element("rect", { x: 0, y: 0, width: across ? 0 : WIDTH, height: across ? HEIGHT : 0 });
-    clipPath.append(band);
-    defs.append(clipPath);
-    const line = element("polyline", { points: routePoints, class: "journey-route is-travelled", "clip-path": `url(#${clipPath.id})` });
-    svg.append(line);
-    return { band, line };
-  });
-
-  const [goalX, goalY] = spec.route.at(-1);
-  const goal = element("g", { class: "journey-goal", transform: `translate(${goalX} ${goalY})` });
-  spec.goal(goal);
-  svg.append(goal);
-  const marks = element("g", { class: "journey-marks" });
-  svg.append(marks);
-  const pinLayer = element("g", { class: "journey-pins" });
-  svg.append(pinLayer);
-  const traveller = element("g", { class: "journey-traveller" });
-  const sprite = element("g", { class: `journey-sprite is-${type}` });
-  TRAVELLERS[type in TRAVELLERS ? type : "climb"](sprite);
-  traveller.append(sprite);
-  svg.append(traveller);
-  let replaying = 0;
-  container.replaceChildren(svg);
-
-  return {
-    type,
-    // `value` is where the traveller is now; `stretches` the rounds so far, each
-    // { from, to, color } (the last can still be growing); `stops` the values where
-    // earlier rounds ended.
-    draw(value, { stretches: travelled = [], stops = [] } = {}) {
-      stretches.forEach((stretch, index) => {
-        const part = travelled[index];
-        const display = part && part.to > part.from && value > part.from;
-        stretch.line.style.display = display ? "" : "none";
-        if (!display) return;
-        stretch.line.style.stroke = part.color || "";
-        const a = at(part.from);
-        const b = at(Math.min(part.to, value));
-        // A little extra at the start so neighbouring stretches meet without a gap.
-        const pad = part.from === 0 ? 8 : 0.5;
-        const low = Math.min(a, b) - (a < b ? pad : 0);
-        const size = Math.abs(b - a) + pad;
-        stretch.band.setAttribute(across ? "x" : "y", low);
-        stretch.band.setAttribute(across ? "width" : "height", Math.max(0, size));
-      });
-      const [x, y, angle] = pointAt(at(value));
-      traveller.setAttribute("transform", `translate(${x} ${y})${type === "rocket" ? ` rotate(${angle})` : ""} scale(${TRAVELLER_SCALE})`);
-      marks.replaceChildren(...stops.map(stop => {
-        const [markX, markY] = pointAt(at(stop));
-        return element("circle", { cx: markX, cy: markY, r: 3 });
-      }));
-      svg.classList.toggle("is-goal", value >= summit);
-    },
-    // Plays the day's journey once: from the start through every round's stretch (a short
-    // stop where each round ended), then stays where the score puts it. With reduced motion
-    // it just draws the end. Stops early once the drawing is hidden or gone, or on `stop()`;
-    // `finish()` (SKIP) jumps to the end. Returns how long it takes, in ms.
-    replay({ stretches: travelled = [], total = travelled.at(-1)?.to || 0 } = {}, { speed = 2.2, pause = 320, hold = 2200, rest = 500 } = {}) {
-      this.stop();
-      const run = ++replaying;
-      // The timeline: each stretch takes time in proportion to its points.
-      const legs = [];
-      let time = rest;
-      travelled.forEach(part => {
-        const length = Math.max(0, part.to - part.from) / speed;
-        legs.push({ from: part.from, to: part.to, start: time, end: time + length });
-        time += length + pause;
-      });
-      const finish = () => this.draw(total, { stretches: travelled, stops: travelled.slice(0, -1).map(part => part.to) });
-      this.finish = () => { if (run === replaying) { this.stop(); finish(); } };
-      if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { finish(); return 0; }
-      const begin = performance.now();
-      const frame = now => {
-        if (run !== replaying || !svg.isConnected || svg.closest(".hidden")) return;
-        const t = now - begin;
-        if (t >= time) { finish(); return; }
-        let value = 0;
-        legs.forEach(leg => {
-          if (t >= leg.end) value = leg.to;
-          else if (t > leg.start) value = leg.from + (leg.to - leg.from) * ((t - leg.start) / (leg.end - leg.start));
-        });
-        value = Math.min(value, total);
-        this.draw(value, { stretches: travelled, stops: travelled.slice(0, -1).map(part => part.to).filter(stop => stop <= value) });
-        requestAnimationFrame(frame);
-      };
-      requestAnimationFrame(frame);
-      return time;
-    },
-    // Jumps a replay to its end (set by replay()).
-    finish() {},
-    stop() {
-      replaying += 1;
-    },
-    // Labelled points on the route, e.g. where the top 10% got to: [{ value, label, tone }].
-    // Labels take turns left and right (above and below for a trek) so close ones don't clash.
-    pins(list) {
-      const sorted = [...list].sort((left, right) => left.value - right.value);
-      pinLayer.replaceChildren(...sorted.map(({ value, label, tone = "" }, index) => {
-        const [x, y] = pointAt(at(value));
-        const pin = element("g", { class: `journey-pin${tone ? ` is-${tone}` : ""}`, transform: `translate(${x} ${y})` });
-        const flip = index % 2 === 1;
-        const text = element("text", across
-          ? { x: 0, y: flip ? 15 : -9, "text-anchor": "middle" }
-          : { x: flip ? -9 : 9, y: 3.5, "text-anchor": flip ? "end" : "start" });
-        text.textContent = label;
-        pin.append(element("circle", { r: 4 }), text);
-        return pin;
-      }));
-    }
-  };
 }
 
-return { ROUND_COLORS, JOURNEYS, createJourney };
+const sounds = new SoundEngine();
+
+return { sounds };
 })();
 
 // ---- config.js
@@ -15043,6 +14843,1960 @@ const getGroupBoard = (groupId, from, to) => call("group_board", { group_ref: gr
 return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, saveBase, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, addToGroup, leaveGroup, getGroups, getGroupBoard };
 })();
 
+// ---- atlas.js
+__modules["atlas.js"] = (() => {
+// Atlas, the old explorer who keeps Base Camp's logbook. A 24×24 pixel sprite in the game's
+// 8-bit palette (pompom hat with ear flaps, goggles pushed up, white moustache, gold scarf,
+// teal parka), with a few poses, a blink, and a speech bubble that types its line out.
+// "Quiet" (a toggle, kept in the browser and the account) silences his bubbles, typing and
+// sounds; he stays on screen and nothing else changes.
+const { sounds } = __modules["audio.js"];
+const { getUser, saveAtlasQuiet } = __modules["auth.js"];
+const { t } = __modules["i18n.js"];
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+const QUIET_KEY = "daily-geography:atlas-quiet:v1";
+const TYPE_MS = 24; // per letter
+
+const ATLAS_COLORS = {
+  K: "#0b1020", // outline
+  R: "#e0484f", r: "#9c2b35", // hat
+  Y: "#ffd45c", y: "#c99a2e", // pompom, band, scarf
+  G: "#45e3ff", g: "#2a3550", // goggles
+  S: "#f0b48a", s: "#c07f58", // skin
+  W: "#f4f1e8", w: "#c9c3b5", // moustache and beard
+  T: "#2bb3a3", t: "#1c7a70", // parka
+  P: "#8a5a32", p: "#5c3a1f", // boots and straps
+  E: "#0b1020" // eyes (blink)
+};
+
+// The body, 16 wide, drawn at x = 4 on a 24-wide canvas. Arms hang at the sides.
+const BODY = [
+  ".......YY.......",
+  "......YYYY......",
+  ".....KKKKKK.....",
+  "...KKRRRRRRKK...",
+  "..KRRrRRRRrRRK..",
+  "..KRRRRRRRRRRK..",
+  ".KYYYYYYYYYYYYK.",
+  ".KGGGgKKKKgGGGK.",
+  ".KRSWWSSSSWWSRK.",
+  ".KRSESSSSSSESRK.",
+  ".KRSSSSssSSSSRK.",
+  ".KRRSWWWWWWSRRK.",
+  "..KRWWWWWWWWRK..",
+  "..KKWWwwwwWWKK..",
+  ".KYYYYYYYYYYYYK.",
+  "KTTTyYTTTTTTTTTK",
+  "KTpTYYTTTTTTpTTK",
+  "KTpTTYTTKTTTpTTK",
+  "KSpTTTTTKTTTpTSK",
+  ".KKTTTTTKTTTTKK.",
+  "..KggKKKKKKggK..",
+  "..KggK....KggK..",
+  ".KPPPK....KPPPK.",
+  ".KKKKK....KKKKK."
+];
+
+// Arms: pixels drawn over the body (x, y on the 24-wide canvas). A raised arm also covers
+// the hanging mitten with sleeve.
+const arm = (rows, x0, y0) => rows.flatMap((row, y) => [...row].map((key, x) => key === "." ? null : [x0 + x, y0 + y, key]).filter(Boolean));
+const RIGHT_UP_A = [...arm([
+  ".KK.",
+  "KSSK",
+  "KSSK",
+  "KTTK",
+  ".KTK",
+  ".KTK",
+  "KTTK",
+  "KTK."
+], 19, 8), [18, 18, "T"], [19, 15, "T"]];
+const RIGHT_UP_B = [...arm([
+  "..KK",
+  ".KSSK",
+  ".KSSK",
+  ".KTTK",
+  ".KTK",
+  ".KTK",
+  "KTTK",
+  "KTK."
+], 19, 8), [18, 18, "T"], [19, 15, "T"]];
+const LEFT_UP = [...arm([
+  ".KK.",
+  "KSSK",
+  "KSSK",
+  "KTTK",
+  "KTK.",
+  "KTK.",
+  "KTTK",
+  ".KTK"
+], 1, 8), [5, 18, "T"], [4, 15, "T"]];
+const THINK = [...arm([
+  ".KK..",
+  "KSSK.",
+  "KSSK.",
+  ".KTTK",
+  "..KTT"
+], 13, 11), [18, 18, "T"], [18, 16, "T"], [18, 17, "T"]];
+const POINT = [...arm([
+  "KKKK.",
+  "TTTSK",
+  "KKKSK",
+  "...K."
+], 20, 16), [18, 18, "T"], [19, 16, "T"], [19, 17, "K"]];
+
+const POSES = {
+  idle: [],
+  wave: RIGHT_UP_A,
+  waveB: RIGHT_UP_B,
+  cheer: [...RIGHT_UP_A, ...LEFT_UP],
+  think: THINK,
+  point: POINT
+};
+
+function drawPixels(svg, cells, className = "") {
+  const group = document.createElementNS(SVG_NS, "g");
+  if (className) group.setAttribute("class", className);
+  cells.forEach(([x, y, key]) => {
+    const rect = document.createElementNS(SVG_NS, "rect");
+    Object.entries({ x, y, width: 1, height: 1, fill: ATLAS_COLORS[key] }).forEach(([name, value]) => rect.setAttribute(name, value));
+    if (key === "E") rect.setAttribute("class", "atlas-eye");
+    group.appendChild(rect);
+  });
+  svg.appendChild(group);
+  return group;
+}
+
+const bodyCells = () => BODY.flatMap((row, y) => [...row].map((key, x) => key === "." ? null : [x + 4, y, key]).filter(Boolean));
+
+// The sprite as an SVG (24×24 pixels at `size`). setPose() swaps the arms; "wave" swings
+// between two frames (CSS, .atlas-wave-a/.atlas-wave-b).
+function createAtlasSprite(size = 96, pose = "idle") {
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("width", size);
+  svg.setAttribute("height", size);
+  svg.setAttribute("shape-rendering", "crispEdges");
+  svg.setAttribute("class", "atlas-sprite");
+  svg.setAttribute("aria-hidden", "true");
+  drawPixels(svg, bodyCells());
+  const arms = document.createElementNS(SVG_NS, "g");
+  svg.appendChild(arms);
+  svg.setPose = name => {
+    arms.replaceChildren();
+    svg.dataset.pose = name;
+    if (name === "wave") {
+      drawPixels(arms, POSES.wave, "atlas-wave-a");
+      drawPixels(arms, POSES.waveB, "atlas-wave-b");
+    } else drawPixels(arms, POSES[name] || []);
+  };
+  svg.setPose(pose);
+  return svg;
+}
+
+// A pixel tent (gold, with a dark door) and a planted flag in the game's pink, for the
+// Base Camp scene and the landing.
+function createTent(size = 96) {
+  const rows = [
+    "...........K............",
+    "..........KYK...........",
+    ".........KYYyK..........",
+    "........KYYYyyK.........",
+    ".......KYYYKyyyK........",
+    "......KYYYKKKyyyK.......",
+    ".....KYYYKgKKyyyyK......",
+    "....KYYYKggKKKyyyyK.....",
+    "...KYYYKgggKKKKyyyyK....",
+    "..KYYYKggggKKKKKyyyyK...",
+    ".KYYYKgggggKKKKKKyyyyK..",
+    "KKKKKKKKKKKKKKKKKKKKKKK."
+  ];
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("viewBox", "0 0 24 12");
+  svg.setAttribute("width", size);
+  svg.setAttribute("height", size / 2);
+  svg.setAttribute("shape-rendering", "crispEdges");
+  svg.setAttribute("class", "atlas-tent");
+  svg.setAttribute("aria-hidden", "true");
+  drawPixels(svg, rows.flatMap((row, y) => [...row].map((key, x) => key === "." ? null : [x, y, key]).filter(Boolean)));
+  return svg;
+}
+
+function createFlag(size = 48) {
+  const rows = [
+    "KKKKKKK.",
+    "KFFFFFFK",
+    "KFFfFFFK",
+    "KFfffFFK",
+    "KFFfFFFK",
+    "KFFFFFFK",
+    "KKKKKKK.",
+    "K.......",
+    "K.......",
+    "K.......",
+    "K.......",
+    "K.......",
+    "K.......",
+    "K.......",
+    "KK......",
+    "KK......"
+  ];
+  const colors = { K: "#f4f1e8", F: "#ff6b9d", f: "#ffd45c" };
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("viewBox", "0 0 8 16");
+  svg.setAttribute("width", size / 2);
+  svg.setAttribute("height", size);
+  svg.setAttribute("shape-rendering", "crispEdges");
+  svg.setAttribute("class", "atlas-flag");
+  svg.setAttribute("aria-hidden", "true");
+  rows.forEach((row, y) => [...row].forEach((key, x) => {
+    if (!colors[key]) return;
+    const rect = document.createElementNS(SVG_NS, "rect");
+    Object.entries({ x, y, width: 1, height: 1, fill: colors[key] }).forEach(([name, value]) => rect.setAttribute(name, value));
+    svg.appendChild(rect);
+  }));
+  return svg;
+}
+
+// ----- Quiet -----
+
+const listeners = new Set();
+let quiet = (() => { try { return localStorage.getItem(QUIET_KEY) === "1"; } catch { return false; } })();
+
+const isAtlasQuiet = () => quiet;
+function setAtlasQuiet(value, { save = true } = {}) {
+  quiet = Boolean(value);
+  try { localStorage.setItem(QUIET_KEY, quiet ? "1" : "0"); } catch { /* storage off */ }
+  if (save && getUser()) saveAtlasQuiet(quiet);
+  listeners.forEach(listener => listener(quiet));
+}
+const onAtlasQuietChange = listener => listeners.add(listener);
+
+// After signing in: the account's choice wins; an account without one gets the browser's.
+function syncAtlasQuiet(account) {
+  const stored = account?.user_metadata?.atlasQuiet;
+  if (typeof stored === "boolean") setAtlasQuiet(stored, { save: false });
+  else if (account && quiet) saveAtlasQuiet(quiet);
+}
+
+// ----- Atlas on screen -----
+
+// Atlas with his speech bubble. say(line, pose) types a line out (a click finishes it, the
+// next click closes it); while quiet he only takes the pose. Clicking Atlas asks for
+// another line (onPoke).
+function createAtlas({ size = 96, onPoke = () => {} } = {}) {
+  const host = document.createElement("div");
+  host.className = "atlas";
+  const bubble = document.createElement("div");
+  bubble.className = "atlas-bubble hidden";
+  bubble.setAttribute("role", "status");
+  bubble.setAttribute("aria-live", "polite");
+  const name = document.createElement("span");
+  name.className = "atlas-bubble-name";
+  name.textContent = "ATLAS";
+  const text = document.createElement("p");
+  bubble.append(name, text);
+  const figure = document.createElement("button");
+  figure.type = "button";
+  figure.className = "atlas-figure";
+  figure.setAttribute("aria-label", t("atlas.poke"));
+  const sprite = createAtlasSprite(size);
+  figure.appendChild(sprite);
+  // A small "…" speech badge by his head says he can be clicked (gone while he talks or
+  // keeps quiet).
+  const hint = document.createElement("span");
+  hint.className = "atlas-hint";
+  hint.setAttribute("aria-hidden", "true");
+  hint.innerHTML = '<svg viewBox="0 0 9 7" shape-rendering="crispEdges"><path d="M1 0h7v1h1v4H8v1H3L1 7V6H0V1h1z" fill="#f4f1e8"/><path d="M2 2h1v2H2zm2 0h1v2H4zm2 0h1v2H6z" fill="#0b1020"/></svg>';
+  figure.appendChild(hint);
+  figure.title = t("atlas.poke");
+  host.append(bubble, figure);
+
+  let timer = null;
+  let full = "";
+  let typing = false;
+  let poseTimer = null;
+
+  const close = () => {
+    clearInterval(timer);
+    typing = false;
+    bubble.classList.add("hidden");
+  };
+  let hideTimer = null;
+  const finish = () => {
+    clearInterval(timer);
+    typing = false;
+    text.textContent = full;
+    // In the corner of a phone the bubble covers the page, so it goes by itself.
+    clearTimeout(hideTimer);
+    if (host.classList.contains("is-docked")) hideTimer = setTimeout(close, 6000);
+  };
+
+  function say(line, pose = "idle") {
+    clearTimeout(poseTimer);
+    sprite.setPose(pose);
+    // Back to standing after a while (a wave doesn't go on forever).
+    if (pose !== "idle") poseTimer = setTimeout(() => sprite.setPose("idle"), 3200);
+    if (quiet || !line) { close(); return; }
+    full = line;
+    text.textContent = "";
+    bubble.classList.remove("hidden");
+    clearInterval(timer);
+    typing = true;
+    let index = 0;
+    timer = setInterval(() => {
+      index += 1;
+      text.textContent = full.slice(0, index);
+      if (index % 3 === 1 && /\S/.test(full[index - 1])) sounds.playTick(0.2 + (index % 7) / 20);
+      if (index >= full.length) finish();
+    }, TYPE_MS);
+  }
+
+  bubble.addEventListener("click", () => (typing ? finish() : close()));
+  figure.addEventListener("click", () => {
+    if (typing) { finish(); return; }
+    onPoke();
+  });
+  onAtlasQuietChange(value => {
+    host.classList.toggle("is-quiet", value);
+    if (value) close();
+  });
+  host.classList.toggle("is-quiet", quiet);
+  figure.setAttribute("aria-label", t("atlas.poke"));
+
+  return { element: host, sprite, say, close, relabel: () => { figure.setAttribute("aria-label", t("atlas.poke")); figure.title = t("atlas.poke"); } };
+}
+
+return { ATLAS_COLORS, POSES, createAtlasSprite, createTent, createFlag, isAtlasQuiet, setAtlasQuiet, onAtlasQuietChange, syncAtlasQuiet, createAtlas };
+})();
+
+// ---- journey-pixels.js
+__modules["journey-pixels.js"] = (() => {
+// Pixel tools for the score journeys (journeys.js, journey-scenes.js): a tiny painter on a
+// 176×80 canvas where one unit is one art pixel, cached sprites from string maps, a 3×5
+// pixel font, a seeded random, colour mixing, routes measured by length, and Atlas in
+// miniature (11×14, the same hat, goggles, moustache, scarf and parka as atlas.js).
+const { ATLAS_COLORS } = __modules["atlas.js"];
+
+const W = 176;
+const H = 80;
+
+// The game's colours (style.css), for scenes to share.
+const C = {
+  ink: "#04121a", navy: "#0a0f1d", night: "#0d1433",
+  cyan: "#45e3ff", gold: "#ffd45c", orange: "#ff8a3d", purple: "#c58cff", green: "#5cf28a", pink: "#ff6b9d",
+  red: "#e0484f", white: "#f4f1e8", snow: "#e9eefb", ice: "#bfe3ff", faint: "rgba(233, 238, 251, 0.55)"
+};
+
+// ---------------------------------------------------------------------------
+// Numbers and colours
+// ---------------------------------------------------------------------------
+
+const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
+const lerp = (a, b, t) => a + (b - a) * t;
+
+// A seeded random (mulberry32), so a scene looks the same every time.
+function random(seed = 1) {
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let value = state;
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const rgbCache = new Map();
+function rgb(hex) {
+  if (!rgbCache.has(hex)) rgbCache.set(hex, [1, 3, 5].map(index => parseInt(hex.slice(index, index + 2), 16)));
+  return rgbCache.get(hex);
+}
+// Mixes two #rrggbb colours (t = 0 is a, 1 is b).
+function mix(a, b, t) {
+  const [ar, ag, ab] = rgb(a);
+  const [br, bg, bb] = rgb(b);
+  const channel = (x, y) => Math.round(x + (y - x) * t).toString(16).padStart(2, "0");
+  return `#${channel(ar, br)}${channel(ag, bg)}${channel(ab, bb)}`;
+}
+// A colour along a list of [stop, colour] pairs (stops from 0 to 1).
+function ramp(stops, t) {
+  if (t <= stops[0][0]) return stops[0][1];
+  for (let index = 1; index < stops.length; index += 1) {
+    const [s1, c1] = stops[index];
+    const [s0, c0] = stops[index - 1];
+    if (t <= s1) return mix(c0, c1, (t - s0) / (s1 - s0 || 1));
+  }
+  return stops.at(-1)[1];
+}
+
+// ---------------------------------------------------------------------------
+// Sprites
+// ---------------------------------------------------------------------------
+
+// A sprite is a list of equal-length strings; each letter is a colour in the palette and
+// "." is see-through. Each sprite and palette is drawn once to a small canvas (and once
+// mirrored), then copied.
+const spriteCache = new Map();
+function spriteImage(rows, palette, flip = false) {
+  let byPalette = spriteCache.get(rows);
+  if (!byPalette) spriteCache.set(rows, byPalette = new Map());
+  let images = byPalette.get(palette);
+  if (!images) {
+    const width = Math.max(...rows.map(row => row.length));
+    const make = mirrored => {
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = rows.length;
+      const ctx = canvas.getContext("2d");
+      rows.forEach((row, y) => [...row].forEach((key, x) => {
+        const color = palette[key];
+        if (key === "." || !color) return;
+        ctx.fillStyle = color;
+        ctx.fillRect(mirrored ? width - 1 - x : x, y, 1, 1);
+      }));
+      return canvas;
+    };
+    images = { plain: make(false), flipped: make(true), width, height: rows.length };
+    byPalette.set(palette, images);
+  }
+  return flip ? images.flipped : images.plain;
+}
+
+// ---------------------------------------------------------------------------
+// The 3×5 pixel font (capitals, digits and a few marks)
+// ---------------------------------------------------------------------------
+
+const GLYPHS = {
+  "0": "111101101101111", "1": "010110010010111", "2": "111001111100111", "3": "111001111001111",
+  "4": "101101111001001", "5": "111100111001111", "6": "111100111101111", "7": "111001010010010",
+  "8": "111101111101111", "9": "111101111001111",
+  A: "010101111101101", B: "110101110101110", C: "011100100100011", D: "110101101101110",
+  E: "111100110100111", F: "111100110100100", G: "011100101101011", H: "101101111101101",
+  I: "111010010010111", J: "001001001101010", K: "101110100110101", L: "100100100100111",
+  M: "101111111101101", N: "110101101101101", O: "010101101101010", P: "110101110100100",
+  Q: "010101101111011", R: "110101110101101", S: "011100010001110", T: "111010010010010",
+  U: "101101101101111", V: "101101101101010", W: "101101111111101", X: "101101010101101",
+  Y: "101101010010010", Z: "111001010100111",
+  "-": "000000111000000", ".": "000000000000010", "!": "010010010000010", "?": "111001010000010",
+  " ": "000000000000000", "'": "010010000000000", "+": "000010111010000"
+};
+const glyphOf = char => GLYPHS[char] || GLYPHS[char.normalize("NFD")[0]] || GLYPHS["?"];
+const textWidth = text => (text.length ? text.length * 4 - 1 : 0);
+
+// ---------------------------------------------------------------------------
+// The painter: whole-pixel drawing on the art canvas
+// ---------------------------------------------------------------------------
+
+function painter(ctx) {
+  return {
+    ctx,
+    px(x, y, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
+    },
+    rect(x, y, width, height, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(Math.round(x), Math.round(y), Math.round(width), Math.round(height));
+    },
+    // Top-left at (x, y).
+    sprite(rows, palette, x, y, { flip = false, alpha = 1 } = {}) {
+      const image = spriteImage(rows, palette, flip);
+      if (alpha !== 1) ctx.globalAlpha = alpha;
+      ctx.drawImage(image, Math.round(x), Math.round(y));
+      if (alpha !== 1) ctx.globalAlpha = 1;
+    },
+    // Centred on (x, y) at its bottom row (feet, wheels, the basket).
+    spriteAt(rows, palette, x, y, options = {}) {
+      const width = rows[0].length;
+      this.sprite(rows, palette, x - Math.floor(width / 2), y - rows.length + 1, options);
+    },
+    text(text, x, y, color, { align = "left", shadow = null } = {}) {
+      const value = String(text).toUpperCase();
+      const width = textWidth(value);
+      let left = Math.round(align === "center" ? x - width / 2 : align === "right" ? x - width : x);
+      const top = Math.round(y);
+      const paint = (dx, dy, fill) => {
+        ctx.fillStyle = fill;
+        [...value].forEach((char, index) => {
+          const bits = glyphOf(char);
+          for (let bit = 0; bit < 15; bit += 1) if (bits[bit] === "1") ctx.fillRect(left + index * 4 + (bit % 3) + dx, top + Math.floor(bit / 3) + dy, 1, 1);
+        });
+      };
+      if (shadow) paint(1, 1, shadow);
+      paint(0, 0, color);
+      return width;
+    },
+    // A line of single pixels, every `gap`th one (1 = solid).
+    line(x0, y0, x1, y1, color, gap = 1) {
+      const steps = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), 1);
+      ctx.fillStyle = color;
+      for (let step = 0; step <= steps; step += gap) {
+        ctx.fillRect(Math.round(lerp(x0, x1, step / steps)), Math.round(lerp(y0, y1, step / steps)), 1, 1);
+      }
+    },
+    // Vertical bands of colour from top to bottom, with a checkerboard dither where two
+    // bands meet (8-bit skies, water and rock).
+    bands(x, y, width, height, colorAt) {
+      for (let row = 0; row < height; row += 1) {
+        const t = row / Math.max(1, height - 1);
+        const here = colorAt(t);
+        const next = colorAt(Math.min(1, t + 1 / height * 2));
+        ctx.fillStyle = here;
+        ctx.fillRect(x, y + row, width, 1);
+        if (next !== here) {
+          ctx.fillStyle = next;
+          for (let col = (row % 2); col < width; col += 2) ctx.fillRect(x + col, y + row, 1, 1);
+        }
+      }
+    },
+    disc(cx, cy, radius, color) {
+      ctx.fillStyle = color;
+      for (let dy = -radius; dy <= radius; dy += 1) {
+        const half = Math.floor(Math.sqrt(radius * radius - dy * dy) + 0.3);
+        ctx.fillRect(Math.round(cx - half), Math.round(cy + dy), half * 2 + 1, 1);
+      }
+    }
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Routes, measured by length so equal points always cover equal distance
+// ---------------------------------------------------------------------------
+
+function makeRoute(points) {
+  const segments = [];
+  let total = 0;
+  for (let index = 1; index < points.length; index += 1) {
+    const [ax, ay] = points[index - 1];
+    const [bx, by] = points[index];
+    const length = Math.hypot(bx - ax, by - ay);
+    segments.push({ ax, ay, bx, by, length, start: total });
+    total += length;
+  }
+  const at = fraction => {
+    const distance = clamp(fraction, 0, 1) * total;
+    const segment = segments.find(item => distance <= item.start + item.length) || segments.at(-1);
+    const t = segment.length ? (distance - segment.start) / segment.length : 0;
+    return {
+      x: lerp(segment.ax, segment.bx, t),
+      y: lerp(segment.ay, segment.by, t),
+      dx: (segment.bx - segment.ax) / (segment.length || 1),
+      dy: (segment.by - segment.ay) / (segment.length || 1)
+    };
+  };
+  return {
+    points,
+    total,
+    at,
+    // Points one pixel apart from fraction a to b.
+    samples(a, b) {
+      const list = [];
+      if (b <= a) return list;
+      const steps = Math.max(1, Math.ceil((b - a) * total));
+      for (let step = 0; step <= steps; step += 1) list.push(at(lerp(a, b, step / steps)));
+      return list;
+    }
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Atlas in miniature
+// ---------------------------------------------------------------------------
+
+const ATLAS = { ...ATLAS_COLORS };
+// The miniature, 11 wide (a free column each side for raised arms), 14 tall.
+const MINI = [
+  ".....Y.....",
+  "....KRK....",
+  "...KRRRK...",
+  "..KRRrRRK..",
+  "..KGGKGGK..",
+  "..KSESESK..",
+  "..KWWWWWK..",
+  "...KSWSK...",
+  "..KYYYYYK..",
+  ".KTTYTTTTK.",
+  ".KTTYTTTTK.",
+  ".KSTTTTTSK.",
+  "..KggKggK..",
+  "..KPPKPPK.."
+];
+const setPixels = (rows, cells) => {
+  const grid = rows.map(row => [...row]);
+  cells.forEach(([x, y, key]) => { grid[y][x] = key; });
+  return grid.map(row => row.join(""));
+};
+const ARM_UP = side => {
+  const x = side === "left" ? 0 : 10;
+  const mitten = side === "left" ? 2 : 8;
+  return [[x, 6, "S"], [x, 7, "T"], [x, 8, "T"], [mitten, 11, "T"]];
+};
+const ATLAS_POSES = {
+  idle: MINI,
+  cheer: setPixels(MINI, [...ARM_UP("left"), ...ARM_UP("right")]),
+  wave: setPixels(MINI, ARM_UP("right")),
+  waveB: setPixels(MINI, [[10, 5, "S"], [10, 6, "T"], [10, 7, "T"], [10, 8, "T"], [8, 11, "T"]]),
+  blink: setPixels(MINI, [[3, 5, "S"], [5, 5, "S"]])
+};
+// Only the top rows, for Atlas in a basket, a cab or a porthole.
+const UPPER = {};
+Object.entries(ATLAS_POSES).forEach(([name, rows]) => { UPPER[name] = rows.slice(0, 11); });
+
+// The rows for a pose at a time (wave swings, and he blinks now and then).
+function atlasRows(pose = "idle", now = 0, { upper = false } = {}) {
+  const set = upper ? UPPER : ATLAS_POSES;
+  if (pose === "wave") return Math.floor(now * 4) % 2 ? set.waveB : set.wave;
+  if (pose === "cheer") return set.cheer;
+  return now % 3.4 < 0.14 ? set.blink : set.idle;
+}
+
+return { W, H, C, clamp, lerp, random, rgb, mix, ramp, spriteImage, textWidth, painter, makeRoute, ATLAS, atlasRows };
+})();
+
+// ---- journey-scenes.js
+__modules["journey-scenes.js"] = (() => {
+// The six score journeys (see journeys.js), each a pixel scene on the 176×80 art canvas.
+// A scene is made for a goal (`summit`, 6,000 or 9,000) and has:
+//   route          the path Atlas travels, measured by length (makeRoute)
+//   background(p)  the still parts, drawn once
+//   frame(p, s)    everything that moves, every frame; `s` is the journey's state: value,
+//                  f (0–1), stretches [{ a, b, color }], stops [{ f, color }], now, moving,
+//                  pose, goal, small
+//   head(s)        where the top of Atlas's hat is (for sparkles and his "?")
+//   goal           where the goal sparkles once it's reached
+//   react(s, …)    optional: the scene's own touch after a round
+const { ATLAS, H, W, atlasRows, clamp, lerp, makeRoute, mix, ramp, random, textWidth } = __modules["journey-pixels.js"];
+
+const LABEL = "#f4f1e8";
+const LABEL_AHEAD = "#aab4d4";
+const SHADOW = "#0b1020";
+
+// ---------------------------------------------------------------------------
+// Shared parts
+// ---------------------------------------------------------------------------
+
+// Every 1,000 before the goal: (fraction, "2K", reached).
+function eachMark(s, fn) {
+  for (let value = 1000; value < s.summit; value += 1000) fn(value / s.summit, `${value / 1000}K`, value <= s.value + 0.5);
+}
+// Every pixel of the route travelled, in its round's colour.
+function eachTrail(s, fn) {
+  s.stretches.forEach((part, index) => {
+    if (part.b <= part.a || s.f <= part.a) return;
+    s.route.samples(part.a, Math.min(part.b, s.f)).forEach(point => fn(point, part.color, index));
+  });
+}
+// The whole route, faintly: so the way to the goal is always in view.
+function planned(p, s, color, gap = 3, offsetY = 0) {
+  s.route.all ||= s.route.samples(0, 1);
+  s.route.all.forEach((point, index) => { if (index % gap === 0) p.px(point.x, point.y + offsetY, color); });
+}
+// A scale label on a soft dark plate (a drop shadow made 3 look like 9).
+const label = (p, s, text, x, y, reached, { align = "left" } = {}) => {
+  if (s.small) return;
+  const width = textWidth(text);
+  const left = Math.round(align === "center" ? x - width / 2 : align === "right" ? x - width : x);
+  p.rect(left - 1, Math.round(y) - 1, width + 2, 7, "rgba(11,16,32,0.55)");
+  p.text(text, left, y, reached ? LABEL : LABEL_AHEAD);
+};
+// Palettes made from one colour (a flag, a carriage stripe), kept per colour.
+const paletteCache = new Map();
+const paletteOf = (name, color, make) => {
+  const key = `${name}:${color}`;
+  if (!paletteCache.has(key)) paletteCache.set(key, make(color));
+  return paletteCache.get(key);
+};
+const darker = (color, amount = 0.35) => mix(color, "#000000", amount);
+const lighter = (color, amount = 0.4) => mix(color, "#ffffff", amount);
+// A soft round glow (lanterns, the bathysphere's lamp, beacons).
+function glow(p, x, y, radius, color, strength = 0.35) {
+  const { ctx } = p;
+  const gradient = ctx.createRadialGradient(x + 0.5, y + 0.5, 0, x + 0.5, y + 0.5, radius);
+  gradient.addColorStop(0, color);
+  gradient.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.globalAlpha = strength;
+  ctx.fillStyle = gradient;
+  ctx.fillRect(x - radius, y - radius, radius * 2 + 1, radius * 2 + 1);
+  ctx.globalAlpha = 1;
+}
+const drawAtlas = (p, s, x, bottom, { upper = false, flip = false } = {}) => {
+  const rows = atlasRows(s.pose, s.now, { upper });
+  p.sprite(rows, ATLAS, x - 5, bottom - rows.length + 1, { flip });
+};
+// A small flag on a pole, its foot at (x, y).
+function flag(p, x, y, color, height = 6, now = 0) {
+  p.rect(x, y - height, 1, height, SHADOW);
+  const wave = Math.floor(now * 3 + x) % 2;
+  p.rect(x + 1, y - height, 3, 2, color);
+  p.px(x + 4, y - height + wave, color);
+}
+// A cloud of pixels, 14×5.
+const CLOUD = [
+  "....wwww......",
+  "..wwwwwwww.ww.",
+  ".wwwwwwwwwwwww",
+  "wwwwwwwwwwwwww",
+  ".ssssssssssss."
+];
+const CLOUD_COLORS = { w: "#f4f7ff", s: "#c9d6ef" };
+const PINE = ["..w..", ".wgw.", "..g..", ".wgg.", "ggwgg", ".ggg.", "gggwg", "..p.."];
+const PINE_COLORS = { w: "#e9eefb", g: "#1d6b4a", p: "#5c3a1f" };
+const GREEN_PINE = { w: "#2fa35a", g: "#1d6b3a", p: "#5c3a1f" };
+
+// ---------------------------------------------------------------------------
+// 1. Balloon: Atlas in the basket, rising through a sky at dusk. Every round he drops a
+// sandbag in its colour, which lands on the hills below where that round ended.
+// ---------------------------------------------------------------------------
+
+const ENVELOPE = [
+  "....KKKKK....",
+  "..KKRRYRRKK..",
+  ".KRRRYYYRRRK.",
+  ".KRRYYYYYRRK.",
+  "KRRRYYYYYRRRK",
+  "KRRRYYYYYRRRK",
+  "KRRRYYYYYRRRK",
+  "KrRRYYYYYRRrK",
+  ".KrRRYYYRRrK.",
+  ".KKrRYYYRrKK.",
+  "...KKrYrKK...",
+  ".....KKK....."
+];
+const BASKET = ["KPPPPPPPPPK", "KpPpPpPpPpK", "KPPPPPPPPPK", ".KKKKKKKKK."];
+const BAG = [".c.", "sss", "sts"];
+const BIRD = [["K...K", ".K.K.", "..K.."], [".....", "KKKKK", "..K.."]];
+const PLANE = ["...K...", "KKWWWWK", "...K..."];
+
+function balloon(summit) {
+  // A straight climb on the wind, so the scale lines are evenly spaced.
+  const route = makeRoute([[30, 72], [96, 29]]);
+  const rnd = random(11);
+  const stars = Array.from({ length: 40 }, () => [Math.floor(rnd() * W), Math.floor(rnd() * 26)]);
+  const groundY = x => 71 + Math.round(Math.sin(x * 0.06) * 1.5);
+  const falling = [];
+  const landed = new Map();
+  return {
+    route,
+    goal: { x: 128, y: 8 },
+    background(p) {
+      p.bands(0, 0, W, 72, t => ramp([[0, "#151b44"], [0.3, "#263a7a"], [0.6, "#4b7cc8"], [0.84, "#9cc4ec"], [0.94, "#f2c09a"], [1, "#ffd29a"]], t));
+      stars.forEach(([x, y]) => p.px(x, y, y < 12 ? "#ffffff" : "#9fb3e8"));
+      p.disc(150, 70, 7, "#ff8a3d");
+      p.disc(150, 70, 5, "#ffd45c");
+      for (let x = 0; x < W; x += 1) {
+        const far = 63 + Math.round(Math.sin(x * 0.09) * 2 + Math.sin(x * 0.031) * 2);
+        p.rect(x, far, 1, H - far, "#3d5d8c");
+      }
+      for (let x = 0; x < W; x += 1) {
+        const top = groundY(x);
+        p.rect(x, top, 1, H - top, "#2a8a4c");
+        p.px(x, top, "#5cc46a");
+        const near = 76 + Math.round(Math.sin(x * 0.11 + 1) * 1.2);
+        p.rect(x, near, 1, H - near, "#1d6b3a");
+      }
+      // A village on the hills, with lit windows.
+      [[116, "#e0484f"], [124, "#2a6fd0"], [133, "#ffd45c"], [143, "#e0484f"], [153, "#c58cff"], [162, "#2a6fd0"]].forEach(([x, roof]) => {
+        const base = groundY(x) + 2;
+        p.rect(x, base - 4, 5, 4, "#f4f1e8");
+        p.rect(x - 1, base - 5, 7, 1, roof);
+        p.rect(x, base - 6, 5, 1, roof);
+        p.rect(x + 1, base - 7, 3, 1, roof);
+        p.px(x + 1, base - 3, "#ffd45c");
+        p.px(x + 3, base - 3, "#ffd45c");
+      });
+      [4, 11, 96, 104, 170].forEach(x => p.sprite(PINE, GREEN_PINE, x, groundY(x) - 6));
+      // The launch field and a windsock.
+      p.rect(22, 72, 17, 1, "#8a5a32");
+      p.rect(44, 64, 1, 8, "#c9ced9");
+      p.rect(45, 64, 3, 1, "#ff8a3d");
+      p.rect(45, 65, 2, 1, "#f4f1e8");
+    },
+    frame(p, s) {
+      // Twinkling stars, a plane on the jet stream, birds and drifting clouds.
+      stars.slice(0, 10).forEach(([x, y], index) => { if ((s.now * 1.3 + index * 0.71) % 3 < 0.25) p.px(x, y, "#ffd45c"); });
+      const planeX = ((s.now * 9) % 320) - 60;
+      for (let x = planeX - 34; x < planeX; x += 2) p.px(x, 13, `rgba(255,255,255,${0.1 + (x - planeX + 34) / 34 * 0.35})`);
+      p.sprite(PLANE, { K: "#0b1020", W: "#f4f1e8" }, planeX, 12);
+      [[60, 46], [68, 49], [76, 45]].forEach(([x0, y], index) => {
+        const x = ((x0 - s.now * 4) % (W + 20) + W + 20) % (W + 20) - 10;
+        p.sprite(BIRD[(Math.floor(s.now * 4) + index) % 2], { K: "#1a2238" }, x, y);
+      });
+      [[10, 26, 2.2], [90, 49, 1.5], [140, 20, 2.8], [40, 58, 1.1]].forEach(([x0, y, speed]) => {
+        const x = ((x0 + s.now * speed) % (W + 30)) - 15;
+        p.sprite(CLOUD, CLOUD_COLORS, x, y, { alpha: 0.85 });
+      });
+
+      // The scale: a line across the sky every 1,000, labelled on the left.
+      eachMark(s, (f, text, reached) => {
+        const y = Math.round(s.route.at(f).y);
+        for (let x = 0; x < W; x += 3) p.px(x, y, "rgba(255,255,255,0.18)");
+        label(p, s, text, 2, y - 6, reached);
+      });
+      label(p, s, `${s.summit / 1000}K`, 134, 6, s.goal);
+      drawStar(p, s.goal ? "#ffd45c" : "#8f9bbd", 128, 8);
+
+      planned(p, s, "rgba(255,255,255,0.4)", 3);
+      eachTrail(s, (point, color) => {
+        p.px(point.x, point.y, color);
+        p.px(point.x + 1, point.y, darker(color, 0.25));
+      });
+
+      // Sandbags on the ground, one for every round that has ended.
+      const bags = new Map(landed);
+      s.stops.forEach(stop => bags.set(stop.value, stop.color));
+      falling.forEach(item => bags.delete(item.value));
+      bags.forEach((color, value) => {
+        const x = Math.round(s.route.at(value / s.summit).x);
+        p.sprite(BAG, paletteOf("bag", color, tie => ({ c: tie, s: "#c9a66b", t: "#9a7a46" })), x - 1, groundY(x) - 1);
+      });
+      for (let index = falling.length - 1; index >= 0; index -= 1) {
+        const item = falling[index];
+        const age = s.now - item.born;
+        const ground = groundY(item.x) - 1;
+        const y = Math.min(ground, item.y + 60 * age * age);
+        if (y >= ground) {
+          landed.set(item.value, item.color);
+          falling.splice(index, 1);
+        }
+        p.sprite(BAG, paletteOf("bag", item.color, tie => ({ c: tie, s: "#c9a66b", t: "#9a7a46" })), item.x - 1, y);
+      }
+
+      // The balloon: envelope, burner, Atlas in the basket.
+      const at = s.route.at(s.f);
+      const x = Math.round(at.x + Math.sin(s.now * 1.3) * 0.8);
+      const y = Math.round(at.y);
+      p.line(x - 5, y - 21, x - 5, y - 4, "#5c3a1f");
+      p.line(x + 5, y - 21, x + 5, y - 4, "#5c3a1f");
+      drawAtlas(p, s, x, y - 3, { upper: true });
+      p.sprite(BASKET, ATLAS, x - 5, y - 3);
+      p.rect(x - 1, y - 15, 3, 1, "#8f9bbd");
+      const burning = s.moving || s.now % 2.6 < 0.4;
+      if (burning) {
+        const tall = Math.floor(s.now * 14) % 2;
+        p.rect(x, y - 17 - tall, 1, 2 + tall, "#ffd45c");
+        p.px(x - 1 + tall * 2, y - 16, "#ff8a3d");
+      }
+      p.sprite(ENVELOPE, ATLAS, x - 6, y - 28);
+    },
+    head(s) {
+      const at = s.route.at(s.f);
+      return { x: Math.round(at.x), y: Math.round(at.y) - 13 };
+    },
+    react(s, { points, color }) {
+      if (points <= 0) return;
+      const at = s.route.at(s.f);
+      falling.push({ x: Math.round(at.x) + 6, y: Math.round(at.y) - 2, born: s.now, color, value: s.value });
+    }
+  };
+}
+const STAR = ["..K..", ".KYK.", "KYYYK", ".KYK.", "K.K.K"];
+const drawStar = (p, color, x, y) => p.sprite(STAR, paletteOf("star", color, fill => ({ K: darker(fill, 0.5), Y: fill })), x - 2, y - 2);
+
+// ---------------------------------------------------------------------------
+// 2. Climb: Atlas on a snowmobile from Base Camp up the switchbacks to the summit. Each
+// bend is where something blocks the way: pine trees, an alpine hut, a boulder with a
+// yeti behind it, rocks at the cliff edge, an avalanche sign.
+// ---------------------------------------------------------------------------
+
+const SNOWMOBILE = [
+  "........KK...",
+  ".......KGK...",
+  "..KKKKKKKKK..",
+  ".KRRRRRRRRRK.",
+  "KRRYYRRRRRRRK",
+  ".KKKKKKKKKKKK",
+  "..KgKgKgKgK.K",
+  "KKKKKKKKKKKKK"
+];
+const HUT = [
+  "....WWW.c..",
+  "..WWWWWWcW.",
+  ".WWWWWWWWWW",
+  "WKKKKKKKKKW",
+  ".KPPPPPPPK.",
+  ".KPYPPPYPK.",
+  ".KPYPPKKPK.",
+  ".KPPPPKKPK."
+];
+const HUT_COLORS = { W: "#f4f7ff", K: "#3a2414", P: "#8a5a32", Y: "#ffd45c", c: "#5c3a1f" };
+const BOULDER = ["..WWWW..", ".WWsssW.", "sssssss.", "ssddssss", ".ddddds."];
+const BOULDER_COLORS = { W: "#f4f7ff", s: "#6a7a9a", d: "#4a5778" };
+const YETI = [
+  "..WWW..",
+  ".WWWWW.",
+  ".WbEbW.",
+  ".WbbbW.",
+  "WWWWWWW",
+  "WWWWWWW",
+  ".WWWWW.",
+  ".WW.WW.",
+  ".WW.WW."
+];
+const YETI_COLORS = { W: "#f4f1e8", b: "#7f93c4", E: "#0b1020" };
+const TENT = ["....K....", "...KYK...", "..KYYYK..", ".KYYKYYK.", "KYYYKYYYK", "KKKKKKKKK"];
+const TENT_COLORS = { K: "#0b1020", Y: "#45e3ff" };
+const SIGN = ["..K..", ".KYK.", ".KKK.", "KYKYK", "KKKKK"];
+
+function climb(summit) {
+  const route = makeRoute([[16, 73], [90, 68], [32, 57], [100, 46], [62, 37], [110, 24], [119, 9]]);
+  const rnd = random(7);
+  const peakX = 120;
+  const top = x => Math.round(x <= peakX ? 64 - x * (58 / peakX) : 6 + (x - peakX) * (46 / (W - peakX))) + (x % 7 === 3 ? 1 : 0);
+  const stars = Array.from({ length: 34 }, () => [Math.floor(rnd() * W), Math.floor(rnd() * 40)]);
+  const yeti = { x: 108, y: 46 };
+  return {
+    route,
+    goal: { x: 122, y: 2 },
+    background(p) {
+      p.bands(0, 0, W, 64, t => ramp([[0, "#0b1030"], [0.55, "#1d2a5e"], [1, "#33478a"]], t));
+      stars.forEach(([x, y]) => p.px(x, y, y < 20 ? "#ffffff" : "#8fa3d8"));
+      p.disc(152, 12, 4, "#f4f1e8");
+      p.px(151, 11, "#c9c3b5");
+      p.px(153, 13, "#c9c3b5");
+      // Far ridges.
+      for (let x = 0; x < W; x += 1) {
+        const ridge = 40 + Math.round(Math.abs(((x * 0.7) % 30) - 15) * 0.9 + Math.sin(x * 0.2) * 1.5);
+        p.rect(x, ridge, 1, H - ridge, "#26336a");
+        if (ridge < 44) p.px(x, ridge, "#8fa3d8");
+      }
+      // The mountain: the lit face on the left, the shadow face on the right.
+      for (let x = 0; x < W; x += 1) {
+        const y0 = top(x);
+        for (let y = y0; y < H; y += 1) {
+          const lit = x <= peakX;
+          const depth = y - y0;
+          let color = lit ? (depth < 2 ? "#ffffff" : (x + y) % 2 && depth > 14 ? "#c3d0ea" : "#dfe7f7") : (depth < 1 ? "#b9c7e6" : (x + y) % 2 ? "#7f93c4" : "#8a9dcc");
+          if (rnd() < 0.025 && depth > 3) color = lit ? "#9aa9cc" : "#5a6a9a";
+          p.px(x, y, color);
+        }
+      }
+      for (let x = 0; x < W; x += 1) p.rect(x, 74, 1, 6, (x % 2) ? "#e9eefb" : "#dfe7f7");
+      // Base Camp at the start.
+      p.sprite(TENT, TENT_COLORS, 2, 68);
+      flag(p, 12, 73, "#ff6b9d", 7);
+      // Pine trees at the first bend.
+      [[93, 62], [98, 60], [103, 63], [108, 61]].forEach(([x, y]) => p.sprite(PINE, PINE_COLORS, x, y));
+      // The hut at the second.
+      p.sprite(HUT, HUT_COLORS, 14, 50);
+      // Rocks at the cliff edge, the avalanche sign, and the summit.
+      p.sprite(BOULDER, BOULDER_COLORS, 52, 32);
+      p.sprite(PINE, PINE_COLORS, 57, 30);
+      p.rect(116, 19, 1, 6, "#5c3a1f");
+      p.sprite(SIGN, { K: "#0b1020", Y: "#ffd45c" }, 114, 15);
+    },
+    frame(p, s) {
+      // Smoke from the hut's chimney.
+      for (let index = 0; index < 4; index += 1) {
+        const age = (s.now * 0.6 + index / 4) % 1;
+        p.px(22 + Math.round(Math.sin(age * 6 + index) * 1 + age * 4), 49 - Math.round(age * 10), `rgba(230,236,250,${0.6 * (1 - age)})`);
+      }
+      // The yeti, peeking out from behind his boulder; he waves when Atlas comes by.
+      const at = s.route.at(s.f);
+      const near = Math.hypot(at.x - yeti.x, at.y - yeti.y) < 22;
+      const peek = near ? 5 : (s.now % 6 < 1.4 ? 3 : 0);
+      if (peek) {
+        p.sprite(YETI, YETI_COLORS, yeti.x, yeti.y - 4 - peek);
+        if (near && Math.floor(s.now * 4) % 2) { p.px(yeti.x + 7, yeti.y - 7 - peek, "#f4f1e8"); p.px(yeti.x + 7, yeti.y - 8 - peek, "#f4f1e8"); }
+      }
+      p.sprite(BOULDER, BOULDER_COLORS, yeti.x - 2, yeti.y - 4);
+
+      planned(p, s, "#5a6fa8", 2);
+      eachTrail(s, (point, color) => {
+        p.px(point.x, point.y, color);
+        p.px(point.x, point.y + 1, darker(color, 0.3));
+      });
+      // Marker posts every 1,000, and a flag where each round ended.
+      eachMark(s, (f, text, reached) => {
+        const point = s.route.at(f);
+        p.rect(point.x, point.y - 3, 1, 3, "#5c3a1f");
+        p.px(point.x, point.y - 3, reached ? "#ffd45c" : "#c9ced9");
+        label(p, s, text, point.x + 2, point.y - 9, reached);
+      });
+      s.stops.forEach(stop => {
+        const point = s.route.at(stop.f);
+        flag(p, Math.round(point.x), Math.round(point.y), stop.color, 6, s.now);
+      });
+      // The summit flag, with the goal.
+      flag(p, 120, 7, s.goal ? "#ffd45c" : "#ff6b9d", 7, s.now);
+      label(p, s, `${s.summit / 1000}K`, 126, 1, s.goal);
+
+      // Atlas on his snowmobile, facing the way he goes, snow spraying behind him.
+      const flip = at.dx < -0.01;
+      const x = Math.round(at.x);
+      const y = Math.round(at.y);
+      if (s.moving) {
+        for (let index = 0; index < 5; index += 1) {
+          const back = (flip ? 1 : -1) * (7 + Math.random() * 6);
+          p.px(x + back, y - Math.random() * 4, "#ffffff");
+        }
+      }
+      const left = x - 6;
+      drawAtlas(p, s, x + (flip ? 1 : -1), y - 4, { upper: true, flip });
+      p.sprite(SNOWMOBILE, ATLAS, left, y - 7, { flip });
+    },
+    head(s) {
+      const at = s.route.at(s.f);
+      return { x: Math.round(at.x), y: Math.round(at.y) - 14 };
+    }
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 3. Mine: Atlas digs down a tunnel past one deposit for every 1,000, coal first and
+// diamonds at the bottom. What he mines goes into his backpack, and each round leaves a
+// lantern on the tunnel wall.
+// ---------------------------------------------------------------------------
+
+const MINERALS = {
+  coal: { ore: "#1a1a1f", shine: "#5a5a66" },
+  iron: { ore: "#b5552b", shine: "#e08a5a" },
+  copper: { ore: "#d9822b", shine: "#5cc9a0" },
+  silver: { ore: "#c9ced9", shine: "#ffffff" },
+  gold: { ore: "#ffd45c", shine: "#fff2b0" },
+  emerald: { ore: "#2fbf6a", shine: "#a8ffcf", gem: true },
+  sapphire: { ore: "#3f6fff", shine: "#a8c4ff", gem: true },
+  ruby: { ore: "#e0304f", shine: "#ff9aae", gem: true },
+  diamond: { ore: "#bff4ff", shine: "#ffffff", gem: true }
+};
+const MINE_ORDER = {
+  6: ["coal", "iron", "gold", "emerald", "ruby", "diamond"],
+  9: ["coal", "iron", "copper", "silver", "gold", "emerald", "sapphire", "ruby", "diamond"]
+};
+const PACK = ["K...K", "KPPPK", "KpYpK", "KPPPK", "KPPPK", "KKKKK"];
+const BONE = ["W.....W", "WWWWWWW", "W.....W"];
+const GEODE = ["...K...", "..KDK..", ".KDdDK.", "KDdDDdK", ".KDDDK.", "..KdK..", "...K..."];
+
+function mine(summit) {
+  const route = makeRoute([[22, 9], [22, 18], [158, 74]]);
+  const levels = Math.max(1, Math.round(summit / 1000));
+  const order = MINE_ORDER[levels] || Array.from({ length: levels }, (_, index) => MINE_ORDER[9][Math.round(index * 8 / Math.max(1, levels - 1))]);
+  const tops = Array.from({ length: levels + 1 }, (_, index) => index === 0 ? 10 : index === levels ? H : Math.round(route.at(index / levels).y));
+  const rnd = random(5);
+  const gems = [];
+  const chunks = [];
+  let lastSwing = 0;
+  const layerAt = f => Math.min(levels - 1, Math.floor(f * levels + 1e-9));
+  return {
+    route,
+    goal: { x: 165, y: 72 },
+    background(p) {
+      p.bands(0, 0, W, 7, t => ramp([[0, "#7fc0ff"], [1, "#bfe3ff"]], t));
+      p.rect(0, 7, W, 2, "#2fb35e");
+      p.rect(0, 9, W, 1, "#1d7a40");
+      // The headframe over the shaft, and a cart of ore.
+      p.line(15, 9, 20, 1, "#8a5a32");
+      p.line(29, 9, 24, 1, "#8a5a32");
+      p.rect(19, 1, 7, 1, "#5c3a1f");
+      p.disc(22, 1, 1, "#c9ced9");
+      p.rect(34, 5, 7, 3, "#6a7a9a");
+      p.rect(35, 4, 5, 1, "#ffd45c");
+      p.px(35, 8, "#0b1020");
+      p.px(39, 8, "#0b1020");
+      // The rock, one layer for every 1,000, darker the deeper it goes.
+      for (let level = 0; level < levels; level += 1) {
+        const y0 = tops[level];
+        const y1 = tops[level + 1];
+        const base = ramp([[0, "#7a5636"], [0.35, "#5e4a44"], [0.7, "#3e3550"], [1, "#272038"]], level / Math.max(1, levels - 1));
+        for (let y = y0; y < y1; y += 1) {
+          for (let x = 0; x < W; x += 1) {
+            const r = rnd();
+            p.px(x, y, r < 0.1 ? darker(base, 0.2) : r > 0.94 ? lighter(base, 0.12) : base);
+          }
+        }
+        if (level > 0) for (let x = 0; x < W; x += 1) p.px(x, y0 + Math.round(Math.sin(x * 0.2 + level) * 0.8), darker(base, 0.45));
+        // Its deposit, in clusters.
+        const mineral = MINERALS[order[level]];
+        const count = mineral.gem ? 7 : 11;
+        for (let index = 0; index < count; index += 1) {
+          const x = 3 + Math.floor(rnd() * (W - 8));
+          const y = y0 + 2 + Math.floor(rnd() * Math.max(1, y1 - y0 - 4));
+          if (mineral.gem) {
+            p.px(x, y - 1, mineral.shine);
+            p.rect(x - 1, y, 3, 1, mineral.ore);
+            p.px(x, y + 1, darker(mineral.ore, 0.3));
+            gems.push([x, y - 1, mineral.shine]);
+          } else {
+            p.rect(x, y, 2, 2, mineral.ore);
+            p.px(x + 2, y + 1, mineral.ore);
+            p.px(x, y, mineral.shine);
+          }
+        }
+      }
+      // Roots in the soil and a fossil bone.
+      for (let index = 0; index < 14; index += 1) {
+        const x = Math.floor(rnd() * W);
+        p.line(x, 10, x + Math.round(rnd() * 4 - 2), 12 + Math.floor(rnd() * 3), "#3a2414");
+      }
+      p.sprite(BONE, { W: "#e8dcc0" }, 120, Math.round(lerp(tops[0], tops[1], 0.55)));
+    },
+    frame(p, s) {
+      gems.forEach(([x, y, color], index) => { if ((s.now * 0.9 + index * 0.37) % 2.4 < 0.18) { p.px(x, y - 1, color); p.px(x - 1, y - 1, "#ffffff"); p.px(x + 1, y - 1, "#ffffff"); } });
+      // The tunnel so far, with its rails in each round's colour.
+      s.route.samples(0, s.f).forEach(point => p.rect(point.x - 2, point.y - 6, 5, 7, "#160f0c"));
+      s.route.samples(s.f, 1).forEach((point, index) => { if (index % 3 === 0) p.px(point.x, point.y - 3, "rgba(255,255,255,0.22)"); });
+      eachTrail(s, (point, color) => p.px(point.x, point.y, color));
+      // Depth marks on the left, and a timber frame in the tunnel at every 1,000.
+      eachMark(s, (f, text, reached) => {
+        const point = s.route.at(f);
+        if (reached) {
+          p.rect(point.x - 3, point.y - 6, 1, 7, "#8a5a32");
+          p.rect(point.x + 3, point.y - 6, 1, 7, "#8a5a32");
+          p.rect(point.x - 3, point.y - 7, 7, 1, "#a8743a");
+        }
+      });
+      for (let level = 1; level < levels; level += 1) label(p, s, `${level}K`, 2, tops[level] + 2, level * 1000 <= s.value + 0.5);
+      // A lantern where each round ended.
+      s.stops.forEach(stop => {
+        const point = s.route.at(stop.f);
+        const x = Math.round(point.x);
+        const y = Math.round(point.y) - 5;
+        glow(p, x, y + 1, 6, stop.color, 0.45);
+        p.px(x, y - 1, SHADOW);
+        p.rect(x, y, 1, 2, stop.color);
+      });
+      // The diamonds at the bottom.
+      p.sprite(GEODE, { K: "#0b1020", D: "#bff4ff", d: "#ffffff" }, 162, 69);
+      if (s.goal) glow(p, 165, 72, 8, "#bff4ff", 0.5);
+
+      // Atlas with his pickaxe and his backpack full of what he found.
+      const at = s.route.at(s.f);
+      const x = Math.round(at.x);
+      const y = Math.round(at.y);
+      const swinging = s.moving && s.f > 0.01;
+      const strike = swinging && Math.floor(s.now * 6) % 2 === 1;
+      const mineral = MINERALS[order[layerAt(s.f)]];
+      if (swinging && strike && s.now - lastSwing > 0.25) {
+        lastSwing = s.now;
+        chunks.push({ born: s.now, color: mineral.ore, shine: mineral.shine });
+      }
+      p.sprite(PACK, { K: "#0b1020", P: "#8a5a32", p: "#5c3a1f", Y: "#ffd45c" }, x - 9, y - 10);
+      const found = s.f > 0 ? Math.min(levels, layerAt(s.f) + 1) : 0;
+      for (let index = 0; index < found; index += 1) {
+        const item = MINERALS[order[index]];
+        p.px(x - 8 + (index % 3), y - 10 - Math.floor(index / 3), item.ore);
+        if (index === found - 1) p.px(x - 8 + (index % 3), y - 11 - Math.floor(index / 3), item.shine);
+      }
+      drawAtlas(p, s, x, y);
+      if (strike) {
+        p.line(x + 4, y - 5, x + 9, y - 4, "#8a5a32");
+        p.rect(x + 9, y - 6, 1, 4, "#c9ced9");
+        if (Math.random() < 0.6) p.px(x + 10 + Math.round(Math.random() * 2), y - 5 + Math.round(Math.random() * 2), "#ffd45c");
+      } else if (swinging) {
+        p.line(x + 4, y - 5, x + 6, y - 12, "#8a5a32");
+        p.rect(x + 4, y - 13, 5, 1, "#c9ced9");
+      } else {
+        p.line(x + 4, y - 4, x + 7, y - 10, "#8a5a32");
+        p.rect(x + 6, y - 11, 4, 1, "#c9ced9");
+      }
+      // Chunks flying from the rock face into the backpack.
+      for (let index = chunks.length - 1; index >= 0; index -= 1) {
+        const item = chunks[index];
+        const t = (s.now - item.born) / 0.45;
+        if (t >= 1) { chunks.splice(index, 1); continue; }
+        const cx = lerp(x + 10, x - 7, t);
+        const cy = lerp(y - 4, y - 11, t) - Math.sin(t * Math.PI) * 7;
+        p.px(cx, cy, item.color);
+        p.px(cx + 1, cy, item.shine);
+      }
+    },
+    head(s) {
+      const at = s.route.at(s.f);
+      return { x: Math.round(at.x), y: Math.round(at.y) - 13 };
+    }
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 4. Train: a steam train with Atlas in the cab. Every round couples on a carriage that
+// covers that round's stretch of the track, in its colour and with its own load: animals
+// at the windows, sand, gravel, a T. rex, timber, and a globe.
+// ---------------------------------------------------------------------------
+
+const LOCO = [
+  "..............KKK.....",
+  "...............KgK....",
+  "KKKKKKK........KgK....",
+  "KTTTTTK........KgK....",
+  "KTTTTTKKKKKKKKKKKKKK..",
+  "KTtttTKTTTTTTTTTTTTTK.",
+  "KTtttTKTTYTTTTYTTTTTK.",
+  "KTTTTTKTTTTTTTTTTTTTK.",
+  "KYYYYYKYYYYYYYYYYYYYKR",
+  "KKKKKKKKKKKKKKKKKKKKKR"
+];
+const WHEELS = [
+  [".KggggK.KggggK.KggggKRR", ".KgYggK.KggYgK.KgYggKR.", "..KKKK...KKKK...KKKK..."],
+  [".KggggK.KggggK.KggggKRR", ".KggYgK.KgYggK.KggYgKR.", "..KKKK...KKKK...KKKK..."]
+];
+const LOCO_COLORS = { ...ATLAS, T: "#2bb3a3", t: "#1c7a70", g: "#2a3550", Y: "#ffd45c", R: "#e0484f" };
+const TRACK_Y = 65;
+const GIRAFFE = ["K.K", "YYY", ".Yb", ".Y.", ".b.", ".Y.", ".Y."];
+const MONKEY = [".bb.", "bssb", ".bb.", ".b..", "b..."];
+const ELEPHANT = ["ggg.", "gEgg", "ggg.", "..g.", "...g", "..g."];
+const PARROT = [".R.", "RRG", ".RG", ".Y."];
+const ANIMAL_COLORS = { K: "#5c3a1f", Y: "#f2c14e", b: "#8a5a32", s: "#f0b48a", g: "#8f9bbd", E: "#0b1020", R: "#e0484f", G: "#2fbf6a" };
+
+function train(summit) {
+  const route = makeRoute([[4, TRACK_Y], [146, TRACK_Y]]);
+  const rnd = random(3);
+  const puffs = [];
+  let lastPuff = 0;
+  const stationX = 154;
+  return {
+    route,
+    goal: { x: 168, y: 44 },
+    background(p) {
+      p.bands(0, 0, W, 52, t => ramp([[0, "#3f86d8"], [0.6, "#8fc6f5"], [1, "#d8efff"]], t));
+      p.disc(22, 11, 5, "#ffd45c");
+      p.disc(22, 11, 3, "#fff2b0");
+      for (let x = 0; x < W; x += 1) {
+        const peak = 34 + Math.round(Math.abs(((x * 1.3) % 44) - 22) * 0.6 + Math.sin(x * 0.17) * 2);
+        p.rect(x, peak, 1, H - peak, "#7f9fcf");
+        if (peak < 37) p.px(x, peak, "#f4f7ff");
+      }
+      for (let x = 0; x < W; x += 1) {
+        const hill = 48 + Math.round(Math.sin(x * 0.07 + 0.5) * 3 + Math.sin(x * 0.19) * 1);
+        p.rect(x, hill, 1, H - hill, "#5fbf6a");
+      }
+      for (let index = 0; index < 18; index += 1) {
+        const x = Math.floor(rnd() * W);
+        const y = 50 + Math.floor(rnd() * 5);
+        p.rect(x, y - 2, 2, 3, "#2f8a4a");
+      }
+      p.rect(0, 58, W, H - 58, "#3f9a4c");
+      for (let index = 0; index < 40; index += 1) p.px(Math.floor(rnd() * W), 70 + Math.floor(rnd() * 10), ["#ffd45c", "#ff6b9d", "#f4f1e8"][index % 3]);
+      // The track: gravel, sleepers and the rail.
+      p.rect(0, TRACK_Y + 1, W, 3, "#8a7a66");
+      for (let x = 0; x < W; x += 1) if (rnd() < 0.35) p.px(x, TRACK_Y + 1 + Math.floor(rnd() * 3), "#6a5c4c");
+      for (let x = 1; x < W; x += 3) p.rect(x, TRACK_Y + 1, 2, 1, "#5c3a1f");
+      p.rect(0, TRACK_Y, W, 1, "#c9ced9");
+      // The station at the end of the line.
+      p.rect(stationX - 2, TRACK_Y - 4, W - stationX + 2, 4, "#c9b08a");
+      p.rect(stationX - 2, TRACK_Y - 5, W - stationX + 2, 1, "#f4f1e8");
+      p.rect(160, 47, 14, 13, "#f4f1e8");
+      p.rect(158, 45, 18, 2, "#ff6b9d");
+      p.rect(160, 43, 14, 2, "#ff6b9d");
+      p.rect(162, 41, 10, 2, "#ff6b9d");
+      p.rect(162, 50, 3, 4, "#2a6fd0");
+      p.rect(169, 50, 3, 4, "#2a6fd0");
+      p.rect(165, 55, 4, 5, "#8a5a32");
+      p.disc(167, 47, 1, "#ffd45c");
+    },
+    frame(p, s) {
+      const xOf = f => Math.round(4 + f * 142);
+      // Kilometre posts below the track.
+      eachMark(s, (f, text, reached) => {
+        const x = xOf(f);
+        p.rect(x, TRACK_Y + 4, 1, 3, reached ? "#ffd45c" : "#f4f1e8");
+        label(p, s, text, x, TRACK_Y + 8, reached, { align: "center" });
+      });
+      label(p, s, `${s.summit / 1000}K`, 165, TRACK_Y + 8, s.goal, { align: "center" });
+      flag(p, 167, 41, s.goal ? "#ffd45c" : "#ff6b9d", 5, s.now);
+      // The rest of the line, faintly marked.
+      for (let x = xOf(s.f) + 22; x < 146 + 22; x += 3) p.px(x, TRACK_Y - 1, "rgba(255,255,255,0.45)");
+
+      // The carriages, one per round, each from where its round began to where it ended.
+      const shake = s.now % 2.6 < 0.16;
+      s.stretches.forEach((part, index) => {
+        if (part.b <= part.a || s.f <= part.a) return;
+        const a = xOf(part.a);
+        const b = xOf(Math.min(part.b, s.f));
+        drawCarriage(p, s, index, a + 1, b - 1, part.color, shake && index % 6 === 3);
+      });
+
+      // The engine, Atlas in the cab, and its smoke.
+      const x = xOf(s.f);
+      const bottom = TRACK_Y - 1;
+      if (s.now - lastPuff > (s.moving ? 0.18 : 0.9)) {
+        lastPuff = s.now;
+        puffs.push({ x: x + 16, y: bottom - 12, born: s.now });
+      }
+      for (let index = puffs.length - 1; index >= 0; index -= 1) {
+        const item = puffs[index];
+        const age = s.now - item.born;
+        if (age > 1.6) { puffs.splice(index, 1); continue; }
+        const radius = Math.min(3, Math.floor(age * 2.5));
+        p.disc(item.x - age * (s.moving ? 18 : 5), item.y - age * 8, radius, `rgba(244,247,255,${0.75 * (1 - age / 1.6)})`);
+      }
+      drawAtlas(p, s, x + 3, bottom - 6, { upper: true });
+      p.sprite(LOCO, LOCO_COLORS, x, bottom - 12);
+      p.sprite(WHEELS[s.moving ? Math.floor(s.now * 10) % 2 : 0], LOCO_COLORS, x - 1, bottom - 2);
+    },
+    head(s) {
+      return { x: Math.round(4 + s.f * 142) + 3, y: TRACK_Y - 1 - 17 };
+    }
+  };
+}
+// One carriage from x a to x b (both inside), its body above the rail.
+function drawCarriage(p, s, index, a, b, color, jolt) {
+  const width = b - a + 1;
+  if (width < 1) return;
+  const theme = index % 6;
+  const floor = TRACK_Y - 3;
+  const lift = jolt ? 1 : 0;
+  // Wheels and frame.
+  p.rect(a, floor + 1, width, 1, "#2a3550");
+  if (width >= 5) {
+    [a + 1, b - 2].forEach(wheel => { p.rect(wheel, floor + 2, 2, 1, "#0b1020"); });
+  } else p.px(a + Math.floor(width / 2), floor + 2, "#0b1020");
+  // The coupling to the next carriage.
+  p.px(b + 1, floor, "#2a3550");
+  if (width < 3) { p.rect(a, floor - 1, width, 2, color); return; }
+
+  if (theme === 0) {
+    // Animals: a stock car with windows, and who's looking out of them.
+    const top = floor - 7;
+    p.rect(a, top, width, 8, "#a8743a");
+    for (let x = a + 2; x < b; x += 4) p.rect(x, top + 1, 1, 6, "#8a5a32");
+    p.rect(a, top + 6, width, 2, color);
+    p.rect(a, top - 1, width, 1, darker(color, 0.3));
+    let slot = 0;
+    for (let x = a + 2; x + 3 <= b - 1; x += 7, slot += 1) {
+      p.rect(x, top + 2, 3, 3, "#1a1208");
+      const swing = Math.round(Math.sin(s.now * 3 + slot) * 1);
+      switch (slot % 4) {
+        case 0: p.sprite(GIRAFFE, ANIMAL_COLORS, x, top - 6); break;
+        case 1: p.sprite(MONKEY, ANIMAL_COLORS, x + swing, top + 3); break;
+        case 2: p.sprite(ELEPHANT, ANIMAL_COLORS, x, top + 1); break;
+        default: p.sprite(PARROT, ANIMAL_COLORS, x, top - 4);
+      }
+    }
+  } else if (theme === 1 || theme === 2) {
+    // Sand or gravel: an open hopper heaped with its load.
+    const top = floor - 5;
+    const body = theme === 1 ? "#7f93a8" : "#5f6f7f";
+    p.rect(a, top, width, 6, body);
+    p.rect(a, top + 4, width, 2, color);
+    for (let x = a; x <= b; x += 1) {
+      const edge = Math.min(x - a, b - x);
+      const heap = Math.min(3, Math.floor(edge / 2) + 1);
+      for (let y = 0; y < heap; y += 1) {
+        const grain = (x * 7 + y * 13) % 5;
+        const fill = theme === 1 ? (y === heap - 1 ? "#f5dca0" : "#e8c37a") : ["#9a9a9a", "#6a6a6a", "#c0b8a8", "#808080", "#b0a898"][grain];
+        p.px(x, top - 1 - y, fill);
+      }
+    }
+    if (theme === 1 && s.moving) for (let index = 0; index < 3; index += 1) p.px(a - 1 - Math.random() * 6, top - 2 - Math.random() * 3, "#f5dca0");
+  } else if (theme === 3) {
+    // T. rex inside: a tall boxcar that jolts now and then, with a tail out of the back.
+    const top = floor - 9 - lift;
+    p.rect(a, top, width, 10, "#b8313a");
+    p.rect(a, top + 8, width, 2, color);
+    p.rect(a, top - 1, width, 1, "#7a1f26");
+    const words = width >= 49 ? "T-REX INSIDE" : width >= 21 ? "T-REX" : width >= 4 ? "!" : "";
+    if (words) p.text(words, a + width / 2, top + 2, "#f4f1e8", { align: "center" });
+    if (width >= 14) {
+      p.rect(a - 3, top + 4, 3, 1, "#4f9a3a");
+      p.px(a - 4, top + 3, "#4f9a3a");
+    }
+    if (width >= 9 && s.now % 3.1 > 0.2) p.px(b - 2, top + 1, "#ffd45c");
+  } else if (theme === 4) {
+    // Timber.
+    const top = floor - 5;
+    p.rect(a, top + 4, width, 2, color);
+    for (let row = 0; row < 2; row += 1) {
+      p.rect(a + row, top + 2 - row * 2, width - row * 2, 2, "#8a5a32");
+      p.rect(a + row, top + 2 - row * 2, width - row * 2, 1, "#a8743a");
+      p.px(a + row, top + 2 - row * 2, "#c98a46");
+    }
+  } else {
+    // A globe for the expedition, strapped onto a flatcar.
+    const top = floor - 1;
+    p.rect(a, top, width, 2, color);
+    if (width >= 9) {
+      const cx = a + Math.floor(width / 2);
+      p.disc(cx, top - 4, 4, "#2a6fd0");
+      [[-2, -6], [-1, -6], [1, -4], [2, -4], [2, -3], [-3, -3], [-2, -2], [0, -7]].forEach(([dx, dy]) => p.px(cx + dx, top + dy, "#2fbf6a"));
+      p.rect(cx - 4, top - 3, 9, 1, "#ffd45c");
+    } else p.rect(a, top - 3, width, 3, "#8a5a32");
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 5. Dive: Atlas in a bathysphere, lowered from a ship. The depth scale is real: each
+// animal is drawn at a depth where it lives (sources in the comments), and below the
+// sunlight only the lamp shows them, apart from the ones that glow.
+// ---------------------------------------------------------------------------
+
+const SPHERE = ["..KKKKK..", ".KhssssK.", "KhsKRKssK", "KsKSESKsK", "KsKWWWKsK", "KssKKKssK", "KsssssssK", ".KsssssK.", "..KKKKK.."];
+const SPHERE_COLORS = { ...ATLAS, s: "#8fa3c0", h: "#d8e2f0" };
+const SHIP = [
+  ".........K.....K....",
+  ".........K....KK....",
+  "......KKKKK..K.K....",
+  "......KWWWK.K..K....",
+  "..KKKKKWWWKKKKKKKKK.",
+  "KRRRRRRRRRRRRRRRRRRK",
+  ".KWWWWWWWWWWWWWWWWK.",
+  "..KKKKKKKKKKKKKKKK.."
+];
+const SEA = {
+  B: "#7f93a8", b: "#4f6278", W: "#f4f1e8", K: "#0b1020", G: "#2f8a5a", g: "#1d5a3a", Y: "#ffd45c",
+  S: "#c9ced9", s: "#8f9bbd", P: "#f2a6c8", p: "#c97aa0", R: "#b8313a", r: "#7a1f26", D: "#3a3a4a",
+  O: "#e88a6a", L: "#7ff6ff", A: "#ffe08a", E: "#e8dcc0", T: "#c9b08a", N: "#5a4a6a"
+};
+// [name, depth in metres, x, sprite, sway (px), glow pixels [dx, dy]]
+// Depths: bottlenose dolphins and sardines live near the surface; green turtles feed in
+// the top ~100 m; moon jellies in the sunlit zone; swordfish hunt at 200–600 m by day;
+// lanternfish spend the day at ~300–1,200 m; vampire squid ~600–900 m; sperm whales dive
+// to 1,000–2,000 m; humpback anglerfish ~1,000–4,000 m; gulper eels ~500–3,000 m; dumbo
+// octopuses ~3,000–4,000 m; abyssal grenadiers ~2,000–5,000 m; sea pigs on the abyssal
+// plain to ~6,000 m; Mariana snailfish ~6,900–8,000 m; amphipods to the trench floor.
+const CREATURES = [
+  ["turtle", 40, 140, ["..GG..", ".GgGgG", "G.GG.G", ".K..K."], 6],
+  ["sardines", 60, 96, ["S.S.S.S", ".S.S.S.", "S.S.S.S"], 8],
+  ["jelly", 120, 20, [".PP.", "PPPP", "p.p.", ".p.p"], 2],
+  ["swordfish", 450, 128, ["........K", "KBBBBBBSS", "BBBBBBB..", ".K......."], 10],
+  ["lanternfish", 700, 34, ["NN.", "NNL", "N.."], 6, [[2, 1]]],
+  ["lanternfish", 760, 44, ["NN.", "NNL", "N.."], 6, [[2, 1]]],
+  ["vampire squid", 800, 156, [".RR.", "RRRR", "RrRr", "r.r."], 3, [[0, 1], [3, 1]]],
+  ["sperm whale", 1500, 118, ["...DDDDDDDDD.", "DDDDDDDDDDDDD", "DDDDDDDDDDD.D", "DD..DDDD....."], 12],
+  ["anglerfish", 2000, 30, ["...A.", "..K..", "DDDD.", "DWDDD", "DDDD."], 4, [[3, 0]]],
+  ["gulper eel", 2800, 140, ["DDD......", "DWDDDDDDD", "DDD....DD"], 8, [[8, 2]]],
+  ["dumbo octopus", 3800, 26, ["O..O", "OOOO", "OKOK", ".OO.", "O..O"], 5],
+  ["grenadier", 4800, 128, ["SSS....", "SKSSSSS", "SSS..S."], 10],
+  ["snailfish", 7700, 78, ["PPP..", "PKPPP", ".PP.P"], 4],
+  ["amphipod", 8800, 70, ["E.E.E", "EEEEE"], 2]
+];
+const SEA_PIG = [".P.P.", "PPPPP", "P.P.P"];
+const BRITTLE_STAR = ["T...T", ".TTT.", "TTTTT", ".T.T."];
+
+function dive(summit) {
+  const sphereX = 60;
+  const y0 = 14;
+  const span = 58;
+  const depthY = depth => y0 + depth / summit * span;
+  const route = makeRoute([[sphereX, y0], [sphereX, y0 + span]]);
+  const plain = Math.min(6000, summit);
+  const plainY = Math.round(depthY(plain)) + 5;
+  const floorY = Math.round(depthY(summit)) + 5;
+  const trench = summit > 6000;
+  const rnd = random(9);
+  const bubbles = [];
+  const colorAtDepth = depth => ramp([[0, "#3fc4f0"], [200, "#1d86c4"], [1000, "#0d3c78"], [2000, "#0a2650"], [4000, "#06132e"], [6000, "#040a1e"], [9000, "#02040f"]].map(([d, c]) => [d / 9000, c]), depth / 9000);
+  const seabedTop = x => trench && (x < 44 || x > 80) ? plainY : floorY;
+  return {
+    route,
+    goal: { x: sphereX, y: floorY - 1 },
+    background(p) {
+      p.bands(0, 0, W, 10, t => ramp([[0, "#4f6fb8"], [0.7, "#f2a87a"], [1, "#ffd29a"]], t));
+      for (let y = 10; y < H; y += 1) {
+        const depth = Math.max(0, (y - y0) / span * summit);
+        const here = colorAtDepth(depth);
+        const next = colorAtDepth(depth + summit / span);
+        for (let x = 0; x < W; x += 1) p.px(x, y, (x + y) % 2 && here !== next ? next : here);
+      }
+      // Sunlight in the top of the sea.
+      [[100, 0.18], [130, 0.12], [150, 0.16]].forEach(([x, alpha]) => { for (let y = 11; y < 20; y += 1) p.rect(x + (y - 11), y, 3, 1, `rgba(220,250,255,${alpha * (1 - (y - 11) / 9)})`); });
+      // The seabed: the abyssal plain with manganese nodules, and the trench below it.
+      for (let x = 0; x < W; x += 1) {
+        const top = seabedTop(x) + (x % 9 === 0 ? -1 : 0);
+        p.rect(x, top, 1, H - top, x % 2 ? "#2e2a22" : "#3a3428");
+        p.px(x, top, "#4a4434");
+        if (rnd() < 0.16) p.px(x, top + 1 + Math.floor(rnd() * 2), "#141210");
+      }
+      if (trench) {
+        for (let y = plainY; y < floorY; y += 1) {
+          p.px(43 - Math.floor((y - plainY) / 6), y, "#3a3428");
+          p.px(81 + Math.floor((y - plainY) / 6), y, "#3a3428");
+        }
+      }
+      // The ship and its A-frame.
+      p.sprite(SHIP, { K: "#0b1020", R: "#e0484f", W: "#f4f1e8" }, 38, 3);
+      p.line(52, 4, sphereX, 1, "#ffd45c");
+      p.line(57, 10, sphereX, 1, "#ffd45c");
+    },
+    frame(p, s) {
+      // Waves on the surface, and a dolphin that leaps now and then.
+      for (let x = 0; x < W; x += 1) if ((x + Math.floor(s.now * 6)) % 7 === 0) p.px(x, 10, "#ffffff");
+      const leap = (s.now % 7) / 1.2;
+      if (leap < 1) {
+        const lx = 118 + leap * 18;
+        const ly = 10 - Math.sin(leap * Math.PI) * 6;
+        p.sprite([".BBBB.", "BBBBBK", ".b..b."], SEA, lx, ly - 1);
+      }
+      const at = s.route.at(s.f);
+      const sy = Math.round(at.y);
+      // The animals, each at its own depth; in the dark the lamp has to find them.
+      CREATURES.forEach(([name, depth, x0, rows, sway, lights = []]) => {
+        if (depth > summit) return;
+        const x = Math.round(x0 + Math.sin(s.now * 0.5 + x0) * sway);
+        const y = Math.round(depthY(depth)) - Math.floor(rows.length / 2);
+        const flip = Math.cos(s.now * 0.5 + x0) < 0;
+        const dark = depth > 800 ? clamp(1 - (Math.hypot(x - sphereX, y - sy) - 12) / 18, 0.2, 1) : 1;
+        p.sprite(rows, SEA, x, y, { flip, alpha: dark });
+        lights.forEach(([dx, dy]) => {
+          const lx = flip ? x + rows[0].length - 1 - dx : x + dx;
+          if ((s.now * 1.5 + x0) % 2 > 0.3) { p.px(lx, y + dy, SEA.L); glow(p, lx, y + dy, 3, SEA.L, 0.4); }
+        });
+      });
+      // On the abyssal plain: sea pigs and a brittle star.
+      if (plain <= summit) {
+        [[104, 0], [116, 1]].forEach(([x0, index]) => {
+          const x = Math.round(x0 + Math.sin(s.now * 0.3 + index * 2) * 3);
+          const dark = clamp(1 - (Math.hypot(x - sphereX, plainY - sy) - 12) / 18, 0.25, 1);
+          p.sprite(SEA_PIG, SEA, x, plainY - 3, { alpha: dark });
+        });
+        p.sprite(BRITTLE_STAR, SEA, 140, plainY - 4, { alpha: clamp(1 - (Math.hypot(140 - sphereX, plainY - sy) - 12) / 18, 0.25, 1) });
+      }
+
+      // The depth scale on the left.
+      eachMark(s, (f, text, reached) => {
+        const y = Math.round(depthY(f * summit));
+        p.rect(0, y, 3, 1, reached ? "#ffd45c" : "rgba(255,255,255,0.4)");
+        label(p, s, text, 4, y - 2, reached);
+      });
+      label(p, s, `${s.summit / 1000}K`, 4, floorY - 3, s.goal);
+      // The way down, faintly; the cable in each round's colour; a beacon per round.
+      for (let y = sy + 6; y < floorY - 1; y += 3) p.px(sphereX, y, "rgba(255,255,255,0.28)");
+      p.rect(sphereX, 1, 1, y0 - 1, "#c9ced9");
+      eachTrail(s, (point, color) => p.px(point.x, point.y - 5, color));
+      s.stops.forEach(stop => {
+        const y = Math.round(s.route.at(stop.f).y) - 5;
+        if ((s.now * 2 + stop.f * 7) % 2 > 0.4) glow(p, sphereX, y, 4, stop.color, 0.6);
+        p.rect(sphereX - 1, y, 3, 1, stop.color);
+      });
+      // A beacon on the seabed, lit once he gets there.
+      p.rect(sphereX + 7, floorY - 4, 1, 4, "#c9ced9");
+      p.px(sphereX + 7, floorY - 5, s.goal ? "#ffd45c" : "#5a6a8a");
+      if (s.goal) glow(p, sphereX + 7, floorY - 5, 5, "#ffd45c", 0.6);
+
+      // The bathysphere, its lamp, and bubbles.
+      if (s.f > 0.03) glow(p, sphereX, sy + 6, 20, "#bff4ff", 0.22 + 0.08 * Math.min(1, s.f * 4));
+      if (s.moving && Math.random() < 0.5) bubbles.push({ x: sphereX + (Math.random() < 0.5 ? -4 : 4), y: sy - 2, born: s.now });
+      for (let index = bubbles.length - 1; index >= 0; index -= 1) {
+        const item = bubbles[index];
+        const age = s.now - item.born;
+        const y = item.y - age * 14;
+        if (age > 1.2 || y < 11) { bubbles.splice(index, 1); continue; }
+        p.px(item.x + Math.round(Math.sin(age * 9)), y, "rgba(220,250,255,0.7)");
+      }
+      p.sprite(SPHERE, SPHERE_COLORS, sphereX - 4, sy - 4);
+      p.px(sphereX, sy + 5, "#ffd45c");
+    },
+    head(s) {
+      return { x: sphereX, y: Math.round(s.route.at(s.f).y) - 5 };
+    }
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 6. Sled: Atlas and his huskies across the sea ice to the North Pole, past a research
+// station, a polar bear and an open lead (where a narwhal surfaces, and the sled jumps).
+// Every round lights its own curtain of the aurora, in its colour, over its stretch.
+// ---------------------------------------------------------------------------
+
+const SLED = ["K.......K.", "KPPPPPPPK.", "KpPpPpPpK.", ".KKKKKKKKK", "KK.......K"];
+const HUSKY = [
+  ["W.....KK", ".WWWWWWK", ".WwwwwW.", ".W.W.W.W"],
+  ["W.....KK", ".WWWWWWK", ".WwwwwW.", "W.W...W."]
+];
+const HUSKY_COLORS = { W: "#e9eefb", w: "#8f9bbd", K: "#4a5778" };
+const BEAR = ["......WW.", ".WWWWWWWK", "WWWWWWWW.", ".W.W.W.W."];
+const NARWHAL = ["W.......", ".W......", "..SSSS..", ".SSSSSS."];
+const STATION = [
+  "......K....",
+  "......K....",
+  "......K....",
+  ".OOOOOKOOO.",
+  "OOOOOOOOOOO",
+  "OYOOOYOOOOO",
+  "OOOOOOOOOOO",
+  "KKKKKKKKKKK"
+];
+
+function sled(summit) {
+  const trackY = 68;
+  const route = makeRoute([[8, trackY], [126, trackY]]);
+  const lead = [62, 72];
+  const rnd = random(4);
+  const stars = Array.from({ length: 50 }, () => [Math.floor(rnd() * W), Math.floor(rnd() * 46)]);
+  const snow = Array.from({ length: 18 }, () => [rnd() * W, rnd() * H, 0.5 + rnd()]);
+  const hop = x => (x > lead[0] - 2 && x < lead[1] + 2 ? -Math.round(Math.sin(Math.PI * (x - lead[0] + 2) / (lead[1] - lead[0] + 4)) * 3) : 0);
+  return {
+    route,
+    goal: { x: 166, y: 50 },
+    background(p) {
+      p.bands(0, 0, W, 54, t => ramp([[0, "#050818"], [0.6, "#0d1640"], [1, "#1d2c63"]], t));
+      stars.forEach(([x, y]) => p.px(x, y, y < 24 ? "#ffffff" : "#7f8fc8"));
+      p.disc(26, 10, 4, "#f4f1e8");
+      p.disc(28, 9, 3, "#050818");
+      // The ice: far pressure ridges, then the flat sea ice.
+      for (let x = 0; x < W; x += 1) {
+        const ridge = 50 + Math.round(Math.abs(((x * 1.7) % 18) - 9) * 0.5 + Math.sin(x * 0.3) * 1);
+        p.rect(x, ridge, 1, H - ridge, "#a9c1de");
+        p.px(x, ridge, "#f4f7ff");
+      }
+      p.bands(0, 57, W, H - 57, t => ramp([[0, "#c9d9ee"], [1, "#e9f1fb"]], t));
+      // The open lead across the ice.
+      for (let y = 58; y < H; y += 1) {
+        const shift = Math.round((y - 58) * 0.25);
+        p.rect(lead[0] + shift, y, lead[1] - lead[0] - 1, 1, (y % 3) ? "#0b2a4a" : "#123a62");
+        p.px(lead[0] + shift - 1, y, "#f4f7ff");
+      }
+      p.sprite(STATION, { O: "#ff8a3d", Y: "#ffd45c", K: "#0b1020" }, 28, 49);
+      // The North Pole.
+      for (let y = 52; y < trackY + 1; y += 1) p.px(166, y, Math.floor(y / 2) % 2 ? "#e0484f" : "#f4f1e8");
+      p.rect(163, trackY + 1, 7, 1, "#8f9bbd");
+    },
+    frame(p, s) {
+      const xOf = f => Math.round(8 + f * 118);
+      // The aurora: one curtain per round, over the stretch of ice it covered.
+      s.stretches.forEach((part, index) => {
+        if (part.b <= part.a || s.f <= part.a) return;
+        const a = xOf(part.a);
+        const b = xOf(Math.min(part.b, s.f));
+        const base = 14 + (index % 3) * 6;
+        for (let x = a; x <= b; x += 1) {
+          const wave = Math.sin(x * 0.16 + s.now * 1.1 + index * 1.7) * 3 + Math.sin(x * 0.05 - s.now * 0.4) * 2;
+          const shimmer = 0.55 + 0.45 * Math.sin(s.now * 2.3 + x * 0.4 + index);
+          const top = Math.round(base + wave);
+          const height = 13 + Math.round(Math.sin(x * 0.3 + index) * 3);
+          for (let y = 0; y < height; y += 1) {
+            const alpha = (1 - y / height) ** 0.7 * 0.85 * shimmer;
+            if (alpha > 0.05) p.rect(x, top + y, 1, 1, `${part.color}${Math.round(alpha * 255).toString(16).padStart(2, "0")}`);
+          }
+        }
+      });
+      // The station's radio light, drifting snow, the narwhal and the polar bear.
+      if (s.now % 1.6 < 0.5) { p.px(34, 49, "#ff3a3a"); glow(p, 34, 49, 3, "#ff3a3a", 0.5); }
+      snow.forEach(([x0, y0, speed]) => p.px(((x0 - s.now * 14 * speed) % W + W) % W, (y0 + s.now * 3 * speed) % H, "rgba(255,255,255,0.7)"));
+      const surfacing = s.now % 6.5;
+      if (surfacing < 2) {
+        const rise = Math.round(Math.sin(surfacing / 2 * Math.PI) * 3);
+        p.sprite(NARWHAL, SEA, lead[0] + 3, 73 - rise);
+      }
+      const bearX = Math.round(118 + Math.sin(s.now * 0.25) * 8);
+      p.sprite(BEAR, { W: "#f4ecd8", K: "#0b1020" }, bearX, 49, { flip: Math.cos(s.now * 0.25) < 0 });
+
+      // Stakes every 1,000 and the goal.
+      eachMark(s, (f, text, reached) => {
+        const x = xOf(f);
+        p.rect(x, trackY + 2, 1, 3, reached ? "#ffd45c" : "#4a5778");
+        label(p, s, text, x, trackY + 6, reached, { align: "center" });
+      });
+      label(p, s, `${s.summit / 1000}K`, 166, trackY + 6, s.goal, { align: "center" });
+      p.disc(166, 51, 1, s.goal ? "#ffd45c" : "#c9ced9");
+      for (let x = xOf(s.f) + 40; x < 160; x += 3) p.px(x, trackY + 1, "rgba(74,87,120,0.6)");
+      // The runners' tracks, in each round's colour.
+      s.stretches.forEach(part => {
+        if (part.b <= part.a || s.f <= part.a) return;
+        for (let x = xOf(part.a); x <= xOf(Math.min(part.b, s.f)); x += 1) {
+          if (x >= lead[0] && x < lead[1]) continue;
+          p.px(x, trackY + 1, part.color);
+        }
+      });
+
+      // The team: sled and Atlas, then three huskies on the line.
+      const x = xOf(s.f);
+      const running = s.moving;
+      const sledY = trackY + hop(x + 5);
+      drawAtlas(p, s, x + 4, sledY - 3, { upper: true });
+      p.sprite(SLED, ATLAS, x, sledY - 4);
+      const dogs = [x + 12, x + 21, x + 30];
+      p.line(x + 9, sledY - 3, dogs[2] + 6, trackY - 3 + hop(dogs[2] + 4), "#8a5a32");
+      dogs.forEach((dog, index) => {
+        const frame = running ? (Math.floor(s.now * 10) + index) % 2 : 0;
+        p.sprite(HUSKY[frame], HUSKY_COLORS, dog, trackY - 3 + hop(dog + 4));
+      });
+    },
+    head(s) {
+      const x = Math.round(8 + s.f * 118);
+      return { x: x + 4, y: trackY + hop(x + 5) - 13 };
+    }
+  };
+}
+
+const SCENES = { balloon, climb, mine, train, dive, sled };
+
+return { SCENES };
+})();
+
+// ---- journeys.js
+__modules["journeys.js"] = (() => {
+const { t } = __modules["i18n.js"];
+const { H, W, painter } = __modules["journey-pixels.js"];
+const { SCENES } = __modules["journey-scenes.js"];
+// The day's score as a journey with Atlas: every point takes him one unit further, and a
+// full day reaches the goal. Each day has its own journey (getJourney in daily.js), in the
+// same 8-bit pixel style as Atlas and the menu's planes and ships:
+//
+//   balloon  Atlas in the basket of a hot-air balloon, up through the sky
+//   climb    on a snowmobile up the mountain, around huts, trees and a yeti, to the summit
+//   mine     down a mine with his pickaxe, past coal, ores and gems, to the diamonds
+//   train    a steam train with a carriage for every round, to the station
+//   dive     down in a bathysphere past the sea life of each depth, to the seabed
+//   sled     by dog sled across the ice to the North Pole, under an aurora of the rounds
+//
+// Every journey is a small canvas (176×80 art pixels, scaled up in whole pixels) with the
+// same parts: the whole route faintly, scale marks every 1,000, the route travelled so far
+// in one colour per round, a mark where each round ended, Atlas, and the goal.
+
+// One colour per round, for its stretch of the route and its dot in the rounds list.
+// One colour per round; the sixth is for the globe mode, which has six rounds.
+const ROUND_COLORS = ["#45e3ff", "#ffd45c", "#ff8a3d", "#c58cff", "#5cf28a", "#ff6b9d"];
+
+// The words each journey uses for its score: "+800 m", "Depth 2,400 m · seabed 6,000 m".
+// The words are in the language on screen (i18n.js), read when shown.
+const journeyWords = (type, emoji, unit) => ({
+  emoji,
+  unit,
+  get name() { return t(`journey.${type}.name`); },
+  get measure() { return t(`journey.${type}.measure`); },
+  get goal() { return t(`journey.${type}.goal`); },
+  get verb() { return t(`journey.${type}.verb`); }
+});
+const JOURNEYS = {
+  balloon: journeyWords("balloon", "🎈", "m"),
+  climb: journeyWords("climb", "🏔️", "m"),
+  mine: journeyWords("mine", "⛏️", "m"),
+  train: journeyWords("train", "🚂", "km"),
+  dive: journeyWords("dive", "🌊", "m"),
+  sled: journeyWords("sled", "🛷", "km")
+};
+
+// How good a round was, from 0 (no points) to 5 (a full 1,000 or more). The score card
+// plays the tier's sound (sounds.playScoreTier) and Atlas reacts to it.
+function scoreTier(points) {
+  if (points <= 0) return 0;
+  if (points < 300) return 1;
+  if (points < 600) return 2;
+  if (points < 850) return 3;
+  if (points < 1000) return 4;
+  return 5;
+}
+const TIER_POSE = ["think", "idle", "idle", "wave", "cheer", "cheer"];
+const TIER_SPARKS = [0, 3, 6, 12, 20, 34];
+
+const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+// Below this width the scale labels are left out (the score tile).
+const SMALL_WIDTH = 240;
+
+function createJourney(type, container, { summit = 6000 } = {}) {
+  const make = SCENES[type] || SCENES.climb;
+  const scene = make(summit);
+  const route = scene.route;
+
+  const canvas = document.createElement("canvas");
+  canvas.className = `journey journey-${type}`;
+  canvas.setAttribute("aria-hidden", "true");
+  canvas.width = W * 4;
+  canvas.height = H * 4;
+  const ctx = canvas.getContext("2d");
+  // The art is drawn at one unit per pixel, then copied up in whole pixels.
+  const art = document.createElement("canvas");
+  art.width = W;
+  art.height = H;
+  const artCtx = art.getContext("2d");
+  const p = painter(artCtx);
+  const background = document.createElement("canvas");
+  background.width = W;
+  background.height = H;
+  scene.background(painter(background.getContext("2d")));
+  container.replaceChildren(canvas);
+
+  const state = {
+    summit,
+    route,
+    value: 0,
+    f: 0,
+    stretches: [],
+    stops: [],
+    colorOf: new Map(),
+    now: 0,
+    moving: false,
+    pose: "idle",
+    goal: false,
+    small: false,
+    sparks: []
+  };
+  let lastMoveAt = -1;
+  let mood = null;
+  let dirty = true;
+  let lastPaint = 0;
+  let frame = 0;
+  let timer = 0;
+  let replaying = 0;
+
+  // Keeps the canvas at a whole number of device pixels per art pixel.
+  const resize = () => {
+    const width = canvas.clientWidth;
+    if (!width) return;
+    state.small = width < SMALL_WIDTH;
+    const scale = Math.min(8, Math.max(1, Math.ceil(width * (window.devicePixelRatio || 1) / W)));
+    if (canvas.width !== W * scale) {
+      canvas.width = W * scale;
+      canvas.height = H * scale;
+    }
+    dirty = true;
+    wake();
+  };
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(canvas);
+
+  const render = nowMs => {
+    const now = nowMs / 1000;
+    state.now = now;
+    state.moving = nowMs - lastMoveAt < 200;
+    if (mood && now > mood.until) mood = null;
+    state.pose = mood ? mood.pose : "idle";
+    state.thinking = mood?.pose === "think";
+    state.goal = state.value >= summit - 0.5;
+    artCtx.clearRect(0, 0, W, H);
+    artCtx.drawImage(background, 0, 0);
+    scene.frame(p, state);
+    // Atlas thinking after a round without points.
+    if (state.thinking) {
+      const head = scene.head(state);
+      const bob = Math.floor(now * 2) % 2;
+      drawBubble(p, head.x, head.y - 1 - bob);
+    }
+    // Sparkles: from Atlas after a good round, and at the goal once it's reached.
+    if (state.goal && !reducedMotion() && Math.random() < 0.12) spark(scene.goal, 1, ["#ffd45c", "#ffffff"]);
+    state.sparks = state.sparks.filter(item => now - item.born < item.life);
+    state.sparks.forEach(item => {
+      const age = now - item.born;
+      const x = item.x + item.vx * age;
+      const y = item.y + item.vy * age + 26 * age * age;
+      if (Math.floor((age + item.phase) * 10) % 3 !== 0 || age < 0.15) p.px(x, y, item.color);
+    });
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(art, 0, 0, canvas.width, canvas.height);
+  };
+
+  const spark = (at, count, colors) => {
+    for (let index = 0; index < count; index += 1) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 10 + Math.random() * 26;
+      state.sparks.push({
+        x: at.x, y: at.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - 16,
+        born: state.now, life: 0.7 + Math.random() * 0.7, phase: Math.random(), color: colors[index % colors.length]
+      });
+    }
+  };
+
+  // The animation loop: smooth while something moves, about 12 frames a second for the
+  // idle scene (flames, waves, dogs), and asleep while the canvas is hidden or gone.
+  function wake() {
+    if (frame || timer) return;
+    frame = requestAnimationFrame(tick);
+  }
+  function tick(nowMs) {
+    frame = 0;
+    if (!canvas.isConnected) return; // draw() wakes it again
+    const hidden = document.hidden || !canvas.getClientRects().length || canvas.closest(".hidden");
+    if (hidden) {
+      timer = setTimeout(() => { timer = 0; wake(); }, 600);
+      return;
+    }
+    const busy = nowMs - lastMoveAt < 400 || state.sparks.length || mood;
+    if (dirty || busy || nowMs - lastPaint > 80) {
+      render(nowMs);
+      lastPaint = nowMs;
+      dirty = false;
+    }
+    if (reducedMotion() && !busy) return;
+    frame = requestAnimationFrame(tick);
+  }
+
+  return {
+    type,
+    // `value` is where Atlas is now; `stretches` the rounds so far, each { from, to, color }
+    // (the last can still be growing); `stops` the values where earlier rounds ended.
+    draw(value, { stretches = [], stops = [] } = {}) {
+      const clamped = Math.min(Math.max(value, 0), summit);
+      if (Math.abs(clamped - state.value) > 0.01) lastMoveAt = performance.now();
+      state.value = clamped;
+      state.f = clamped / summit;
+      state.stretches = stretches.map(part => ({ a: part.from / summit, b: Math.min(part.to, summit) / summit, color: part.color, to: part.to }));
+      state.colorOf = new Map(stretches.map(part => [part.to, part.color]));
+      state.stops = stops.map(stop => ({ f: Math.min(stop, summit) / summit, value: stop, color: state.colorOf.get(stop) || "#ffffff" }));
+      dirty = true;
+      wake();
+    },
+    // Atlas reacts to a round's points: a "?" for none, a wave, or a cheer with sparkles.
+    // The scene can add its own touch (the balloon drops a sandbag). Returns the tier.
+    react(points, { color = "#ffd45c" } = {}) {
+      const tier = scoreTier(points);
+      mood = { pose: TIER_POSE[tier], until: performance.now() / 1000 + (tier === 0 ? 2.4 : 2.2) };
+      state.now = performance.now() / 1000;
+      if (!reducedMotion()) {
+        const head = scene.head(state);
+        spark({ x: head.x, y: head.y + 2 }, TIER_SPARKS[tier], tier >= 4 ? [color, "#ffd45c", "#ffffff"] : [color, "#ffffff"]);
+      }
+      scene.react?.(state, { points, tier, color });
+      dirty = true;
+      wake();
+      return tier;
+    },
+    // Plays the day's journey once: from the start through every round's stretch (a short
+    // stop where each round ended), then stays where the score puts it, with Atlas waving.
+    // With reduced motion it just draws the end. Stops early once the drawing is gone, or
+    // on `stop()`; `finish()` (SKIP) jumps to the end. Returns how long it takes, in ms.
+    replay({ stretches: travelled = [], total = travelled.at(-1)?.to || 0 } = {}, { speed = 2.2, pause = 320, rest = 500 } = {}) {
+      this.stop();
+      const run = ++replaying;
+      // The timeline: each stretch takes time in proportion to its points.
+      const legs = [];
+      let time = rest;
+      travelled.forEach(part => {
+        const length = Math.max(0, part.to - part.from) / speed;
+        legs.push({ from: part.from, to: part.to, start: time, end: time + length });
+        time += length + pause;
+      });
+      const stopsOf = value => travelled.slice(0, -1).map(part => part.to).filter(stop => stop <= value);
+      const finish = () => {
+        this.draw(total, { stretches: travelled, stops: stopsOf(total) });
+        mood = { pose: "wave", until: performance.now() / 1000 + 3 };
+        wake();
+      };
+      this.finish = () => { if (run === replaying) { this.stop(); finish(); } };
+      if (reducedMotion()) { finish(); return 0; }
+      const begin = performance.now();
+      const step = now => {
+        if (run !== replaying || !canvas.isConnected || canvas.closest(".hidden")) return;
+        const elapsed = now - begin;
+        if (elapsed >= time) { finish(); return; }
+        let value = 0;
+        legs.forEach(leg => {
+          if (elapsed >= leg.end) value = leg.to;
+          else if (elapsed > leg.start) value = leg.from + (leg.to - leg.from) * ((elapsed - leg.start) / (leg.end - leg.start));
+        });
+        value = Math.min(value, total);
+        this.draw(value, { stretches: travelled, stops: stopsOf(value) });
+        requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+      return time;
+    },
+    // Jumps a replay to its end (set by replay()).
+    finish() {},
+    stop() {
+      replaying += 1;
+    }
+  };
+}
+
+// A small "?" bubble above Atlas.
+const BUBBLE = [
+  ".KKKKK.",
+  "KWWWWWK",
+  "KWKKKWK",
+  "KWWWKWK",
+  "KWWKWWK",
+  "KWWWWWK",
+  "KWWKWWK",
+  ".KKKKK.",
+  "..KK...",
+  "..K...."
+];
+const BUBBLE_COLORS = { K: "#0b1020", W: "#f4f1e8" };
+const drawBubble = (p, x, y) => p.sprite(BUBBLE, BUBBLE_COLORS, x - 3, y - BUBBLE.length);
+
+return { ROUND_COLORS, JOURNEYS, scoreTier, createJourney };
+})();
+
 // ---- round-pictures.js
 __modules["round-pictures.js"] = (() => {
 // Generated by tools/fetch-pictures.mjs from days.js: the picture on each round's info
@@ -15281,191 +17035,6 @@ const ROUND_PICTURES = {
 };
 
 return { ROUND_PICTURES };
-})();
-
-// ---- audio.js
-__modules["audio.js"] = (() => {
-// The game's sounds, made in the browser (no sound files). A mix of soft, natural sounds
-// (a wooden tick, a marimba, a bell chord, a whoosh) and a few of the original 8-bit
-// beeps the player liked. Everything goes through one master volume and a gentle
-// compressor, so loud and quiet sounds end up at about the same level; the marimba and
-// bells also get a short room echo.
-const MASTER_VOLUME = 1;
-
-class SoundEngine {
-  constructor() {
-    this.ctx = null;
-    this.enabled = true;
-  }
-
-  init() {
-    if (this.ctx) {
-      if (this.ctx.state === "suspended") this.ctx.resume();
-      return;
-    }
-    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const compressor = this.ctx.createDynamicsCompressor();
-    compressor.threshold.value = -18;
-    compressor.ratio.value = 4;
-    this.master = this.ctx.createGain();
-    this.master.gain.value = MASTER_VOLUME;
-    this.master.connect(compressor);
-    compressor.connect(this.ctx.destination);
-    // The echo: a second of fading noise as a room's impulse, mixed in quietly.
-    const length = this.ctx.sampleRate * 1.2;
-    const impulse = this.ctx.createBuffer(2, length, this.ctx.sampleRate);
-    for (let channel = 0; channel < 2; channel += 1) {
-      const data = impulse.getChannelData(channel);
-      for (let index = 0; index < length; index += 1) data[index] = (Math.random() * 2 - 1) * (1 - index / length) ** 3;
-    }
-    this.reverb = this.ctx.createConvolver();
-    this.reverb.buffer = impulse;
-    const wet = this.ctx.createGain();
-    wet.gain.value = 0.22;
-    this.reverb.connect(wet);
-    wet.connect(this.master);
-  }
-
-  // A sound starting soon, or null when sound is off.
-  start() {
-    if (!this.enabled) return null;
-    this.init();
-    return this.ctx.currentTime + 0.01;
-  }
-
-  send(node, echo) {
-    node.connect(this.master);
-    if (echo) node.connect(this.reverb);
-  }
-
-  // A soft tone: quick fade in, smooth fade out (optionally gliding to another pitch).
-  tone(frequency, at, duration, { type = "sine", volume = 0.1, to = null, attack = 0.005, echo = false } = {}) {
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(frequency, at);
-    if (to) osc.frequency.exponentialRampToValueAtTime(to, at + duration);
-    gain.gain.setValueAtTime(0.0001, at);
-    gain.gain.exponentialRampToValueAtTime(volume, at + attack);
-    gain.gain.exponentialRampToValueAtTime(0.0001, at + duration);
-    osc.connect(gain);
-    this.send(gain, echo);
-    osc.start(at);
-    osc.stop(at + duration + 0.05);
-  }
-
-  // A retro beep: straight on, fading out in a line (the original 8-bit sounds).
-  beep(frequency, at, duration, { type = "square", volume = 0.05, to = null } = {}) {
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(frequency, at);
-    if (to) osc.frequency.exponentialRampToValueAtTime(to, at + duration);
-    gain.gain.setValueAtTime(volume, at);
-    gain.gain.linearRampToValueAtTime(0.0001, at + duration);
-    osc.connect(gain);
-    this.send(gain, false);
-    osc.start(at);
-    osc.stop(at + duration);
-  }
-
-  // A marimba note: the tone and two quick overtones of a struck wooden bar.
-  marimba(frequency, at, volume = 0.16, echo = true) {
-    this.tone(frequency, at, 0.9, { volume, echo });
-    this.tone(frequency * 4, at, 0.18, { volume: volume * 0.25, echo });
-    this.tone(frequency * 10, at, 0.05, { volume: volume * 0.08, echo });
-  }
-
-  // Filtered noise: ticks, knocks and whooshes.
-  noise(at, duration, { filter = "bandpass", frequency = 1000, to = null, q = 1, volume = 0.2, attack = 0.003, echo = false } = {}) {
-    const length = Math.ceil(this.ctx.sampleRate * duration);
-    const buffer = this.ctx.createBuffer(1, length, this.ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let index = 0; index < length; index += 1) data[index] = Math.random() * 2 - 1;
-    const source = this.ctx.createBufferSource();
-    source.buffer = buffer;
-    const shape = this.ctx.createBiquadFilter();
-    shape.type = filter;
-    shape.frequency.setValueAtTime(frequency, at);
-    if (to) shape.frequency.exponentialRampToValueAtTime(to, at + duration);
-    shape.Q.value = q;
-    const gain = this.ctx.createGain();
-    gain.gain.setValueAtTime(0.0001, at);
-    gain.gain.exponentialRampToValueAtTime(volume, at + attack);
-    gain.gain.exponentialRampToValueAtTime(0.0001, at + duration);
-    source.connect(shape);
-    shape.connect(gain);
-    this.send(gain, echo);
-    source.start(at);
-    source.stop(at + duration);
-  }
-
-  // Buttons: a soft wooden tick.
-  playClick() {
-    const at = this.start();
-    if (at === null) return;
-    this.noise(at, 0.03, { frequency: 2600, q: 6, volume: 2.2 });
-    this.tone(1800, at, 0.03, { volume: 0.2 });
-  }
-
-  // A guess card flying in: an airy whoosh.
-  playFlyTo() {
-    const at = this.start();
-    if (at === null) return;
-    this.noise(at, 0.35, { frequency: 500, to: 2400, q: 1.5, volume: 0.8, attack: 0.12, echo: true });
-  }
-
-  // A right answer that doesn't end the round (Deep Cut, painting a country): the
-  // original quick 8-bit arpeggio.
-  playGuess() {
-    const at = this.start();
-    if (at === null) return;
-    [261.63, 329.63, 392].forEach((frequency, index) => this.beep(frequency, at + index * 0.06, 0.08, { volume: 0.18 }));
-  }
-
-  // The right answer: a warm bell chord, C–E–G and the octave, with a little echo.
-  playVictory() {
-    const at = this.start();
-    if (at === null) return;
-    [523.25, 659.25, 783.99].forEach((frequency, index) => this.marimba(frequency, at + index * 0.09, 0.28));
-    this.marimba(1046.5, at + 0.3, 0.3);
-    this.tone(2093, at + 0.3, 1.2, { volume: 0.05, attack: 0.02, echo: true });
-  }
-
-  // A wrong answer: two soft low marimba notes, falling.
-  playError() {
-    const at = this.start();
-    if (at === null) return;
-    this.marimba(220, at, 0.32);
-    this.marimba(174.61, at + 0.16, 0.32);
-  }
-
-  // One country passing by as the globe mode's ranking climbs: a short wooden tick,
-  // rising in pitch as it nears the top (progress 0 → 1).
-  playTick(progress = 0) {
-    const at = this.start();
-    if (at === null) return;
-    this.tone(700 + progress * 700, at, 0.035, { type: "triangle", volume: 0.12, attack: 0.002 });
-  }
-
-  // One hint turning over on the guess card: a bright chime for a match (higher with each
-  // match in a row), a soft blip for a pointer, a muted wooden knock for a no.
-  playReveal(status, streak = 0) {
-    const at = this.start();
-    if (at === null) return;
-    if (status === "miss") {
-      this.tone(160, at, 0.18, { volume: 0.8, to: 90 });
-      this.noise(at, 0.04, { filter: "lowpass", frequency: 500, volume: 0.35 });
-      return;
-    }
-    const notes = status === "match" ? [660 * 2 ** (streak / 6), 990 * 2 ** (streak / 6)] : [520];
-    notes.forEach((frequency, index) => this.tone(frequency, at + index * 0.07, status === "match" ? 0.35 : 0.15, { volume: status === "match" ? 0.31 : 0.6, attack: 0.01 }));
-  }
-}
-
-const sounds = new SoundEngine();
-
-return { sounds };
 })();
 
 // ---- shape-data.js
@@ -15770,8 +17339,8 @@ __modules["days.js"] = (() => {
 //
 // name:     shown to players. It hints at the theme but must never give an answer away.
 // theme:    a note for us; never shown.
-// journey:  how the score is shown: climb, dive, rocket, balloon or trek (journeys.js).
-//           Without one, days take turns.
+// journey:  how the score is shown: balloon, climb, mine, train, dive or sled (journeys.js).
+//           Without one (or with the old rocket or trek), days take turns.
 // mystery:  the answer (ISO code). Its five clues come from clues.js.
 // pinpoint: the answer and its fun clues (anything, not only geography), hardest first.
 //           They unlock one per wrong click, before the map clues (size, shape, ...).
@@ -21651,13 +23220,19 @@ const RANK_METRICS = {
   }
 };
 
-// How the day's score is shown (journeys.js): a climb, a dive, a launch, a balloon ride or
-// a trek. A hand-made day picks one to fit its theme; other days take turns.
-const JOURNEY_TYPES = ["climb", "dive", "rocket", "balloon", "trek"];
+// How the day's score is shown (journeys.js), each with Atlas: a balloon ride, a snowmobile
+// climb, a mine, a train, a bathysphere dive or a dog sled to the North Pole. A hand-made
+// day can pick one to fit its theme (the old "rocket" and "trek" no longer exist and take
+// their turn instead); other days take turns, every mode its own, so all six come round
+// within six days.
+const JOURNEY_TYPES = ["balloon", "climb", "mine", "train", "dive", "sled"];
+const JOURNEY_OFFSET = { extremes: 0, casual: 3, competitive: 1 };
 function getJourney(dateKey, mode = "competitive") {
   const chosen = calendarOf(mode)[dateKey]?.journey;
-  const seed = mode === "competitive" ? `journey:${dateKey}` : `journey:${mode}:${dateKey}`;
-  return JOURNEY_TYPES.includes(chosen) ? chosen : JOURNEY_TYPES[hashStringToSeed(seed) % JOURNEY_TYPES.length];
+  if (JOURNEY_TYPES.includes(chosen)) return chosen;
+  const day = Math.floor(Date.parse(`${dateKey}T00:00:00Z`) / 86400000);
+  const turn = Number.isFinite(day) ? day : hashStringToSeed(`journey:${dateKey}`);
+  return JOURNEY_TYPES[((turn + (JOURNEY_OFFSET[mode] ?? 0)) % JOURNEY_TYPES.length + JOURNEY_TYPES.length) % JOURNEY_TYPES.length];
 }
 
 // What a Rank 'Em round ranks by: one of RANK_METRICS (generated days), or the day's own
@@ -24764,14 +26339,31 @@ function initializePlayerStats({ getDays, getDayRecord, openArchive }) {
   };
 
   tabs.forEach(tab => tab.addEventListener("click", () => { sounds.playClick(); mode = tab.dataset.mode; render(); }));
-  document.querySelectorAll(".stats-open-button, #menuStatsButton").forEach(button => button.addEventListener("click", () => {
+  document.querySelectorAll(".stats-open-button").forEach(button => button.addEventListener("click", () => {
     sounds.playClick();
-    // From a game, the stats open on that game's mode.
+    // From a game or the archive, the stats open on that game's mode; from My Tent, on the
+    // main game. (They open over My Tent, and closing them goes back to it.)
+    const fromTent = button.id === "accountStatsButton";
     const gameMode = button.closest("#archiveModal") ? archiveModal().dataset.mode : document.getElementById("gameView").dataset.mode;
-    if (button.id !== "menuStatsButton" && (gameMode === "extremes" || gameMode === "casual")) mode = gameMode;
+    if (fromTent) mode = MAIN_MODE;
+    else if (gameMode === "extremes" || gameMode === "casual") mode = gameMode;
     render();
     modal.classList.remove("hidden");
   }));
+  // The line on the stats button in My Tent: days played and the average in the main game,
+  // filled in each time My Tent opens.
+  const tentNote = () => {
+    const dates = everyDateUntilToday(getDays()[0]);
+    const records = [...new Set([...getDays(), ...dates])].map(dateKey => {
+      try { return withCommunity(getDayRecord(dateKey, MAIN_MODE)); } catch { return null; }
+    }).filter(Boolean);
+    const stats = computePlayerStats(records, dates);
+    const note = document.getElementById("accountStatsNote");
+    note.textContent = stats.played ? t("account.statsLine", { n: stats.played, avg: num(stats.average) }) : t("menu.statsNote");
+  };
+  const tentModal = document.getElementById("accountModal");
+  new MutationObserver(() => { if (!tentModal.classList.contains("hidden")) tentNote(); }).observe(tentModal, { attributes: true, attributeFilter: ["class"] });
+  onLangChange(() => { if (!tentModal.classList.contains("hidden")) tentNote(); });
   onLangChange(() => { if (!modal.classList.contains("hidden")) render(); });
   document.getElementById("closeStatsButton").addEventListener("click", () => { sounds.playClick(); modal.classList.add("hidden"); });
   const share = document.getElementById("statsShare");
@@ -24785,333 +26377,6 @@ function initializePlayerStats({ getDays, getDayRecord, openArchive }) {
 }
 
 return { createDistributionChart, initializeHistoryScreens, computePlayerStats };
-})();
-
-// ---- atlas.js
-__modules["atlas.js"] = (() => {
-// Atlas, the old explorer who keeps Base Camp's logbook. A 24×24 pixel sprite in the game's
-// 8-bit palette (pompom hat with ear flaps, goggles pushed up, white moustache, gold scarf,
-// teal parka), with a few poses, a blink, and a speech bubble that types its line out.
-// "Quiet" (a toggle, kept in the browser and the account) silences his bubbles, typing and
-// sounds; he stays on screen and nothing else changes.
-const { sounds } = __modules["audio.js"];
-const { getUser, saveAtlasQuiet } = __modules["auth.js"];
-const { t } = __modules["i18n.js"];
-
-const SVG_NS = "http://www.w3.org/2000/svg";
-const QUIET_KEY = "daily-geography:atlas-quiet:v1";
-const TYPE_MS = 24; // per letter
-
-const ATLAS_COLORS = {
-  K: "#0b1020", // outline
-  R: "#e0484f", r: "#9c2b35", // hat
-  Y: "#ffd45c", y: "#c99a2e", // pompom, band, scarf
-  G: "#45e3ff", g: "#2a3550", // goggles
-  S: "#f0b48a", s: "#c07f58", // skin
-  W: "#f4f1e8", w: "#c9c3b5", // moustache and beard
-  T: "#2bb3a3", t: "#1c7a70", // parka
-  P: "#8a5a32", p: "#5c3a1f", // boots and straps
-  E: "#0b1020" // eyes (blink)
-};
-
-// The body, 16 wide, drawn at x = 4 on a 24-wide canvas. Arms hang at the sides.
-const BODY = [
-  ".......YY.......",
-  "......YYYY......",
-  ".....KKKKKK.....",
-  "...KKRRRRRRKK...",
-  "..KRRrRRRRrRRK..",
-  "..KRRRRRRRRRRK..",
-  ".KYYYYYYYYYYYYK.",
-  ".KGGGgKKKKgGGGK.",
-  ".KRSWWSSSSWWSRK.",
-  ".KRSESSSSSSESRK.",
-  ".KRSSSSssSSSSRK.",
-  ".KRRSWWWWWWSRRK.",
-  "..KRWWWWWWWWRK..",
-  "..KKWWwwwwWWKK..",
-  ".KYYYYYYYYYYYYK.",
-  "KTTTyYTTTTTTTTTK",
-  "KTpTYYTTTTTTpTTK",
-  "KTpTTYTTKTTTpTTK",
-  "KSpTTTTTKTTTpTSK",
-  ".KKTTTTTKTTTTKK.",
-  "..KggKKKKKKggK..",
-  "..KggK....KggK..",
-  ".KPPPK....KPPPK.",
-  ".KKKKK....KKKKK."
-];
-
-// Arms: pixels drawn over the body (x, y on the 24-wide canvas). A raised arm also covers
-// the hanging mitten with sleeve.
-const arm = (rows, x0, y0) => rows.flatMap((row, y) => [...row].map((key, x) => key === "." ? null : [x0 + x, y0 + y, key]).filter(Boolean));
-const RIGHT_UP_A = [...arm([
-  ".KK.",
-  "KSSK",
-  "KSSK",
-  "KTTK",
-  ".KTK",
-  ".KTK",
-  "KTTK",
-  "KTK."
-], 19, 8), [18, 18, "T"], [19, 15, "T"]];
-const RIGHT_UP_B = [...arm([
-  "..KK",
-  ".KSSK",
-  ".KSSK",
-  ".KTTK",
-  ".KTK",
-  ".KTK",
-  "KTTK",
-  "KTK."
-], 19, 8), [18, 18, "T"], [19, 15, "T"]];
-const LEFT_UP = [...arm([
-  ".KK.",
-  "KSSK",
-  "KSSK",
-  "KTTK",
-  "KTK.",
-  "KTK.",
-  "KTTK",
-  ".KTK"
-], 1, 8), [5, 18, "T"], [4, 15, "T"]];
-const THINK = [...arm([
-  ".KK..",
-  "KSSK.",
-  "KSSK.",
-  ".KTTK",
-  "..KTT"
-], 13, 11), [18, 18, "T"], [18, 16, "T"], [18, 17, "T"]];
-const POINT = [...arm([
-  "KKKK.",
-  "TTTSK",
-  "KKKSK",
-  "...K."
-], 20, 16), [18, 18, "T"], [19, 16, "T"], [19, 17, "K"]];
-
-const POSES = {
-  idle: [],
-  wave: RIGHT_UP_A,
-  waveB: RIGHT_UP_B,
-  cheer: [...RIGHT_UP_A, ...LEFT_UP],
-  think: THINK,
-  point: POINT
-};
-
-function drawPixels(svg, cells, className = "") {
-  const group = document.createElementNS(SVG_NS, "g");
-  if (className) group.setAttribute("class", className);
-  cells.forEach(([x, y, key]) => {
-    const rect = document.createElementNS(SVG_NS, "rect");
-    Object.entries({ x, y, width: 1, height: 1, fill: ATLAS_COLORS[key] }).forEach(([name, value]) => rect.setAttribute(name, value));
-    if (key === "E") rect.setAttribute("class", "atlas-eye");
-    group.appendChild(rect);
-  });
-  svg.appendChild(group);
-  return group;
-}
-
-const bodyCells = () => BODY.flatMap((row, y) => [...row].map((key, x) => key === "." ? null : [x + 4, y, key]).filter(Boolean));
-
-// The sprite as an SVG (24×24 pixels at `size`). setPose() swaps the arms; "wave" swings
-// between two frames (CSS, .atlas-wave-a/.atlas-wave-b).
-function createAtlasSprite(size = 96, pose = "idle") {
-  const svg = document.createElementNS(SVG_NS, "svg");
-  svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("width", size);
-  svg.setAttribute("height", size);
-  svg.setAttribute("shape-rendering", "crispEdges");
-  svg.setAttribute("class", "atlas-sprite");
-  svg.setAttribute("aria-hidden", "true");
-  drawPixels(svg, bodyCells());
-  const arms = document.createElementNS(SVG_NS, "g");
-  svg.appendChild(arms);
-  svg.setPose = name => {
-    arms.replaceChildren();
-    svg.dataset.pose = name;
-    if (name === "wave") {
-      drawPixels(arms, POSES.wave, "atlas-wave-a");
-      drawPixels(arms, POSES.waveB, "atlas-wave-b");
-    } else drawPixels(arms, POSES[name] || []);
-  };
-  svg.setPose(pose);
-  return svg;
-}
-
-// A pixel tent (gold, with a dark door) and a planted flag in the game's pink, for the
-// Base Camp scene and the landing.
-function createTent(size = 96) {
-  const rows = [
-    "...........K............",
-    "..........KYK...........",
-    ".........KYYyK..........",
-    "........KYYYyyK.........",
-    ".......KYYYKyyyK........",
-    "......KYYYKKKyyyK.......",
-    ".....KYYYKgKKyyyyK......",
-    "....KYYYKggKKKyyyyK.....",
-    "...KYYYKgggKKKKyyyyK....",
-    "..KYYYKggggKKKKKyyyyK...",
-    ".KYYYKgggggKKKKKKyyyyK..",
-    "KKKKKKKKKKKKKKKKKKKKKKK."
-  ];
-  const svg = document.createElementNS(SVG_NS, "svg");
-  svg.setAttribute("viewBox", "0 0 24 12");
-  svg.setAttribute("width", size);
-  svg.setAttribute("height", size / 2);
-  svg.setAttribute("shape-rendering", "crispEdges");
-  svg.setAttribute("class", "atlas-tent");
-  svg.setAttribute("aria-hidden", "true");
-  drawPixels(svg, rows.flatMap((row, y) => [...row].map((key, x) => key === "." ? null : [x, y, key]).filter(Boolean)));
-  return svg;
-}
-
-function createFlag(size = 48) {
-  const rows = [
-    "KKKKKKK.",
-    "KFFFFFFK",
-    "KFFfFFFK",
-    "KFfffFFK",
-    "KFFfFFFK",
-    "KFFFFFFK",
-    "KKKKKKK.",
-    "K.......",
-    "K.......",
-    "K.......",
-    "K.......",
-    "K.......",
-    "K.......",
-    "K.......",
-    "KK......",
-    "KK......"
-  ];
-  const colors = { K: "#f4f1e8", F: "#ff6b9d", f: "#ffd45c" };
-  const svg = document.createElementNS(SVG_NS, "svg");
-  svg.setAttribute("viewBox", "0 0 8 16");
-  svg.setAttribute("width", size / 2);
-  svg.setAttribute("height", size);
-  svg.setAttribute("shape-rendering", "crispEdges");
-  svg.setAttribute("class", "atlas-flag");
-  svg.setAttribute("aria-hidden", "true");
-  rows.forEach((row, y) => [...row].forEach((key, x) => {
-    if (!colors[key]) return;
-    const rect = document.createElementNS(SVG_NS, "rect");
-    Object.entries({ x, y, width: 1, height: 1, fill: colors[key] }).forEach(([name, value]) => rect.setAttribute(name, value));
-    svg.appendChild(rect);
-  }));
-  return svg;
-}
-
-// ----- Quiet -----
-
-const listeners = new Set();
-let quiet = (() => { try { return localStorage.getItem(QUIET_KEY) === "1"; } catch { return false; } })();
-
-const isAtlasQuiet = () => quiet;
-function setAtlasQuiet(value, { save = true } = {}) {
-  quiet = Boolean(value);
-  try { localStorage.setItem(QUIET_KEY, quiet ? "1" : "0"); } catch { /* storage off */ }
-  if (save && getUser()) saveAtlasQuiet(quiet);
-  listeners.forEach(listener => listener(quiet));
-}
-const onAtlasQuietChange = listener => listeners.add(listener);
-
-// After signing in: the account's choice wins; an account without one gets the browser's.
-function syncAtlasQuiet(account) {
-  const stored = account?.user_metadata?.atlasQuiet;
-  if (typeof stored === "boolean") setAtlasQuiet(stored, { save: false });
-  else if (account && quiet) saveAtlasQuiet(quiet);
-}
-
-// ----- Atlas on screen -----
-
-// Atlas with his speech bubble. say(line, pose) types a line out (a click finishes it, the
-// next click closes it); while quiet he only takes the pose. Clicking Atlas asks for
-// another line (onPoke).
-function createAtlas({ size = 96, onPoke = () => {} } = {}) {
-  const host = document.createElement("div");
-  host.className = "atlas";
-  const bubble = document.createElement("div");
-  bubble.className = "atlas-bubble hidden";
-  bubble.setAttribute("role", "status");
-  bubble.setAttribute("aria-live", "polite");
-  const name = document.createElement("span");
-  name.className = "atlas-bubble-name";
-  name.textContent = "ATLAS";
-  const text = document.createElement("p");
-  bubble.append(name, text);
-  const figure = document.createElement("button");
-  figure.type = "button";
-  figure.className = "atlas-figure";
-  figure.setAttribute("aria-label", t("atlas.poke"));
-  const sprite = createAtlasSprite(size);
-  figure.appendChild(sprite);
-  // A small "…" speech badge by his head says he can be clicked (gone while he talks or
-  // keeps quiet).
-  const hint = document.createElement("span");
-  hint.className = "atlas-hint";
-  hint.setAttribute("aria-hidden", "true");
-  hint.innerHTML = '<svg viewBox="0 0 9 7" shape-rendering="crispEdges"><path d="M1 0h7v1h1v4H8v1H3L1 7V6H0V1h1z" fill="#f4f1e8"/><path d="M2 2h1v2H2zm2 0h1v2H4zm2 0h1v2H6z" fill="#0b1020"/></svg>';
-  figure.appendChild(hint);
-  figure.title = t("atlas.poke");
-  host.append(bubble, figure);
-
-  let timer = null;
-  let full = "";
-  let typing = false;
-  let poseTimer = null;
-
-  const close = () => {
-    clearInterval(timer);
-    typing = false;
-    bubble.classList.add("hidden");
-  };
-  let hideTimer = null;
-  const finish = () => {
-    clearInterval(timer);
-    typing = false;
-    text.textContent = full;
-    // In the corner of a phone the bubble covers the page, so it goes by itself.
-    clearTimeout(hideTimer);
-    if (host.classList.contains("is-docked")) hideTimer = setTimeout(close, 6000);
-  };
-
-  function say(line, pose = "idle") {
-    clearTimeout(poseTimer);
-    sprite.setPose(pose);
-    // Back to standing after a while (a wave doesn't go on forever).
-    if (pose !== "idle") poseTimer = setTimeout(() => sprite.setPose("idle"), 3200);
-    if (quiet || !line) { close(); return; }
-    full = line;
-    text.textContent = "";
-    bubble.classList.remove("hidden");
-    clearInterval(timer);
-    typing = true;
-    let index = 0;
-    timer = setInterval(() => {
-      index += 1;
-      text.textContent = full.slice(0, index);
-      if (index % 3 === 1 && /\S/.test(full[index - 1])) sounds.playTick(0.2 + (index % 7) / 20);
-      if (index >= full.length) finish();
-    }, TYPE_MS);
-  }
-
-  bubble.addEventListener("click", () => (typing ? finish() : close()));
-  figure.addEventListener("click", () => {
-    if (typing) { finish(); return; }
-    onPoke();
-  });
-  onAtlasQuietChange(value => {
-    host.classList.toggle("is-quiet", value);
-    if (value) close();
-  });
-  host.classList.toggle("is-quiet", quiet);
-  figure.setAttribute("aria-label", t("atlas.poke"));
-
-  return { element: host, sprite, say, close, relabel: () => { figure.setAttribute("aria-label", t("atlas.poke")); figure.title = t("atlas.poke"); } };
-}
-
-return { ATLAS_COLORS, POSES, createAtlasSprite, createTent, createFlag, isAtlasQuiet, setAtlasQuiet, onAtlasQuietChange, syncAtlasQuiet, createAtlas };
 })();
 
 // ---- tents.js
@@ -26114,7 +27379,7 @@ function moveFrom(from, km, bearing) {
   return [((lon2 / RAD + 540) % 360) - 180, lat2 / RAD];
 }
 
-// Draws the live traffic (live-traffic.js: real planes and ships, each where it really is,
+// Draws the live traffic (live-traffic.js: real planes, ships and trains, each where it really is,
 // moving at its real speed) on the layer every frame while running. vehicles() gives the
 // current ones: { kind, heading, position(nowS) }.
 function startAmbient(layer, { isRunning, onFrame = () => {}, vehicles = () => [] }) {
@@ -26127,7 +27392,7 @@ function startAmbient(layer, { isRunning, onFrame = () => {}, vehicles = () => [
     vehicles().forEach(vehicle => {
       const here = vehicle.position(nowS);
       vehicle.here = here;
-      layer.vehicle(vehicle.kind, here, moveFrom(here, 60, vehicle.heading), 2, vehicle);
+      layer.vehicle(vehicle.kind, here, moveFrom(here, 60, Number.isFinite(vehicle.heading) ? vehicle.heading : 90), 2, vehicle);
     });
     onFrame(layer);
   };
@@ -27214,9 +28479,12 @@ __modules["transit-card.js"] = (() => {
 //
 // A plane: its aircraft type, airline and callsign, the airport it left from and the one it's
 // flying to, its height and speed, and where it is now. A ship: its name and type, the
-// destination its crew set (as they typed it), its speed and course, and where it is now.
-// Everything comes from the live sources (adsb.lol, aisstream.io) and Virtual Radar Server's
-// standing data; nothing is filled in by the game.
+// destination its crew set (as they typed it), its speed and course, and where it is now. A
+// train: what kind it is, its operator and line or number, where it started and where it's
+// going (as its feed names them), its speed, and where it is now.
+// Everything comes from the live sources (adsb.lol, aisstream.io, the train feeds in
+// supabase/functions/live-traffic/trains.js) and Virtual Radar Server's standing data;
+// nothing is filled in by the game.
 const { getCountry } = __modules["daily.js"];
 const { countryName, locale, num, t, tr } = __modules["i18n.js"];
 const { CITIES, SEAS } = __modules["place-data.js"];
@@ -27292,6 +28560,10 @@ function liveTitle(vehicle) {
     const place = airport => tr(airport.city || airport.name || airport.icao);
     return { title: `${data.callsign} · ${place(data.from)} → ${place(data.to)}`, hint: data.airline?.name || null, iso: data.to?.iso || null };
   }
+  if (vehicle.kind === "train") {
+    const route = data.from && data.to ? `${tr(data.from)} → ${tr(data.to)}` : data.to ? `→ ${tr(data.to)}` : data.name || data.number || "";
+    return { title: `${t(`live.train.${data.category}`)} · ${route}`, hint: [data.operator, data.name].filter(Boolean).join(" · ") || null, iso: data.iso || null };
+  }
   const kind = shipKind(data.shipType);
   return { title: `${t("travel.kind.ship")} · ${data.name || t("live.unnamed")}`, hint: kind ? t(`live.ship.${kind}`) : null, iso: null };
 }
@@ -27310,9 +28582,12 @@ function airportLine(airport) {
 }
 
 // Where it is now: over a country, on a named sea, or at sea with its coordinates.
-function nowText(here, countryOf) {
-  const country = countryOf(here[0], here[1]);
-  if (country) return t("transit.overCountry", { country: countryName(country) });
+// A train is always on land: near a coast the coarse map may miss it, so it falls back to
+// its feed's country (each train feed covers one country's network).
+function nowText(here, countryOf, landIso = null) {
+  const country = countryOf(here[0], here[1]) || (landIso ? getCountry(landIso) : null);
+  const onLand = Boolean(landIso);
+  if (country) return t(onLand ? "live.inCountry" : "transit.overCountry", { country: countryName(country) });
   const sea = seaAt(here);
   if (sea) return t("transit.onSea", { sea: tr(sea) });
   const off = nearestCity(here, 250);
@@ -27334,6 +28609,10 @@ function fillTransitCard(card, vehicle, { countryOf }, onClose) {
   if (plane) {
     title.append(element("strong", "", [t("travel.kind.plane"), data.type?.name || data.type?.code].filter(Boolean).join(" · ").toUpperCase()));
     title.append(element("small", "", [data.airline?.name || data.airline?.icao, data.callsign].filter(Boolean).join(" · ")));
+  } else if (vehicle.kind === "train") {
+    // "FREIGHT TRAIN", and its operator with its line or number ("VR · T 3775").
+    title.append(element("strong", "", t(`live.train.${data.category}`).toUpperCase()));
+    title.append(element("small", "", [data.operator, data.name, data.number].filter(Boolean).join(" · ")));
   } else {
     const kind = shipKind(data.shipType);
     // Its type ("CARGO SHIP"), or just SHIP when it didn't say.
@@ -27354,9 +28633,22 @@ function fillTransitCard(card, vehicle, { countryOf }, onClose) {
     wrap.lastChild.append(value);
     rows.appendChild(wrap);
   };
+  const stationLine = (name, missing) => {
+    const line = element("span", "transit-place");
+    const text = element("span", "");
+    const country = getCountry(data.iso);
+    if (name && country) line.appendChild(createFlagImage(country, "transit-flag"));
+    text.appendChild(element("strong", "", name ? tr(name) : t("live.noOrigin")));
+    if (!name) text.appendChild(element("small", "", missing));
+    line.appendChild(text);
+    return line;
+  };
   if (plane) {
     row(t("transit.from"), airportLine(data.from));
     row(t("transit.to"), airportLine(data.to));
+  } else if (vehicle.kind === "train") {
+    row(t("transit.from"), stationLine(data.from, t("live.trainNoFrom")));
+    row(t("transit.to"), stationLine(data.to, t("live.trainNoFrom")));
   } else {
     // The destination exactly as the crew typed it into the AIS set (often a port code).
     const line = element("span", "transit-place");
@@ -27379,6 +28671,9 @@ function fillTransitCard(card, vehicle, { countryOf }, onClose) {
     fact(t("live.altitude"), `${num(Math.round(data.altM / 10) * 10)} m`);
     fact(t("live.speed"), `${num(data.kmh)} km/h`, t("live.overGround"));
     if (data.reg) fact(t("live.reg"), data.reg);
+  } else if (vehicle.kind === "train") {
+    fact(t("live.speed"), Number.isFinite(data.kmh) ? `${num(data.kmh)} km/h` : t("live.stillOrUnknown"), data.kmhFromFixes ? t("live.computed") : null);
+    if (data.number && data.name) fact(t("live.trainNumber"), data.number);
   } else {
     fact(t("live.speed"), `${num(data.knots)} kn`, `${num(Math.round(data.kmh))} km/h`);
     fact(t("live.course"), `${Math.round(data.course)}°`);
@@ -27386,11 +28681,12 @@ function fillTransitCard(card, vehicle, { countryOf }, onClose) {
   card.appendChild(facts);
 
   const now = element("p", "transit-now");
-  now.append(element("span", "field-label", t("transit.now")), " ", nowText(vehicle.here || [data.lon, data.lat], countryOf));
+  now.append(element("span", "field-label", t("transit.now")), " ", nowText(vehicle.here || [data.lon, data.lat], countryOf, vehicle.kind === "train" ? data.iso || null : null));
   card.appendChild(now);
 
   // Where it comes from, and how fresh the fix is.
-  card.appendChild(element("p", "transit-fleet-note", t(plane ? "live.sourcePlane" : "live.sourceShip", { time: clock(data.at) })));
+  const sourceKey = plane ? "live.sourcePlane" : vehicle.kind === "train" ? `live.source.${data.source}` : "live.sourceShip";
+  card.appendChild(element("p", "transit-fleet-note", t(sourceKey, { time: clock(data.at) })));
   return card;
 }
 
@@ -27399,10 +28695,11 @@ return { liveTitle, fillTransitCard };
 
 // ---- live-traffic.js
 __modules["live-traffic.js"] = (() => {
-// The menu globe's live traffic: about 100 real planes and 100 real ships, each where it
-// really is and moving at its real speed. The positions come from the Edge Function
-// `live-traffic` (supabase/functions/live-traffic: adsb.lol for planes, AIS via
-// aisstream.io for ships), which refreshes every few minutes for everyone. Between those
+// The menu globe's live traffic: about 100 real planes, 100 real ships and 100 real trains,
+// each where it really is and moving at its real speed. The positions come from the Edge
+// Function `live-traffic` (supabase/functions/live-traffic: adsb.lol for planes, AIS via
+// aisstream.io for ships, the open train feeds of Finland, Norway, Ireland and North America
+// for trains), which refreshes every few minutes for everyone. Between those
 // fixes each vehicle moves on along its reported course at its reported speed (dead
 // reckoning), for at most MAX_RECKON_S; a new fix eases in over BLEND_S instead of jumping.
 //
@@ -27416,6 +28713,8 @@ const POLL_MS = 2 * 60 * 1000;
 const STALE_S = 6 * 60;
 const RETRY_MS = 45 * 1000;
 const MAX_RECKON_S = 30 * 60;
+// Trains follow curves and stop at stations, so they're moved on for less long.
+const MAX_RECKON_TRAIN_S = 6 * 60;
 const BLEND_S = 3;
 const EARTH_KM = 6371;
 
@@ -27433,16 +28732,17 @@ function createVehicle(kind, data) {
     kind,
     id: `${kind}:${data.id}`,
     data,
-    heading: kind === "plane" ? data.track : data.course,
+    heading: kind === "plane" ? data.track : kind === "ship" ? data.course : data.heading,
     blend: null,
     // Where it is at nowS (seconds): its fix moved on along its course; a plane stops at its
     // destination.
     position(nowS) {
       const fix = vehicle.data;
-      const seconds = Math.max(0, Math.min(MAX_RECKON_S, nowS - fix.at));
-      let km = fix.kmh * seconds / 3600;
+      const seconds = Math.max(0, Math.min(kind === "train" ? MAX_RECKON_TRAIN_S : MAX_RECKON_S, nowS - fix.at));
+      // A train whose feed sent no heading or speed (and that hasn't moved since) stays put.
+      let km = Number.isFinite(vehicle.heading) && Number.isFinite(fix.kmh) ? fix.kmh * seconds / 3600 : 0;
       if (kind === "plane" && fix.to) km = Math.min(km, distance([fix.lon, fix.lat], [fix.to.lon, fix.to.lat]) * EARTH_KM);
-      const here = moveFrom([fix.lon, fix.lat], km, vehicle.heading);
+      const here = km ? moveFrom([fix.lon, fix.lat], km, vehicle.heading) : [fix.lon, fix.lat];
       if (!vehicle.blend) return here;
       const left = 1 - (nowS - vehicle.blend.start) / BLEND_S;
       if (left <= 0) { vehicle.blend = null; return here; }
@@ -27468,7 +28768,8 @@ function createLiveTraffic({ isActive = () => true } = {}) {
     const old = new Map(vehicles.map(vehicle => [vehicle.id, vehicle]));
     const fresh = [
       ...(data.planes || []).filter(plane => Number.isFinite(plane.lat) && Number.isFinite(plane.lon)).map(plane => createVehicle("plane", plane)),
-      ...(data.ships || []).filter(ship => Number.isFinite(ship.lat) && Number.isFinite(ship.lon)).map(ship => createVehicle("ship", ship))
+      ...(data.ships || []).filter(ship => Number.isFinite(ship.lat) && Number.isFinite(ship.lon)).map(ship => createVehicle("ship", ship)),
+      ...(data.trains || []).filter(train => Number.isFinite(train.lat) && Number.isFinite(train.lon)).map(train => createVehicle("train", train))
     ];
     // A vehicle we already showed eases from where it was drawn to its new fix.
     fresh.forEach(vehicle => {
@@ -27522,7 +28823,7 @@ return { createLiveTraffic };
 __modules["engine.js"] = (() => {
 const { COUNTRIES, LEGACY_COUNTRY_ISOS, TERRITORIES } = __modules["countries.js"];
 const { PixelGlobe } = __modules["globe.js"];
-const { JOURNEYS, ROUND_COLORS, createJourney } = __modules["journeys.js"];
+const { JOURNEYS, ROUND_COLORS, createJourney, scoreTier } = __modules["journeys.js"];
 const { getAccountLanguage, getProfile, getUser, initAuth, isConfigured: isAuthConfigured, pullDays, pushDay, saveLanguage, sendEmailLink, signIn, signOut, takeAuthRedirectError, verifyEmailCode } = __modules["auth.js"];
 const { ROUND_PICTURES } = __modules["round-pictures.js"];
 const { CLUES } = __modules["clues.js"];
@@ -28333,10 +29634,26 @@ function showScoreBurst(index, { keepCardsOut = false } = {}) {
   const burst = ++burstRun;
   let climbStart = 0;
   let settled = false;
+  let landed = false;
+  let lastMark = Math.floor(before / 1000);
+  // Once the points have landed: Atlas reacts and the round's tier plays, from a
+  // neutral knock for nothing to a fanfare for a full 1,000.
+  const land = () => {
+    if (landed || burst !== burstRun) return;
+    landed = true;
+    climb.react(result.points, { color: stretches[index]?.color });
+    sounds.playScoreTier(scoreTier(result.points));
+  };
   const rise = now => {
     if (settled || burst !== burstRun) return;
     const progress = Math.min(1, (now - climbStart) / 1400);
-    climb.draw(before + result.points * (1 - (1 - progress) ** 3), { stretches, stops });
+    const value = before + result.points * (1 - (1 - progress) ** 3);
+    climb.draw(value, { stretches, stops });
+    // A soft tick for every 1,000 passed on the way.
+    if (Math.floor(value / 1000) > lastMark) {
+      lastMark = Math.floor(value / 1000);
+      sounds.playTick(Math.min(1, value / getMaxScore(activeMode)));
+    }
     // It rises once, then stays at the day's new total.
     if (progress < 1) requestAnimationFrame(rise);
   };
@@ -28363,10 +29680,11 @@ function showScoreBurst(index, { keepCardsOut = false } = {}) {
     setText("scoreBurstPoints", result.points.toLocaleString(locale()));
     setText("scoreBurstTotal", dayScore.total.toLocaleString(locale()));
     setText("dailyTotalScore", dayScore.total.toLocaleString(locale()));
+    land();
   };
   // Nothing counts up without points, so no SKIP then.
   const hideSkip = result.points ? showSkip(settle) : () => {};
-  const settleTimer = setTimeout(() => { hideSkip(); settled = true; }, 1700);
+  const settleTimer = setTimeout(() => { hideSkip(); settled = true; land(); }, result.points ? 1700 : 500);
 
   return new Promise(resolve => {
     endScoreBurst = () => {
@@ -30646,6 +31964,7 @@ function setDrawer(open, { refocus = true } = {}) {
   drawer.inert = !open;
   drawerToggle.setAttribute("aria-expanded", String(open));
   document.getElementById("mainMenu").classList.toggle("is-drawer-open", open);
+  queueHudUpdate();
   // On a big screen the globe moves over, so its place stays in the open part.
   globe.setMenuShiftX(open && bigScreen() ? Math.round(drawer.offsetWidth / 2) : 0);
   clearTimeout(focusBackTimer);
@@ -30698,7 +32017,11 @@ document.addEventListener("keydown", event => {
   setDrawer(false);
   drawerToggle.focus({ preventScroll: true });
 });
-window.addEventListener("resize", () => { if (drawerOpen) globe.setMenuShiftX(bigScreen() ? Math.round(drawer.offsetWidth / 2) : 0, 0); });
+window.addEventListener("resize", () => {
+  if (!drawerOpen) return;
+  globe.setMenuShiftX(bigScreen() ? Math.round(drawer.offsetWidth / 2) : 0, 0);
+  queueHudUpdate();
+});
 
 // What's under the pointer on the menu globe: one of the places, a vehicle, or a country.
 function countryByCcn3(ccn3) {
@@ -31706,11 +33029,25 @@ function homeTarget() {
 const kmBetween = (a, b) => Math.round(distanceOnGlobe(a, b) * 6371);
 // (For code that runs before the card exists: on the next frame.)
 function queueHudUpdate() { requestAnimationFrame(() => updatePlaceHud()); }
+// The HUD's room beside the open Expedition menu: a gap on each side, and below this width
+// the two would touch.
+const HUD_GAP = 24;
+const HUD_MIN_WIDTH = 260;
 function hudContext() {
   const open = id => !document.getElementById(id).classList.contains("hidden");
   if (open("communityModal") || open("gameView") && isGameViewVisible) return null;
   if (document.querySelector(".modal-overlay:not(.hidden), .base-overlay, .travel-banner")) return null;
-  if (open("mainMenu") && !document.getElementById("mainMenu").classList.contains("is-leaving") && !document.getElementById("mainMenu").classList.contains("is-travelling")) return "menu";
+  if (open("mainMenu") && !document.getElementById("mainMenu").classList.contains("is-leaving") && !document.getElementById("mainMenu").classList.contains("is-travelling")) {
+    // With the Expedition menu open, the HUD keeps to the free part on the right; on a
+    // screen too narrow for both (a phone), it steps away until the menu closes.
+    placeHud.style.removeProperty("--hud-room");
+    if (drawerOpen) {
+      const room = window.innerWidth - drawer.offsetWidth - HUD_GAP * 2;
+      if (room < HUD_MIN_WIDTH) return null;
+      placeHud.style.setProperty("--hud-room", `${Math.round(room)}px`);
+    }
+    return "menu";
+  }
   return null;
 }
 function updatePlaceHud() {
