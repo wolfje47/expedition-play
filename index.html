@@ -6987,6 +6987,9 @@ const EN = {
   "travel.kind.ship": "Ship",
   "transit.close": "Close",
   "transit.from": "FROM",
+  "transit.route": "ROUTE",
+  "live.noRoute": "Route unknown",
+  "live.noRouteWhy": "This flight isn't in the route database",
   "transit.to": "TO",
   "transit.now": "NOW",
   "transit.atSea": "Open sea, {coords}",
@@ -7005,6 +7008,7 @@ const EN = {
   "live.reg": "REG.",
   "live.course": "COURSE",
   "live.sourcePlane": "Live from adsb.lol, last fix {time}. Route: Virtual Radar Server, checked against the plane's position.",
+  "live.sourcePlaneNoRoute": "Live from adsb.lol, last fix {time}.",
   "live.sourceShip": "Live AIS from aisstream.io, last fix {time}.",
   "live.ship.fishing": "Fishing vessel",
   "live.ship.towing": "Towing",
@@ -7954,6 +7958,9 @@ const NL = {
   "travel.kind.ship": "Schip",
   "transit.close": "Sluiten",
   "transit.from": "VAN",
+  "transit.route": "ROUTE",
+  "live.noRoute": "Route onbekend",
+  "live.noRouteWhy": "Deze vlucht staat niet in de routedatabank",
   "transit.to": "NAAR",
   "transit.now": "NU",
   "transit.atSea": "Open zee, {coords}",
@@ -7972,6 +7979,7 @@ const NL = {
   "live.reg": "REG.",
   "live.course": "KOERS",
   "live.sourcePlane": "Live van adsb.lol, laatste positie {time}. Route: Virtual Radar Server, gecontroleerd met de positie van het vliegtuig.",
+  "live.sourcePlaneNoRoute": "Live van adsb.lol, laatste positie {time}.",
   "live.sourceShip": "Live AIS van aisstream.io, laatste positie {time}.",
   "live.ship.fishing": "Vissersschip",
   "live.ship.towing": "Sleepvaart",
@@ -28646,7 +28654,8 @@ function liveTitle(vehicle) {
   const data = vehicle.data;
   if (vehicle.kind === "plane") {
     const place = airport => tr(airport.city || airport.name || airport.icao);
-    return { title: `${data.callsign} · ${place(data.from)} → ${place(data.to)}`, hint: data.airline?.name || null, iso: data.to?.iso || null };
+    const route = data.from && data.to ? ` · ${place(data.from)} → ${place(data.to)}` : "";
+    return { title: `${data.callsign}${route}`, hint: data.airline?.name || (route ? null : t("live.noRoute")), iso: data.to?.iso || null };
   }
   if (vehicle.kind === "train") {
     const route = data.from && data.to ? `${tr(data.from)} → ${tr(data.to)}` : data.to ? `→ ${tr(data.to)}` : data.name || data.number || "";
@@ -28734,8 +28743,17 @@ function fillTransitCard(card, vehicle, { countryOf }, onClose) {
     return line;
   };
   if (plane) {
-    row(t("transit.from"), airportLine(data.from));
-    row(t("transit.to"), airportLine(data.to));
+    if (data.from && data.to) {
+      row(t("transit.from"), airportLine(data.from));
+      row(t("transit.to"), airportLine(data.to));
+    } else {
+      // Not every flight is in the route database: then no airports rather than a guess.
+      const line = element("span", "transit-place");
+      const text = element("span", "");
+      text.append(element("strong", "", t("live.noRoute")), element("small", "", t("live.noRouteWhy")));
+      line.appendChild(text);
+      row(t("transit.route"), line);
+    }
   } else if (vehicle.kind === "train") {
     row(t("transit.from"), stationLine(data.from, t("live.trainNoFrom")));
     row(t("transit.to"), stationLine(data.to, t("live.trainNoFrom")));
@@ -28775,7 +28793,7 @@ function fillTransitCard(card, vehicle, { countryOf }, onClose) {
   card.appendChild(now);
 
   // Where it comes from, and how fresh the fix is.
-  const sourceKey = plane ? (data.source === "opensky" ? "live.sourcePlaneOpensky" : "live.sourcePlane") : vehicle.kind === "train" ? `live.source.${data.source}` : "live.sourceShip";
+  const sourceKey = plane ? (data.source === "opensky" ? "live.sourcePlaneOpensky" : data.to ? "live.sourcePlane" : "live.sourcePlaneNoRoute") : vehicle.kind === "train" ? `live.source.${data.source}` : "live.sourceShip";
   card.appendChild(element("p", "transit-fleet-note", data.timetable ? t("live.sourceTimetable", { credit: data.credit || "" }) : t(sourceKey, { time: clock(data.at) })));
   return card;
 }
