@@ -7029,6 +7029,10 @@ const EN = {
   "live.train.long": "Long-distance train",
   "live.train.commuter": "Commuter train",
   "live.train.passenger": "Passenger train",
+  "live.train.metro": "Metro train",
+  "live.timetable": "Timetable",
+  "live.fromTimetable": "from the timetable",
+  "live.sourceTimetable": "Not live: where the timetable puts it now, between its two stations. {credit}.",
   "live.inCountry": "in {country}",
   "live.noOrigin": "Not given",
   "live.trainNoFrom": "the feed doesn't say",
@@ -7038,6 +7042,12 @@ const EN = {
   "live.source.no": "Live from Entur, last fix {time}.",
   "live.source.ie": "Live from Irish Rail, last fix {time}.",
   "live.source.am": "Live from Amtraker (Amtrak, VIA Rail and Brightline's own trackers), last fix {time}.",
+  "live.source.qld": "Live from TransLink (Queensland), last fix {time}.",
+  "live.source.adl": "Live from Adelaide Metro, last fix {time}.",
+  "live.source.my": "Live from data.gov.my (KTMB), last fix {time}.",
+  "live.sourcePlaneOpensky": "Live from the OpenSky Network, last fix {time}. Route: Virtual Radar Server, checked against the plane's position.",
+  "menu.northPole": "North Pole",
+  "menu.southPole": "South Pole",
   "live.computed": "worked out from its last two fixes",
   "hud.current": "CURRENT LOCATION",
   "hud.campShort": "Everest Base Camp",
@@ -7986,6 +7996,10 @@ const NL = {
   "live.train.long": "Langeafstandstrein",
   "live.train.commuter": "Forensentrein",
   "live.train.passenger": "Passagierstrein",
+  "live.train.metro": "Metro",
+  "live.timetable": "Dienstregeling",
+  "live.fromTimetable": "volgens de dienstregeling",
+  "live.sourceTimetable": "Niet live: waar de dienstregeling hem nu zet, tussen zijn twee stations. {credit}.",
   "live.inCountry": "in {country}",
   "live.noOrigin": "Niet opgegeven",
   "live.trainNoFrom": "de bron zegt het niet",
@@ -7995,6 +8009,12 @@ const NL = {
   "live.source.no": "Live van Entur, laatste positie {time}.",
   "live.source.ie": "Live van Irish Rail, laatste positie {time}.",
   "live.source.am": "Live van Amtraker (de eigen trackers van Amtrak, VIA Rail en Brightline), laatste positie {time}.",
+  "live.source.qld": "Live van TransLink (Queensland), laatste positie {time}.",
+  "live.source.adl": "Live van Adelaide Metro, laatste positie {time}.",
+  "live.source.my": "Live van data.gov.my (KTMB), laatste positie {time}.",
+  "live.sourcePlaneOpensky": "Live van het OpenSky Network, laatste positie {time}. Route: Virtual Radar Server, gecontroleerd met de positie van het vliegtuig.",
+  "menu.northPole": "Noordpool",
+  "menu.southPole": "Zuidpool",
   "live.computed": "berekend uit de laatste twee posities",
   "hud.current": "HUIDIGE PLEK",
   "hud.campShort": "Everest-basiskamp",
@@ -13547,9 +13567,11 @@ class PixelGlobe {
     this.globeGroup.updateMatrixWorld();
     world.applyMatrix4(this.globeGroup.matrixWorld);
     const toCamera = this.camera.position.clone().sub(world).normalize();
-    const visible = toCamera.dot(world.clone().normalize()) > 0.05;
+    // facing: 1 in the middle of the globe as seen, 0 at its edge (things there squash up).
+    const facing = toCamera.dot(world.clone().normalize());
+    const visible = facing > 0.05;
     world.project(this.camera);
-    return { x: (world.x + 1) / 2 * this.renderer.domElement.clientWidth, y: (1 - world.y) / 2 * this.renderer.domElement.clientHeight, visible };
+    return { x: (world.x + 1) / 2 * this.renderer.domElement.clientWidth, y: (1 - world.y) / 2 * this.renderer.domElement.clientHeight, visible, facing };
   }
 
   // Whether a point is on land (for travel: trains and cars on land only, ships on water).
@@ -15497,7 +15519,7 @@ const label = (p, s, text, x, y, reached, { align = "left" } = {}) => {
   if (s.small) return;
   const width = textWidth(text);
   const left = Math.round(align === "center" ? x - width / 2 : align === "right" ? x - width : x);
-  p.rect(left - 1, Math.round(y) - 1, width + 2, 7, "rgba(11,16,32,0.55)");
+  p.rect(left - 1, Math.round(y) - 1, width + 2, 7, "#141a30");
   p.text(text, left, y, reached ? LABEL : LABEL_AHEAD);
 };
 // Palettes made from one colour (a flag, a carriage stripe), kept per colour.
@@ -16128,6 +16150,11 @@ function train(summit) {
     }
   };
 }
+// The T. rex's head, and how much of it shows at each height (made once: sprites are
+// cached per rows array).
+const REX = ["..GGGG.", ".GGEGGG", "GGGGGGG", "GWGWGW.", "GGGG..."];
+const REX_PEEK = REX.map((_, index) => REX.slice(0, index + 1));
+const REX_COLORS = { G: "#4f9a3a", E: "#ffd45c", W: "#f4f1e8" };
 // One carriage from x a to x b (both inside), its body above the rail.
 function drawCarriage(p, s, index, a, b, color, jolt) {
   const width = b - a + 1;
@@ -16180,12 +16207,24 @@ function drawCarriage(p, s, index, a, b, color, jolt) {
     if (theme === 1 && s.moving) for (let index = 0; index < 3; index += 1) p.px(a - 1 - Math.random() * 6, top - 2 - Math.random() * 3, "#f5dca0");
   } else if (theme === 3) {
     // T. rex inside: a tall boxcar that jolts now and then, with a tail out of the back.
-    const top = floor - 9 - lift;
-    p.rect(a, top, width, 10, "#b8313a");
-    p.rect(a, top + 8, width, 2, color);
+    const top = floor - 13 - lift;
+    p.rect(a, top, width, 14, "#b8313a");
+    p.rect(a, top + 12, width, 2, color);
     p.rect(a, top - 1, width, 1, "#7a1f26");
-    const words = width >= 49 ? "T-REX INSIDE" : width >= 21 ? "T-REX" : width >= 4 ? "!" : "";
-    if (words) p.text(words, a + width / 2, top + 2, "#f4f1e8", { align: "center" });
+    // The stencil: on one line if it fits, else on two, else just the start.
+    if (width >= 49) p.text("T-REX INSIDE", a + width / 2, top + 4, "#f4f1e8", { align: "center" });
+    else if (width >= 25) { p.text("T-REX", a + width / 2, top + 1, "#f4f1e8", { align: "center" }); p.text("INSIDE", a + width / 2, top + 7, "#f4f1e8", { align: "center" }); }
+    else if (width >= 21) p.text("T-REX", a + width / 2, top + 4, "#f4f1e8", { align: "center" });
+    else if (width >= 4) p.text("!", a + width / 2, top + 4, "#f4f1e8", { align: "center" });
+    // Now and then his head comes up through the roof hatch.
+    if (width >= 9) {
+      const up = clamp(Math.round(Math.sin(s.now * 0.9 + index) * 6), 0, 4);
+      const hx = a + Math.floor(width / 2) - 3;
+      p.rect(hx - 1, top - 1, 8, 1, "#3a1014");
+      if (up) {
+        p.sprite(REX_PEEK[up], REX_COLORS, hx, top - 1 - up);
+      }
+    }
     if (width >= 14) {
       p.rect(a - 3, top + 4, 3, 1, "#4f9a3a");
       p.px(a - 4, top + 3, "#4f9a3a");
@@ -16388,11 +16427,12 @@ function dive(summit) {
 // ---------------------------------------------------------------------------
 
 const SLED = ["K.......K.", "KPPPPPPPK.", "KpPpPpPpK.", ".KKKKKKKKK", "KK.......K"];
+// A husky with a dark back and a white belly (so it shows on the ice), two running frames.
 const HUSKY = [
-  ["W.....KK", ".WWWWWWK", ".WwwwwW.", ".W.W.W.W"],
-  ["W.....KK", ".WWWWWWK", ".WwwwwW.", "W.W...W."]
+  ["D......DD.", ".D....DDWD", ".DDDDDDWWE", ".DWWWWWD..", ".D.D..D.D."],
+  ["D......DD.", ".D....DDWD", ".DDDDDDWWE", ".DWWWWWD..", "D..D.D..D."]
 ];
-const HUSKY_COLORS = { W: "#e9eefb", w: "#8f9bbd", K: "#4a5778" };
+const HUSKY_COLORS = { D: "#3a4560", W: "#f4f7ff", E: "#0b1020" };
 const BEAR = ["......WW.", ".WWWWWWWK", "WWWWWWWW.", ".W.W.W.W."];
 const NARWHAL = ["W.......", ".W......", "..SSSS..", ".SSSSSS."];
 const STATION = [
@@ -16408,7 +16448,7 @@ const STATION = [
 
 function sled(summit) {
   const trackY = 68;
-  const route = makeRoute([[8, trackY], [126, trackY]]);
+  const route = makeRoute([[8, trackY], [120, trackY]]);
   const lead = [62, 72];
   const rnd = random(4);
   const stars = Array.from({ length: 50 }, () => [Math.floor(rnd() * W), Math.floor(rnd() * 46)]);
@@ -16441,7 +16481,7 @@ function sled(summit) {
       p.rect(163, trackY + 1, 7, 1, "#8f9bbd");
     },
     frame(p, s) {
-      const xOf = f => Math.round(8 + f * 118);
+      const xOf = f => Math.round(8 + f * 112);
       // The aurora: one curtain per round, over the stretch of ice it covered.
       s.stretches.forEach((part, index) => {
         if (part.b <= part.a || s.f <= part.a) return;
@@ -16478,7 +16518,7 @@ function sled(summit) {
       });
       label(p, s, `${s.summit / 1000}K`, 166, trackY + 6, s.goal, { align: "center" });
       p.disc(166, 51, 1, s.goal ? "#ffd45c" : "#c9ced9");
-      for (let x = xOf(s.f) + 40; x < 160; x += 3) p.px(x, trackY + 1, "rgba(74,87,120,0.6)");
+      for (let x = xOf(s.f) + 44; x < 162; x += 3) p.px(x, trackY + 1, "rgba(74,87,120,0.6)");
       // The runners' tracks, in each round's colour.
       s.stretches.forEach(part => {
         if (part.b <= part.a || s.f <= part.a) return;
@@ -16494,15 +16534,15 @@ function sled(summit) {
       const sledY = trackY + hop(x + 5);
       drawAtlas(p, s, x + 4, sledY - 3, { upper: true });
       p.sprite(SLED, ATLAS, x, sledY - 4);
-      const dogs = [x + 12, x + 21, x + 30];
-      p.line(x + 9, sledY - 3, dogs[2] + 6, trackY - 3 + hop(dogs[2] + 4), "#8a5a32");
+      const dogs = [x + 11, x + 22, x + 33];
+      p.line(x + 9, sledY - 3, dogs[2] + 3, trackY - 3 + hop(dogs[2] + 4), "#8a5a32");
       dogs.forEach((dog, index) => {
         const frame = running ? (Math.floor(s.now * 10) + index) % 2 : 0;
-        p.sprite(HUSKY[frame], HUSKY_COLORS, dog, trackY - 3 + hop(dog + 4));
+        p.sprite(HUSKY[frame], HUSKY_COLORS, dog, trackY - 4 + hop(dog + 4));
       });
     },
     head(s) {
-      const x = Math.round(8 + s.f * 118);
+      const x = Math.round(8 + s.f * 112);
       return { x: x + 4, y: trackY + hop(x + 5) - 13 };
     }
   };
@@ -27280,13 +27320,35 @@ function createTravelLayer(host, project) {
       carry = (carry - length % 7 + 7) % 7;
     }
   }
-  function vehicle(kind, point, ahead, scale = 2, route = null) {
+  // A short fading trail of pixels behind a moving plane (contrail) or ship (wake), along
+  // its real heading, so you can see which way each one is going.
+  const WAKE = { plane: "244, 241, 232", ship: "190, 235, 255" };
+  function wake(kind, point, heading, alpha = 1) {
+    if (!WAKE[kind] || !Number.isFinite(heading) || alpha <= 0) return;
     const here = project(point);
-    if (!here.visible) return null;
-    if (route) hits.push({ x: here.x, y: here.y - (FLYING.has(kind) ? 5 * scale : 2 * scale), route });
+    const back = project(moveFrom(point, 50, heading + 180));
+    if (!here.visible || !back.visible) return;
+    const length = Math.hypot(back.x - here.x, back.y - here.y);
+    if (length < 0.5) return;
+    const dx = (back.x - here.x) / length;
+    const dy = (back.y - here.y) / length;
+    const lift = FLYING.has(kind) ? 10 : 4;
+    for (let step = 10, n = 0; step <= 34; step += 3, n += 1) {
+      ctx.fillStyle = `rgba(${WAKE[kind]}, ${(0.55 * alpha * (1 - n / 9)).toFixed(2)})`;
+      ctx.fillRect(Math.round(here.x + dx * step) - 1, Math.round(here.y - lift + dy * step) - 1, 2, 2);
+    }
+  }
+  // alpha < 1 draws it faded (the live traffic near the globe's edge); a faded one can't
+  // be tapped.
+  function vehicle(kind, point, ahead, scale = 2, route = null, alpha = 1) {
+    const here = project(point);
+    if (!here.visible || alpha <= 0) return null;
+    if (route && alpha >= 0.5) hits.push({ x: here.x, y: here.y - (FLYING.has(kind) ? 5 * scale : 2 * scale), route });
     const next = project(ahead);
     const lift = FLYING.has(kind) ? 5 * scale : 2 * scale;
+    if (alpha < 1) ctx.globalAlpha = alpha;
     drawSprite(ctx, kind, here.x, here.y - lift, { flip: next.visible && next.x < here.x - 0.01, scale });
+    ctx.globalAlpha = 1;
     return here;
   }
   // A station: a square dot (gold once reached), drawn at once, and maybe a name tag with
@@ -27356,7 +27418,7 @@ function createTravelLayer(host, project) {
     });
     queue.length = 0;
   }
-  return { canvas, ctx, fit, trail, vehicle, station, placeLabels, hits, tagBoxes, remove: () => canvas.remove() };
+  return { canvas, ctx, fit, project, trail, wake, vehicle, station, placeLabels, hits, tagBoxes, remove: () => canvas.remove() };
 }
 
 // Flags for station tags (flagcdn, as everywhere in the game), loaded once.
@@ -27382,17 +27444,42 @@ function moveFrom(from, km, bearing) {
 // Draws the live traffic (live-traffic.js: real planes, ships and trains, each where it really is,
 // moving at its real speed) on the layer every frame while running. vehicles() gives the
 // current ones: { kind, heading, position(nowS) }.
-function startAmbient(layer, { isRunning, onFrame = () => {}, vehicles = () => [] }) {
+// How far round the globe the live traffic fades out: gone at facing 0.2, full at 0.45.
+const EDGE_FADE = [0.2, 0.45];
+// On screen no two are drawn closer than ROOM_PX across (ROOM_PX × 0.7 down): where they'd
+// overlap (zoomed out, or a busy corner), the one later in a fixed order (from its id) waits
+// until there's room, so the same one stays and nothing flickers.
+const ROOM_PX = 30;
+const rankOf = vehicle => {
+  if (vehicle.rank === undefined) {
+    let hash = 2166136261;
+    for (const char of vehicle.id) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
+    vehicle.rank = hash >>> 0;
+  }
+  return vehicle.rank;
+};
+// first(): a vehicle drawn before all others (the one whose card is open), or null.
+function startAmbient(layer, { isRunning, onFrame = () => {}, vehicles = () => [], first = () => null }) {
   let frame = 0;
   const step = () => {
     frame = requestAnimationFrame(step);
     layer.fit();
     if (!isRunning()) return;
     const nowS = Date.now() / 1000;
-    vehicles().forEach(vehicle => {
+    const lead = first();
+    const drawn = [];
+    [...vehicles()].sort((a, b) => (b === lead) - (a === lead) || rankOf(a) - rankOf(b)).forEach(vehicle => {
       const here = vehicle.position(nowS);
       vehicle.here = here;
-      layer.vehicle(vehicle.kind, here, moveFrom(here, 60, Number.isFinite(vehicle.heading) ? vehicle.heading : 90), 2, vehicle);
+      const spot = layer.project(here);
+      if (!spot.visible) return;
+      // Near the globe's edge everything squashes together: there they fade out.
+      const alpha = Math.max(0, Math.min(1, ((spot.facing ?? 1) - EDGE_FADE[0]) / (EDGE_FADE[1] - EDGE_FADE[0])));
+      if (!alpha) return;
+      if (vehicle !== lead && drawn.some(other => Math.abs(other.x - spot.x) < ROOM_PX && Math.abs(other.y - spot.y) < ROOM_PX * 0.7)) return;
+      drawn.push(spot);
+      if (!vehicle.stopped && vehicle.data?.kmh > 0) layer.wake(vehicle.kind, here, vehicle.heading, alpha);
+      layer.vehicle(vehicle.kind, here, moveFrom(here, 60, Number.isFinite(vehicle.heading) ? vehicle.heading : 90), 2, vehicle, alpha);
     });
     onFrame(layer);
   };
@@ -28483,8 +28570,9 @@ __modules["transit-card.js"] = (() => {
 // train: what kind it is, its operator and line or number, where it started and where it's
 // going (as its feed names them), its speed, and where it is now.
 // Everything comes from the live sources (adsb.lol, aisstream.io, the train feeds in
-// supabase/functions/live-traffic/trains.js) and Virtual Radar Server's standing data;
-// nothing is filled in by the game.
+// supabase/functions/live-traffic/trains.js) and Virtual Radar Server's standing data, or,
+// for a train marked timetable, from its published timetable (timetables.js), which the card
+// says; nothing is filled in by the game.
 const { getCountry } = __modules["daily.js"];
 const { countryName, locale, num, t, tr } = __modules["i18n.js"];
 const { CITIES, SEAS } = __modules["place-data.js"];
@@ -28562,7 +28650,8 @@ function liveTitle(vehicle) {
   }
   if (vehicle.kind === "train") {
     const route = data.from && data.to ? `${tr(data.from)} → ${tr(data.to)}` : data.to ? `→ ${tr(data.to)}` : data.name || data.number || "";
-    return { title: `${t(`live.train.${data.category}`)} · ${route}`, hint: [data.operator, data.name].filter(Boolean).join(" · ") || null, iso: data.iso || null };
+    const hint = [data.operator, data.name, data.timetable ? t("live.timetable") : null].filter(Boolean).join(" · ");
+    return { title: `${t(`live.train.${data.category}`)} · ${route}`, hint: hint || null, iso: data.iso || null };
   }
   const kind = shipKind(data.shipType);
   return { title: `${t("travel.kind.ship")} · ${data.name || t("live.unnamed")}`, hint: kind ? t(`live.ship.${kind}`) : null, iso: null };
@@ -28611,8 +28700,9 @@ function fillTransitCard(card, vehicle, { countryOf }, onClose) {
     title.append(element("small", "", [data.airline?.name || data.airline?.icao, data.callsign].filter(Boolean).join(" · ")));
   } else if (vehicle.kind === "train") {
     // "FREIGHT TRAIN", and its operator with its line or number ("VR · T 3775").
-    title.append(element("strong", "", t(`live.train.${data.category}`).toUpperCase()));
-    title.append(element("small", "", [data.operator, data.name, data.number].filter(Boolean).join(" · ")));
+    // A train placed by its timetable says so: "PASSENGER TRAIN · TIMETABLE".
+    title.append(element("strong", "", [t(`live.train.${data.category}`), data.timetable ? t("live.timetable") : null].filter(Boolean).join(" · ").toUpperCase()));
+    title.append(element("small", "", [data.operator, data.name, data.number !== data.name ? data.number : null].filter(Boolean).join(" · ")));
   } else {
     const kind = shipKind(data.shipType);
     // Its type ("CARGO SHIP"), or just SHIP when it didn't say.
@@ -28672,8 +28762,8 @@ function fillTransitCard(card, vehicle, { countryOf }, onClose) {
     fact(t("live.speed"), `${num(data.kmh)} km/h`, t("live.overGround"));
     if (data.reg) fact(t("live.reg"), data.reg);
   } else if (vehicle.kind === "train") {
-    fact(t("live.speed"), Number.isFinite(data.kmh) ? `${num(data.kmh)} km/h` : t("live.stillOrUnknown"), data.kmhFromFixes ? t("live.computed") : null);
-    if (data.number && data.name) fact(t("live.trainNumber"), data.number);
+    fact(t("live.speed"), Number.isFinite(data.kmh) ? `${num(data.kmh)} km/h` : t("live.stillOrUnknown"), data.timetable ? t("live.fromTimetable") : data.kmhFromFixes ? t("live.computed") : null);
+    if (data.number && data.name && data.number !== data.name) fact(t("live.trainNumber"), data.number);
   } else {
     fact(t("live.speed"), `${num(data.knots)} kn`, `${num(Math.round(data.kmh))} km/h`);
     fact(t("live.course"), `${Math.round(data.course)}°`);
@@ -28685,8 +28775,8 @@ function fillTransitCard(card, vehicle, { countryOf }, onClose) {
   card.appendChild(now);
 
   // Where it comes from, and how fresh the fix is.
-  const sourceKey = plane ? "live.sourcePlane" : vehicle.kind === "train" ? `live.source.${data.source}` : "live.sourceShip";
-  card.appendChild(element("p", "transit-fleet-note", t(sourceKey, { time: clock(data.at) })));
+  const sourceKey = plane ? (data.source === "opensky" ? "live.sourcePlaneOpensky" : "live.sourcePlane") : vehicle.kind === "train" ? `live.source.${data.source}` : "live.sourceShip";
+  card.appendChild(element("p", "transit-fleet-note", data.timetable ? t("live.sourceTimetable", { credit: data.credit || "" }) : t(sourceKey, { time: clock(data.at) })));
   return card;
 }
 
@@ -28742,6 +28832,10 @@ function createVehicle(kind, data) {
       // A train whose feed sent no heading or speed (and that hasn't moved since) stays put.
       let km = Number.isFinite(vehicle.heading) && Number.isFinite(fix.kmh) ? fix.kmh * seconds / 3600 : 0;
       if (kind === "plane" && fix.to) km = Math.min(km, distance([fix.lon, fix.lat], [fix.to.lon, fix.to.lat]) * EARTH_KM);
+      // A ship stops where its course would take it ashore (stopKm, worked out by the
+      // function against the land map), a timetable train at its next station.
+      vehicle.stopped = (kind === "ship" || fix.timetable === true) && Number.isFinite(fix.stopKm) && km >= fix.stopKm;
+      if (vehicle.stopped) km = fix.stopKm;
       const here = km ? moveFrom([fix.lon, fix.lat], km, vehicle.heading) : [fix.lon, fix.lat];
       if (!vehicle.blend) return here;
       const left = 1 - (nowS - vehicle.blend.start) / BLEND_S;
@@ -28755,7 +28849,10 @@ function createVehicle(kind, data) {
 // isActive(): whether the menu is showing (only then does it ask for new positions).
 // Returns { vehicles() (the current ones), updated() (the snapshot's time, or null),
 // sources() }.
-function createLiveTraffic({ isActive = () => true } = {}) {
+// isLand(lon, lat): the globe's own land map (quarter-degree pixels). Ships the function
+// checked against its finer map carry stopKm; one without it (an older snapshot) is only
+// shown when this map has it on water too.
+function createLiveTraffic({ isActive = () => true, isLand = () => false } = {}) {
   const source = sourceUrl();
   let vehicles = [];
   let snapshot = null;
@@ -28768,7 +28865,7 @@ function createLiveTraffic({ isActive = () => true } = {}) {
     const old = new Map(vehicles.map(vehicle => [vehicle.id, vehicle]));
     const fresh = [
       ...(data.planes || []).filter(plane => Number.isFinite(plane.lat) && Number.isFinite(plane.lon)).map(plane => createVehicle("plane", plane)),
-      ...(data.ships || []).filter(ship => Number.isFinite(ship.lat) && Number.isFinite(ship.lon)).map(ship => createVehicle("ship", ship)),
+      ...(data.ships || []).filter(ship => Number.isFinite(ship.lat) && Number.isFinite(ship.lon) && ("stopKm" in ship || !isLand(ship.lon, ship.lat))).map(ship => createVehicle("ship", ship)),
       ...(data.trains || []).filter(train => Number.isFinite(train.lat) && Number.isFinite(train.lon)).map(train => createVehicle("train", train))
     ];
     // A vehicle we already showed eases from where it was drawn to its new fix.
@@ -31608,7 +31705,7 @@ function showMenuGlobe() {
 // really are, plus the pins and your tent.
 const menuTravel = createTravelLayer(document.getElementById("menuGlobe"), point => globe.projectLonLat(point));
 const menuShowing = () => globe.mode === "menu" && !document.getElementById("mainMenu").classList.contains("hidden");
-const liveTraffic = createLiveTraffic({ isActive: menuShowing });
+const liveTraffic = createLiveTraffic({ isActive: menuShowing, isLand: (lon, lat) => globe.isLand(lon, lat) });
 // The vehicle whose card is pinned (see openRideCard), and whether the press that closed it
 // was on the globe (that tap then does nothing else).
 let pinnedRide = null;
@@ -31625,6 +31722,7 @@ function pinnedRoute(vehicle) {
 }
 startAmbient(menuTravel, {
   vehicles: () => liveTraffic.vehicles(),
+  first: () => pinnedRide,
   isRunning: menuShowing,
   // The menu's places: your base (a flag), today's starting point and Base Camp (a tent),
   // each with a tag; remembered for taps.
@@ -31662,6 +31760,14 @@ startAmbient(menuTravel, {
     // The places as pins with their own logo (no words): Highs & Lows' bars, Casual's
     // coffee cup, Base Camp's tent. The one in focus is bigger. A click on a pin tells you
     // what it is (pinInfo); the games are played from the hero card and the Expedition menu.
+    // A teeny flag on each pole (hover or tap: which pole).
+    [["north", 90], ["south", -90]].forEach(([pole, lat]) => {
+      const spot = globe.projectLonLat([0, lat]);
+      if (!spot.visible) return;
+      // The flag's pole stands on the spot (the sprite is 5 × 8 pixels, its pole on the left).
+      drawSprite(layer.ctx, "flag", spot.x + 4, spot.y - 8, { scale: 2 });
+      menuMarks.push({ x: spot.x + 4, y: spot.y - 8, kind: "pole", pole });
+    });
     const pins = [
       { kind: "camp", lonLat: BASE_CAMP_LONLAT },
       { kind: "casual", lonLat: startLonLat("casual"), country: todayPlace("casual") },
@@ -32037,6 +32143,7 @@ function menuHit(event, { countries = false } = {}) {
   const mark = [...menuMarks].reverse().find(inBox) || menuMarks.find(item => !item.box && Math.hypot(item.x - x, item.y - y) < 26);
   if (mark) {
     const base = getBase();
+    if (mark.kind === "pole") return { kind: "pole", title: t(`menu.${mark.pole}Pole`), hint: mark.pole === "north" ? "90°N" : "90°S" };
     if (mark.kind === "base") return { kind: "base", title: `${t("base.label")} · ${countryName(base)}`, hint: t("menu.tipBase"), iso: base.iso, action: () => pickBase() };
     // The pins tell you what they are; the games start from the hero card or the menu.
     return { kind: mark.kind, pin: true, box: mark.box };
