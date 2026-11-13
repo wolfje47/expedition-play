@@ -3202,8 +3202,8 @@ h1, h2, h3 { font-weight: normal; }
   transform: translateY(48px);
   pointer-events: none;
 }
-.base-camp.is-open .camp-page { opacity: 1; transform: none; pointer-events: auto; transition: opacity 0.6s ease-out, transform 0.7s cubic-bezier(0.2, 0.9, 0.3, 1); }
-.base-camp.is-closing .camp-page { opacity: 0; transform: translateY(24px); transition: opacity 0.3s ease-in, transform 0.3s ease-in; }
+.base-camp.is-open .camp-page { opacity: 1; transform: none; pointer-events: auto; transition: opacity 0.25s ease-out, transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); }
+.base-camp.is-closing .camp-page { opacity: 0; transform: translateY(24px); transition: opacity 0.2s ease-in, transform 0.2s ease-in; }
 
 .camp-head { display: flex; align-items: center; gap: 0.9rem; padding: 0.75rem 0.9rem; border: 1px solid var(--glass-line); border-radius: 18px; background: var(--glass); box-shadow: var(--glass-shine), var(--glass-shadow); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); }
 .camp-head .brand-mark { flex: none; }
@@ -3224,17 +3224,8 @@ h1, h2, h3 { font-weight: normal; }
 .camp-right .community-card,
 .camp-left .camp-invite { background: var(--glass); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); box-shadow: var(--glass-shine); }
 
-/* The scene: a night sky with pixel stars, two ranges of the Himalaya, the tent and the
-   flag; Atlas stands in front. Under it, you. */
+/* You: a card with your shield and name (the scene with Atlas is the page's backdrop). */
 .camp-scene { overflow: hidden; border: 1px solid var(--glass-line); border-radius: 18px; background: var(--glass); box-shadow: var(--glass-shine), var(--glass-shadow); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); }
-.camp-scene-stage { position: relative; height: 250px; background: linear-gradient(180deg, #060a1c 0%, #121a3d 55%, color-mix(in srgb, #ff6b9d 30%, #1a2148) 100%); }
-.camp-stars { position: absolute; inset: 0 0 40% 0; background-image: radial-gradient(1px 1px at 12% 20%, #fff 99%, transparent), radial-gradient(1px 1px at 30% 45%, #cfe 99%, transparent), radial-gradient(2px 2px at 52% 15%, #ffd45c 99%, transparent), radial-gradient(1px 1px at 70% 38%, #fff 99%, transparent), radial-gradient(1px 1px at 86% 12%, #fff 99%, transparent), radial-gradient(1px 1px at 92% 52%, #cfe 99%, transparent), radial-gradient(1px 1px at 42% 70%, #fff 99%, transparent); opacity: 0.85; animation: camp-twinkle 3.2s steps(2) infinite alternate; }
-@keyframes camp-twinkle { to { opacity: 0.55; } }
-.camp-range { position: absolute; inset: auto 0 0 0; width: 100%; height: 48%; image-rendering: pixelated; }
-.camp-scene-stage .atlas-tent { position: absolute; left: 50%; bottom: 10px; image-rendering: pixelated; }
-.camp-scene-stage .atlas-flag { position: absolute; left: calc(50% + 100px); bottom: 14px; image-rendering: pixelated; animation: camp-flag 1.2s steps(2) infinite; transform-origin: bottom left; }
-@keyframes camp-flag { 50% { transform: skewY(-4deg); } }
-.camp-scene-stage .atlas { position: absolute; left: calc(50% - 110px); bottom: 6px; }
 
 /* Atlas: the sprite, idle he breathes and blinks; poses swap his arms (atlas.js). */
 .atlas { display: grid; justify-items: start; }
@@ -3337,19 +3328,18 @@ h1, h2, h3 { font-weight: normal; }
 .base-camp.is-iris .camp-backdrop,
 .base-camp.is-open .camp-backdrop,
 .base-camp.is-closing .camp-backdrop { clip-path: circle(75% at 50% 50%); }
+/* Everest at sunrise, drawn in whole pixels (camp-scene.js). */
+.camp-sky { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+/* Where the page scrolls (narrower screens), it turns solid under the band, so the board
+   reads clearly as it slides up over the sky. */
+@media (max-width: 1100px) {
+  .camp-page { background: linear-gradient(180deg, transparent 0, transparent calc(var(--camp-band, 300px) - 24px), rgba(10, 15, 30, 0.96) calc(var(--camp-band, 300px) + 48px)) local; }
+}
 /* Closing: no iris, the scene fades out over the globe instead. */
-.base-camp.is-closing .camp-backdrop { opacity: 0; transition: opacity 0.6s ease-in; }
-.base-camp.is-open .camp-backdrop { transition-duration: 0.5s; }
+.base-camp.is-closing .camp-backdrop { opacity: 0; transition: opacity 0.2s ease-in; }
+/* Opening is quick (13 November 2026, team request: snappy, no flight first). */
+.base-camp.is-open .camp-backdrop { transition-duration: 0.25s; }
 /* Pixel stars, 3 px squares, twinkling in steps. */
-.camp-backdrop .camp-stars { position: absolute; inset: auto; left: 0; top: 0; width: 3px; height: 3px; background: none; box-shadow: 43vw 11vh 0 #ffd45c, 52vw 43vh 0 #f4f1e8, 8vw 6vh 0 #f4f1e8, 70vw 8vh 0 #bfe9ff, 48vw 39vh 0 #f4f1e8, 9vw 34vh 0 #f4f1e8, 29vw 4vh 0 #bfe9ff, 13vw 29vh 0 #f4f1e8, 55vw 6vh 0 #f4f1e8, 32vw 7vh 0 #ffd45c, 72vw 29vh 0 #f4f1e8, 9vw 38vh 0 #f4f1e8, 17vw 16vh 0 #bfe9ff, 82vw 42vh 0 #f4f1e8, 76vw 5vh 0 #f4f1e8, 75vw 39vh 0 #bfe9ff, 52vw 5vh 0 #f4f1e8, 30vw 4vh 0 #f4f1e8, 73vw 10vh 0 #ffd45c, 39vw 28vh 0 #f4f1e8, 20vw 36vh 0 #f4f1e8, 17vw 38vh 0 #bfe9ff, 41vw 37vh 0 #f4f1e8, 89vw 13vh 0 #f4f1e8, 15vw 39vh 0 #bfe9ff, 75vw 42vh 0 #f4f1e8, 26vw 25vh 0 #f4f1e8, 14vw 37vh 0 #ffd45c, 93vw 6vh 0 #f4f1e8, 74vw 5vh 0 #f4f1e8, 81vw 15vh 0 #bfe9ff, 65vw 45vh 0 #f4f1e8, 70vw 29vh 0 #f4f1e8, 42vw 31vh 0 #bfe9ff; animation: camp-twinkle 3.2s steps(2) infinite alternate; }
-.camp-backdrop .camp-range { height: 52%; }
-.camp-backdrop svg { image-rendering: pixelated; }
-.camp-backdrop .atlas-tent { position: absolute; left: 50%; bottom: 15%; width: clamp(200px, 26vmin, 340px); height: auto; translate: -50% 0; }
-.camp-backdrop .atlas-flag { position: absolute; left: calc(50% + clamp(130px, 17vmin, 220px)); bottom: 15.5%; width: clamp(48px, 6.5vmin, 84px); height: auto; animation: camp-flag 1.2s steps(2) infinite; transform-origin: bottom left; }
-.camp-backdrop-atlas { position: absolute; left: calc(50% - clamp(240px, 31vmin, 400px)); bottom: 15%; width: clamp(120px, 16vmin, 200px); aspect-ratio: 1; overflow: hidden; }
-.camp-backdrop-atlas .atlas-sprite { width: 100%; height: 100%; transform: translateY(100%); animation: none; }
-.base-camp.is-atlas .camp-backdrop-atlas .atlas-sprite { animation: camp-climb-out 0.5s steps(8) forwards; }
-.base-camp.is-open .camp-backdrop-atlas { opacity: 0; transition: opacity 0.4s ease 0.3s; }
 @keyframes camp-climb-out { to { transform: none; } }
 
 /* ---------- Base Camp at a glance, on the menu ---------- */
@@ -3398,23 +3388,27 @@ h1, h2, h3 { font-weight: normal; }
   .camp-column { overflow: visible; padding: 0; }
   .camp-center { padding: 0.7rem; background: rgb(14, 20, 38); -webkit-backdrop-filter: none; backdrop-filter: none; }
   .camp-scene, .camp-right .community-card, .camp-left .camp-invite { background: rgb(14, 20, 38); -webkit-backdrop-filter: none; backdrop-filter: none; }
-  .camp-scene-stage { height: 150px; }
-  .camp-scene-stage .atlas-tent { left: auto; right: 28%; }
-  .camp-scene-stage .atlas-flag { left: auto; right: 12%; }
   .community-group-tabs { position: sticky; top: 64px; z-index: 2; background: rgb(14, 20, 38); }
   .community-views { position: sticky; top: 112px; z-index: 2; background: rgb(14, 20, 38); }
   .community-views { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .community-views .board-tab { min-width: 0; padding: 0.5rem 0.2rem; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; }
   .community-board .board-row { grid-template-columns: 30px minmax(0, 1fr) auto auto; gap: 0.4rem; padding: 0.3rem 0.5rem; }
   .community-board .board-extra { font-size: 12px; }
-  /* Atlas in the corner, his bubble to his left. */
-  .atlas.is-docked { position: fixed; right: 10px; bottom: calc(env(safe-area-inset-bottom, 0px) + 8px); z-index: 4; justify-items: end; }
-  .atlas.is-docked .atlas-sprite { width: 60px; height: 60px; }
-  .atlas.is-docked .atlas-bubble { left: auto; right: 46px; bottom: 40px; max-width: min(260px, calc(100vw - 100px)); }
+  /* Atlas on the glacier: his bubble to his right and upward (over the sky, not the page). */
+  .atlas.is-in-scene:not(.is-docked) .atlas-bubble { top: auto; bottom: 6px; max-width: calc(72vw - 64px); }
 }
-.base-camp:not(.is-open) .atlas.is-docked { opacity: 0; }
+/* Atlas in the scene (social.js layoutScene): on the rock or the glacier, his bubble to his
+   right. Once the page scrolls past the band, in the bottom corner, his bubble to his left. */
+.atlas.is-in-scene { position: absolute; z-index: 4; }
+.atlas.is-in-scene .atlas-sprite { width: var(--atlas-size, 96px); height: var(--atlas-size, 96px); filter: drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.35)); }
+.atlas.is-in-scene:not(.is-docked) .atlas-bubble { left: calc(100% + 12px); bottom: auto; top: 4px; }
+.atlas.is-docked { position: fixed; right: 10px; bottom: calc(env(safe-area-inset-bottom, 0px) + 8px); z-index: 4; justify-items: end; animation: atlas-dock 0.15s steps(3) both; }
+@keyframes atlas-dock { from { opacity: 0; transform: translateY(8px); } }
+.atlas.is-docked .atlas-sprite { width: 60px; height: 60px; }
+.atlas.is-docked .atlas-bubble { left: auto; right: 46px; bottom: 40px; max-width: min(260px, calc(100vw - 100px)); }
+.base-camp:not(.is-open) .atlas.is-in-scene { opacity: 0; }
 @media (prefers-reduced-motion: reduce) {
-  .atlas-sprite, .atlas-eye, .camp-stars, .camp-scene-stage .atlas-flag { animation: none; }
+  .atlas-sprite, .atlas-eye { animation: none; }
 }
 
 /* ---------- Travel on the globe (travel.js) ---------- */
@@ -3537,10 +3531,10 @@ h1, h2, h3 { font-weight: normal; }
 
 /* The bottom of the home screen (13 November 2026, replaces the Expedition drawer): the
    card for the selected game over a dock of five buttons (engine.js, the dock). */
-.main-menu .menu-bottom { align-self: center; display: grid; gap: 10px; width: min(100%, 560px); transition: opacity 0.3s ease, transform 0.3s ease; }
+.main-menu .menu-bottom { align-self: center; display: grid; gap: 10px; width: min(100%, 600px); transition: opacity 0.3s ease, transform 0.3s ease; }
 .main-menu .menu-bottom .menu-hero { width: 100%; }
 .menu-dock {
-  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; padding: 6px;
+  display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; padding: 6px;
   border-radius: 16px; background: rgba(10, 15, 30, 0.84);
   -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
   box-shadow: inset 0 0 0 1px var(--glass-line), var(--glass-shine), 0 10px 30px rgba(0, 0, 0, 0.45);
@@ -3559,8 +3553,10 @@ h1, h2, h3 { font-weight: normal; }
 .dock-art svg { width: 26px; height: 26px; }
 .dock-label { max-width: 100%; font: 9px/1.35 var(--font-display); letter-spacing: var(--ls-pixel); text-align: center; text-transform: uppercase; }
 .dock-status { display: none; }
-.dock-item:hover, .dock-item:focus-visible { background: rgba(255, 255, 255, 0.06); outline: none; transform: translateY(-1px); }
-.dock-item:focus-visible { box-shadow: inset 0 0 0 2px var(--cyan); }
+/* Pointed at (hover or keyboard focus): filled in with the button's own colour, no glow
+   or ring (13 November 2026, team request). */
+.dock-item:hover, .dock-item:focus-visible { background: color-mix(in srgb, var(--tile) 22%, transparent); outline: none; box-shadow: none; transform: translateY(-1px); }
+.dock-item:hover .dock-label, .dock-item:focus-visible .dock-label { color: var(--tile); }
 .dock-item.is-active { background: color-mix(in srgb, var(--tile) 16%, transparent); box-shadow: inset 0 0 0 2px var(--tile); }
 .dock-item.is-active .dock-label { color: var(--tile); }
 .dock-item:disabled { opacity: 0.45; cursor: default; }
@@ -3570,6 +3566,8 @@ h1, h2, h3 { font-weight: normal; }
 .dock-item[data-state="done"]::after { background: #5cf28a; }
 .dock-soon { position: absolute; top: 4px; right: 4px; padding: 2px 3px; border-radius: 3px; background: var(--tile); color: #04121a; font: 7px var(--font-display); letter-spacing: var(--ls-pixel); }
 #menuSettingsButton .dock-art { color: #cfd8dc; }
+/* Your tent, as it looks, in its colour (engine.js renderTentTile). */
+.dock-tent .menu-tent-canvas { width: 30px; height: 30px; image-rendering: pixelated; }
 
 /* Settings: My Tent on top, then a list of rows. */
 .settings-modal { display: grid; gap: 14px; width: min(460px, calc(100vw - 32px)); }
@@ -3602,7 +3600,8 @@ h1, h2, h3 { font-weight: normal; }
   .dock-item { gap: 6px; min-height: 66px; padding: 8px 1px 7px; }
   .dock-art { width: 34px; height: 34px; }
   .dock-art svg { width: 24px; height: 24px; }
-  .dock-label { font-size: 8px; }
+  .dock-label { font-size: 7px; }
+  .dock-tent .menu-tent-canvas { width: 26px; height: 26px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .main-menu .menu-bottom, .dock-item { transition: none; }
@@ -3863,8 +3862,8 @@ h1, h2, h3 { font-weight: normal; }
         <p class="menu-tagline" data-i18n="menu.tagline">The daily geography challenge</p>
       </div>
       <!-- The bottom of the home screen (13 November 2026): the card for the selected game
-           (PLAY, and its own ARCHIVE) over a dock of five, each one click away: Highs & Lows,
-           Casual, 1v1 (coming soon), Crew and Settings. -->
+           (PLAY, and its own ARCHIVE) over a dock of six, each one click away: Highs & Lows,
+           Casual, 1v1 (coming soon), Crew, your tent and Settings. -->
       <div class="menu-bottom">
         <div class="menu-hero" id="menuHero">
           <!-- The card for what's selected (engine.js renderHero): today's main game at first,
@@ -3905,12 +3904,19 @@ h1, h2, h3 { font-weight: normal; }
             <span class="dock-label">1V1</span>
             <small class="dock-soon" data-i18n="menu.soon">SOON</small>
           </button>
-          <button class="dock-item community-open-button" id="menuCommunityButton" type="button" style="--tile: var(--cyan)">
+          <button class="dock-item" id="menuCommunityButton" data-select="camp" type="button" style="--tile: var(--cyan)">
             <span class="dock-art" aria-hidden="true">
               <svg viewBox="0 0 32 32" shape-rendering="crispEdges"><path d="M8 5h6v6H8zm10 0h6v6h-6zM5 13h12v3H5zm12 0h10v3H17zM5 16h3v11H5zm9 0h3v11h-3zm10 0h3v11h-3zM8 22h6v3H8zm9 0h7v3h-7z" fill="currentColor"/></svg>
             </span>
             <span class="dock-label" data-i18n="menu.community">CREW</span>
             <small class="menu-option-note" hidden></small>
+          </button>
+          <!-- Your tent, drawn as it looks (style, explorer, colour): opens My Tent (your account
+               and your tent). Pointing at it turns the globe to your tent. -->
+          <button class="dock-item dock-tent" id="menuAccountButton" data-select="tent" type="button" style="--tile: #ffd45c">
+            <span class="dock-art" id="menuTentIcon" aria-hidden="true"></span>
+            <span class="dock-label" data-i18n="menu.tentShort">MY TENT</span>
+            <span hidden><small id="menuTentWhere"></small><small id="menuAccountLabel"></small><span class="account-avatar" id="menuAccountAvatar" aria-hidden="true" hidden></span></span>
           </button>
           <button class="dock-item" id="menuSettingsButton" type="button" aria-haspopup="dialog" style="--tile: #cfd8dc">
             <span class="dock-art" aria-hidden="true">
@@ -3936,23 +3942,13 @@ h1, h2, h3 { font-weight: normal; }
     </div>
   </section>
 
-  <!-- Settings (the dock's last button): My Tent, your stats, how to play, language and sound. -->
+  <!-- Settings (the dock's last button): your stats, how to play, language and sound. -->
   <div id="settingsModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
     <div class="modal settings-modal">
       <div class="modal-head">
         <h2 id="settingsTitle" data-i18n="menu.settings">SETTINGS</h2>
         <button class="modal-close" id="closeSettingsButton" type="button" aria-label="Close" data-i18n-attr="aria-label:settings.close">×</button>
       </div>
-      <button class="menu-tent-card" id="menuAccountButton" data-focus="tent" type="button">
-        <span class="menu-tent-icon" id="menuTentIcon" aria-hidden="true"></span>
-        <span class="menu-tent-text">
-          <strong data-i18n="menu.account">MY TENT</strong>
-          <small id="menuTentWhere"></small>
-          <small id="menuAccountLabel"></small>
-        </span>
-        <span class="account-avatar" id="menuAccountAvatar" aria-hidden="true" hidden></span>
-        <span class="menu-tent-go" aria-hidden="true">›</span>
-      </button>
       <div class="settings-list">
         <button class="settings-row stats-open-button" id="settingsStatsButton" type="button">
           <svg viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges"><path d="M3 27h26v3H1V5h3zm4-3h5V15H7zm8 0h5V9h-5zm8 0h5V3h-5z" fill="currentColor"/></svg>
@@ -6287,7 +6283,8 @@ const EN = {
   "menu.comingSoon": "Coming soon",
   "menu.soon": "SOON",
   "menu.settings": "SETTINGS",
-  "menu.settingsShort": "SETTINGS",
+  "menu.settingsShort": "OPTIONS",
+  "menu.tentShort": "MY TENT",
   "menu.duelText": "Play a friend head to head, on the same questions.",
   "menu.duelSoon": "We're still building this one.",
   "settings.close": "Close settings",
@@ -6986,6 +6983,8 @@ const EN = {
   "base.colorN": "Colour {n}",
   "menu.drawerCamp": "CAMP & COMMUNITY",
   "menu.tentGuest": "Guest · sign in to keep your days",
+  "menu.tentGo": "OPEN MY TENT ›",
+  "menu.tentText": "Your account, and your tent: where it stands and how it looks.",
   "menu.tentNone": "No tent pitched yet",
   "base.style": "TENT",
   "base.avatar": "EXPLORER",
@@ -7245,6 +7244,7 @@ const NL = {
   "menu.soon": "STRAKS",
   "menu.settings": "INSTELLINGEN",
   "menu.settingsShort": "OPTIES",
+  "menu.tentShort": "MIJN TENT",
   "menu.duelText": "Speel één tegen één tegen een vriend, met dezelfde vragen.",
   "menu.duelSoon": "Hier bouwen we nog aan.",
   "settings.close": "Instellingen sluiten",
@@ -7966,6 +7966,8 @@ const NL = {
   "base.colorN": "Kleur {n}",
   "menu.drawerCamp": "KAMP & COMMUNITY",
   "menu.tentGuest": "Gast · log in om je dagen te bewaren",
+  "menu.tentGo": "OPEN MIJN TENT ›",
+  "menu.tentText": "Je account en je tent: waar hij staat en hoe hij eruitziet.",
   "menu.tentNone": "Nog geen tent opgezet",
   "base.style": "TENT",
   "base.avatar": "ONTDEKKER",
@@ -27307,11 +27309,28 @@ function drawTentLook(ctx, { style = "aframe", avatar = "none", color = "#ff9f43
   if (person) paint(ctx, person, left + 11 * scale, top + (bottom - person.length + 1) * scale, scale, colors);
 }
 // A canvas with the look at a whole-pixel scale (crisp at any size).
-function createTentCanvas(look, scale = 3, className = "tent-icon") {
+// centred: the drawn pixels in the middle of the square (the grid keeps the tent on the
+// ground and room for an explorer, so without one it would sit low and to the side).
+function createTentCanvas(look, scale = 3, className = "tent-icon", { centred = false } = {}) {
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = 16 * scale;
   canvas.className = className;
-  drawTentLook(canvas.getContext("2d"), look, 0, 0, scale);
+  const ctx = canvas.getContext("2d");
+  drawTentLook(ctx, look, 0, 0, scale);
+  if (!centred) return canvas;
+  const size = canvas.width;
+  const { data } = ctx.getImageData(0, 0, size, size);
+  let minX = size, minY = size, maxX = -1, maxY = -1;
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    if (!data[(y * size + x) * 4 + 3]) continue;
+    minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+  }
+  if (maxX < 0) return canvas;
+  const copy = document.createElement("canvas");
+  copy.width = copy.height = size;
+  copy.getContext("2d").drawImage(canvas, Math.round((size - (minX + maxX + 1)) / 2), Math.round((size - (minY + maxY + 1)) / 2));
+  ctx.clearRect(0, 0, size, size);
+  ctx.drawImage(copy, 0, 0);
   return canvas;
 }
 
@@ -27778,6 +27797,1063 @@ function createBaseLine({ onChange = null } = {}) {
 }
 
 return { TENT_COLORS, getTentColor, setTentLevelSource, getTentLook, setTentLook, defaultBaseIso, setTentColor, getBase, onBaseChange, tentSpots, getTent, tentLonLat, setBase, syncBase, pickBase, createBaseLine };
+})();
+
+// ---- camp-scene.js
+__modules["camp-scene.js"] = (() => {
+// The scene behind Crew: Everest at sunrise in 8-bit pixels (13 November 2026, team choice
+// from mockups/crew-scene: the colours of "Centre stage"). Drawn on a small canvas and scaled
+// up in whole pixels (CSS image-rendering: pixelated), so every pixel stays sharp.
+//
+// drawCampScene(canvas, options): the sky down to `base` (a fraction of the height), the
+// massif (Lhotse behind, Everest, Nuptse in front) standing on it, the glacier below, prayer
+// flags and tents. With `outcrop`, a rock in front of the mountains for Atlas to stand on.
+
+const PALETTE = {
+  sky: ["#141b48", "#3a2a6a", "#8a3f7f", "#ff6b9d", "#ffb36b"],
+  far: "#5a3f78", lit: "#7a5a8c", shade: "#3c2c5e", snow: "#ffe1cf", snowShade: "#b48bb8",
+  band: "#b07a6e", ground: "#f2d9d6", groundShade: "#9d7fa6", stone: "#3a3f5c", stoneTop: "#5a6080",
+  pole: "#2a1d12", rockLit: "#7a5a8c", rockShade: "#3c2c5e", rockLine: "#1f1638", rockSnow: "#fff1e6", rockSnowShade: "#c9a3c4"
+};
+const FLAG_COLORS = ["#45a3ff", "#f4f1e8", "#ff4d5a", "#4bd17a", "#ffd45c"];
+
+// The massif in its own units: the summit of Everest at (0, 0), the foot of the mountains
+// at y = 1. Each peak: its outline, the ridge that splits the lit face (left) from the shade
+// (from `peak` to `foot`), where the snow ends, and a few gullies of rock down the snow.
+const MASSIF = [
+  { outline: [[0.2, 1], [0.42, 0.34], [0.55, 0.2], [0.66, 0.13], [0.78, 0.22], [0.95, 0.4], [1.3, 1]], peak: [0.66, 0.13], foot: [0.8, 1], snow: 0.55, gullies: [[0.6, 0.24, 0.18], [0.74, 0.22, 0.2]] },
+  { outline: [[-1.0, 1], [-0.62, 0.42], [-0.4, 0.26], [-0.18, 0.12], [0, 0], [0.16, 0.1], [0.3, 0.2], [0.42, 0.34], [0.7, 1]], peak: [0, 0], foot: [0.18, 1], snow: 0.5, band: [0.14, 0.17], gullies: [[-0.12, 0.2, 0.22], [-0.3, 0.27, 0.16], [0.1, 0.18, 0.25], [0.26, 0.24, 0.14]] },
+  { outline: [[-1.35, 1], [-0.95, 0.56], [-0.78, 0.47], [-0.62, 0.5], [-0.5, 0.46], [-0.3, 0.6], [-0.05, 0.78], [0.1, 1]], peak: [-0.78, 0.47], foot: [-0.66, 1], snow: 0.72, gullies: [[-0.86, 0.56, 0.1], [-0.6, 0.55, 0.12]] }
+];
+
+function inside(poly, x, y) {
+  let hit = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i], [xj, yj] = poly[j];
+    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) hit = !hit;
+  }
+  return hit;
+}
+function random(seed) { return () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296); }
+
+// Options (fractions of the canvas): px (CSS pixels per art pixel), summitX, base (the foot
+// of the mountains), ground (where the glacier turns to its shade), sunX, flags [x0, x1, y],
+// tents [[x, y, size, colour]], outcrop [x, top, bottom], top (no summit above it: room for
+// a header). Returns nothing; the canvas is sized to its own box.
+function drawCampScene(canvas, { px = 6, summitX = 0.58, base = 0.42, ground = base + 0.06, sunX = 0.84, flags = null, tents = [], outcrop = null, top = 0.04 } = {}) {
+  const W = Math.max(1, Math.ceil(canvas.clientWidth / px));
+  const H = Math.max(1, Math.ceil(canvas.clientHeight / px));
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  const P = PALETTE;
+  const rect = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); };
+  const dot = (x, y, c) => rect(x, y, 1, 1, c);
+  const r = random(11);
+  const baseY = Math.round(H * base);
+
+  // Sky: flat bands, a checker row where two meet.
+  const bands = P.sky.length, bandH = baseY / bands;
+  for (let i = 0; i < bands; i++) rect(0, Math.floor(i * bandH), W, Math.ceil(bandH) + 1, P.sky[i]);
+  for (let i = 1; i < bands; i++) { const y = Math.floor(i * bandH) - 1; for (let x = y % 2; x < W; x += 2) dot(x, y, P.sky[i]); }
+  // The sun, low over the range.
+  const sx = Math.round(W * sunX), sy = Math.round(baseY * 0.7);
+  for (let y = -5; y <= 5; y++) for (let x = -5; x <= 5; x++) if (x * x + y * y <= 25) dot(sx + x, sy + y, x * x + y * y <= 12 ? "#fff1b8" : "#ffd45c");
+
+  // A far range, zigzag, in one flat colour with snowy tips.
+  const step = Math.max(6, Math.round(W / 16));
+  for (let x = 0; x < W; x++) {
+    const k = x % (step * 2), t = k < step ? k / step : 2 - k / step;
+    const peakH = 0.18 + 0.1 * Math.sin(Math.floor(x / (step * 2)) * 2.3);
+    const top = Math.round(baseY - baseY * (0.12 + peakH * t));
+    rect(x, top, 1, baseY - top, P.far);
+    if (t > 0.6) rect(x, top, 1, 2, P.snowShade);
+  }
+
+  // The massif, as large as fits: under `top`, never wider than the screen.
+  const scale = Math.max(4, Math.min(baseY - H * top, W * 0.42));
+  const ox = W * summitX, oy = baseY - scale;
+  const U = ([x, y]) => [ox + x * scale, oy + y * scale];
+  for (const peak of MASSIF) {
+    const poly = peak.outline.map(U);
+    const [px0, py0] = U(peak.peak), [fx, fy] = U(peak.foot);
+    const lean = (fx - px0) / (fy - py0);
+    const gullies = peak.gullies.map(([gx, gy, len]) => [...U([gx, gy]), len]);
+    for (let y = Math.max(0, Math.floor(py0)); y < baseY; y++) {
+      for (let x = Math.max(0, Math.floor(Math.min(...poly.map(p => p[0])))); x < Math.min(W, Math.ceil(Math.max(...poly.map(p => p[0])))); x++) {
+        if (!inside(poly, x + 0.5, y + 0.5)) continue;
+        const v = (y - oy) / scale; // 0 at the summit, 1 at the foot
+        const lit = x + 0.5 < px0 + (y - py0) * lean;
+        const tooth = Math.abs(((x / 3) | 0) % 4 - 2) * 0.025; // a snow line with teeth
+        const snow = v < peak.snow - 0.1 + tooth + (lit ? 0.06 : 0);
+        let c = snow ? (lit ? P.snow : P.snowShade) : (lit ? P.lit : P.shade);
+        for (const [ax, ay, len] of gullies) {
+          const along = (y - ay) / scale;
+          if (along >= 0 && along < len && Math.abs(x - (ax + (y - ay) * (lit ? -0.35 : 0.35))) < 0.8) c = lit ? P.lit : P.shade;
+        }
+        // The Yellow Band: a broken strip of rock across Everest below the summit.
+        if (peak.band && v > peak.band[0] && v < peak.band[1] && (x * 7 + y) % 5 > 1) c = lit ? P.band : P.shade;
+        if (!inside(poly, x + 0.5, y - 0.5)) c = lit ? "#ffffff" : P.snowShade; // the rim
+        dot(x, y, c);
+      }
+    }
+  }
+  // The plume off the summit.
+  const [tx, ty] = U([0, 0]);
+  for (let i = 0; i < 12; i++) dot(Math.round(tx) + 2 + i, Math.round(ty) + ((i / 4) | 0), i % 3 ? "rgba(255,241,230,.6)" : "rgba(255,241,230,.3)");
+
+  // The glacier at base camp, flat with a few stones.
+  const gY = Math.round(H * ground);
+  rect(0, baseY, W, gY - baseY, P.ground);
+  rect(0, gY, W, H - gY, P.groundShade);
+  rect(0, baseY, W, 1, P.snowShade);
+  for (let i = 0; i < W / 4; i++) {
+    const x = Math.floor(r() * W), y = baseY + 2 + Math.floor(r() * Math.max(1, H - baseY - 3));
+    rect(x, y, 2, 1, P.stone);
+    dot(x, y - 1, P.stoneTop);
+  }
+  // Prayer flags strung between two poles.
+  if (flags) {
+    const x0 = Math.round(W * flags[0]), x1 = Math.round(W * flags[1]), y0 = Math.round(H * flags[2]);
+    rect(x0, y0, 1, gY - y0, P.pole);
+    rect(x1, y0 + 4, 1, gY - y0 - 4, P.pole);
+    for (let x = x0; x <= x1; x++) {
+      const t = (x - x0) / (x1 - x0), y = Math.round(y0 + t * 4 + Math.sin(t * Math.PI) * 6);
+      dot(x, y, P.pole);
+      if ((x - x0) % 3 === 1) rect(x, y + 1, 2, 2, FLAG_COLORS[((x - x0) / 3 | 0) % 5]);
+    }
+  }
+  // Tents: a pixel A-frame with a dark door.
+  for (const [x, y, s, c] of tents) {
+    const cx = Math.round(W * x), by = Math.round(H * y);
+    for (let row = 0; row < 4 * s; row++) rect(cx - row, by - 4 * s + row, row * 2 + 1, 1, row === 0 ? P.pole : c);
+    rect(cx - s + 1, by - 2 * s, s * 2 - 1, 2 * s, P.pole);
+  }
+  // Atlas's outcrop: lit on the left, shaded on the right, snow on top, a crack or two.
+  if (outcrop) {
+    const cx = Math.round(W * outcrop[0]), top = Math.round(H * outcrop[1]), bottom = Math.round(H * outcrop[2]);
+    for (let y = 0; y < bottom - top; y++) {
+      const half = 9 + Math.round(y * 0.9) + (y % 5 === 2 ? 1 : 0);
+      for (let x = cx - half; x <= cx + half; x++) {
+        let c = y < 2 ? (x < cx ? P.rockSnow : P.rockSnowShade) : x < cx - 2 ? P.rockLit : P.rockShade;
+        if (x === cx - half || x === cx + half) c = P.rockLine;
+        if (y > 4 && (x === cx + 4 + (y >> 2) || x === cx - 7 - (y >> 3)) && y % 7 < 4) c = P.rockLine;
+        dot(x, top + y, c);
+      }
+    }
+  }
+}
+
+return { drawCampScene };
+})();
+
+// ---- social.js
+__modules["social.js"] = (() => {
+// Base Camp (the Community screen): where climbers compare logbooks. Atlas, the old explorer
+// who keeps the logbook, stands by his tent on the left with your name, this month's shield
+// and how far the next one is; the middle holds your groups, each with four boards (DAY,
+// THIS WEEK, THIS MONTH, HISTORY) and gold, silver and bronze for the top three; the right
+// holds your friends, adding one, and the shields of past months. Inviting friends sits
+// behind INVITE FRIENDS. In a group weeks (Monday to Sunday) and months rank average daily
+// scores; each ended month's podium stays. The data lives in Supabase (supabase/social.sql);
+// without an account the middle asks you to sign in.
+//
+// Opening it from the menu, the globe turns to the Himalaya, a pin drops on Everest Base
+// Camp, and the night mountain scene opens out of the pin (an iris); Atlas climbs out of
+// his tent to wave before the page slides in (about 5.3 s, with SKIP). The scene stays as
+// the page's background.
+// The menu also gets a glance at the week (refreshGlance): a card beside the games on a
+// wide screen, a line on the Base Camp tile on a phone.
+const { sounds } = __modules["audio.js"];
+const { addFriend, addToGroup, createGroup, getFriends, getGroupBoard, getGroups, getMyProfile, getUser, isConfigured, leaveGroup, removeFriend, setDisplayName } = __modules["auth.js"];
+const { createAtlas, createAtlasSprite, isAtlasQuiet, onAtlasQuietChange, setAtlasQuiet, syncAtlasQuiet } = __modules["atlas.js"];
+const { createBadge, createMedal, getGroupMedal } = __modules["badges.js"];
+const { createBaseLine } = __modules["base.js"];
+const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getTopPercent } = __modules["community.js"];
+const { showToastNotice } = __modules["ui.js"];
+const { drawCampScene } = __modules["camp-scene.js"];
+const { countryName, locale, onLangChange, t } = __modules["i18n.js"];
+
+const PENDING_INVITE_KEY = "daily-geography:pending-invite:v1";
+const MET_ATLAS_KEY = "daily-geography:atlas-met:v1";
+// Closing: the page and scene fade out (ms).
+const CLOSE_FADE_MS = 200;
+const GLANCE_ROWS = 3;
+
+function element(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function button(className, text, onClick) {
+  const node = element("button", className, text);
+  node.type = "button";
+  node.addEventListener("click", event => { sounds.playClick(); onClick(event); });
+  return node;
+}
+
+const toKey = date => date.toISOString().slice(0, 10);
+const addDays = (dateKey, days) => {
+  const date = new Date(`${dateKey}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return toKey(date);
+};
+const mondayOf = dateKey => addDays(dateKey, -((new Date(`${dateKey}T00:00:00Z`).getUTCDay() + 6) % 7));
+const topPercentOf = (dateKey, score) => getTopPercent(getDayStats(dateKey), score);
+const storage = {
+  get(key) { try { return localStorage.getItem(key); } catch { return null; } },
+  set(key, value) { try { localStorage.setItem(key, value); } catch { /* storage off */ } },
+  remove(key) { try { localStorage.removeItem(key); } catch { /* storage off */ } }
+};
+
+// Everyone in a group, each with their finished days, from group_board's rows.
+function membersOf(rows) {
+  const members = new Map();
+  rows.forEach(row => {
+    if (!members.has(row.user_id)) members.set(row.user_id, { id: row.user_id, name: row.display_name, days: new Map() });
+    if (row.date) members.get(row.user_id).days.set(row.date, row.score);
+  });
+  return [...members.values()];
+}
+
+// Everyone who played between two dates: their average daily score and average top %,
+// best first. More days played breaks a tie.
+function standings(people, from, to) {
+  return people.map(person => {
+    const days = [...person.days.entries()].filter(([dateKey]) => dateKey >= from && dateKey <= to);
+    if (!days.length) return null;
+    return {
+      person,
+      played: days.length,
+      score: Math.round(days.reduce((sum, [, score]) => sum + score, 0) / days.length),
+      topPercent: days.reduce((sum, [dateKey, score]) => sum + topPercentOf(dateKey, score), 0) / days.length
+    };
+  }).filter(Boolean).sort((left, right) => right.score - left.score || right.played - left.played);
+}
+
+// Places with equal scores (and days) shared, so a tie shares its medal too.
+function withPlaces(entries) {
+  let place = 0;
+  return entries.map((entry, index) => {
+    const previous = entries[index - 1];
+    if (!previous || previous.score !== entry.score || previous.played !== entry.played) place = index + 1;
+    return { ...entry, place };
+  });
+}
+
+// globe: the game's PixelGlobe (for the dive); getDays() gives the archive's day records
+// (with each day's top %); today is the current puzzle date; dayLabel(dateKey) names a day.
+function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null }) {
+  const modal = document.getElementById("communityModal");
+  const page = document.getElementById("baseCampPage");
+  const body = document.getElementById("communityBody");
+  const menu = document.getElementById("mainMenu");
+  const phone = window.matchMedia("(max-width: 760px)");
+  const state = { profile: null, friends: [], groups: [], groupId: null, boards: new Map(), view: "day", dateKey: today, creating: false, error: null, loaded: false };
+  let dove = false; // whether the globe dived (so it rises again on closing)
+  let lastLine = null;
+  let pokes = 0;
+
+  // An invite link (?invite=CODE) is kept until you're signed in, then used.
+  const invite = new URLSearchParams(location.search).get("invite");
+  if (invite) {
+    storage.set(PENDING_INVITE_KEY, invite.toUpperCase());
+    history.replaceState(null, "", location.pathname);
+  }
+
+  // Atlas, on screen all the time Crew is open, standing in the scene itself (13 November
+  // 2026, team choice from mockups/crew-scene): on a wide screen on a rock in front of
+  // Everest, his bubble beside him ("On the ridge"); on a phone on the glacier in the band
+  // at the top ("Centre stage"). Once the page scrolls past the band, he steps into the
+  // bottom corner, so he's still there.
+  const atlas = createAtlas({ size: 96, onPoke: () => sayNext() });
+  const quietButton = document.getElementById("atlasQuietButton");
+  function renderQuietButton() {
+    const quiet = isAtlasQuiet();
+    quietButton.setAttribute("aria-pressed", String(quiet));
+    quietButton.querySelector("span").textContent = t(quiet ? "atlas.quietOn" : "atlas.quietOff");
+    quietButton.title = t(quiet ? "atlas.unmute" : "atlas.mute");
+    quietButton.setAttribute("aria-label", t(quiet ? "atlas.unmute" : "atlas.mute"));
+  }
+  quietButton.addEventListener("click", () => {
+    sounds.playClick();
+    setAtlasQuiet(!isAtlasQuiet());
+    if (!isAtlasQuiet()) sayNext(true);
+  });
+  onAtlasQuietChange(renderQuietButton);
+  renderQuietButton();
+
+  // The scene's layout: how tall the band of sky and mountains is, where Atlas stands, and
+  // where the page starts (just under the band). Redrawn when the window changes size.
+  const head = page.querySelector(".camp-head");
+  let sceneSize = "";
+  let atlasSpot = null; // { left, top, size } in the scene
+  function layoutScene() {
+    if (modal.classList.contains("hidden")) return;
+    const canvas = document.getElementById("baseCampSky");
+    const W = modal.clientWidth, H = modal.clientHeight;
+    const small = phone.matches;
+    const band = Math.round(small ? Math.min(H * 0.36, 290) : Math.min(H * 0.42, 420));
+    const size = small ? 80 : 128;
+    const px = small ? 4 : 6;
+    modal.style.setProperty("--camp-band", `${band}px`);
+    const headBottom = page.offsetTop + head.offsetTop + head.offsetHeight; // (not the rect: the page slides in)
+    const key = `${W}x${H}x${Math.round(headBottom)}`;
+    if (key !== sceneSize) {
+      sceneSize = key;
+      // On a phone a strip of glacier shows above the page, for Atlas to stand on.
+      const base = (small ? band - 34 : band) / H;
+      const top = (headBottom + (small ? 14 : 24)) / H; // the summit clear of the header
+      drawCampScene(canvas, small
+        ? { px, summitX: 0.56, base, ground: base + 0.06, sunX: 0.84, flags: [0.04, 0.42, base * 0.62], tents: [[0.86, base + 0.045, 2, "#45e3ff"]], top }
+        : { px, summitX: 0.58, base, ground: base + 0.08, sunX: 0.86, flags: [0.7, 0.97, base * 0.72], tents: [[0.84, base + 0.07, 3, "#ffd45c"]], outcrop: [0.1, base * 0.84, base + 0.08], top });
+    }
+    // Atlas: on the rock (wide), or on the glacier left of middle (phone).
+    const snap = value => Math.round(value / px) * px;
+    atlasSpot = small
+      ? { left: Math.round(W * 0.28 - size / 2), top: snap(band - 8) - size, size }
+      : { left: Math.round(W * 0.1 - size / 2), top: snap(Math.round(band * 0.84 / px) * px) - size + 6, size };
+    // The page starts under the band.
+    body.style.marginTop = "0px";
+    const pageHead = head.offsetTop + head.offsetHeight;
+    body.style.marginTop = `${Math.max(0, band + 12 - pageHead - (small ? 12 : 16))}px`;
+    // How far the page can scroll before it would slide under Atlas's feet.
+    atlasSpot.dockAt = page.offsetTop + body.offsetTop - (atlasSpot.top + size) - 4;
+    placeAtlas();
+  }
+  function placeAtlas() {
+    if (atlas.element.parentNode !== modal) modal.appendChild(atlas.element);
+    if (!atlasSpot) return;
+    // Scrolled past the band: Atlas in the bottom corner (CSS .is-docked).
+    const docked = page.scrollTop > atlasSpot.dockAt;
+    // Stepping into the corner, his bubble would cover the page: it closes (a tap on him
+    // brings the next line).
+    if (docked && !atlas.element.classList.contains("is-docked")) atlas.close();
+    atlas.element.classList.toggle("is-docked", docked);
+    atlas.element.classList.add("is-in-scene");
+    Object.assign(atlas.element.style, docked ? { left: "", top: "" } : { left: `${atlasSpot.left}px`, top: `${atlasSpot.top}px` });
+    atlas.element.style.setProperty("--atlas-size", `${atlasSpot.size}px`);
+  }
+  phone.addEventListener("change", layoutScene);
+  window.addEventListener("resize", layoutScene);
+  page.addEventListener("scroll", placeAtlas, { passive: true });
+
+  async function load() {
+    state.error = null;
+    try {
+      state.profile = await getMyProfile();
+      const pending = storage.get(PENDING_INVITE_KEY);
+      if (pending) {
+        storage.remove(PENDING_INVITE_KEY);
+        if (pending !== state.profile?.invite_code) {
+          try {
+            const name = await addFriend(pending);
+            showToastNotice(t("community.nowFriends", { name }));
+          } catch (error) {
+            showToastNotice(error.message);
+          }
+        }
+      }
+      [state.friends, state.groups] = await Promise.all([getFriends(), getGroups()]);
+      if (!state.groups.some(group => group.id === state.groupId)) state.groupId = state.groups[0]?.id || null;
+      state.boards.clear();
+      if (state.groupId) await loadBoard(state.groupId);
+      state.loaded = true;
+    } catch (error) {
+      state.error = error;
+    }
+  }
+
+  // A group's members and their days (cached until Base Camp is opened again).
+  async function loadBoard(groupId) {
+    if (state.boards.has(groupId)) return state.boards.get(groupId);
+    const firstDay = getDays()[0]?.dateKey || today;
+    try {
+      const board = { people: membersOf(await getGroupBoard(groupId, firstDay, today)) };
+      state.boards.set(groupId, board);
+      return board;
+    } catch (error) {
+      const board = { error };
+      state.boards.set(groupId, board);
+      return board;
+    }
+  }
+
+  const signedIn = () => isConfigured && getUser();
+
+  // ----- Opening and closing -----
+
+  async function open() {
+    if (!modal.classList.contains("hidden")) return;
+    document.getElementById("archiveModal")?.classList.add("hidden");
+    const fromMenu = !menu.classList.contains("hidden") && globe.mode === "menu";
+    modal.classList.remove("hidden", "is-open", "is-landing", "is-over-game");
+    modal.classList.toggle("is-over-game", !fromMenu);
+    lastLine = null;
+    buildBackdrop();
+    page.scrollTop = 0;
+    const rendering = render(true);
+    layoutScene();
+    if (fromMenu) {
+      dove = true;
+      menu.classList.add("is-camp");
+      // Straight in, no flight (13 November 2026, team request: snappy).
+      globe.diveToBaseCamp(0);
+      requestAnimationFrame(() => modal.classList.add("is-open"));
+    } else {
+      dove = false;
+      requestAnimationFrame(() => modal.classList.add("is-open"));
+    }
+    await rendering;
+    speak();
+  }
+
+  // The full-screen scene behind the page: Everest at sunrise (camp-scene.js), drawn by
+  // layoutScene for the window's size.
+  function buildBackdrop() {
+    const backdrop = document.getElementById("baseCampBackdrop");
+    if (backdrop.childElementCount) return;
+    const canvas = element("canvas", "camp-sky");
+    canvas.id = "baseCampSky";
+    backdrop.append(canvas);
+  }
+
+  // Closing: the page and the mountain scene fade out quickly and the menu is back, the
+  // globe where it was on the menu (no flight).
+  async function close() {
+    if (modal.classList.contains("hidden")) return;
+    atlas.close();
+    modal.classList.remove("is-open");
+    modal.classList.add("is-closing");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    await new Promise(resolve => setTimeout(resolve, reduceMotion ? 0 : CLOSE_FADE_MS));
+    modal.classList.add("hidden");
+    modal.classList.remove("is-closing");
+    if (dove) {
+      dove = false;
+      await globe.riseToMenu(0);
+    }
+    menu.classList.remove("is-camp");
+    refreshGlance();
+  }
+
+  // ----- Atlas's lines -----
+
+  // What Atlas says on arrival: the most useful thing first (a first hello, signing in,
+  // a friend to invite, a group to make, the week's standings, today's climb, the next
+  // shield), else a tip. Every figure comes from your own days and your group's board.
+  function currentLine() {
+    if (!storage.get(MET_ATLAS_KEY)) {
+      storage.set(MET_ATLAS_KEY, "1");
+      return { text: t("atlas.hello"), pose: "wave" };
+    }
+    if (!isConfigured) return { text: t("atlas.accountsOff"), pose: "think" };
+    if (!getUser()) return { text: t("atlas.signedOut"), pose: "wave" };
+    if (state.error) return { text: t("atlas.closed"), pose: "think" };
+    if (!state.friends.length) return { text: t("atlas.noFriends"), pose: "point" };
+    if (!state.groups.length) return { text: t("atlas.noGroup"), pose: "think" };
+    const week = weekStanding(state.boards.get(state.groupId));
+    if (week?.leader && week.you?.place === 1 && week.count > 1) return { text: t("atlas.leading", { group: groupName() }), pose: "cheer" };
+    if (week?.ahead) return { text: t("atlas.behind", { name: week.ahead.person.name, n: (week.ahead.score - week.you.score).toLocaleString(locale()) }), pose: "think" };
+    const todayDay = getDays().find(day => day.dateKey === today);
+    if (todayDay && !todayDay.noGame && !todayDay.completed) return { text: t("atlas.notToday"), pose: "point" };
+    const shield = shieldLine();
+    if (shield) return { text: shield, pose: "idle" };
+    return null;
+  }
+
+  const TIPS = ["atlas.tip1", "atlas.tip2", "atlas.tip3", "atlas.tip4", "atlas.tip5"];
+  function speak() {
+    const line = currentLine() || { text: t(TIPS[0]), pose: "idle" };
+    lastLine = line.text;
+    atlas.say(line.text, line.pose);
+  }
+  // A click on Atlas (or switching him back on): the next tip, never the same line twice.
+  function sayNext(fresh = false) {
+    const line = fresh ? (currentLine() || null) : null;
+    if (line && line.text !== lastLine) { lastLine = line.text; atlas.say(line.text, line.pose); return; }
+    pokes += 1;
+    const text = t(TIPS[pokes % TIPS.length]);
+    lastLine = text;
+    atlas.say(text, pokes % 2 ? "think" : "idle");
+  }
+
+  const groupName = () => state.groups.find(group => group.id === state.groupId)?.name || "";
+
+  function shieldLine() {
+    const month = today.slice(0, 7);
+    const badge = getMonthBadge(getDays(), month);
+    if (!badge.next) return badge.tier ? t("atlas.topShield") : null;
+    const left = Math.max(0, badge.next.minDays - badge.played);
+    if (!left) return null;
+    return t("atlas.shield", { n: left, name: badge.next.name });
+  }
+
+  // This week in a group: your place, who's first, and who's just ahead of you.
+  function weekStanding(board) {
+    if (!board?.people) return null;
+    const monday = mondayOf(today);
+    const ranked = withPlaces(standings(board.people, monday, addDays(monday, 6)));
+    const me = getUser()?.id;
+    const youIndex = ranked.findIndex(entry => entry.person.id === me);
+    const you = ranked[youIndex] || null;
+    const ahead = you && youIndex > 0 ? ranked.slice(0, youIndex).reverse().find(entry => entry.score > you.score) : null;
+    return { ranked, you, ahead, leader: ranked[0] || null, count: board.people.length };
+  }
+
+  // ----- The page -----
+
+  async function render(reload = false) {
+    const left = element("section", "camp-column camp-left");
+    const center = element("section", "camp-column camp-center");
+    const right = element("section", "camp-column camp-right");
+    left.appendChild(createScene());
+    if (!signedIn()) {
+      center.appendChild(createSignInCard());
+      right.appendChild(createShieldHistory());
+      body.replaceChildren(left, center, right);
+      placeAtlas();
+      return;
+    }
+    if (reload) {
+      center.appendChild(element("p", "community-loading", t("community.loading")));
+      body.replaceChildren(left, center, right);
+      placeAtlas();
+      await load();
+      // Closed (or redrawn) while loading: start again from what's there now.
+      if (modal.classList.contains("hidden")) return;
+      return render();
+    }
+    if (state.error) {
+      center.appendChild(element("p", "community-empty", state.error.notSetUp
+        ? t("community.notSetUp")
+        : t("community.loadFailed", { message: state.error.message })));
+      right.appendChild(createShieldHistory());
+      body.replaceChildren(left, center, right);
+      placeAtlas();
+      return;
+    }
+    left.appendChild(createInviteCard());
+    center.append(createGroupTabs());
+    if (state.creating) center.appendChild(createNewGroupCard());
+    else if (state.groupId) center.appendChild(await createGroupCard(state.groups.find(group => group.id === state.groupId)));
+    else center.appendChild(element("p", "community-card community-empty", state.friends.length
+      ? t("community.makeGroup")
+      : t("community.addFirst")));
+    right.append(createAddFriendCard(), createFriendsCard(), createShieldHistory());
+    body.replaceChildren(left, center, right);
+    placeAtlas();
+  }
+
+  // You: name, this month's shield and the way to the next one. (The scene with Atlas is
+  // the page's backdrop now, not a card.)
+  function createScene() {
+    const card = element("div", "camp-scene");
+    card.appendChild(createIdentity());
+    return card;
+  }
+
+  function createIdentity() {
+    const you = element("div", "camp-you");
+    const month = today.slice(0, 7);
+    const days = getDays();
+    const badge = getMonthBadge(days, month);
+    const icon = createBadge(badge.tier || RANK_TIERS.at(-1), 64);
+    icon.classList.toggle("is-locked", !badge.tier);
+    const text = element("div", "camp-you-text");
+    const nameRow = element("div", "camp-name-row");
+    const name = element("strong", "camp-name", state.profile?.display_name || t("common.you"));
+    nameRow.appendChild(name);
+    if (signedIn() && state.profile) {
+      const edit = button("camp-edit", t("camp.edit"), () => {
+        const form = element("form", "community-name");
+        const input = Object.assign(element("input"), { value: state.profile.display_name, maxLength: 24 });
+        input.setAttribute("aria-label", t("community.yourName"));
+        form.append(input, Object.assign(element("button", "btn btn-secondary", t("community.save")), { type: "submit" }));
+        form.addEventListener("submit", async event => {
+          event.preventDefault();
+          try {
+            await setDisplayName(input.value);
+            state.profile.display_name = input.value.trim();
+            showToastNotice(t("community.nameSaved"));
+            nameRow.replaceChildren(element("strong", "camp-name", state.profile.display_name), edit);
+          } catch (error) {
+            showToastNotice(error.message);
+          }
+        });
+        nameRow.replaceChildren(form);
+        input.focus();
+        input.select();
+      });
+      edit.setAttribute("aria-label", t("community.yourName"));
+      nameRow.appendChild(edit);
+    }
+    text.append(
+      element("span", "field-label", t("camp.thisMonth", { month: monthName(month) })),
+      nameRow,
+      element("span", "camp-shield-name", badge.tier ? badge.tier.name.toUpperCase() : t("archive.noBadge"))
+    );
+    // The way to the next shield, as in the archive.
+    const progress = element("div", "camp-progress");
+    if (badge.next) {
+      const bar = element("i", "archive-stats-bar");
+      bar.style.setProperty("--share", `${Math.min(1, badge.played / badge.next.minDays) * 100}%`);
+      const left = Math.max(0, badge.next.minDays - badge.played);
+      progress.append(bar, element("small", "", left
+        ? t(badge.next.maxPercent >= 100 ? "archive.moreDaysFor" : "archive.moreDaysForTop", { n: left, name: badge.next.name, range: badge.next.range.toLowerCase() })
+        : t("archive.onAverage", { name: badge.next.name, range: badge.next.range.toLowerCase() })));
+    } else progress.appendChild(element("small", "", t("archive.highestBadge")));
+    const facts = element("dl", "camp-facts");
+    const played = days.filter(day => !day.noGame && day.dateKey.startsWith(month) && day.completed);
+    const best = played.length ? Math.min(...played.map(day => day.topPercent)) : null;
+    [[t("archive.days"), `${badge.played}/${badge.total}`], [t("archive.avg"), badge.percent === null ? "—" : formatTopPercent(badge.percent)], [t("archive.best"), best === null ? "—" : formatTopPercent(best)]].forEach(([label, value]) => {
+      const item = element("div");
+      item.append(element("dt", "", label), element("dd", "", value));
+      facts.appendChild(item);
+    });
+    const head = element("div", "camp-you-head");
+    head.append(icon, text);
+    you.append(head, createBaseLine(), progress, facts);
+    return you;
+  }
+
+  // INVITE FRIENDS, folded away: your code, the link to copy or share, and how it works.
+  function createInviteCard() {
+    const details = element("details", "camp-invite");
+    // Open by itself while you have no friends yet (that's when Atlas points at it).
+    details.open = !state.friends.length;
+    const summary = element("summary", "", t("camp.invite"));
+    details.appendChild(summary);
+    const link = inviteLink(state.profile.invite_code);
+    const code = element("div", "community-code");
+    code.append(
+      element("span", "field-label", t("community.inviteCode")),
+      element("strong", "", state.profile.invite_code),
+      element("small", "", t("community.inviteText"))
+    );
+    const actions = element("div", "community-actions");
+    if (navigator.share) actions.appendChild(button("btn btn-primary", t("camp.share"), () => shareInvite(link)));
+    actions.append(
+      button(`btn ${navigator.share ? "btn-secondary" : "btn-primary"}`, t("community.copyLink"), () => copy(link, t("community.linkCopied"))),
+      button("btn btn-secondary", t("community.copyCode"), () => copy(state.profile.invite_code, t("community.codeCopied")))
+    );
+    details.append(code, actions);
+    return details;
+  }
+
+  function createSignInCard() {
+    const card = element("div", "community-card community-signin");
+    card.append(
+      element("strong", "", t("community.signInHead")),
+      element("p", "", isConfigured
+        ? t("community.signInText")
+        : t("community.accountsOff"))
+    );
+    if (isConfigured) card.appendChild(button("btn btn-primary", t("account.signIn"), () => {
+      close();
+      document.getElementById("accountModal").classList.remove("hidden");
+    }));
+    return card;
+  }
+
+  function createAddFriendCard() {
+    const card = element("form", "community-card community-add");
+    const input = Object.assign(element("input"), { placeholder: t("community.codePlaceholder"), maxLength: 6 });
+    input.setAttribute("aria-label", t("community.codeAria"));
+    card.append(element("span", "field-label", t("community.addFriend")), input, Object.assign(element("button", "btn btn-secondary", t("community.add")), { type: "submit" }));
+    card.addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!input.value.trim()) return;
+      try {
+        const name = await addFriend(input.value);
+        showToastNotice(t("community.nowFriends", { name }));
+        atlas.say(t("atlas.newFriend", { name }), "cheer");
+        await render(true);
+      } catch (error) {
+        showToastNotice(error.message);
+      }
+    });
+    return card;
+  }
+
+  function createFriendsCard() {
+    const card = element("div", "community-card");
+    card.appendChild(element("span", "field-label", t("community.friends", { n: state.friends.length })));
+    if (!state.friends.length) card.appendChild(element("p", "community-empty", t("community.noFriends")));
+    const list = element("ul", "community-friends");
+    state.friends.forEach(friend => {
+      const row = element("li");
+      row.append(element("span", "", friend.display_name), button("community-remove", "×", async () => {
+        if (!confirm(t("community.removeConfirm", { name: friend.display_name }))) return;
+        await removeFriend(friend.user_id);
+        await render(true);
+      }));
+      row.lastChild.setAttribute("aria-label", t("community.remove", { name: friend.display_name }));
+      list.appendChild(row);
+    });
+    card.appendChild(list);
+    return card;
+  }
+
+  // Your shield for every month you played, newest first (from your own days).
+  function createShieldHistory() {
+    const card = element("div", "community-card camp-shields");
+    card.appendChild(element("span", "field-label", t("camp.shields")));
+    const days = getDays();
+    const months = [...new Set(days.filter(day => day.completed && !day.noGame).map(day => day.dateKey.slice(0, 7)))].sort().reverse();
+    const list = element("ul", "camp-shield-list");
+    months.forEach(month => {
+      const badge = getMonthBadge(days, month);
+      const item = element("li");
+      const icon = createBadge(badge.tier || RANK_TIERS.at(-1), 36);
+      icon.classList.toggle("is-locked", !badge.tier);
+      const text = element("span");
+      text.append(element("strong", "", badge.tier ? badge.tier.name : t("archive.noBadge")), element("small", "", `${monthName(month)}${month === today.slice(0, 7) ? t("camp.soFar") : ""} · ${t("common.days", { n: badge.played })}`));
+      item.append(icon, text);
+      list.appendChild(item);
+    });
+    if (!months.length) card.appendChild(element("p", "community-empty", t("camp.noShields")));
+    else card.appendChild(list);
+    return card;
+  }
+
+  function createGroupTabs() {
+    const tabs = element("div", "board-tabs community-group-tabs");
+    state.groups.forEach(group => {
+      const tab = button(`board-tab${group.id === state.groupId && !state.creating ? " is-active" : ""}`, group.name.toUpperCase(), async () => {
+        state.groupId = group.id;
+        state.creating = false;
+        await loadBoard(group.id);
+        render();
+      });
+      tabs.appendChild(tab);
+    });
+    tabs.appendChild(button(`board-tab${state.creating ? " is-active" : ""}`, t("community.newGroup"), () => {
+      state.creating = true;
+      render();
+    }));
+    return tabs;
+  }
+
+  function createNewGroupCard() {
+    const card = element("form", "community-card community-new-group");
+    const name = Object.assign(element("input"), { placeholder: t("community.groupPlaceholder"), maxLength: 30 });
+    name.setAttribute("aria-label", t("community.groupName"));
+    const picks = element("div", "community-picks");
+    state.friends.forEach(friend => {
+      const label = element("label");
+      label.append(Object.assign(element("input"), { type: "checkbox", value: friend.user_id }), friend.display_name);
+      picks.appendChild(label);
+    });
+    if (!state.friends.length) picks.appendChild(element("p", "community-empty", t("community.friendsFirst")));
+    card.append(element("span", "field-label", t("community.newGroupHead")), name, element("span", "field-label", t("community.with")), picks, Object.assign(element("button", "btn btn-primary", t("community.createGroup")), { type: "submit" }));
+    card.addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!name.value.trim()) { showToastNotice(t("community.nameGroup")); return; }
+      try {
+        state.groupId = await createGroup(name.value.trim(), [...picks.querySelectorAll("input:checked")].map(box => box.value));
+        state.creating = false;
+        await render(true);
+      } catch (error) {
+        showToastNotice(error.message);
+      }
+    });
+    return card;
+  }
+
+  // A group: who's in it, then one of four tables. DAY ranks a day's scores; THIS WEEK and
+  // THIS MONTH rank average daily scores; each gives gold, silver and bronze to the top
+  // three. HISTORY shows the podium of every month that has ended.
+  async function createGroupCard(group) {
+    const card = element("div", "community-card community-group");
+    const firstDay = getDays()[0]?.dateKey || today;
+    const board = await loadBoard(group.id);
+    if (board.error) {
+      card.appendChild(element("p", "community-empty", board.error.message));
+      return card;
+    }
+    const people = board.people;
+    const me = getUser().id;
+
+    const head = element("div", "community-group-head");
+    const title = element("div");
+    title.append(element("strong", "", group.name), element("small", "", t("community.members", { n: people.length })));
+    const addSelect = element("select", "board-day");
+    addSelect.setAttribute("aria-label", t("community.addToGroup"));
+    addSelect.appendChild(Object.assign(element("option", "", t("community.addOption")), { value: "" }));
+    state.friends.filter(friend => !people.some(person => person.id === friend.user_id)).forEach(friend => addSelect.appendChild(Object.assign(element("option", "", friend.display_name), { value: friend.user_id })));
+    addSelect.addEventListener("change", async () => {
+      if (!addSelect.value) return;
+      try {
+        await addToGroup(group.id, addSelect.value);
+        await render(true);
+      } catch (error) {
+        showToastNotice(error.message);
+      }
+    });
+    const leave = button("community-leave", t("community.leave"), async () => {
+      if (!confirm(t("community.leaveConfirm", { name: group.name }))) return;
+      await leaveGroup(group.id);
+      state.groupId = null;
+      await render(true);
+    });
+    head.append(title, addSelect, leave);
+
+    const views = element("div", "board-tabs community-views");
+    [["day", t("community.day")], ["week", t("community.week")], ["month", t("community.month")], ["history", t("community.history")]].forEach(([key, label]) => views.appendChild(button(`board-tab${state.view === key ? " is-active" : ""}`, label, () => {
+      state.view = key;
+      render();
+    })));
+    card.append(head, views);
+
+    if (state.view === "day") {
+      const picker = element("select", "board-day community-day-picker");
+      picker.setAttribute("aria-label", t("community.dayAria"));
+      getDays().map(day => day.dateKey).filter(dateKey => dateKey <= today).reverse().forEach(dateKey => {
+        picker.appendChild(Object.assign(element("option", "", `${dayLabel(dateKey)}${dateKey === today ? t("community.today") : ""}`), { value: dateKey, selected: dateKey === state.dateKey }));
+      });
+      picker.addEventListener("change", () => {
+        state.dateKey = picker.value;
+        render();
+      });
+      card.append(picker, createRanking(standings(people, state.dateKey, state.dateKey), people, me, { perDay: false }));
+    } else if (state.view === "week") {
+      const weekStart = mondayOf(today);
+      card.append(element("p", "community-range", t("community.perDay", { range: formatRange(weekStart, addDays(weekStart, 6)) })),
+        createRanking(standings(people, weekStart, addDays(weekStart, 6)), people, me, { perDay: true }));
+    } else if (state.view === "month") {
+      const month = today.slice(0, 7);
+      card.append(element("p", "community-range", t("community.perDay", { range: monthName(month) })),
+        createRanking(standings(people, `${month}-01`, `${month}-31`), people, me, { perDay: true }));
+    } else {
+      card.appendChild(createHistory(people, firstDay, me));
+    }
+    card.appendChild(element("p", "sample-note", t("community.sample")));
+    return card;
+  }
+
+  // A member's name with the badge they've earned this month.
+  function memberName(person, played = null) {
+    const name = element("span", "board-name");
+    const playedDays = [...person.days.entries()].filter(([dateKey]) => dateKey.startsWith(today.slice(0, 7)))
+      .map(([dateKey, score]) => ({ dateKey, completed: true, topPercent: topPercentOf(dateKey, score) }));
+    const badge = getMonthBadge(playedDays, today.slice(0, 7));
+    const icon = createBadge(badge.tier || RANK_TIERS.at(-1), 22);
+    icon.classList.toggle("is-locked", !badge.tier);
+    if (badge.tier) icon.setAttribute("aria-label", t("community.badgeMonth", { name: badge.tier.name }));
+    const label = element("span", "board-name-text");
+    label.appendChild(element("span", "", person.name));
+    if (played !== null) label.appendChild(element("small", "board-days", t("common.days", { n: played })));
+    name.append(icon, label);
+    return name;
+  }
+
+  // A ranking: gold, silver and bronze for the top three, then everyone who hasn't played
+  // in this stretch at the bottom.
+  function createRanking(entries, people, me, { perDay }) {
+    const list = element("ol", "board-list community-board");
+    withPlaces(entries).forEach(entry => {
+      const row = element("li", "board-row");
+      row.classList.toggle("is-you", entry.person.id === me);
+      const medal = getGroupMedal(entry.place);
+      const rank = element("span", "board-rank");
+      if (medal) rank.appendChild(createMedal(medal, 26));
+      else rank.textContent = `#${entry.place}`;
+      row.append(rank, memberName(entry.person, perDay ? entry.played : null), element("span", "board-extra", formatTopPercent(entry.topPercent)), element("strong", "board-score", entry.score.toLocaleString(locale())));
+      list.appendChild(row);
+    });
+    people.filter(person => !entries.some(entry => entry.person === person)).forEach(person => {
+      const row = element("li", "board-row is-waiting");
+      row.classList.toggle("is-you", person.id === me);
+      row.append(element("span", "board-rank", "—"), memberName(person), element("span", "board-extra", t("community.notPlayed")), element("strong", "board-score", "—"));
+      list.appendChild(row);
+    });
+    if (!people.length) list.appendChild(element("li", "community-empty", t("community.nobody")));
+    return list;
+  }
+
+  // Every month that has ended, newest first, with its winner and podium.
+  function createHistory(people, firstDay, me) {
+    const history = element("div", "community-history");
+    const months = [];
+    for (let month = firstDay.slice(0, 7); month < today.slice(0, 7); month = addDays(`${month}-28`, 7).slice(0, 7)) months.unshift(month);
+    months.forEach(month => {
+      const podium = withPlaces(standings(people, `${month}-01`, `${month}-31`)).filter(entry => entry.place <= 3);
+      if (!podium.length) return;
+      const block = element("section", "community-podium");
+      block.appendChild(element("h3", "", `${monthName(month)} · 👑 ${podium[0].person.name}`));
+      const list = element("ol", "board-list community-board");
+      podium.forEach(entry => {
+        const row = element("li", "board-row");
+        row.classList.toggle("is-you", entry.person.id === me);
+        const rank = element("span", "board-rank");
+        rank.appendChild(createMedal(getGroupMedal(entry.place), 26));
+        const name = element("span", "board-name");
+        const label = element("span", "board-name-text");
+        label.append(element("span", "", entry.person.name), element("small", "board-days", t("common.days", { n: entry.played })));
+        name.appendChild(label);
+        row.append(rank, name, element("span", "board-extra", formatTopPercent(entry.topPercent)), element("strong", "board-score", entry.score.toLocaleString(locale())));
+        list.appendChild(row);
+      });
+      block.appendChild(list);
+      history.appendChild(block);
+    });
+    if (!history.children.length) history.appendChild(element("p", "community-empty", t("community.podiumLater", { month: monthName(today.slice(0, 7)) })));
+    return history;
+  }
+
+  function monthName(month) {
+    return new Date(`${month}-01T00:00:00Z`).toLocaleDateString(locale(), { month: "long", year: "numeric", timeZone: "UTC" });
+  }
+
+  function formatRange(from, to) {
+    const format = dateKey => new Date(`${dateKey}T00:00:00Z`).toLocaleDateString(locale(), { day: "numeric", month: "short", timeZone: "UTC" });
+    return `${format(from)} – ${format(to)}`;
+  }
+
+  const inviteLink = code => `${location.origin}${location.pathname}?invite=${code}`;
+  const copy = (text, done) => navigator.clipboard?.writeText(text).then(() => showToastNotice(done), () => showToastNotice(text));
+  function shareInvite(link) {
+    if (navigator.share) navigator.share({ title: "Expedition", text: t("camp.shareText"), url: link }).catch(() => {});
+    else copy(link, t("community.linkCopied"));
+  }
+
+  // ----- The menu's glance at the week -----
+
+  // Loaded again at most once a minute (and after Base Camp closes).
+  let glanceAt = 0;
+  let glanceData = null;
+  async function loadGlance() {
+    if (!signedIn()) return null;
+    if (glanceData && Date.now() - glanceAt < 60000) return glanceData;
+    try {
+      const [profile, friends, groups] = await Promise.all([getMyProfile(), getFriends(), getGroups()]);
+      const group = groups.find(item => item.id === state.groupId) || groups[0] || null;
+      const firstDay = getDays()[0]?.dateKey || today;
+      const people = group ? membersOf(await getGroupBoard(group.id, firstDay, today)) : null;
+      glanceData = { profile, friends, group, people };
+    } catch (error) {
+      glanceData = { error };
+    }
+    glanceAt = Date.now();
+    return glanceData;
+  }
+
+  const glanceCard = document.getElementById("menuCommunityCard");
+  const tileNote = document.querySelector("#menuCommunityButton .menu-option-note");
+  async function refreshGlance() {
+    const data = await loadGlance();
+    renderGlance(data);
+  }
+
+  function renderGlance(data) {
+    const quiet = isAtlasQuiet();
+    const head = element("div", "glance-head");
+    const sprite = createAtlasSprite(40, "idle");
+    const title = element("div");
+    title.append(element("strong", "", t("menu.community")), element("small", "", t("glance.week")));
+    head.append(sprite, title);
+    const open = button("glance-open", "", () => open_());
+    open.setAttribute("aria-label", t("glance.open"));
+    open.appendChild(head);
+    const extra = element("div", "glance-extra");
+    let note = t("menu.communityNote");
+
+    if (!signedIn()) {
+      open.appendChild(element("p", "glance-text", t(isConfigured ? "glance.signedOut" : "glance.accountsOff")));
+      if (isConfigured) extra.appendChild(button("btn btn-secondary glance-action", t("account.signIn"), () => document.getElementById("accountModal").classList.remove("hidden")));
+    } else if (!data || data.error) {
+      open.appendChild(element("p", "glance-text", data?.error?.notSetUp ? t("glance.notSetUp") : t("glance.loading")));
+    } else if (!data.friends.length) {
+      // No friends yet: climb together.
+      open.appendChild(element("strong", "glance-call", t("glance.together")));
+      open.appendChild(element("p", "glance-text", t("glance.togetherText")));
+      const code = element("div", "glance-code");
+      code.append(element("span", "field-label", t("community.inviteCode")), element("strong", "", data.profile.invite_code));
+      extra.append(code, button("btn btn-primary glance-action", t(navigator.share ? "camp.share" : "community.copyLink"), () => shareInvite(inviteLink(data.profile.invite_code))));
+      note = t("glance.noteInvite");
+    } else if (!data.group) {
+      open.appendChild(element("p", "glance-text", t("glance.noGroup", { n: data.friends.length })));
+      note = t("glance.noteNoGroup");
+    } else {
+      const monday = mondayOf(today);
+      const ranked = withPlaces(standings(data.people, monday, addDays(monday, 6)));
+      const me = getUser().id;
+      open.appendChild(element("span", "glance-group", data.group.name));
+      const list = element("ol", "glance-board");
+      const shown = ranked.slice(0, GLANCE_ROWS);
+      const mine = ranked.find(entry => entry.person.id === me);
+      if (mine && !shown.includes(mine)) shown.push(mine);
+      shown.forEach(entry => {
+        const row = element("li");
+        row.classList.toggle("is-you", entry.person.id === me);
+        const rank = element("span", "glance-rank");
+        const medal = getGroupMedal(entry.place);
+        if (medal) rank.appendChild(createMedal(medal, 18));
+        else rank.textContent = `#${entry.place}`;
+        row.append(rank, element("span", "glance-name", entry.person.name), element("span", "glance-score", entry.score.toLocaleString(locale())));
+        list.appendChild(row);
+      });
+      if (!ranked.length) open.appendChild(element("p", "glance-text", t("glance.nobodyYet")));
+      else open.appendChild(list);
+      note = !ranked.length ? t("glance.noteNobody")
+        : mine?.place === 1 ? t("glance.noteLead", { group: data.group.name })
+          : mine ? t("glance.notePlace", { place: mine.place, n: data.people.length, name: ranked[0].person.name })
+            : t("glance.noteLeader", { name: ranked[0].person.name });
+    }
+    // On a phone the card is small: just this one line under the title.
+    open.appendChild(element("span", "glance-line", note));
+    open.appendChild(element("span", "glance-more", t("glance.open")));
+    glanceCard.classList.toggle("is-quiet", quiet);
+    glanceCard.replaceChildren(open, ...(extra.children.length ? [extra] : []));
+    if (tileNote) tileNote.textContent = note;
+  }
+  const open_ = () => open();
+
+  document.querySelectorAll(".community-open-button").forEach(openButton => openButton.addEventListener("click", () => {
+    sounds.playClick();
+    open();
+  }));
+  document.getElementById("closeCommunityButton").addEventListener("click", () => {
+    sounds.playClick();
+    close();
+  });
+  window.addEventListener("keydown", event => {
+    if (event.key !== "Escape" || modal.classList.contains("hidden")) return;
+    if (!document.getElementById("accountModal").classList.contains("hidden")) return;
+    close();
+  });
+
+  // A language switch redraws the screen if it's open (without loading it again).
+  onLangChange(() => {
+    renderQuietButton();
+    atlas.relabel();
+    if (!modal.classList.contains("hidden")) render().then(() => { if (!isAtlasQuiet()) speak(); });
+    renderGlance(glanceData);
+  });
+  renderGlance(null);
+  refreshGlance();
+
+  return {
+    open,
+    close,
+    refreshGlance,
+    // After signing in or out: refresh the screen if it's open, use a waiting invite, and
+    // take Atlas's setting from the account.
+    onAccountChange(account) {
+      syncAtlasQuiet(account);
+      glanceData = null;
+      state.loaded = false;
+      refreshGlance();
+      if (account && storage.get(PENDING_INVITE_KEY)) open();
+      else if (!modal.classList.contains("hidden")) render(true).then(speak);
+    }
+  };
+}
+
+return { initializeCommunity };
 })();
 
 // ---- travel.js
@@ -28290,7 +29366,7 @@ const ease = t => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
 // Every flight from one place to another in the menu (your tent to a game, to Base Camp,
 // and the flight into the game or back to the menu) takes FLIGHT_MS, eased in and out
 // (ease-in-out cubic): a direct flight is DIRECT_LIFT_MS of lift-off plus the rest.
-const FLIGHT_MS = 1400;
+const FLIGHT_MS = 800; // 1.4 s until 13 November 2026 (team request: snappier)
 const DIRECT_LIFT_MS = 300;
 // Milliseconds per leg: planes take longer the farther they fly; ground legs are short.
 const legDuration = leg => leg.direct ? FLIGHT_MS - DIRECT_LIFT_MS
@@ -28396,964 +29472,6 @@ function shortest(from, to) {
 }
 
 return { SPRITES, drawSprite, spriteCanvas, spriteIcon, distance, interpolate, makeTrack, BASE_CAMP_POINT, placeOf, baseCampJourney, planJourney, getDayPlace, createTravelLayer, moveFrom, startAmbient, FLIGHT_MS, DIRECT_LIFT_MS, legDuration, directFlight, playJourney };
-})();
-
-// ---- social.js
-__modules["social.js"] = (() => {
-// Base Camp (the Community screen): where climbers compare logbooks. Atlas, the old explorer
-// who keeps the logbook, stands by his tent on the left with your name, this month's shield
-// and how far the next one is; the middle holds your groups, each with four boards (DAY,
-// THIS WEEK, THIS MONTH, HISTORY) and gold, silver and bronze for the top three; the right
-// holds your friends, adding one, and the shields of past months. Inviting friends sits
-// behind INVITE FRIENDS. In a group weeks (Monday to Sunday) and months rank average daily
-// scores; each ended month's podium stays. The data lives in Supabase (supabase/social.sql);
-// without an account the middle asks you to sign in.
-//
-// Opening it from the menu, the globe turns to the Himalaya, a pin drops on Everest Base
-// Camp, and the night mountain scene opens out of the pin (an iris); Atlas climbs out of
-// his tent to wave before the page slides in (about 5.3 s, with SKIP). The scene stays as
-// the page's background.
-// The menu also gets a glance at the week (refreshGlance): a card beside the games on a
-// wide screen, a line on the Base Camp tile on a phone.
-const { sounds } = __modules["audio.js"];
-const { addFriend, addToGroup, createGroup, getFriends, getGroupBoard, getGroups, getMyProfile, getUser, isConfigured, leaveGroup, removeFriend, setDisplayName } = __modules["auth.js"];
-const { createAtlas, createAtlasSprite, createFlag, createTent, isAtlasQuiet, onAtlasQuietChange, setAtlasQuiet, syncAtlasQuiet } = __modules["atlas.js"];
-const { createBadge, createMedal, getGroupMedal } = __modules["badges.js"];
-const { createBaseLine } = __modules["base.js"];
-const { BASE_CAMP_POINT, DIRECT_LIFT_MS, FLIGHT_MS, createTravelLayer, directFlight, playJourney } = __modules["travel.js"];
-const { getCountry } = __modules["daily.js"];
-const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getTopPercent } = __modules["community.js"];
-const { showSkip, showToastNotice, showTripCard } = __modules["ui.js"];
-const { countryName, locale, onLangChange, t } = __modules["i18n.js"];
-
-const PENDING_INVITE_KEY = "daily-geography:pending-invite:v1";
-const MET_ATLAS_KEY = "daily-geography:atlas-met:v1";
-const SVG_NS = "http://www.w3.org/2000/svg";
-// After the trip has arrived (ms): the mountain scene opens straight out of Base Camp,
-// then the page slides in.
-const LANDING = { iris: 100, page: 900, done: 1500 };
-// The whole trip once a day; later visits that day fly from your base straight to Kathmandu.
-// Closing: the scene fades (ms), then the globe flies back (1.6 s); the menu returns near its end.
-const CLOSE_FADE_MS = 650;
-const MENU_BACK_MS = 1100;
-const GLANCE_ROWS = 3;
-
-function element(tag, className, text) {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text !== undefined) node.textContent = text;
-  return node;
-}
-
-function button(className, text, onClick) {
-  const node = element("button", className, text);
-  node.type = "button";
-  node.addEventListener("click", event => { sounds.playClick(); onClick(event); });
-  return node;
-}
-
-const toKey = date => date.toISOString().slice(0, 10);
-const addDays = (dateKey, days) => {
-  const date = new Date(`${dateKey}T00:00:00Z`);
-  date.setUTCDate(date.getUTCDate() + days);
-  return toKey(date);
-};
-const mondayOf = dateKey => addDays(dateKey, -((new Date(`${dateKey}T00:00:00Z`).getUTCDay() + 6) % 7));
-const topPercentOf = (dateKey, score) => getTopPercent(getDayStats(dateKey), score);
-const storage = {
-  get(key) { try { return localStorage.getItem(key); } catch { return null; } },
-  set(key, value) { try { localStorage.setItem(key, value); } catch { /* storage off */ } },
-  remove(key) { try { localStorage.removeItem(key); } catch { /* storage off */ } }
-};
-
-// Everyone in a group, each with their finished days, from group_board's rows.
-function membersOf(rows) {
-  const members = new Map();
-  rows.forEach(row => {
-    if (!members.has(row.user_id)) members.set(row.user_id, { id: row.user_id, name: row.display_name, days: new Map() });
-    if (row.date) members.get(row.user_id).days.set(row.date, row.score);
-  });
-  return [...members.values()];
-}
-
-// Everyone who played between two dates: their average daily score and average top %,
-// best first. More days played breaks a tie.
-function standings(people, from, to) {
-  return people.map(person => {
-    const days = [...person.days.entries()].filter(([dateKey]) => dateKey >= from && dateKey <= to);
-    if (!days.length) return null;
-    return {
-      person,
-      played: days.length,
-      score: Math.round(days.reduce((sum, [, score]) => sum + score, 0) / days.length),
-      topPercent: days.reduce((sum, [dateKey, score]) => sum + topPercentOf(dateKey, score), 0) / days.length
-    };
-  }).filter(Boolean).sort((left, right) => right.score - left.score || right.played - left.played);
-}
-
-// Places with equal scores (and days) shared, so a tie shares its medal too.
-function withPlaces(entries) {
-  let place = 0;
-  return entries.map((entry, index) => {
-    const previous = entries[index - 1];
-    if (!previous || previous.score !== entry.score || previous.played !== entry.played) place = index + 1;
-    return { ...entry, place };
-  });
-}
-
-// A low, stepped mountain range in pixels for the scene behind Atlas: two ranges, the far
-// one darker, with snow on the highest steps. The same every time (no randomness).
-function createRange() {
-  const width = 96;
-  const height = 30;
-  const svg = document.createElementNS(SVG_NS, "svg");
-  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-  svg.setAttribute("preserveAspectRatio", "xMidYMax slice");
-  svg.setAttribute("shape-rendering", "crispEdges");
-  svg.setAttribute("class", "camp-range");
-  svg.setAttribute("aria-hidden", "true");
-  const ridge = (peaks, x) => Math.max(...peaks.map(([at, top, slope]) => top + Math.abs(x - at) * slope));
-  const far = [[14, 3, 0.9], [46, 1, 0.7], [70, 6, 0.8], [90, 4, 1]];
-  const near = [[6, 14, 0.6], [30, 11, 0.55], [60, 15, 0.5], [84, 12, 0.6]];
-  const column = (x, top, color, snow) => {
-    const add = (y, h, fill) => {
-      const rect = document.createElementNS(SVG_NS, "rect");
-      Object.entries({ x, y, width: 1, height: h, fill }).forEach(([name, value]) => rect.setAttribute(name, value));
-      svg.appendChild(rect);
-    };
-    const y = Math.round(top);
-    add(y, height - y, color);
-    if (snow && y < snow) add(y, Math.min(2, snow - y), "#e8ecf6");
-  };
-  for (let x = 0; x < width; x += 1) column(x, Math.min(...far.map(peak => ridge([peak], x))), "#2c3d6e", 8);
-  for (let x = 0; x < width; x += 1) column(x, Math.min(...near.map(peak => ridge([peak], x))), "#18224a", 14);
-  return svg;
-}
-
-// globe: the game's PixelGlobe (for the dive); getDays() gives the archive's day records
-// (with each day's top %); today is the current puzzle date; dayLabel(dateKey) names a day.
-function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null }) {
-  const modal = document.getElementById("communityModal");
-  const page = document.getElementById("baseCampPage");
-  const body = document.getElementById("communityBody");
-  const menu = document.getElementById("mainMenu");
-  const phone = window.matchMedia("(max-width: 760px)");
-  const state = { profile: null, friends: [], groups: [], groupId: null, boards: new Map(), view: "day", dateKey: today, creating: false, error: null, loaded: false };
-  let landing = null; // the landing in progress: { skip }
-  let dove = false; // whether the globe dived (so it rises again on closing)
-  let lastLine = null;
-  let pokes = 0;
-
-  // An invite link (?invite=CODE) is kept until you're signed in, then used.
-  const invite = new URLSearchParams(location.search).get("invite");
-  if (invite) {
-    storage.set(PENDING_INVITE_KEY, invite.toUpperCase());
-    history.replaceState(null, "", location.pathname);
-  }
-
-  // Atlas, on screen all the time Base Camp is open: in the scene on a wide screen, in the
-  // bottom corner on a phone (so he's still there as the page scrolls).
-  const atlas = createAtlas({ size: 96, onPoke: () => sayNext() });
-  const quietButton = document.getElementById("atlasQuietButton");
-  function renderQuietButton() {
-    const quiet = isAtlasQuiet();
-    quietButton.setAttribute("aria-pressed", String(quiet));
-    quietButton.querySelector("span").textContent = t(quiet ? "atlas.quietOn" : "atlas.quietOff");
-    quietButton.title = t(quiet ? "atlas.unmute" : "atlas.mute");
-    quietButton.setAttribute("aria-label", t(quiet ? "atlas.unmute" : "atlas.mute"));
-  }
-  quietButton.addEventListener("click", () => {
-    sounds.playClick();
-    setAtlasQuiet(!isAtlasQuiet());
-    if (!isAtlasQuiet()) sayNext(true);
-  });
-  onAtlasQuietChange(renderQuietButton);
-  renderQuietButton();
-
-  function placeAtlas() {
-    const scene = body.querySelector(".camp-scene-stage");
-    if (phone.matches || !scene) modal.appendChild(atlas.element);
-    else scene.appendChild(atlas.element);
-    atlas.element.classList.toggle("is-docked", phone.matches || !scene);
-  }
-  phone.addEventListener("change", placeAtlas);
-
-  async function load() {
-    state.error = null;
-    try {
-      state.profile = await getMyProfile();
-      const pending = storage.get(PENDING_INVITE_KEY);
-      if (pending) {
-        storage.remove(PENDING_INVITE_KEY);
-        if (pending !== state.profile?.invite_code) {
-          try {
-            const name = await addFriend(pending);
-            showToastNotice(t("community.nowFriends", { name }));
-          } catch (error) {
-            showToastNotice(error.message);
-          }
-        }
-      }
-      [state.friends, state.groups] = await Promise.all([getFriends(), getGroups()]);
-      if (!state.groups.some(group => group.id === state.groupId)) state.groupId = state.groups[0]?.id || null;
-      state.boards.clear();
-      if (state.groupId) await loadBoard(state.groupId);
-      state.loaded = true;
-    } catch (error) {
-      state.error = error;
-    }
-  }
-
-  // A group's members and their days (cached until Base Camp is opened again).
-  async function loadBoard(groupId) {
-    if (state.boards.has(groupId)) return state.boards.get(groupId);
-    const firstDay = getDays()[0]?.dateKey || today;
-    try {
-      const board = { people: membersOf(await getGroupBoard(groupId, firstDay, today)) };
-      state.boards.set(groupId, board);
-      return board;
-    } catch (error) {
-      const board = { error };
-      state.boards.set(groupId, board);
-      return board;
-    }
-  }
-
-  const signedIn = () => isConfigured && getUser();
-
-  // ----- Opening and closing -----
-
-  async function open() {
-    if (!modal.classList.contains("hidden")) return;
-    document.getElementById("archiveModal")?.classList.add("hidden");
-    const fromMenu = !menu.classList.contains("hidden") && globe.mode === "menu";
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    modal.classList.remove("hidden", "is-open", "is-landing", "is-over-game");
-    modal.classList.toggle("is-over-game", !fromMenu);
-    lastLine = null;
-    buildBackdrop();
-    const rendering = render(true);
-    placeAtlas();
-    if (fromMenu) {
-      dove = true;
-      menu.classList.add("is-camp");
-      if (reduceMotion) {
-        globe.diveToBaseCamp(0);
-        modal.classList.add("is-open");
-      } else await playLanding();
-    } else {
-      dove = false;
-      requestAnimationFrame(() => modal.classList.add("is-open"));
-    }
-    await rendering;
-    speak();
-  }
-
-  // The full-screen scene behind the page: night sky, stars, two pixel ranges of the
-  // Himalaya, the tent and the flag, and (during the landing) Atlas climbing out.
-  function buildBackdrop() {
-    const backdrop = document.getElementById("baseCampBackdrop");
-    if (backdrop.childElementCount) return;
-    // (Atlas isn't in it: he only appears on the page, in his own spot.)
-    backdrop.append(element("div", "camp-stars"), createRange(), createTent(240), createFlag(96));
-  }
-
-  // The landing: a trip from your base to Base Camp, leg by leg (travel.js: plane, train,
-  // car, the little plane to Lukla, the trek), with a banner naming each leg; then a pin
-  // drops on Base Camp with a puff of dust and its height, the mountain scene opens out of
-  // the pin, Atlas climbs out of his tent and waves, and the page slides up. SKIP (or
-  // Escape) jumps to the page.
-  async function playLanding() {
-    modal.classList.add("is-landing");
-
-    let skipped = false;
-    let journey = null;
-    let finishLanding = () => {};
-    const hideSkip = showSkip(() => {
-      skipped = true;
-      journey?.skip();
-      finishLanding();
-    });
-    landing = { skip: () => { skipped = true; hideSkip(); journey?.skip(); finishLanding(); } };
-
-    // The trip: one quick, direct flight from where you are (your tent, or the capital of
-    // today's country) to Base Camp.
-    const origin = getOrigin?.();
-    globe.startJourney();
-    const layer = createTravelLayer(modal, point => globe.projectLonLat(point));
-    modal.insertBefore(layer.canvas, modal.firstChild);
-    const camp = { get name() { return t("menu.community"); }, iso: "NP" };
-    const legs = directFlight(origin?.lonLat || [85.32, 27.71], BASE_CAMP_POINT, { fromStation: origin ? { name: origin.short, iso: origin.country.iso } : null, toStation: camp });
-    // The trip card stays until the page opens, so there's time to read it.
-    const tripCard = origin ? showTripCard({ from: { name: origin.short, country: origin.country }, to: { name: camp.name, country: getCountry("NP") } }) : null;
-    journey = playJourney(globe, layer, legs, { liftMs: DIRECT_LIFT_MS });
-    if (!skipped) await journey.done;
-
-    // Arrived: the mountain scene opens straight away (over the trip's last tags, which stay
-    // until it covers them), then the page.
-    return new Promise(resolve => {
-      const timers = [];
-      const at = (ms, fn) => timers.push(setTimeout(fn, ms));
-      finishLanding = () => {
-        timers.forEach(clearTimeout);
-        if (skipped) tripCard?.remove();
-        else tripCard?.leave(300);
-        hideSkip();
-        landing = null;
-        layer.remove();
-        modal.classList.remove("is-landing", "is-iris");
-        modal.classList.add("is-open");
-        resolve();
-      };
-      if (skipped) { finishLanding(); return; }
-      at(LANDING.iris, () => { modal.classList.add("is-iris"); sounds.playReveal("match", 0); });
-      at(LANDING.page, () => { modal.classList.add("is-open"); });
-      at(LANDING.done, finishLanding);
-    });
-  }
-
-  // Closing, the reverse of opening: the page goes, the mountain scene fades out over the
-  // globe at Base Camp, the globe flies back up to the menu's horizon, and the menu comes
-  // back only as the globe settles.
-  async function close() {
-    if (modal.classList.contains("hidden")) return;
-    landing?.skip();
-    atlas.close();
-    modal.classList.remove("is-open");
-    modal.classList.add("is-closing");
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    await new Promise(resolve => setTimeout(resolve, reduceMotion ? 0 : CLOSE_FADE_MS));
-    modal.classList.add("hidden");
-    modal.classList.remove("is-closing");
-    if (dove) {
-      dove = false;
-      const rise = globe.riseToMenu(reduceMotion ? 0 : FLIGHT_MS);
-      // The menu fades back in over the last part of the flight.
-      setTimeout(() => menu.classList.remove("is-camp"), reduceMotion ? 0 : MENU_BACK_MS);
-      await rise;
-    }
-    menu.classList.remove("is-camp");
-    refreshGlance();
-  }
-
-  // ----- Atlas's lines -----
-
-  // What Atlas says on arrival: the most useful thing first (a first hello, signing in,
-  // a friend to invite, a group to make, the week's standings, today's climb, the next
-  // shield), else a tip. Every figure comes from your own days and your group's board.
-  function currentLine() {
-    if (!storage.get(MET_ATLAS_KEY)) {
-      storage.set(MET_ATLAS_KEY, "1");
-      return { text: t("atlas.hello"), pose: "wave" };
-    }
-    if (!isConfigured) return { text: t("atlas.accountsOff"), pose: "think" };
-    if (!getUser()) return { text: t("atlas.signedOut"), pose: "wave" };
-    if (state.error) return { text: t("atlas.closed"), pose: "think" };
-    if (!state.friends.length) return { text: t("atlas.noFriends"), pose: "point" };
-    if (!state.groups.length) return { text: t("atlas.noGroup"), pose: "think" };
-    const week = weekStanding(state.boards.get(state.groupId));
-    if (week?.leader && week.you?.place === 1 && week.count > 1) return { text: t("atlas.leading", { group: groupName() }), pose: "cheer" };
-    if (week?.ahead) return { text: t("atlas.behind", { name: week.ahead.person.name, n: (week.ahead.score - week.you.score).toLocaleString(locale()) }), pose: "think" };
-    const todayDay = getDays().find(day => day.dateKey === today);
-    if (todayDay && !todayDay.noGame && !todayDay.completed) return { text: t("atlas.notToday"), pose: "point" };
-    const shield = shieldLine();
-    if (shield) return { text: shield, pose: "idle" };
-    return null;
-  }
-
-  const TIPS = ["atlas.tip1", "atlas.tip2", "atlas.tip3", "atlas.tip4", "atlas.tip5"];
-  function speak() {
-    const line = currentLine() || { text: t(TIPS[0]), pose: "idle" };
-    lastLine = line.text;
-    atlas.say(line.text, line.pose);
-  }
-  // A click on Atlas (or switching him back on): the next tip, never the same line twice.
-  function sayNext(fresh = false) {
-    const line = fresh ? (currentLine() || null) : null;
-    if (line && line.text !== lastLine) { lastLine = line.text; atlas.say(line.text, line.pose); return; }
-    pokes += 1;
-    const text = t(TIPS[pokes % TIPS.length]);
-    lastLine = text;
-    atlas.say(text, pokes % 2 ? "think" : "idle");
-  }
-
-  const groupName = () => state.groups.find(group => group.id === state.groupId)?.name || "";
-
-  function shieldLine() {
-    const month = today.slice(0, 7);
-    const badge = getMonthBadge(getDays(), month);
-    if (!badge.next) return badge.tier ? t("atlas.topShield") : null;
-    const left = Math.max(0, badge.next.minDays - badge.played);
-    if (!left) return null;
-    return t("atlas.shield", { n: left, name: badge.next.name });
-  }
-
-  // This week in a group: your place, who's first, and who's just ahead of you.
-  function weekStanding(board) {
-    if (!board?.people) return null;
-    const monday = mondayOf(today);
-    const ranked = withPlaces(standings(board.people, monday, addDays(monday, 6)));
-    const me = getUser()?.id;
-    const youIndex = ranked.findIndex(entry => entry.person.id === me);
-    const you = ranked[youIndex] || null;
-    const ahead = you && youIndex > 0 ? ranked.slice(0, youIndex).reverse().find(entry => entry.score > you.score) : null;
-    return { ranked, you, ahead, leader: ranked[0] || null, count: board.people.length };
-  }
-
-  // ----- The page -----
-
-  async function render(reload = false) {
-    const left = element("section", "camp-column camp-left");
-    const center = element("section", "camp-column camp-center");
-    const right = element("section", "camp-column camp-right");
-    left.appendChild(createScene());
-    if (!signedIn()) {
-      center.appendChild(createSignInCard());
-      right.appendChild(createShieldHistory());
-      body.replaceChildren(left, center, right);
-      placeAtlas();
-      return;
-    }
-    if (reload) {
-      center.appendChild(element("p", "community-loading", t("community.loading")));
-      body.replaceChildren(left, center, right);
-      placeAtlas();
-      await load();
-      // Closed (or redrawn) while loading: start again from what's there now.
-      if (modal.classList.contains("hidden")) return;
-      return render();
-    }
-    if (state.error) {
-      center.appendChild(element("p", "community-empty", state.error.notSetUp
-        ? t("community.notSetUp")
-        : t("community.loadFailed", { message: state.error.message })));
-      right.appendChild(createShieldHistory());
-      body.replaceChildren(left, center, right);
-      placeAtlas();
-      return;
-    }
-    left.appendChild(createInviteCard());
-    center.append(createGroupTabs());
-    if (state.creating) center.appendChild(createNewGroupCard());
-    else if (state.groupId) center.appendChild(await createGroupCard(state.groups.find(group => group.id === state.groupId)));
-    else center.appendChild(element("p", "community-card community-empty", state.friends.length
-      ? t("community.makeGroup")
-      : t("community.addFirst")));
-    right.append(createAddFriendCard(), createFriendsCard(), createShieldHistory());
-    body.replaceChildren(left, center, right);
-    placeAtlas();
-  }
-
-  // The scene: night sky over the Himalaya, the tent and the flag, with Atlas beside them;
-  // under it you (name, this month's shield and the way to the next one).
-  function createScene() {
-    const card = element("div", "camp-scene");
-    const stage = element("div", "camp-scene-stage");
-    const stars = element("div", "camp-stars");
-    stage.append(stars, createRange(), createTent(96), createFlag(44));
-    card.appendChild(stage);
-    card.appendChild(createIdentity());
-    return card;
-  }
-
-  function createIdentity() {
-    const you = element("div", "camp-you");
-    const month = today.slice(0, 7);
-    const days = getDays();
-    const badge = getMonthBadge(days, month);
-    const icon = createBadge(badge.tier || RANK_TIERS.at(-1), 64);
-    icon.classList.toggle("is-locked", !badge.tier);
-    const text = element("div", "camp-you-text");
-    const nameRow = element("div", "camp-name-row");
-    const name = element("strong", "camp-name", state.profile?.display_name || t("common.you"));
-    nameRow.appendChild(name);
-    if (signedIn() && state.profile) {
-      const edit = button("camp-edit", t("camp.edit"), () => {
-        const form = element("form", "community-name");
-        const input = Object.assign(element("input"), { value: state.profile.display_name, maxLength: 24 });
-        input.setAttribute("aria-label", t("community.yourName"));
-        form.append(input, Object.assign(element("button", "btn btn-secondary", t("community.save")), { type: "submit" }));
-        form.addEventListener("submit", async event => {
-          event.preventDefault();
-          try {
-            await setDisplayName(input.value);
-            state.profile.display_name = input.value.trim();
-            showToastNotice(t("community.nameSaved"));
-            nameRow.replaceChildren(element("strong", "camp-name", state.profile.display_name), edit);
-          } catch (error) {
-            showToastNotice(error.message);
-          }
-        });
-        nameRow.replaceChildren(form);
-        input.focus();
-        input.select();
-      });
-      edit.setAttribute("aria-label", t("community.yourName"));
-      nameRow.appendChild(edit);
-    }
-    text.append(
-      element("span", "field-label", t("camp.thisMonth", { month: monthName(month) })),
-      nameRow,
-      element("span", "camp-shield-name", badge.tier ? badge.tier.name.toUpperCase() : t("archive.noBadge"))
-    );
-    // The way to the next shield, as in the archive.
-    const progress = element("div", "camp-progress");
-    if (badge.next) {
-      const bar = element("i", "archive-stats-bar");
-      bar.style.setProperty("--share", `${Math.min(1, badge.played / badge.next.minDays) * 100}%`);
-      const left = Math.max(0, badge.next.minDays - badge.played);
-      progress.append(bar, element("small", "", left
-        ? t(badge.next.maxPercent >= 100 ? "archive.moreDaysFor" : "archive.moreDaysForTop", { n: left, name: badge.next.name, range: badge.next.range.toLowerCase() })
-        : t("archive.onAverage", { name: badge.next.name, range: badge.next.range.toLowerCase() })));
-    } else progress.appendChild(element("small", "", t("archive.highestBadge")));
-    const facts = element("dl", "camp-facts");
-    const played = days.filter(day => !day.noGame && day.dateKey.startsWith(month) && day.completed);
-    const best = played.length ? Math.min(...played.map(day => day.topPercent)) : null;
-    [[t("archive.days"), `${badge.played}/${badge.total}`], [t("archive.avg"), badge.percent === null ? "—" : formatTopPercent(badge.percent)], [t("archive.best"), best === null ? "—" : formatTopPercent(best)]].forEach(([label, value]) => {
-      const item = element("div");
-      item.append(element("dt", "", label), element("dd", "", value));
-      facts.appendChild(item);
-    });
-    const head = element("div", "camp-you-head");
-    head.append(icon, text);
-    you.append(head, createBaseLine(), progress, facts);
-    return you;
-  }
-
-  // INVITE FRIENDS, folded away: your code, the link to copy or share, and how it works.
-  function createInviteCard() {
-    const details = element("details", "camp-invite");
-    // Open by itself while you have no friends yet (that's when Atlas points at it).
-    details.open = !state.friends.length;
-    const summary = element("summary", "", t("camp.invite"));
-    details.appendChild(summary);
-    const link = inviteLink(state.profile.invite_code);
-    const code = element("div", "community-code");
-    code.append(
-      element("span", "field-label", t("community.inviteCode")),
-      element("strong", "", state.profile.invite_code),
-      element("small", "", t("community.inviteText"))
-    );
-    const actions = element("div", "community-actions");
-    if (navigator.share) actions.appendChild(button("btn btn-primary", t("camp.share"), () => shareInvite(link)));
-    actions.append(
-      button(`btn ${navigator.share ? "btn-secondary" : "btn-primary"}`, t("community.copyLink"), () => copy(link, t("community.linkCopied"))),
-      button("btn btn-secondary", t("community.copyCode"), () => copy(state.profile.invite_code, t("community.codeCopied")))
-    );
-    details.append(code, actions);
-    return details;
-  }
-
-  function createSignInCard() {
-    const card = element("div", "community-card community-signin");
-    card.append(
-      element("strong", "", t("community.signInHead")),
-      element("p", "", isConfigured
-        ? t("community.signInText")
-        : t("community.accountsOff"))
-    );
-    if (isConfigured) card.appendChild(button("btn btn-primary", t("account.signIn"), () => {
-      close();
-      document.getElementById("accountModal").classList.remove("hidden");
-    }));
-    return card;
-  }
-
-  function createAddFriendCard() {
-    const card = element("form", "community-card community-add");
-    const input = Object.assign(element("input"), { placeholder: t("community.codePlaceholder"), maxLength: 6 });
-    input.setAttribute("aria-label", t("community.codeAria"));
-    card.append(element("span", "field-label", t("community.addFriend")), input, Object.assign(element("button", "btn btn-secondary", t("community.add")), { type: "submit" }));
-    card.addEventListener("submit", async event => {
-      event.preventDefault();
-      if (!input.value.trim()) return;
-      try {
-        const name = await addFriend(input.value);
-        showToastNotice(t("community.nowFriends", { name }));
-        atlas.say(t("atlas.newFriend", { name }), "cheer");
-        await render(true);
-      } catch (error) {
-        showToastNotice(error.message);
-      }
-    });
-    return card;
-  }
-
-  function createFriendsCard() {
-    const card = element("div", "community-card");
-    card.appendChild(element("span", "field-label", t("community.friends", { n: state.friends.length })));
-    if (!state.friends.length) card.appendChild(element("p", "community-empty", t("community.noFriends")));
-    const list = element("ul", "community-friends");
-    state.friends.forEach(friend => {
-      const row = element("li");
-      row.append(element("span", "", friend.display_name), button("community-remove", "×", async () => {
-        if (!confirm(t("community.removeConfirm", { name: friend.display_name }))) return;
-        await removeFriend(friend.user_id);
-        await render(true);
-      }));
-      row.lastChild.setAttribute("aria-label", t("community.remove", { name: friend.display_name }));
-      list.appendChild(row);
-    });
-    card.appendChild(list);
-    return card;
-  }
-
-  // Your shield for every month you played, newest first (from your own days).
-  function createShieldHistory() {
-    const card = element("div", "community-card camp-shields");
-    card.appendChild(element("span", "field-label", t("camp.shields")));
-    const days = getDays();
-    const months = [...new Set(days.filter(day => day.completed && !day.noGame).map(day => day.dateKey.slice(0, 7)))].sort().reverse();
-    const list = element("ul", "camp-shield-list");
-    months.forEach(month => {
-      const badge = getMonthBadge(days, month);
-      const item = element("li");
-      const icon = createBadge(badge.tier || RANK_TIERS.at(-1), 36);
-      icon.classList.toggle("is-locked", !badge.tier);
-      const text = element("span");
-      text.append(element("strong", "", badge.tier ? badge.tier.name : t("archive.noBadge")), element("small", "", `${monthName(month)}${month === today.slice(0, 7) ? t("camp.soFar") : ""} · ${t("common.days", { n: badge.played })}`));
-      item.append(icon, text);
-      list.appendChild(item);
-    });
-    if (!months.length) card.appendChild(element("p", "community-empty", t("camp.noShields")));
-    else card.appendChild(list);
-    return card;
-  }
-
-  function createGroupTabs() {
-    const tabs = element("div", "board-tabs community-group-tabs");
-    state.groups.forEach(group => {
-      const tab = button(`board-tab${group.id === state.groupId && !state.creating ? " is-active" : ""}`, group.name.toUpperCase(), async () => {
-        state.groupId = group.id;
-        state.creating = false;
-        await loadBoard(group.id);
-        render();
-      });
-      tabs.appendChild(tab);
-    });
-    tabs.appendChild(button(`board-tab${state.creating ? " is-active" : ""}`, t("community.newGroup"), () => {
-      state.creating = true;
-      render();
-    }));
-    return tabs;
-  }
-
-  function createNewGroupCard() {
-    const card = element("form", "community-card community-new-group");
-    const name = Object.assign(element("input"), { placeholder: t("community.groupPlaceholder"), maxLength: 30 });
-    name.setAttribute("aria-label", t("community.groupName"));
-    const picks = element("div", "community-picks");
-    state.friends.forEach(friend => {
-      const label = element("label");
-      label.append(Object.assign(element("input"), { type: "checkbox", value: friend.user_id }), friend.display_name);
-      picks.appendChild(label);
-    });
-    if (!state.friends.length) picks.appendChild(element("p", "community-empty", t("community.friendsFirst")));
-    card.append(element("span", "field-label", t("community.newGroupHead")), name, element("span", "field-label", t("community.with")), picks, Object.assign(element("button", "btn btn-primary", t("community.createGroup")), { type: "submit" }));
-    card.addEventListener("submit", async event => {
-      event.preventDefault();
-      if (!name.value.trim()) { showToastNotice(t("community.nameGroup")); return; }
-      try {
-        state.groupId = await createGroup(name.value.trim(), [...picks.querySelectorAll("input:checked")].map(box => box.value));
-        state.creating = false;
-        await render(true);
-      } catch (error) {
-        showToastNotice(error.message);
-      }
-    });
-    return card;
-  }
-
-  // A group: who's in it, then one of four tables. DAY ranks a day's scores; THIS WEEK and
-  // THIS MONTH rank average daily scores; each gives gold, silver and bronze to the top
-  // three. HISTORY shows the podium of every month that has ended.
-  async function createGroupCard(group) {
-    const card = element("div", "community-card community-group");
-    const firstDay = getDays()[0]?.dateKey || today;
-    const board = await loadBoard(group.id);
-    if (board.error) {
-      card.appendChild(element("p", "community-empty", board.error.message));
-      return card;
-    }
-    const people = board.people;
-    const me = getUser().id;
-
-    const head = element("div", "community-group-head");
-    const title = element("div");
-    title.append(element("strong", "", group.name), element("small", "", t("community.members", { n: people.length })));
-    const addSelect = element("select", "board-day");
-    addSelect.setAttribute("aria-label", t("community.addToGroup"));
-    addSelect.appendChild(Object.assign(element("option", "", t("community.addOption")), { value: "" }));
-    state.friends.filter(friend => !people.some(person => person.id === friend.user_id)).forEach(friend => addSelect.appendChild(Object.assign(element("option", "", friend.display_name), { value: friend.user_id })));
-    addSelect.addEventListener("change", async () => {
-      if (!addSelect.value) return;
-      try {
-        await addToGroup(group.id, addSelect.value);
-        await render(true);
-      } catch (error) {
-        showToastNotice(error.message);
-      }
-    });
-    const leave = button("community-leave", t("community.leave"), async () => {
-      if (!confirm(t("community.leaveConfirm", { name: group.name }))) return;
-      await leaveGroup(group.id);
-      state.groupId = null;
-      await render(true);
-    });
-    head.append(title, addSelect, leave);
-
-    const views = element("div", "board-tabs community-views");
-    [["day", t("community.day")], ["week", t("community.week")], ["month", t("community.month")], ["history", t("community.history")]].forEach(([key, label]) => views.appendChild(button(`board-tab${state.view === key ? " is-active" : ""}`, label, () => {
-      state.view = key;
-      render();
-    })));
-    card.append(head, views);
-
-    if (state.view === "day") {
-      const picker = element("select", "board-day community-day-picker");
-      picker.setAttribute("aria-label", t("community.dayAria"));
-      getDays().map(day => day.dateKey).filter(dateKey => dateKey <= today).reverse().forEach(dateKey => {
-        picker.appendChild(Object.assign(element("option", "", `${dayLabel(dateKey)}${dateKey === today ? t("community.today") : ""}`), { value: dateKey, selected: dateKey === state.dateKey }));
-      });
-      picker.addEventListener("change", () => {
-        state.dateKey = picker.value;
-        render();
-      });
-      card.append(picker, createRanking(standings(people, state.dateKey, state.dateKey), people, me, { perDay: false }));
-    } else if (state.view === "week") {
-      const weekStart = mondayOf(today);
-      card.append(element("p", "community-range", t("community.perDay", { range: formatRange(weekStart, addDays(weekStart, 6)) })),
-        createRanking(standings(people, weekStart, addDays(weekStart, 6)), people, me, { perDay: true }));
-    } else if (state.view === "month") {
-      const month = today.slice(0, 7);
-      card.append(element("p", "community-range", t("community.perDay", { range: monthName(month) })),
-        createRanking(standings(people, `${month}-01`, `${month}-31`), people, me, { perDay: true }));
-    } else {
-      card.appendChild(createHistory(people, firstDay, me));
-    }
-    card.appendChild(element("p", "sample-note", t("community.sample")));
-    return card;
-  }
-
-  // A member's name with the badge they've earned this month.
-  function memberName(person, played = null) {
-    const name = element("span", "board-name");
-    const playedDays = [...person.days.entries()].filter(([dateKey]) => dateKey.startsWith(today.slice(0, 7)))
-      .map(([dateKey, score]) => ({ dateKey, completed: true, topPercent: topPercentOf(dateKey, score) }));
-    const badge = getMonthBadge(playedDays, today.slice(0, 7));
-    const icon = createBadge(badge.tier || RANK_TIERS.at(-1), 22);
-    icon.classList.toggle("is-locked", !badge.tier);
-    if (badge.tier) icon.setAttribute("aria-label", t("community.badgeMonth", { name: badge.tier.name }));
-    const label = element("span", "board-name-text");
-    label.appendChild(element("span", "", person.name));
-    if (played !== null) label.appendChild(element("small", "board-days", t("common.days", { n: played })));
-    name.append(icon, label);
-    return name;
-  }
-
-  // A ranking: gold, silver and bronze for the top three, then everyone who hasn't played
-  // in this stretch at the bottom.
-  function createRanking(entries, people, me, { perDay }) {
-    const list = element("ol", "board-list community-board");
-    withPlaces(entries).forEach(entry => {
-      const row = element("li", "board-row");
-      row.classList.toggle("is-you", entry.person.id === me);
-      const medal = getGroupMedal(entry.place);
-      const rank = element("span", "board-rank");
-      if (medal) rank.appendChild(createMedal(medal, 26));
-      else rank.textContent = `#${entry.place}`;
-      row.append(rank, memberName(entry.person, perDay ? entry.played : null), element("span", "board-extra", formatTopPercent(entry.topPercent)), element("strong", "board-score", entry.score.toLocaleString(locale())));
-      list.appendChild(row);
-    });
-    people.filter(person => !entries.some(entry => entry.person === person)).forEach(person => {
-      const row = element("li", "board-row is-waiting");
-      row.classList.toggle("is-you", person.id === me);
-      row.append(element("span", "board-rank", "—"), memberName(person), element("span", "board-extra", t("community.notPlayed")), element("strong", "board-score", "—"));
-      list.appendChild(row);
-    });
-    if (!people.length) list.appendChild(element("li", "community-empty", t("community.nobody")));
-    return list;
-  }
-
-  // Every month that has ended, newest first, with its winner and podium.
-  function createHistory(people, firstDay, me) {
-    const history = element("div", "community-history");
-    const months = [];
-    for (let month = firstDay.slice(0, 7); month < today.slice(0, 7); month = addDays(`${month}-28`, 7).slice(0, 7)) months.unshift(month);
-    months.forEach(month => {
-      const podium = withPlaces(standings(people, `${month}-01`, `${month}-31`)).filter(entry => entry.place <= 3);
-      if (!podium.length) return;
-      const block = element("section", "community-podium");
-      block.appendChild(element("h3", "", `${monthName(month)} · 👑 ${podium[0].person.name}`));
-      const list = element("ol", "board-list community-board");
-      podium.forEach(entry => {
-        const row = element("li", "board-row");
-        row.classList.toggle("is-you", entry.person.id === me);
-        const rank = element("span", "board-rank");
-        rank.appendChild(createMedal(getGroupMedal(entry.place), 26));
-        const name = element("span", "board-name");
-        const label = element("span", "board-name-text");
-        label.append(element("span", "", entry.person.name), element("small", "board-days", t("common.days", { n: entry.played })));
-        name.appendChild(label);
-        row.append(rank, name, element("span", "board-extra", formatTopPercent(entry.topPercent)), element("strong", "board-score", entry.score.toLocaleString(locale())));
-        list.appendChild(row);
-      });
-      block.appendChild(list);
-      history.appendChild(block);
-    });
-    if (!history.children.length) history.appendChild(element("p", "community-empty", t("community.podiumLater", { month: monthName(today.slice(0, 7)) })));
-    return history;
-  }
-
-  function monthName(month) {
-    return new Date(`${month}-01T00:00:00Z`).toLocaleDateString(locale(), { month: "long", year: "numeric", timeZone: "UTC" });
-  }
-
-  function formatRange(from, to) {
-    const format = dateKey => new Date(`${dateKey}T00:00:00Z`).toLocaleDateString(locale(), { day: "numeric", month: "short", timeZone: "UTC" });
-    return `${format(from)} – ${format(to)}`;
-  }
-
-  const inviteLink = code => `${location.origin}${location.pathname}?invite=${code}`;
-  const copy = (text, done) => navigator.clipboard?.writeText(text).then(() => showToastNotice(done), () => showToastNotice(text));
-  function shareInvite(link) {
-    if (navigator.share) navigator.share({ title: "Expedition", text: t("camp.shareText"), url: link }).catch(() => {});
-    else copy(link, t("community.linkCopied"));
-  }
-
-  // ----- The menu's glance at the week -----
-
-  // Loaded again at most once a minute (and after Base Camp closes).
-  let glanceAt = 0;
-  let glanceData = null;
-  async function loadGlance() {
-    if (!signedIn()) return null;
-    if (glanceData && Date.now() - glanceAt < 60000) return glanceData;
-    try {
-      const [profile, friends, groups] = await Promise.all([getMyProfile(), getFriends(), getGroups()]);
-      const group = groups.find(item => item.id === state.groupId) || groups[0] || null;
-      const firstDay = getDays()[0]?.dateKey || today;
-      const people = group ? membersOf(await getGroupBoard(group.id, firstDay, today)) : null;
-      glanceData = { profile, friends, group, people };
-    } catch (error) {
-      glanceData = { error };
-    }
-    glanceAt = Date.now();
-    return glanceData;
-  }
-
-  const glanceCard = document.getElementById("menuCommunityCard");
-  const tileNote = document.querySelector("#menuCommunityButton .menu-option-note");
-  async function refreshGlance() {
-    const data = await loadGlance();
-    renderGlance(data);
-  }
-
-  function renderGlance(data) {
-    const quiet = isAtlasQuiet();
-    const head = element("div", "glance-head");
-    const sprite = createAtlasSprite(40, "idle");
-    const title = element("div");
-    title.append(element("strong", "", t("menu.community")), element("small", "", t("glance.week")));
-    head.append(sprite, title);
-    const open = button("glance-open", "", () => open_());
-    open.setAttribute("aria-label", t("glance.open"));
-    open.appendChild(head);
-    const extra = element("div", "glance-extra");
-    let note = t("menu.communityNote");
-
-    if (!signedIn()) {
-      open.appendChild(element("p", "glance-text", t(isConfigured ? "glance.signedOut" : "glance.accountsOff")));
-      if (isConfigured) extra.appendChild(button("btn btn-secondary glance-action", t("account.signIn"), () => document.getElementById("accountModal").classList.remove("hidden")));
-    } else if (!data || data.error) {
-      open.appendChild(element("p", "glance-text", data?.error?.notSetUp ? t("glance.notSetUp") : t("glance.loading")));
-    } else if (!data.friends.length) {
-      // No friends yet: climb together.
-      open.appendChild(element("strong", "glance-call", t("glance.together")));
-      open.appendChild(element("p", "glance-text", t("glance.togetherText")));
-      const code = element("div", "glance-code");
-      code.append(element("span", "field-label", t("community.inviteCode")), element("strong", "", data.profile.invite_code));
-      extra.append(code, button("btn btn-primary glance-action", t(navigator.share ? "camp.share" : "community.copyLink"), () => shareInvite(inviteLink(data.profile.invite_code))));
-      note = t("glance.noteInvite");
-    } else if (!data.group) {
-      open.appendChild(element("p", "glance-text", t("glance.noGroup", { n: data.friends.length })));
-      note = t("glance.noteNoGroup");
-    } else {
-      const monday = mondayOf(today);
-      const ranked = withPlaces(standings(data.people, monday, addDays(monday, 6)));
-      const me = getUser().id;
-      open.appendChild(element("span", "glance-group", data.group.name));
-      const list = element("ol", "glance-board");
-      const shown = ranked.slice(0, GLANCE_ROWS);
-      const mine = ranked.find(entry => entry.person.id === me);
-      if (mine && !shown.includes(mine)) shown.push(mine);
-      shown.forEach(entry => {
-        const row = element("li");
-        row.classList.toggle("is-you", entry.person.id === me);
-        const rank = element("span", "glance-rank");
-        const medal = getGroupMedal(entry.place);
-        if (medal) rank.appendChild(createMedal(medal, 18));
-        else rank.textContent = `#${entry.place}`;
-        row.append(rank, element("span", "glance-name", entry.person.name), element("span", "glance-score", entry.score.toLocaleString(locale())));
-        list.appendChild(row);
-      });
-      if (!ranked.length) open.appendChild(element("p", "glance-text", t("glance.nobodyYet")));
-      else open.appendChild(list);
-      note = !ranked.length ? t("glance.noteNobody")
-        : mine?.place === 1 ? t("glance.noteLead", { group: data.group.name })
-          : mine ? t("glance.notePlace", { place: mine.place, n: data.people.length, name: ranked[0].person.name })
-            : t("glance.noteLeader", { name: ranked[0].person.name });
-    }
-    // On a phone the card is small: just this one line under the title.
-    open.appendChild(element("span", "glance-line", note));
-    open.appendChild(element("span", "glance-more", t("glance.open")));
-    glanceCard.classList.toggle("is-quiet", quiet);
-    glanceCard.replaceChildren(open, ...(extra.children.length ? [extra] : []));
-    if (tileNote) tileNote.textContent = note;
-  }
-  const open_ = () => open();
-
-  document.querySelectorAll(".community-open-button").forEach(openButton => openButton.addEventListener("click", () => {
-    sounds.playClick();
-    open();
-  }));
-  document.getElementById("closeCommunityButton").addEventListener("click", () => {
-    sounds.playClick();
-    close();
-  });
-  window.addEventListener("keydown", event => {
-    if (event.key !== "Escape" || modal.classList.contains("hidden") || landing) return;
-    if (!document.getElementById("accountModal").classList.contains("hidden")) return;
-    close();
-  });
-
-  // A language switch redraws the screen if it's open (without loading it again).
-  onLangChange(() => {
-    renderQuietButton();
-    atlas.relabel();
-    if (!modal.classList.contains("hidden")) render().then(() => { if (!isAtlasQuiet()) speak(); });
-    renderGlance(glanceData);
-  });
-  renderGlance(null);
-  refreshGlance();
-
-  return {
-    close,
-    refreshGlance,
-    // After signing in or out: refresh the screen if it's open, use a waiting invite, and
-    // take Atlas's setting from the account.
-    onAccountChange(account) {
-      syncAtlasQuiet(account);
-      glanceData = null;
-      state.loaded = false;
-      refreshGlance();
-      if (account && storage.get(PENDING_INVITE_KEY)) open();
-      else if (!modal.classList.contains("hidden")) render(true).then(speak);
-    }
-  };
-}
-
-return { initializeCommunity };
 })();
 
 // ---- transit-card.js
@@ -29740,7 +29858,7 @@ const { RANK_TIERS, formatTopPercent, getDayStats, getTopPercent } = __modules["
 const { initializeCommunity } = __modules["social.js"];
 const { createBaseLine, defaultBaseIso, getBase, getTent, getTentColor, getTentLook, onBaseChange, pickBase, setBase, setTentLevelSource, syncBase, tentLonLat } = __modules["base.js"];
 const { celebrateTent, createTentCanvas, tentLevel, tentToCelebrate } = __modules["tents.js"];
-const { DIRECT_LIFT_MS, FLIGHT_MS, createTravelLayer, directFlight, distance: distanceOnGlobe, drawSprite, getDayPlace, makeTrack, placeOf, playJourney, spriteCanvas, startAmbient } = __modules["travel.js"];
+const { FLIGHT_MS, createTravelLayer, distance: distanceOnGlobe, drawSprite, getDayPlace, makeTrack, placeOf, spriteCanvas, startAmbient } = __modules["travel.js"];
 const { fillTransitCard, liveTitle } = __modules["transit-card.js"];
 const { createLiveTraffic } = __modules["live-traffic.js"];
 const { CAPITALS } = __modules["capital-data.js"];
@@ -29750,7 +29868,7 @@ const { LANGUAGES, applyI18n, clueText, countryName, getLang, localNames, locale
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
 const { hasExtremeDay, MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MAIN_MODE, MODES, MODE_INFO, getSpeedWindow, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress } = __modules["daily.js"];
-const { showHowToSet, createFlagImage, PLAY_ART, PLAY_ART_COLORS, createPixelArt, createGuessRow, initializeCountryInput, initializeMainMenu, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, showToastNotice, showSkip, showTripCard, updateDailyScoreUI } = __modules["ui.js"];
+const { showHowToSet, createFlagImage, PLAY_ART, PLAY_ART_COLORS, createPixelArt, createGuessRow, initializeCountryInput, initializeMainMenu, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, showToastNotice, showSkip, updateDailyScoreUI } = __modules["ui.js"];
 
 // v3: Deep Cut and Paint the Map replaced Capital Call and Border Patrol (October 2026).
 const DAY_STORAGE_PREFIX = "daily-geography:day:v3:";
@@ -31372,14 +31490,15 @@ const ROUND_RENDERERS = {
       ]);
     };
     // No rank markers on the globe in this mode: the tiles and the ladder name the countries.
-    // Right after locking in, a little plane first flies to your pick (flyToPick), then the
-    // heat map spreads and the globe gives its tour; revisiting the round just turns to the answer.
+    // Right after locking in, the heat map spreads and the globe gives its tour straight away
+    // (no plane to your pick since 13 November 2026, team request: snappier); revisiting the
+    // round just turns to the answer.
     if (extremeRevealPending) {
       extremeRevealPending = false;
       const roundIndex = viewIndex;
       const token = revealToken;
       // The score card waits for the flight and then the tour (see commit).
-      extremeFlightDone = flyToPick(roundIndex).then(() => {
+      extremeFlightDone = Promise.resolve().then(() => {
         if (token !== revealToken || activeMode !== "extremes" || viewIndex !== roundIndex || !isGameViewVisible || globe.mode !== "game") return null;
         showHeat();
         playExtremeTour(round, state);
@@ -31721,25 +31840,21 @@ function editDistance(left, right) {
   return previous[right.length];
 }
 
-// Highs & Lows: your day as an expedition. Locking in a pick, a little plane flies there
-// from where you were (today's starting point for the first round, your last pick after
-// that), leaving a gold dotted trail; the trails of the day's picks stay on the globe, so
-// over six rounds they draw your route. Drawn on a canvas over the game's globe.
+// Highs & Lows: your day as an expedition. Each pick adds a gold dotted line from where you
+// were (today's starting point for the first round, your last pick after that), so over six
+// rounds they draw your route. Drawn on a canvas over the game's globe. (Until 13 November
+// 2026 a little plane flew each line first.)
 const gameTravel = createTravelLayer(document.getElementById("globeCanvasContainer"), point => globe.projectLonLat(point));
-const PICK_FLIGHT_MS = FLIGHT_MS; // 1.4 s, like every flight between two places
-const PICK_ZOOM_OUT_MS = 550; // zooming out first, when you'd zoomed in to pick
-// The flight in progress, then the tour (the score card waits for both).
+// The tour in progress (the score card waits for it).
 let extremeFlightDone = null;
-// Bumped when you leave a game: a reveal still on its way (the plane to your pick) is dropped
+// Bumped when you leave a game: a reveal still on its way is dropped
 // then, instead of finishing later and painting the heat map over whatever is on screen.
 let revealToken = 0;
 function cancelPendingReveal() {
   revealToken += 1;
-  if (pickFlight) { const { resolve } = pickFlight; pickFlight = null; resolve(); }
   extremeFlightDone = null;
   extremeRevealPending = false;
 }
-let pickFlight = null; // { roundIndex, track, start, resolve }
 const legTracks = new Map();
 function legTrack(from, to) {
   const key = `${from}|${to}`;
@@ -31755,42 +31870,13 @@ function extremeRoute(uptoIndex = day.rounds.length) {
   }
   return points;
 }
-function flyToPick(roundIndex) {
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const route = extremeRoute(roundIndex + 1);
-  if (reduceMotion || route.length < 2) return Promise.resolve();
-  const from = route.at(-2);
-  const to = route.at(-1);
-  const track = legTrack(from, to);
-  // First zoom out (if you'd zoomed in to pick); the plane waits at the start until then.
-  // The camera then rides along with the plane (followPath), so it stays in the middle of
-  // the screen; a long flight pulls back a little to show more of the way.
-  const zoomedIn = globe.getZoomFactor() < 0.95;
-  const settle = zoomedIn ? PICK_ZOOM_OUT_MS : 0;
-  const km = track.total * 6371;
-  globe.zoomTo(1 + Math.min(0.25, km / 24000));
-  globe.followPath(e => track.at(e), { duration: PICK_FLIGHT_MS, delay: settle });
-  return new Promise(resolve => { pickFlight = { roundIndex, track, start: performance.now() + settle, resolve }; });
-}
 (function drawGameTravel(now) {
   requestAnimationFrame(drawGameTravel);
   gameTravel.fit();
   if (activeMode !== "extremes" || !isGameViewVisible || globe.mode !== "game" || !day) return;
   const route = extremeRoute();
-  const flyingTo = pickFlight ? route.length - 1 : route.length;
-  for (let index = 1; index < flyingTo; index += 1) gameTravel.trail(legTrack(route[index - 1], route[index]).points, "rgba(255, 212, 92, 0.9)");
-  route.slice(1, flyingTo).forEach(point => gameTravel.station(point, "", true));
-  if (pickFlight) {
-    const t = Math.max(0, Math.min(1, (now - pickFlight.start) / PICK_FLIGHT_MS));
-    const e = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
-    gameTravel.trail(pickFlight.track.upTo(e), "rgba(255, 212, 92, 0.9)");
-    gameTravel.vehicle("plane", pickFlight.track.at(e), pickFlight.track.at(Math.min(1, e + 0.02)));
-    if (t >= 1) {
-      const { resolve } = pickFlight;
-      pickFlight = null;
-      resolve();
-    }
-  }
+  for (let index = 1; index < route.length; index += 1) gameTravel.trail(legTrack(route[index - 1], route[index]).points, "rgba(255, 212, 92, 0.9)");
+  route.slice(1).forEach(point => gameTravel.station(point, "", true));
 })(performance.now());
 
 // The globe mode: the selected country is the round's one pick. The cards slide aside and
@@ -32512,7 +32598,6 @@ function showMenuGlobe() {
   globe.setMode("menu");
   globe.setBorderStrength(0);
   // The menu opens over today's main game, its Play button one click away.
-  menuFlight = null;
   hero.key = featuredMode();
   hero.date = null;
   hero.days = null;
@@ -32614,19 +32699,6 @@ startAmbient(menuTravel, {
       if (pin.kind !== "camp" && cachedModeState(pin.kind) === "done") drawPinTick(layer.ctx, box.right - 6, box.top + 2);
       menuMarks.push({ x: spot.x, y: spot.y, kind: pin.kind, country: pin.country, box });
     });
-    // A past day on the card: its pin where that day started, in focus.
-    if (hero.date && hero.key !== "camp") {
-      const spot = globe.projectLonLat(startLonLat(hero.key, hero.date));
-      if (spot.visible) drawMenuPin(layer.ctx, spot.x, spot.y, SIGN_ICONS[hero.key], PIN_COLORS[hero.key], true);
-    }
-    // The plane of a flight on the menu (flyMenuTo), with its route so far in gold.
-    if (menuFlight) {
-      const { track, start, duration } = menuFlight;
-      const progress = duration ? Math.min(1, (performance.now() - start) / duration) : 1;
-      const e = progress < 0.5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2;
-      layer.trail(track.upTo(e), "rgba(255, 212, 92, 0.95)");
-      layer.vehicle("plane", track.at(e), track.at(Math.min(1, e + 0.02)));
-    }
     layer.placeLabels();
   }
 });
@@ -32735,7 +32807,7 @@ function stopOf(key) {
   const [lon, lat] = startLonLat(key);
   return { lat, lon };
 }
-const MENU_FOCUS_MS = 1400; // a glide to the place you point at
+const MENU_FOCUS_MS = 800; // a glide to a place on the menu
 function focusMenuStop(key) {
   if (key === menuFocus || key === "duel") return; // 1v1 has no place on the globe (yet)
   menuFocus = key;
@@ -32749,9 +32821,7 @@ function focusMenuStop(key) {
 // game; a click on a pin, or on a game or Base Camp in the Expedition menu, pans the camera
 // there (selectHero) and the card becomes that one, in the same layout: its name, a line
 // about it, how today stands, and its button (PLAY, CONTINUE or SEE RESULTS; GO TO BASE CAMP).
-// Next to the button: ARCHIVE, which steps back through the past days of that game, one
-// day at a time (‹ ›), a plane flying from wherever the camera is to the day's starting
-// place; PLAY then plays that day. MY TENT (or HOME without a tent) flies back.
+// Next to the button: ARCHIVE, which opens that game's archive (every day on a calendar).
 // ---------------------------------------------------------------------------
 const hero = { key: "extremes", date: null, days: null };
 const HERO_ZOOM = 128; // the camera a little closer on a selected place
@@ -32760,9 +32830,12 @@ const HERO_INFO = {
   casual: { title: () => t("mode.casual.short"), text: () => t("menu.casualText"), color: "#ffd45c" },
   camp: { title: () => t("menu.community"), text: () => t("menu.communityNote"), color: "#45e3ff" },
   // 1v1 is still being made: its card says so, without a button.
-  duel: { title: () => "1V1", text: () => t("menu.duelText"), color: "#c58cff" }
+  duel: { title: () => "1V1", text: () => t("menu.duelText"), color: "#c58cff" },
+  // My Tent: where your tent stands (the camera pans there); OPEN MY TENT opens the window.
+  tent: { title: () => t("menu.account"), text: () => t("menu.tentText"), color: () => getTentColor() }
 };
 function heroArtFor(key) {
+  if (key === "tent") return createTentCanvas(getTentLook(), 3, "hero-art-sprite", { centred: true });
   if (key !== "camp") return createPixelArt(PLAY_ART[key], PLAY_ART_COLORS);
   const canvas = spriteCanvas("tent");
   canvas.className = "hero-art-sprite";
@@ -32779,9 +32852,9 @@ function renderHero() {
   if (!card) return;
   const { key, date } = hero;
   const info = HERO_INFO[key];
-  const camp = key === "camp";
+  const camp = key === "camp" || key === "tent"; // places, not games: no day, no archive
   const state = camp ? "new" : dayState(key, date || today);
-  card.style.setProperty("--tile", info.color);
+  card.style.setProperty("--tile", typeof info.color === "function" ? info.color() : info.color);
   card.dataset.state = state === "none" ? "new" : state;
   card.dataset.key = key;
   card.classList.toggle("is-archive", Boolean(date));
@@ -32794,6 +32867,7 @@ function renderHero() {
   // Under it: how today stands (or, on a past day, whether you played it).
   let status = "";
   if (key === "duel") status = t("menu.duelSoon");
+  else if (key === "tent") status = tentWhere();
   else if (!camp && !date) status = describeMode(key);
   else if (date) status = state === "none" ? t("hero.noGame") : state === "done" ? t("hero.played") : state === "started" ? t("hero.started") : t("hero.notPlayed");
   setText("heroStatus", status);
@@ -32807,7 +32881,7 @@ function renderHero() {
     document.getElementById("heroNewer").disabled = index <= 0;
   }
   const go = document.getElementById("heroGo");
-  go.textContent = camp ? t("menu.pinGoCamp") : t(state === "done" ? "menu.seeResults" : state === "started" ? "menu.continueGo" : "menu.playNow");
+  go.textContent = key === "tent" ? t("menu.tentGo") : camp ? t("menu.pinGoCamp") : t(state === "done" ? "menu.seeResults" : state === "started" ? "menu.continueGo" : "menu.playNow");
   go.disabled = state === "none";
   go.hidden = state === "none" && !date;
   // ARCHIVE next to it (not for Base Camp); on a past day, the way home.
@@ -32825,7 +32899,6 @@ function heroStop() {
   if (hero.date) { const [lon, lat] = startLonLat(hero.key, hero.date); return { lat, lon }; }
   return stopOf(hero.key);
 }
-const refocusHero = () => (hero.date ? (menuFocus = "archive") : focusMenuStop(hero.key));
 // Selecting a game or Base Camp (its pin, or the Expedition menu): the camera pans and zooms
 // there and the card changes.
 function selectHero(key) {
@@ -32837,84 +32910,36 @@ function selectHero(key) {
   if (key === "duel") return; // no place on the globe: the camera stays
   if (globe.mode !== "menu") { menuFocus = key; return; }
   menuFocus = key;
-  menuFlight = null;
   const stop = stopOf(key);
   globe.glideMenuTo(stop.lat, stop.lon, FLIGHT_MS, { distance: HERO_ZOOM });
 }
-// The archive on the card: the past days of the card's game (the newest first).
-function heroArchiveDays(key) {
-  return getAllPuzzleDays().filter(date => date < today && dayState(key, date) !== "none").reverse();
-}
-// A plane from wherever the camera looks now to [lon, lat], the camera riding along.
-let menuFlight = null;
-function flyMenuTo([lon, lat], { zoom = HERO_ZOOM } = {}) {
-  const from = globe.getJourneyStart();
-  const track = makeTrack([[((from.lon % 360) + 540) % 360 - 180, from.lat], [lon, lat]], { great: true });
-  if (track.total < 0.002) { globe.glideMenuTo(lat, lon, 400, { distance: zoom }); return; }
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const flight = { track, start: performance.now(), duration: reduceMotion ? 0 : FLIGHT_MS };
-  menuFlight = flight;
-  globe.followMenuPath(e => track.at(e), flight.duration, { distance: zoom }).then(() => { if (menuFlight === flight) menuFlight = null; });
-}
-function showHeroDay(date) {
-  hero.date = date;
-  renderHero();
-  menuFocus = "archive";
-  if (globe.mode === "menu") flyMenuTo(startLonLat(hero.key, date));
-}
 document.getElementById("heroGo").addEventListener("click", () => {
   sounds.playClick();
-  if (hero.key === "camp") { document.getElementById("menuCommunityButton").click(); return; }
+  if (hero.key === "camp") { selectMenuCountry(null); community.open(); return; }
+  if (hero.key === "tent") { openMyTent(); return; }
   mainMenu.showGame(hero.key, hero.date);
 });
+// ARCHIVE opens the archive of that game: every day on a calendar (13 November 2026, team
+// request; it used to step through past days on the card, a plane flying to each).
 document.getElementById("heroSide").addEventListener("click", () => {
   sounds.playClick();
-  if (!hero.date) {
-    hero.days = heroArchiveDays(hero.key);
-    if (!hero.days.length) { showToastNotice(t("hero.noPast")); return; }
-    showHeroDay(hero.days[0]);
-    return;
-  }
-  // Home: the plane flies back to your tent (or the capital you'd start from).
-  hero.date = null;
-  hero.days = null;
-  renderHero();
-  menuFocus = "tent";
-  if (globe.mode === "menu") flyMenuTo(homeOrigin().lonLat);
-});
-document.getElementById("heroOlder").addEventListener("click", () => {
-  const index = hero.days.indexOf(hero.date);
-  if (index < hero.days.length - 1) { sounds.playClick(); showHeroDay(hero.days[index + 1]); }
-});
-document.getElementById("heroNewer").addEventListener("click", () => {
-  const index = hero.days.indexOf(hero.date);
-  if (index > 0) { sounds.playClick(); showHeroDay(hero.days[index - 1]); }
+  archive.openArchive(null, hero.key);
 });
 onLangChange(renderHero);
 
 // The dock (13 November 2026, team request; replaces the Expedition drawer): five buttons
 // at the bottom of the home screen, each one click away. Highs & Lows, Casual and 1v1 put
-// their card above the dock (selectHero: PLAY, and that game's own ARCHIVE); Crew opens
-// Crew (social.js); Settings opens the settings window. Pointing at a game turns the
-// globe to its place, and back to the selected card 0.7 s after you leave.
+// their card above the dock (selectHero: PLAY, and that game's own ARCHIVE); Crew puts
+// its card up too, the camera panning to Base Camp (GO TO BASE CAMP opens Crew, social.js);
+// Settings opens the settings window. Only a click moves the camera: pointing at a button
+// doesn't (13 November 2026, team request).
 const dock = document.getElementById("menuDock");
-let focusBackTimer = null;
-dock.querySelectorAll("[data-focus]").forEach(item => {
-  const point = () => { clearTimeout(focusBackTimer); focusMenuStop(item.dataset.focus); };
-  const leave = () => {
-    clearTimeout(focusBackTimer);
-    focusBackTimer = setTimeout(refocusHero, 700);
-  };
-  item.addEventListener("pointerenter", event => { if (event.pointerType === "mouse") point(); });
-  item.addEventListener("pointerleave", event => { if (event.pointerType === "mouse") leave(); });
-  item.addEventListener("focusin", point);
-  item.addEventListener("focusout", leave);
-});
-let cinematicArrival = false;
 dock.querySelectorAll("[data-select]").forEach(item => item.addEventListener("click", () => {
+  const key = item.dataset.select;
+  // MY TENT and Crew: a second click opens them, like the button on their card.
+  if (key === hero.key && (key === "tent" || key === "camp")) { document.getElementById("heroGo").click(); return; }
   sounds.playClick();
-  clearTimeout(focusBackTimer);
-  selectHero(item.dataset.select);
+  selectHero(key);
 }));
 
 // Settings: My Tent, your stats, how to play, language and sound. Opened over the menu;
@@ -33101,8 +33126,7 @@ function openRideCard(route, event) {
   // The vehicle to the middle of the screen, at the zoom you had.
   const here = route.here || route.position?.(Date.now() / 1000);
   if (here && globe.mode === "menu") {
-    menuFlight = null;
-    globe.glideMenuTo(here[1], here[0], 900, { distance: globe.camera.position.z });
+      globe.glideMenuTo(here[1], here[0], 900, { distance: globe.camera.position.z });
   }
   globe.holdMenu(true);
 }
@@ -33132,20 +33156,9 @@ document.addEventListener("keydown", event => { if (event.key === "Escape" && pi
 // Opening Base Camp from the menu lets go of a selected country first.
 document.querySelectorAll(".community-open-button, #menuCommunityCard").forEach(node => node.addEventListener("click", () => selectMenuCountry(null), true));
 
-// The first game of the day starts with a trip from your base to the day's place (once a
-// day, in this browser).
-const TRAVELLED_KEY = "daily-geography:travelled:v1";
-const hasTravelled = dateKey => { try { return localStorage.getItem(TRAVELLED_KEY) === dateKey; } catch { return true; } };
-const markTravelled = dateKey => { try { localStorage.setItem(TRAVELLED_KEY, dateKey); } catch { /* storage off */ } };
-
-// From the menu, the globe flies out from the horizon into its place in the game while
-// the menu box drifts away; the game's cards fade in around the globe as it lands. Each
-// day the game starts over the day's place (getDayPlace). The first game of the day travels
-// there first, from your base: a short leg over land or water, a plane, and a short leg in
-// (travel.js), with SKIP.
-// The trip card of the flight from your tent (showTripCard), and how long it stays after landing.
-let tripCard = null;
-const TRIP_CARD_HOLD_MS = 1600;
+// From the menu, the globe flies straight into its place in the game while the menu fades;
+// the game's cards fade in around the globe as it lands. Each day the game starts over the
+// day's place (getDayPlace).
 function flyFromMenu() {
   const menu = document.getElementById("mainMenu");
   const overlay = document.getElementById("globeTransition");
@@ -33161,57 +33174,25 @@ function flyFromMenu() {
   overlay.classList.remove("hidden");
   globe.mountTo("globeTransition");
 
-  const place = getDayPlace(activeDate, activeMode).country;
   selectMenuCountry(null);
-  // Every game (today's or from the archive) starts with one quick, direct flight from where
-  // you are: your tent, or without one the capital of the day's country (then you're already
-  // there and it's just the flight in).
-  const origin = gameOrigin(activeMode, activeDate);
-  const target = startLonLat(activeMode, activeDate);
-  const targetName = startCapital(activeMode, activeDate)?.name || countryName(place);
-  const travel = !reduceMotion && kmBetween(origin.lonLat, target) >= 30 && Boolean(globe.countryFeatures?.length);
-
+  // Straight into the game: no trip from your tent and no trip card any more (13 November
+  // 2026, team request: quick and snappy). The globe flies in to the day's place.
   async function fly() {
-    let fromJourney = false;
-    if (travel) {
-      markTravelled(today);
-      globe.startJourney();
-      const layer = createTravelLayer(overlay, point => globe.projectLonLat(point));
-      // The trip card stays through the flight in and a moment after landing (TRIP_CARD_HOLD_MS).
-      tripCard?.remove();
-      tripCard = showTripCard({
-        label: activeDate === today ? t("travel.today") : t("common.day", { n: getPuzzleNumber(activeDate) }).toUpperCase(),
-        from: { name: origin.short, country: origin.country },
-        to: { name: targetName, country: place },
-        km: num(Math.round(kmBetween(origin.lonLat, target) / 50) * 50)
-      });
-      const legs = directFlight(origin.lonLat, target, { fromStation: { name: origin.short, iso: origin.country.iso }, toStation: { name: targetName, iso: place.iso } });
-      const journey = playJourney(globe, layer, legs, { liftMs: DIRECT_LIFT_MS });
-      const hideJourneySkip = showSkip(() => journey.skip());
-      await journey.done;
-      hideJourneySkip();
-      layer.remove();
-      fromJourney = true;
-    }
     gameView.classList.add("is-arriving");
-    // After the menu's travel to the place (cinematicArrival) the flight in is short too.
-    const arrived = cinematicArrival;
-    cinematicArrival = false;
     const [startLon, startLat] = startLonLat(activeMode, activeDate);
-    const flight = globe.transitionToGame("globeCanvasContainer", reduceMotion ? 0 : FLIGHT_MS, { view: { lat: startLat, lon: startLon }, fromJourney });
-    // The flight takes FLIGHT_MS (1.4 s); SKIP lands the globe at once.
+    const flight = globe.transitionToGame("globeCanvasContainer", reduceMotion ? 0 : FLIGHT_MS, { view: { lat: startLat, lon: startLon } });
+    // The flight takes FLIGHT_MS (0.8 s); SKIP lands the globe at once.
     const hideSkip = reduceMotion ? () => {} : showSkip(() => globe.skipTransition());
     // Halfway through, narrow the overlay to the globe's area (on small screens the globe
     // sits in a box; on large ones it is the whole window, so nothing narrows).
     setTimeout(() => {
       const frame = document.getElementById("globeCanvasContainer").getBoundingClientRect();
       overlay.style.clipPath = `inset(${frame.top}px ${innerWidth - frame.right}px ${innerHeight - frame.bottom}px ${frame.left}px)`;
-    }, reduceMotion ? 0 : fromJourney || arrived ? 800 : 1300);
+    }, reduceMotion ? 0 : FLIGHT_MS * 0.6);
     await flight;
     hideSkip();
     gameView.classList.remove("is-arriving");
-    if (globe.mode !== "game") { tripCard?.remove(); tripCard = null; return; } // back to the menu mid-flight
-    tripCard?.leave(TRIP_CARD_HOLD_MS);
+    if (globe.mode !== "game") return; // back to the menu mid-flight
     overlay.classList.add("hidden");
     menu.classList.add("hidden");
     menu.classList.remove("is-leaving");
@@ -33467,8 +33448,6 @@ const mainMenu = initializeMainMenu({
   onPlay: (mode, dateKey) => enterGameView(dateKey || today, mode),
   onRefresh: () => renderHero(),
   onHome: () => {
-    tripCard?.remove();
-    tripCard = null;
     cancelPendingReveal();
     stopExtremeTour({ all: true });
     extremeHeldRound = null;
@@ -33619,26 +33598,29 @@ function renderAccount(account) {
   setText("accountNote", t(isAuthConfigured ? "account.note" : "account.notOn"));
 }
 
-// My Tent (your account and your tent): from the menu, the globe flies to your tent first,
-// a quick sweep (FLIGHT_MS) with your tent in the middle, then the window opens over it.
-document.getElementById("menuAccountButton").addEventListener("click", () => {
-  sounds.playClick();
-  const fromMenu = globe.mode === "menu" && !document.getElementById("mainMenu").classList.contains("hidden");
+// My Tent (your account and your tent): MY TENT in the dock is like the games (13 November
+// 2026, team request): the first click pans the camera to your tent and puts its card up,
+// a second click (or OPEN MY TENT on the card) opens the window.
+function openMyTent() {
   closeSettings();
-  if (!fromMenu || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    document.getElementById("accountModal").classList.remove("hidden");
-    return;
-  }
-  menuFocus = "tent";
-  const stop = stopOf("tent");
-  globe.glideMenuTo(stop.lat, stop.lon, FLIGHT_MS, { distance: 120 });
-  setTimeout(() => document.getElementById("accountModal").classList.remove("hidden"), FLIGHT_MS * 0.7);
-});
+  document.getElementById("accountModal").classList.remove("hidden");
+}
 // The My Tent tile in the Expedition menu: your tent as it stands, and where.
+// Where your tent stands, in words.
+function tentWhere() {
+  const spot = getTent();
+  return spot ? (spot.city ? t("hud.capital", { city: spot.city, country: countryName(getCountry(spot.iso)) }) : countryName(getCountry(spot.iso))) : t("menu.tentNone");
+}
 function renderTentTile() {
   const spot = getTent();
-  document.getElementById("menuTentIcon").replaceChildren(createTentCanvas(getTentLook(), 2, "menu-tent-canvas"));
-  setText("menuTentWhere", spot ? (spot.city ? t("hud.capital", { city: spot.city, country: countryName(getCountry(spot.iso)) }) : countryName(getCountry(spot.iso))) : t("menu.tentNone"));
+  document.getElementById("menuTentIcon").replaceChildren(createTentCanvas(getTentLook(), 2, "menu-tent-canvas", { centred: true }));
+  const where = spot ? (spot.city ? t("hud.capital", { city: spot.city, country: countryName(getCountry(spot.iso)) }) : countryName(getCountry(spot.iso))) : t("menu.tentNone");
+  setText("menuTentWhere", where);
+  // The dock's tent button in your tent's colour, saying where it stands.
+  const button = document.getElementById("menuAccountButton");
+  button.style.setProperty("--tile", getTentColor());
+  button.title = `${t("menu.account")} · ${where}`;
+  if (hero.key === "tent") renderHero();
 }
 onBaseChange(renderTentTile);
 onLangChange(renderTentTile);
