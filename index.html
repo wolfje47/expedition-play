@@ -225,22 +225,6 @@ h1, h2, h3 { font-weight: normal; }
 /* The language button, small in the header card's top-right corner: the translate icon
    in pixels. It opens the language window (#langModal). */
 .menu-marquee { position: relative; }
-.lang-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border: 1px solid var(--glass-line);
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.3);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
-}
-.lang-button:hover,
-.lang-button:focus-visible { border-color: var(--cyan); box-shadow: 0 0 18px color-mix(in srgb, var(--cyan) 30%, transparent); transform: translateY(-1px); }
 .lang-button-icon { width: 24px; height: 24px; image-rendering: pixelated; }
 
 /* The language window, in the style of the stats window. Each language is a tile; on
@@ -308,8 +292,6 @@ h1, h2, h3 { font-weight: normal; }
 .lang-option:hover .lang-option-text small,
 .lang-option:focus-visible .lang-option-text small { color: var(--text); }
 @media (max-width: 760px) {
-  .lang-button { top: 8px; right: 8px; width: 36px; height: 36px; }
-  .lang-button-icon { width: 22px; height: 22px; }
   .lang-modal { width: 100%; border-radius: 0; }
 }
 
@@ -3486,13 +3468,11 @@ h1, h2, h3 { font-weight: normal; }
 .base-lang[aria-pressed="true"] { background: var(--cyan); color: #04121a; }
 .travel-banner:empty { display: none; }
 
-/* ---------- The menu: a hero card and the Expedition menu (9 November 2026) ----------
-   The globe fills the screen and looks at today's main game. At the top only the menu
-   button (≡) and the word EXPEDITION; at the bottom one hero card: Highs & Lows with ▶ PLAY,
-   one click to play. Everything else is in the Expedition menu, a drawer from the left:
-   today's games, Base Camp (the week at a glance) and a footer of icons (Archive, Stats,
-   How to play, My account, Language). Pointing at a game or Base Camp turns the globe to
-   it (engine.js, focusMenuStop); while the drawer is open the hero steps aside. */
+/* ---------- The menu: the globe, a card and a dock (9 and 13 November 2026) ----------
+   The globe fills the screen and looks at today's main game. At the top only the word
+   EXPEDITION; at the bottom the card for the selected game (PLAY and its ARCHIVE) over a
+   dock of five buttons: Highs & Lows, Casual, 1v1, Crew and Settings. Pointing at a game
+   turns the globe to it (engine.js, focusMenuStop). */
 .main-menu { display: block; min-height: 100dvh; padding: 0; }
 .main-menu .menu-cabinet {
   position: fixed;
@@ -3519,11 +3499,6 @@ h1, h2, h3 { font-weight: normal; }
 .main-menu .menu-logo,
 .main-menu .menu-tagline { display: none; }
 .main-menu .menu-marquee h1 { font: 12px/1.4 var(--font-display); letter-spacing: var(--ls-pixel); text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 18px color-mix(in srgb, var(--accent) 40%, transparent); }
-.menu-drawer-toggle { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 1px solid var(--glass-line); border-radius: 10px; background: rgba(10, 15, 30, 0.74); color: var(--text); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); box-shadow: var(--glass-shine), 0 8px 20px rgba(0, 0, 0, 0.4); cursor: pointer; transition: border-color 0.15s ease, color 0.15s ease, opacity 0.3s ease; }
-.menu-drawer-toggle svg { width: 20px; height: 20px; }
-.menu-drawer-toggle:hover,
-.menu-drawer-toggle:focus-visible { border-color: var(--cyan); color: var(--cyan); outline: none; }
-.main-menu.is-drawer-open .menu-drawer-toggle { opacity: 0; pointer-events: none; }
 
 /* The hero: today's main game, one click to play. */
 .main-menu .menu-hero { align-self: center; width: min(100%, 460px); transition: opacity 0.3s ease, transform 0.3s ease; }
@@ -3557,69 +3532,80 @@ h1, h2, h3 { font-weight: normal; }
 .hero-step:disabled { opacity: 0.3; cursor: default; }
 /* A past day: no glow, so it doesn't read as today's main game. */
 .hero-card.is-archive { animation: none; }
-.main-menu.is-travelling .menu-hero,
-.main-menu.is-travelling .menu-drawer-toggle { opacity: 0; pointer-events: none; }
-.main-menu.is-drawer-open .menu-hero { opacity: 0; transform: translateY(24px); pointer-events: none; }
-.main-menu.is-drawer-open .menu-hero * { pointer-events: none; }
+.main-menu.is-travelling .menu-bottom { opacity: 0; pointer-events: none; }
+.main-menu.is-travelling .menu-bottom * { pointer-events: none; }
 
-/* The Expedition menu. */
-.expedition-drawer {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 3;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  width: min(360px, 88vw);
-  padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(env(safe-area-inset-bottom, 0px) + 16px);
-  overflow-y: auto;
-  border-right: 1px solid var(--glass-line);
-  background: rgba(10, 15, 30, 0.86);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  box-shadow: 12px 0 40px rgba(0, 0, 0, 0.45);
-  transform: translateX(-104%);
-  visibility: hidden;
-  transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.2, 1), visibility 0s linear 0.35s;
+/* The bottom of the home screen (13 November 2026, replaces the Expedition drawer): the
+   card for the selected game over a dock of five buttons (engine.js, the dock). */
+.main-menu .menu-bottom { align-self: center; display: grid; gap: 10px; width: min(100%, 560px); transition: opacity 0.3s ease, transform 0.3s ease; }
+.main-menu .menu-bottom .menu-hero { width: 100%; }
+.menu-dock {
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; padding: 6px;
+  border-radius: 16px; background: rgba(10, 15, 30, 0.84);
+  -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+  box-shadow: inset 0 0 0 1px var(--glass-line), var(--glass-shine), 0 10px 30px rgba(0, 0, 0, 0.45);
 }
-.expedition-drawer.is-open { transform: none; visibility: visible; transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.2, 1), visibility 0s; }
-.main-menu.is-camp .expedition-drawer,
-.main-menu.is-leaving .expedition-drawer { display: none; }
-.drawer-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.drawer-head h2 { font: 12px/1.4 var(--font-display); letter-spacing: var(--ls-pixel); }
-.drawer-section { display: grid; gap: 8px; }
-.drawer-section > .field-label { color: var(--muted); }
-.expedition-drawer .menu-play-options { display: grid; gap: 8px; }
-.expedition-drawer .drawer-mode { grid-template-columns: 52px 1fr; gap: 0.75rem; padding: 0.6rem; border-radius: 14px; background-color: rgba(10, 15, 30, 0.5); }
-.expedition-drawer .drawer-mode .play-tile-art { height: 52px; }
-.expedition-drawer .drawer-mode .play-tile-art svg { width: 36px; height: 36px; }
-.expedition-drawer .drawer-mode .play-tile-text span { color: var(--muted); }
-.expedition-drawer .drawer-mode .play-tile-text small { color: var(--gold); }
-/* Base Camp: the week at a glance, the whole card. */
-.expedition-drawer .menu-community-card { display: grid; padding: 0.4rem; border: 1px solid var(--glass-line); border-radius: 14px; background: rgba(10, 15, 30, 0.5); }
-.expedition-drawer .menu-community-card .glance-head .atlas-sprite { width: 36px; height: 36px; }
-.glance-line { display: none; }
-/* The footer: the rest as a row of equal tiles (Archive, How to play, Language), spread over
-   the whole width, each an icon on the same small scanline screen over its name. */
-.main-menu .expedition-drawer .menu-secondary { display: grid; grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; margin: auto 0 0; padding-top: 14px; border-top: 1px solid var(--glass-line-soft); }
-.main-menu .expedition-drawer .menu-secondary .community-open-button { display: none; }
-.main-menu .expedition-drawer .menu-secondary .menu-option { position: static; grid-column: auto; order: 0; flex-direction: column; justify-content: flex-start; align-items: center; gap: 8px; width: auto; height: auto; min-width: 0; min-height: 0; padding: 10px 4px 9px; border-radius: 10px; text-align: center; }
-.main-menu .expedition-drawer .menu-secondary .menu-option span { display: flex; align-items: center; justify-content: center; max-width: 100%; min-height: 2.8em; font: 9px/1.4 var(--font-display); letter-spacing: var(--ls-pixel); white-space: normal; overflow-wrap: normal; }
-.main-menu .expedition-drawer .menu-secondary .menu-option-note { display: none; }
-.main-menu .expedition-drawer .menu-secondary .menu-pixel-icon,
-.main-menu .expedition-drawer .menu-secondary .lang-button-icon { box-sizing: border-box; width: 34px; height: 34px; padding: 7px; flex: none; border-radius: 9px; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0 2px, transparent 2px 4px), radial-gradient(circle, color-mix(in srgb, var(--tile) 20%, #04121a), #04121a 75%); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tile) 50%, transparent); }
-.main-menu .menu-secondary .lang-button span { text-transform: uppercase; }
+.dock-item {
+  position: relative; display: grid; justify-items: center; align-content: start; gap: 7px;
+  min-width: 0; min-height: 72px; padding: 9px 2px 8px; border: 0; border-radius: 12px;
+  background: transparent; color: var(--text); cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+.dock-art {
+  display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; color: var(--tile);
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0 2px, transparent 2px 4px), radial-gradient(circle, color-mix(in srgb, var(--tile) 22%, #04121a), #04121a 75%);
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tile) 50%, transparent);
+}
+.dock-art svg { width: 26px; height: 26px; }
+.dock-label { max-width: 100%; font: 9px/1.35 var(--font-display); letter-spacing: var(--ls-pixel); text-align: center; text-transform: uppercase; }
+.dock-status { display: none; }
+.dock-item:hover, .dock-item:focus-visible { background: rgba(255, 255, 255, 0.06); outline: none; transform: translateY(-1px); }
+.dock-item:focus-visible { box-shadow: inset 0 0 0 2px var(--cyan); }
+.dock-item.is-active { background: color-mix(in srgb, var(--tile) 16%, transparent); box-shadow: inset 0 0 0 2px var(--tile); }
+.dock-item.is-active .dock-label { color: var(--tile); }
+.dock-item:disabled { opacity: 0.45; cursor: default; }
+/* Today's game started (gold) or done (green): a pixel dot in the corner. */
+.dock-item[data-state="started"]::after,
+.dock-item[data-state="done"]::after { content: ""; position: absolute; top: 7px; right: calc(50% - 26px); width: 8px; height: 8px; background: var(--gold); box-shadow: 0 0 0 2px #04121a; }
+.dock-item[data-state="done"]::after { background: #5cf28a; }
+.dock-soon { position: absolute; top: 4px; right: 4px; padding: 2px 3px; border-radius: 3px; background: var(--tile); color: #04121a; font: 7px var(--font-display); letter-spacing: var(--ls-pixel); }
+#menuSettingsButton .dock-art { color: #cfd8dc; }
+
+/* Settings: My Tent on top, then a list of rows. */
+.settings-modal { display: grid; gap: 14px; width: min(460px, calc(100vw - 32px)); }
+.settings-list { display: grid; gap: 6px; }
+.settings-row {
+  display: grid; grid-template-columns: 36px 1fr auto auto; align-items: center; gap: 12px;
+  min-height: 56px; padding: 9px 12px; border: 1px solid var(--glass-line); border-radius: 12px;
+  background: rgba(10, 15, 30, 0.5); color: var(--text); text-align: left; cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.settings-row svg {
+  box-sizing: border-box; width: 36px; height: 36px; padding: 7px; border-radius: 9px; color: var(--cyan); image-rendering: pixelated;
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0 2px, transparent 2px 4px), #04121a;
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--cyan) 40%, transparent);
+}
+.settings-row span { font: 9px/1.4 var(--font-display); letter-spacing: var(--ls-pixel); text-transform: uppercase; }
+.settings-row em { color: var(--muted); font: 14px var(--font-body); font-style: normal; }
+.settings-row b { grid-column: 4; color: var(--muted); font: 12px var(--font-display); }
+.settings-row:hover, .settings-row:focus-visible { border-color: var(--cyan); background: color-mix(in srgb, var(--cyan) 8%, rgba(10, 15, 30, 0.5)); outline: none; }
+#settingsSoundButton { grid-template-columns: 36px 1fr auto; }
+#settingsSoundButton em { min-width: 44px; padding: 4px 8px; border-radius: 6px; background: #5cf28a; color: #04121a; font: 9px var(--font-display); letter-spacing: var(--ls-pixel); text-align: center; text-transform: uppercase; }
+#settingsSoundButton[aria-pressed="false"] em { background: rgba(255, 255, 255, 0.12); color: var(--muted); }
 
 @media (max-width: 760px) {
-  .main-menu .menu-cabinet { padding: calc(env(safe-area-inset-top, 0px) + 12px) 12px calc(env(safe-area-inset-bottom, 0px) + 12px); }
-  .main-menu .menu-hero { width: 100%; }
-  .main-menu .menu-hero .play-tile.is-main { grid-template-columns: 72px 1fr; padding: 0.9rem 0.8rem; }
-  .main-menu .menu-hero .play-tile-art { height: 72px; }
+  .main-menu .menu-cabinet { padding: calc(env(safe-area-inset-top, 0px) + 12px) 10px calc(env(safe-area-inset-bottom, 0px) + 10px); }
+  .main-menu .menu-bottom { width: 100%; gap: 8px; }
+  .main-menu .menu-hero .play-tile.is-main { grid-template-columns: 56px 1fr; gap: 0.7rem; padding: 0.8rem 0.75rem 0.75rem; }
+  .main-menu .menu-hero .play-tile-art { height: 56px; }
+  .menu-dock { gap: 2px; padding: 4px; border-radius: 14px; }
+  .dock-item { gap: 6px; min-height: 66px; padding: 8px 1px 7px; }
+  .dock-art { width: 34px; height: 34px; }
+  .dock-art svg { width: 24px; height: 24px; }
+  .dock-label { font-size: 8px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .expedition-drawer, .expedition-drawer.is-open, .main-menu .menu-hero { transition: none; }
+  .main-menu .menu-bottom, .dock-item { transition: none; }
 }
 
 /* The menu globe's tag: what's under the pointer (a country, a vehicle, one of the places). */
@@ -3638,6 +3624,9 @@ h1, h2, h3 { font-weight: normal; }
 /* ---------- A vehicle's card on the menu globe (transit-card.js) ---------- */
 .transit-card { position: fixed; z-index: 6; display: grid; gap: 10px; width: min(300px, calc(100vw - 24px)); padding: 12px 14px 12px; border-radius: 10px; background: var(--glass-strong); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); box-shadow: inset 0 0 0 2px var(--gold), var(--glass-shine), 4px 4px 0 rgba(0, 0, 0, 0.5); animation: transit-in 0.18s ease-out; }
 .transit-card.hidden { display: none; }
+/* A preview (hover on a computer): just the card, nothing to click. */
+.transit-card.is-preview { pointer-events: none; animation-duration: 0.12s; }
+.transit-card.is-preview .transit-close { display: none; }
 @keyframes transit-in { from { opacity: 0; transform: translateY(6px); } }
 .transit-head { display: flex; align-items: center; gap: 10px; }
 .transit-head .travel-icon { flex: none; padding: 3px; border-radius: 6px; background: #0b1020; box-shadow: inset 0 0 0 1px var(--line-strong); }
@@ -3664,37 +3653,18 @@ h1, h2, h3 { font-weight: normal; }
 .transit-now .field-label { color: var(--gold); }
 /* A phone: across the top, under the header (the hero card has the bottom). */
 @media (max-width: 760px) {
-  .transit-card { left: 12px !important; right: 12px; top: calc(140px + env(safe-area-inset-top)) !important; width: auto; }
+  /* A phone: the card takes the bottom of the screen (the game card and dock step aside), so
+     the vehicle, turned to the middle above it, stays in view. */
+  .transit-card { left: 12px; right: 12px; top: auto; bottom: calc(12px + env(safe-area-inset-bottom)); width: auto; max-height: 52dvh; overflow-y: auto; }
+  .main-menu.is-ride-open .menu-bottom { opacity: 0; transform: translateY(24px); pointer-events: none; }
+  .main-menu.is-ride-open .menu-bottom * { pointer-events: none; }
 }
 
 /* ---------- Where you are: the home screen's top-right card (updatePlaceHud in engine.js) ---------- */
-.place-hud { position: fixed; z-index: 4; top: calc(16px + env(safe-area-inset-top)); right: calc(16px + env(safe-area-inset-right)); display: flex; align-items: center; gap: 10px; max-width: min(360px, calc(100vw - 200px - env(safe-area-inset-left) - env(safe-area-inset-right)), var(--hud-room, 360px)); padding: 7px 12px 7px 8px; border: 0; border-radius: 10px; background: var(--glass-strong); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); box-shadow: inset 0 0 0 1px var(--glass-line), inset 3px 0 0 var(--hud, var(--gold)), var(--glass-shine), 3px 3px 0 rgba(0, 0, 0, 0.4); color: var(--text); text-align: left; cursor: pointer; animation: transit-in 0.2s ease-out; }
-.place-hud.hidden { display: none; }
-.place-hud:hover,
-.place-hud:focus-visible { box-shadow: inset 0 0 0 2px var(--hud, var(--gold)), var(--glass-shine), 3px 3px 0 rgba(0, 0, 0, 0.4); outline: none; }
-.place-hud-icon { flex: none; width: 32px; height: auto; padding: 3px; border-radius: 6px; background: #0b1020; image-rendering: pixelated; box-sizing: content-box; }
-canvas.place-hud-icon:not(.place-hud-tent) { width: 26px; height: 26px; }
-.place-hud-text { display: grid; gap: 4px; min-width: 0; }
-.place-hud-text .field-label { overflow: hidden; color: var(--hud, var(--gold)); text-overflow: ellipsis; white-space: nowrap; }
-.place-hud-where { display: flex; align-items: center; gap: 6px; min-width: 0; }
-.place-hud-where strong { overflow: hidden; font: 600 14px/1.2 var(--font-body); text-overflow: ellipsis; white-space: nowrap; }
-.place-hud-flag { width: 20px; height: 14px; flex: none; border: 1px solid var(--line-strong); object-fit: cover; }
 /* The trip: ✈ GAME 🏳 place · 1,150 km, in the destination's colour. */
-.place-hud-trip { display: flex; align-items: center; gap: 6px; min-width: 0; padding-top: 4px; border-top: 1px dashed var(--glass-line); color: var(--muted); font: 12px var(--font-body); white-space: nowrap; }
-.place-hud-plane { width: 18px; height: 18px; flex: none; image-rendering: pixelated; }
-.place-hud-trip b { color: var(--to, var(--cyan)); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
-.place-hud-trip span { overflow: hidden; color: var(--text); text-overflow: ellipsis; }
-.place-hud-trip em { flex: none; margin-left: auto; color: var(--to, var(--cyan)); font: 700 12px var(--font-mono); font-style: normal; }
-.place-hud.is-new-target .place-hud-trip { animation: hud-trip 0.5s ease-out; }
 @keyframes hud-trip { from { opacity: 0; transform: translateX(10px); } }
 @media (max-width: 760px) {
   /* Under the header row (the menu button and EXPEDITION have the top). */
-  .place-hud { top: calc(68px + env(safe-area-inset-top)); right: calc(12px + env(safe-area-inset-right)); max-width: calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)); padding: 5px 8px 5px 6px; gap: 6px; }
-  .place-hud-icon { width: 24px; }
-  canvas.place-hud-icon:not(.place-hud-tent) { width: 20px; height: 20px; }
-  .place-hud-where strong { font-size: 12px; }
-  .place-hud-trip { gap: 4px; font-size: 12px; }
-  .place-hud-trip b { display: none; }
 }
 
 /* ---------- A new tent (celebrateTent in tents.js) ---------- */
@@ -3813,6 +3783,72 @@ canvas.place-hud-icon:not(.place-hud-tent) { width: 26px; height: 26px; }
 .tent-look.is-locked { cursor: not-allowed; opacity: 0.35; filter: grayscale(1); }
 .tent-look-icon { width: 32px; height: 32px; image-rendering: pixelated; }
 
+/* ---------- The score card on a phone: the journey, standing, over the whole screen ----------
+   (13 November 2026, team request: the journey is the main way to see your score.) The
+   day's journey stands up behind everything (journey-scenes-tall.js); the points sit in a
+   bar at the top, and the answer, the total, MORE ABOUT IT and NEXT in a card at the bottom.
+   The route runs in the free band between the two (engine.js burstJourneyBand, which also
+   sets --panel-top for the card's backdrop), so every 1,000 and the goal stay in view. */
+@media (max-width: 760px) {
+  .score-burst-card,
+  .score-burst-card.has-info,
+  .score-burst-card.is-extreme {
+    position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; gap: 0;
+    width: 100%; height: 100dvh; max-height: 100dvh; min-width: 0;
+    padding: 0 0 calc(env(safe-area-inset-bottom, 0px) + 12px); overflow-x: hidden; overflow-y: auto;
+    border: 0; border-radius: 0; background: #0a0f1d; box-shadow: none; animation: none; text-align: center;
+  }
+  /* The journey fills the card. */
+  .score-burst-card .score-burst-climb,
+  .score-burst-card.is-extreme .score-burst-climb { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100dvh; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; }
+  .score-burst-card .score-burst-climb .journey.is-tall { width: 100%; height: 100%; max-height: none; aspect-ratio: auto; object-fit: fill; border-radius: 0; image-rendering: pixelated; }
+  /* The backdrop of the card at the bottom: from the scene into the card's navy. */
+  .score-burst-card::before { content: ""; position: absolute; left: 0; right: 0; top: calc(var(--panel-top, 70%) - 28px); bottom: 0; z-index: 1; background: linear-gradient(to bottom, rgba(10, 15, 29, 0), rgba(10, 15, 29, 0.94) 28px); pointer-events: none; }
+  .score-burst-card > :not(.score-burst-climb) { position: relative; z-index: 2; }
+  /* The points bar. */
+  .score-burst-card .score-burst-label {
+    position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); left: 12px; right: 12px; z-index: 3;
+    display: flex; align-items: flex-start; height: 72px; padding: 11px 16px 0; border-radius: 14px;
+    background: rgba(10, 15, 30, 0.8); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    box-shadow: inset 0 0 0 1px var(--glass-line), 0 8px 24px rgba(0, 0, 0, 0.4); text-align: left;
+  }
+  /* The points on the left, under the label (the shared SKIP sits top right on a phone). */
+  .score-burst-card .score-burst-points { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 32px); left: 28px; z-index: 4; display: flex; align-items: center; height: 44px; font-size: 36px; }
+  .score-burst-card .score-burst-streak { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 32px); right: 26px; z-index: 4; display: flex; align-items: center; height: 40px; }
+  /* The card at the bottom. */
+  .score-burst-card .burst-answer { width: auto; margin: 0; padding: 12px 16px 10px; border-bottom: 0; }
+  .score-burst-card .burst-answer-main strong { font-size: 24px; }
+  .score-burst-card .burst-answer-flag img { width: 48px; height: 32px; }
+  .score-burst-card .score-burst-total { padding: 0 16px 10px; }
+  .score-burst-card .burst-more, .score-burst-card .burst-info { margin: 0 12px 10px; width: auto; }
+  .score-burst-card #scoreBurstNext { margin: 0 12px; box-shadow: none; }
+}
+
+/* ---------- In a game: just the top bar and the score (13 November 2026) ----------
+   The icon buttons are gone (EXPEDITION goes to the menu; the rest lives there), and the
+   score tile shows only the score: the journey is on the score card after each round. */
+.score-tile-main { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 760px) {
+  /* The round numbers take the row the buttons had. */
+  .side-left .rounds-card { grid-column: 1 / -1; }
+}
+
+/* ---------- The score card on a computer: the journey big (13 November 2026) ----------
+   After each round the day's journey fills the card's wider left column, under the answer
+   and the points (the info card on the right), so it's the biggest thing on the card and
+   all of it still fits without scrolling (checked at 1366×768). */
+@media (min-width: 761px) {
+  .score-burst-climb { width: min(720px, 86vw); }
+  .score-burst-card.has-info,
+  .score-burst-card.is-extreme.has-info { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); width: min(1240px, 96vw); }
+  .score-burst-card.has-info .burst-info { grid-row: 1 / span 7; }
+  .score-burst-card.has-info.is-deepcut .burst-info { grid-row: 1 / span 7; }
+  .score-burst-card.has-info .score-burst-climb,
+  .score-burst-card.has-info.is-deepcut .score-burst-climb { grid-column: 1; grid-row: auto; width: 100%; justify-self: stretch; }
+  .score-burst-card.has-info.is-deepcut .score-burst-total { grid-column: 1; grid-row: auto; }
+  .score-burst-card .score-burst-climb .journey { max-height: min(44vh, 480px); }
+}
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -3822,66 +3858,71 @@ canvas.place-hud-icon:not(.place-hud-tent) { width: 26px; height: 26px; }
     <div id="menuGlobe" class="menu-globe" aria-hidden="true"></div>
     <div class="menu-cabinet">
       <div class="menu-marquee">
-        <!-- The Expedition menu (a drawer): every game, Base Camp and the rest. -->
-        <button class="menu-drawer-toggle" id="menuDrawerToggle" type="button" aria-controls="expeditionDrawer" aria-expanded="false" data-i18n-attr="title:menu.drawerOpen;aria-label:menu.drawerOpen">
-          <svg viewBox="0 0 16 16" aria-hidden="true" shape-rendering="crispEdges"><path d="M2 3h12v2H2zm0 4h12v2H2zm0 4h12v2H2z" fill="currentColor"/></svg>
-        </button>
         <span class="brand-mark menu-logo" aria-hidden="true"></span>
         <h1 id="menuTitle">EXPEDITION</h1>
         <p class="menu-tagline" data-i18n="menu.tagline">The daily geography challenge</p>
       </div>
-      <!-- Today's main game, one click away: the hero at the bottom. -->
-      <div class="menu-hero" id="menuHero">
-        <!-- The card for what's selected (engine.js renderHero): today's main game at first,
-             or the game or Base Camp you picked on the globe or in the Expedition menu, or a
-             past day while stepping through the archive. -->
-        <div class="play-tile is-main hero-card" id="heroCard" style="--tile: #ff6b9d" aria-live="polite">
-          <span class="play-tile-ribbon" id="heroRibbon"></span>
-          <span class="play-tile-art" id="heroArt" aria-hidden="true"></span>
-          <span class="play-tile-text">
-            <strong id="heroTitle">HIGHS &amp; LOWS</strong>
-            <span id="heroText"></span>
-            <small id="heroStatus"></small>
-          </span>
-          <div class="hero-days hidden" id="heroDays">
-            <button class="hero-step" id="heroOlder" type="button" data-i18n-attr="aria-label:hero.older">‹</button>
-            <span class="hero-day"><strong id="heroDayLabel"></strong><small id="heroDayName"></small></span>
-            <button class="hero-step" id="heroNewer" type="button" data-i18n-attr="aria-label:hero.newer">›</button>
-          </div>
-          <div class="hero-actions">
-            <button class="play-tile-go" id="heroGo" type="button">▶ PLAY</button>
-            <button class="hero-side" id="heroSide" type="button"></button>
+      <!-- The bottom of the home screen (13 November 2026): the card for the selected game
+           (PLAY, and its own ARCHIVE) over a dock of five, each one click away: Highs & Lows,
+           Casual, 1v1 (coming soon), Crew and Settings. -->
+      <div class="menu-bottom">
+        <div class="menu-hero" id="menuHero">
+          <!-- The card for what's selected (engine.js renderHero): today's main game at first,
+               or the game or Base Camp you picked on the globe or in the Expedition menu, or a
+               past day while stepping through the archive. -->
+          <div class="play-tile is-main hero-card" id="heroCard" style="--tile: #ff6b9d" aria-live="polite">
+            <span class="play-tile-ribbon" id="heroRibbon"></span>
+            <span class="play-tile-art" id="heroArt" aria-hidden="true"></span>
+            <span class="play-tile-text">
+              <strong id="heroTitle">HIGHS &amp; LOWS</strong>
+              <span id="heroText"></span>
+              <small id="heroStatus"></small>
+            </span>
+            <div class="hero-days hidden" id="heroDays">
+              <button class="hero-step" id="heroOlder" type="button" data-i18n-attr="aria-label:hero.older">‹</button>
+              <span class="hero-day"><strong id="heroDayLabel"></strong><small id="heroDayName"></small></span>
+              <button class="hero-step" id="heroNewer" type="button" data-i18n-attr="aria-label:hero.newer">›</button>
+            </div>
+            <div class="hero-actions">
+              <button class="play-tile-go" id="heroGo" type="button">▶ PLAY</button>
+              <button class="hero-side" id="heroSide" type="button"></button>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-    <!-- The Expedition menu: today's games, Base Camp, and the rest in a footer. Hovering a
-         game or Base Camp turns the globe to it (engine.js, focusMenuStop). -->
-    <aside class="expedition-drawer" id="expeditionDrawer" aria-labelledby="drawerTitle" inert>
-      <div class="drawer-head">
-        <h2 id="drawerTitle" data-i18n="menu.drawerTitle">EXPEDITION MENU</h2>
-        <button class="modal-close" id="menuDrawerClose" type="button" data-i18n-attr="aria-label:menu.drawerClose">×</button>
-      </div>
-      <section class="drawer-section">
-        <h3 class="field-label" data-i18n="menu.drawerToday">TODAY'S GAMES</h3>
-        <nav class="menu-play-options" id="menuPlayOptions" aria-label="Play" data-i18n-attr="aria-label:menu.play">
-          <button class="play-tile menu-mode drawer-mode" id="drawerExtremesButton" type="button" data-select="extremes" data-focus="extremes" style="--tile: #ff6b9d">
-            <span class="play-tile-art" data-art="extremes" aria-hidden="true"></span>
-            <span class="play-tile-text">
-              <strong>HIGHS &amp; LOWS</strong>
-              <span data-i18n="menu.extremesLine">Six ranking questions a day.</span>
-              <small id="drawerExtremesStatus"></small>
-            </span>
+        <nav class="menu-dock" id="menuDock" aria-label="Main menu" data-i18n-attr="aria-label:menu.mainMenu">
+          <button class="dock-item" id="drawerExtremesButton" type="button" data-select="extremes" data-focus="extremes" style="--tile: #ff6b9d">
+            <span class="dock-art" data-art="extremes" aria-hidden="true"></span>
+            <span class="dock-label">HIGHS &amp; LOWS</span>
+            <small class="dock-status" id="drawerExtremesStatus"></small>
           </button>
-          <button class="play-tile menu-mode drawer-mode" id="menuCasualButton" data-focus="casual" type="button" data-select="casual" style="--tile: var(--gold)">
-            <span class="play-tile-art" data-art="casual" aria-hidden="true"></span>
-            <span class="play-tile-text">
-              <strong data-i18n="mode.casual.short">CASUAL</strong>
-              <span data-i18n="menu.casualText">Five country puzzles a day.</span>
-              <small id="menuCasualStatus"></small>
-            </span>
+          <button class="dock-item" id="menuCasualButton" type="button" data-select="casual" data-focus="casual" style="--tile: var(--gold)">
+            <span class="dock-art" data-art="casual" aria-hidden="true"></span>
+            <span class="dock-label" data-i18n="mode.casual.short">CASUAL</span>
+            <small class="dock-status" id="menuCasualStatus"></small>
           </button>
-          <!-- Competitive and Puzzles are kept in reserve, out of sight. -->
+          <button class="dock-item" id="menuDuelButton" type="button" data-select="duel" style="--tile: #c58cff">
+            <span class="dock-art" data-art="duel" aria-hidden="true"></span>
+            <span class="dock-label">1V1</span>
+            <small class="dock-soon" data-i18n="menu.soon">SOON</small>
+          </button>
+          <button class="dock-item community-open-button" id="menuCommunityButton" type="button" style="--tile: var(--cyan)">
+            <span class="dock-art" aria-hidden="true">
+              <svg viewBox="0 0 32 32" shape-rendering="crispEdges"><path d="M8 5h6v6H8zm10 0h6v6h-6zM5 13h12v3H5zm12 0h10v3H17zM5 16h3v11H5zm9 0h3v11h-3zm10 0h3v11h-3zM8 22h6v3H8zm9 0h7v3h-7z" fill="currentColor"/></svg>
+            </span>
+            <span class="dock-label" data-i18n="menu.community">CREW</span>
+            <small class="menu-option-note" hidden></small>
+          </button>
+          <button class="dock-item" id="menuSettingsButton" type="button" aria-haspopup="dialog" style="--tile: #cfd8dc">
+            <span class="dock-art" aria-hidden="true">
+              <svg viewBox="0 0 32 32" shape-rendering="crispEdges"><path d="M8 8h16v16H8zm4 4v8h8v-8z" fill-rule="evenodd" fill="currentColor"/><path d="M13 3h6v5h-6zm0 21h6v5h-6zM3 13h5v6H3zm21 0h5v6h-5zM6 6h5v5H6zm15 0h5v5h-5zM6 21h5v5H6zm15 0h5v5h-5z" fill="currentColor"/></svg>
+            </span>
+            <span class="dock-label" data-i18n="menu.settingsShort">SETTINGS</span>
+          </button>
+        </nav>
+      </div>
+      <!-- Kept out of sight: Competitive (in reserve) and Crew's week at a glance (social.js
+           still fills it; its one-line summary goes on the Crew button's title). -->
+      <div hidden>
           <button class="play-tile menu-mode" id="menuCompetitiveButton" hidden type="button" data-mode="competitive" style="--tile: var(--accent)">
             <span class="play-tile-art" data-art="competitive" aria-hidden="true"></span>
             <span class="play-tile-text">
@@ -3890,65 +3931,52 @@ canvas.place-hud-icon:not(.place-hud-tent) { width: 26px; height: 26px; }
               <small id="menuCompetitiveStatus"></small>
             </span>
           </button>
-          <button class="play-tile menu-mode" id="menuPuzzlesButton" hidden type="button" disabled style="--tile: #c58cff">
-            <span class="play-tile-art" data-art="puzzles" aria-hidden="true"></span>
-            <span class="play-tile-text">
-              <strong data-i18n="menu.puzzles">PUZZLES</strong>
-              <span data-i18n="menu.puzzlesText">Brain teasers about the world.</span>
-              <small data-i18n="menu.comingSoon">Coming soon</small>
-            </span>
-          </button>
-        </nav>
-      </section>
-      <section class="drawer-section drawer-camp">
-        <h3 class="field-label" data-i18n="menu.drawerCamp">CAMP &amp; COMMUNITY</h3>
-        <!-- Base Camp at a glance: your group's week, an invite to climb together, or a quiet
-             sign-in (social.js, renderGlance). -->
-        <div class="menu-community-card" id="menuCommunityCard" data-focus="camp" aria-label="Base Camp" data-i18n-attr="aria-label:menu.community"></div>
-        <!-- My Tent: your account and your tent (its place, style and explorer). Opening it
-             flies the globe to your tent (engine.js). -->
-        <button class="menu-tent-card" id="menuAccountButton" data-focus="tent" type="button">
-          <span class="menu-tent-icon" id="menuTentIcon" aria-hidden="true"></span>
-          <span class="menu-tent-text">
-            <strong data-i18n="menu.account">MY TENT</strong>
-            <small id="menuTentWhere"></small>
-            <small id="menuAccountLabel"></small>
-          </span>
-          <span class="account-avatar" id="menuAccountAvatar" aria-hidden="true" hidden></span>
-          <span class="menu-tent-go" aria-hidden="true">›</span>
+        <div class="menu-community-card" id="menuCommunityCard"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Settings (the dock's last button): My Tent, your stats, how to play, language and sound. -->
+  <div id="settingsModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal settings-modal">
+      <div class="modal-head">
+        <h2 id="settingsTitle" data-i18n="menu.settings">SETTINGS</h2>
+        <button class="modal-close" id="closeSettingsButton" type="button" aria-label="Close" data-i18n-attr="aria-label:settings.close">×</button>
+      </div>
+      <button class="menu-tent-card" id="menuAccountButton" data-focus="tent" type="button">
+        <span class="menu-tent-icon" id="menuTentIcon" aria-hidden="true"></span>
+        <span class="menu-tent-text">
+          <strong data-i18n="menu.account">MY TENT</strong>
+          <small id="menuTentWhere"></small>
+          <small id="menuAccountLabel"></small>
+        </span>
+        <span class="account-avatar" id="menuAccountAvatar" aria-hidden="true" hidden></span>
+        <span class="menu-tent-go" aria-hidden="true">›</span>
+      </button>
+      <div class="settings-list">
+        <button class="settings-row stats-open-button" id="settingsStatsButton" type="button">
+          <svg viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges"><path d="M3 27h26v3H1V5h3zm4-3h5V15H7zm8 0h5V9h-5zm8 0h5V3h-5z" fill="currentColor"/></svg>
+          <span data-i18n="stats.title">YOUR STATS</span><b aria-hidden="true">›</b>
         </button>
-      </section>
-      <nav class="menu-options menu-secondary drawer-footer" aria-label="Main menu" data-i18n-attr="aria-label:menu.mainMenu">
-        <button class="menu-option" id="menuArchiveButton" type="button">
-          <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
-            <path d="M5 4h4v3h14V4h4v4h2v21H3V8h2zm1 6v16h18V10zm3 2h12v3H9zm0 6h9v3H9z" fill="currentColor"/>
-          </svg>
-          <span data-i18n="menu.archive">ARCHIVE</span>
+        <button class="settings-row" id="menuHowToButton" type="button">
+          <svg viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges"><path d="M10 4h12v3h3v8h-3v3h-4v4h-4v-6h3v-3h3V8h-8v3H8V7h2zm4 21h4v4h-4z" fill="currentColor"/></svg>
+          <span data-i18n="menu.howTo">HOW TO PLAY</span><b aria-hidden="true">›</b>
         </button>
-        <button class="menu-option community-open-button" id="menuCommunityButton" type="button">
-          <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
-            <path d="M8 5h6v6H8zm10 0h6v6h-6zM5 13h12v3H5zm12 0h10v3H17zM5 16h3v11H5zm9 0h3v11h-3zm10 0h3v11h-3zM8 22h6v3H8zm9 0h7v3h-7z" fill="currentColor"/>
-          </svg>
-          <span class="menu-option-text"><span data-i18n="menu.community">BASE CAMP</span><small class="menu-option-note" data-i18n="menu.communityNote">Play with friends in groups.</small></span>
-        </button>
-        <button class="menu-option" id="menuHowToButton" type="button">
-          <svg class="menu-pixel-icon" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
-            <path d="M10 4h12v3h3v8h-3v3h-4v4h-4v-6h3v-3h3V8h-8v3H8V7h2zm4 21h4v4h-4z" fill="currentColor"/>
-          </svg>
-          <span data-i18n="menu.howTo">HOW TO PLAY</span>
-        </button>
-        <!-- The language: opens the language window. -->
-        <button class="menu-option lang-button" id="langButton" type="button" aria-haspopup="dialog" data-i18n-attr="title:lang.label;aria-label:lang.open">
+        <button class="settings-row" id="langButton" type="button" aria-haspopup="dialog">
           <svg class="lang-button-icon" viewBox="0 0 16 16" aria-hidden="true" shape-rendering="crispEdges">
             <path d="M7 0h8v1h-8zM6 1h4v1h-4zM11 1h5v1h-5zM6 2h1v1h-1zM14 2h2v1h-2zM6 3h2v1h-2zM9 3h3v1h-3zM13 3h3v1h-3zM6 4h3v1h-3zM10 4h1v1h-1zM12 4h4v1h-4zM11 5h5v1h-5zM10 6h1v1h-1zM12 6h4v1h-4zM10 7h2v1h-2zM14 7h2v1h-2zM10 8h6v1h-6zM10 9h5v1h-5zM13 10h2v1h-2zM14 11h1v1h-1z" fill="#ffd45c"/>
             <path d="M10 1h1v1h-1zM7 2h7v1h-7zM8 3h1v1h-1zM12 3h1v1h-1zM9 4h1v1h-1zM11 4h1v1h-1zM1 5h8v1h-8zM10 5h1v1h-1zM0 6h1v1h-1zM9 6h1v1h-1zM11 6h1v1h-1zM0 7h1v1h-1zM4 7h2v1h-2zM9 7h1v1h-1zM12 7h2v1h-2zM0 8h1v1h-1zM3 8h1v1h-1zM6 8h1v1h-1zM9 8h1v1h-1zM0 9h1v1h-1zM2 9h1v1h-1zM7 9h1v1h-1zM9 9h1v1h-1zM0 10h1v1h-1zM2 10h6v1h-6zM9 10h1v1h-1zM0 11h1v1h-1zM2 11h1v1h-1zM7 11h1v1h-1zM9 11h1v1h-1zM0 12h1v1h-1zM2 12h1v1h-1zM7 12h1v1h-1zM9 12h1v1h-1zM0 13h1v1h-1zM9 13h1v1h-1zM1 14h1v1h-1zM4 14h5v1h-5z" fill="#0b1020"/>
             <path d="M2 6h6v1h-6zM1 7h3v1h-3zM6 7h3v1h-3zM1 8h2v1h-2zM4 8h2v1h-2zM7 8h2v1h-2zM1 9h1v1h-1zM3 9h4v1h-4zM8 9h1v1h-1zM1 10h1v1h-1zM8 10h1v1h-1zM1 11h1v1h-1zM3 11h4v1h-4zM8 11h1v1h-1zM1 12h1v1h-1zM3 12h4v1h-4zM8 12h1v1h-1zM2 13h6v1h-6zM2 14h2v1h-2zM2 15h1v1h-1z" fill="#45e3ff"/>
           </svg>
-          <span data-i18n="lang.label">Language</span>
+          <span data-i18n="lang.label">Language</span><em id="settingsLangValue"></em><b aria-hidden="true">›</b>
         </button>
-      </nav>
-    </aside>
-  </section>
+        <button class="settings-row" id="settingsSoundButton" type="button" aria-pressed="true">
+          <svg viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges"><path d="M3 12h6l8-7v22l-8-7H3zM21 11h3v3h3v4h-3v3h-3v-3h2v-4h-2zM24 5h3v3h2v3h-3V8h-2zM24 24h2v-3h3v3h-2v3h-3z" fill="currentColor"/></svg>
+          <span data-i18n="settings.sound">SOUND</span><em id="settingsSoundValue"></em>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Holds the globe while it flies from the menu horizon into the game. -->
   <div id="globeTransition" class="globe-transition hidden" aria-hidden="true"></div>
@@ -3993,7 +4021,10 @@ canvas.place-hud-icon:not(.place-hud-tent) { width: 26px; height: 26px; }
           </div>
         </section>
 
-        <nav class="panel game-buttons" aria-label="Game menu" data-i18n-attr="aria-label:game.menu">
+        <!-- The in-game icon buttons are hidden (13 November 2026, team request: EXPEDITION above
+             goes to the menu, and sound, archive, Crew, stats and how to play live there). Kept
+             in the page because the game still uses the sound switch's icons. -->
+        <nav class="panel game-buttons hidden" aria-label="Game menu" data-i18n-attr="aria-label:game.menu">
           <button class="icon-btn home-button" type="button" title="Main menu" aria-label="Back to the main menu" data-i18n-attr="title:game.mainMenu;aria-label:game.backHome">
             <svg viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
               <path d="M14 3h4v2h2v2h2v2h2v2h2v2h3v3h-3v13h-8v-8h-6v8H6V16H3v-3h3v-2h2V9h2V7h2V5h2z" fill="currentColor"/>
@@ -4039,9 +4070,10 @@ canvas.place-hud-icon:not(.place-hud-tent) { width: 26px; height: 26px; }
               <strong id="dailyTotalScore">0</strong>
               <span id="dailyMaxScore">/ 6,000</span>
             </div>
-            <div class="score-tile-climb" id="scoreTileClimb"></div>
+            <div class="score-tile-climb hidden" id="scoreTileClimb"></div>
           </div>
-          <div class="score-tile-round">
+          <!-- Just the score in this bar (13 November 2026); the journey is on the score card. -->
+          <div class="score-tile-round hidden">
             <span id="scoreTileRoundLabel">This round is worth up to</span>
             <strong id="scoreTileWorth">1,000</strong>
           </div>
@@ -6253,8 +6285,17 @@ const EN = {
   "menu.puzzles": "PUZZLES",
   "menu.puzzlesText": "Brain teasers about the world.",
   "menu.comingSoon": "Coming soon",
+  "menu.soon": "SOON",
+  "menu.settings": "SETTINGS",
+  "menu.settingsShort": "SETTINGS",
+  "menu.duelText": "Play a friend head to head, on the same questions.",
+  "menu.duelSoon": "We're still building this one.",
+  "settings.close": "Close settings",
+  "settings.sound": "SOUND",
+  "settings.on": "On",
+  "settings.off": "Off",
   "menu.archive": "ARCHIVE",
-  "menu.community": "BASE CAMP",
+  "menu.community": "CREW",
   "menu.communityNote": "Race your friends each week.",
   "menu.stats": "STATS",
   "menu.statsNote": "Your best days, streaks and more.",
@@ -6295,7 +6336,7 @@ const EN = {
   "game.mute": "Mute sound",
   "game.unmute": "Enable sound",
   "game.archive": "Puzzle archive",
-  "game.community": "Base Camp",
+  "game.community": "Crew",
   "game.statistics": "Statistics",
   "game.howTo": "How to play",
   "game.todaysScore": "Today's score",
@@ -6870,10 +6911,10 @@ const EN = {
 
   // Community
   "community.note": "Your friends, your groups and the logbook.",
-  "community.close": "Close Base Camp",
+  "community.close": "Close Crew",
   "community.nowFriends": "You and {name} are now friends.",
   "community.loading": "Loading your friends and groups…",
-  "community.notSetUp": "Base Camp isn't switched on yet: supabase/social.sql still has to be run in Supabase (see docs/accounts-setup.md).",
+  "community.notSetUp": "Crew isn't switched on yet: supabase/social.sql still has to be run in Supabase (see docs/accounts-setup.md).",
   "community.loadFailed": "Couldn't load your friends and groups: {message}",
   "community.makeGroup": "Make a group with your friends to see who wins each day and each week.",
   "community.addFirst": "Add a friend with their invite code, then make a group together.",
@@ -6977,11 +7018,11 @@ const EN = {
   "menu.extremesLine": "Six ranking questions a day.",
   "menu.pinToday": "Today: {name}",
   "menu.pinStarts": "Starts in {country}",
-  "menu.pinGoCamp": "GO TO BASE CAMP ›",
+  "menu.pinGoCamp": "OPEN CREW ›",
   "menu.tipPlay": "Tap to play",
   "menu.countryFacts": p => `${p.continent} · ${p.people} people · ${p.area} km²`,
   "menu.tipBase": "Tap to move your base",
-  "menu.tipCamp": "Tap to open Base Camp",
+  "menu.tipCamp": "Tap to open Crew",
   "menu.tipToday": "Today's game starts here · tap to play",
   "travel.kind.plane": "Plane",
   "travel.kind.ship": "Ship",
@@ -7101,10 +7142,10 @@ const EN = {
   "atlas.tip4": "Every month's podium stays in History. Forever, more or less.",
   "atlas.tip5": "Your shield comes from how often and how well you climb each month.",
   "glance.week": "THIS WEEK",
-  "glance.open": "OPEN BASE CAMP ›",
+  "glance.open": "OPEN CREW ›",
   "glance.signedOut": "Sign in to race your friends up the weekly board.",
   "glance.accountsOff": "Friends and groups arrive with accounts.",
-  "glance.notSetUp": "Base Camp isn't switched on yet.",
+  "glance.notSetUp": "Crew isn't switched on yet.",
   "glance.loading": "Checking the logbook…",
   "glance.together": "CLIMB TOGETHER",
   "glance.togetherText": "Invite friends and see who climbs highest each week.",
@@ -7201,8 +7242,17 @@ const NL = {
   "menu.puzzles": "PUZZELS",
   "menu.puzzlesText": "Breinbrekers over de wereld.",
   "menu.comingSoon": "Binnenkort",
+  "menu.soon": "STRAKS",
+  "menu.settings": "INSTELLINGEN",
+  "menu.settingsShort": "OPTIES",
+  "menu.duelText": "Speel één tegen één tegen een vriend, met dezelfde vragen.",
+  "menu.duelSoon": "Hier bouwen we nog aan.",
+  "settings.close": "Instellingen sluiten",
+  "settings.sound": "GELUID",
+  "settings.on": "Aan",
+  "settings.off": "Uit",
   "menu.archive": "ARCHIEF",
-  "menu.community": "BASISKAMP",
+  "menu.community": "CREW",
   "menu.communityNote": "Race elke week tegen je vrienden.",
   "menu.stats": "STATS",
   "menu.statsNote": "Je beste dagen, reeksen en meer.",
@@ -7243,7 +7293,7 @@ const NL = {
   "game.mute": "Geluid uit",
   "game.unmute": "Geluid aan",
   "game.archive": "Puzzelarchief",
-  "game.community": "Basiskamp",
+  "game.community": "Crew",
   "game.statistics": "Statistieken",
   "game.howTo": "Uitleg",
   "game.todaysScore": "Score van vandaag",
@@ -7841,10 +7891,10 @@ const NL = {
 
   // Community
   "community.note": "Je vrienden, je groepen en het logboek.",
-  "community.close": "Basiskamp sluiten",
+  "community.close": "Crew sluiten",
   "community.nowFriends": "Jij en {name} zijn nu vrienden.",
   "community.loading": "Je vrienden en groepen laden…",
-  "community.notSetUp": "Het basiskamp staat nog niet aan: supabase/social.sql moet nog in Supabase gedraaid worden (zie docs/accounts-setup.md).",
+  "community.notSetUp": "Crew staat nog niet aan: supabase/social.sql moet nog in Supabase gedraaid worden (zie docs/accounts-setup.md).",
   "community.loadFailed": "Je vrienden en groepen konden niet geladen worden: {message}",
   "community.makeGroup": "Maak een groep met je vrienden om te zien wie elke dag en elke week wint.",
   "community.addFirst": "Voeg een vriend toe met zijn of haar uitnodigingscode en maak dan samen een groep.",
@@ -7948,11 +7998,11 @@ const NL = {
   "menu.extremesLine": "Zes ranglijstvragen per dag.",
   "menu.pinToday": "Vandaag: {name}",
   "menu.pinStarts": "Begint in {country}",
-  "menu.pinGoCamp": "NAAR HET BASISKAMP ›",
+  "menu.pinGoCamp": "OPEN CREW ›",
   "menu.tipPlay": "Tik om te spelen",
   "menu.countryFacts": p => `${p.continent} · ${p.people} inwoners · ${p.area} km²`,
   "menu.tipBase": "Tik om je basis te verplaatsen",
-  "menu.tipCamp": "Tik om het basiskamp te openen",
+  "menu.tipCamp": "Tik om Crew te openen",
   "menu.tipToday": "Het spel van vandaag begint hier · tik om te spelen",
   "travel.kind.plane": "Vliegtuig",
   "travel.kind.ship": "Schip",
@@ -8072,10 +8122,10 @@ const NL = {
   "atlas.tip4": "Het podium van elke maand blijft staan in Geschiedenis. Voor altijd, zo ongeveer.",
   "atlas.tip5": "Je schild hangt af van hoe vaak en hoe goed je elke maand klimt.",
   "glance.week": "DEZE WEEK",
-  "glance.open": "NAAR HET BASISKAMP ›",
+  "glance.open": "OPEN CREW ›",
   "glance.signedOut": "Log in en race met je vrienden naar de top van de week.",
   "glance.accountsOff": "Vrienden en groepen komen met de accounts.",
-  "glance.notSetUp": "Het basiskamp staat nog niet aan.",
+  "glance.notSetUp": "Crew staat nog niet aan.",
   "glance.loading": "Het logboek wordt bekeken…",
   "glance.together": "SAMEN KLIMMEN",
   "glance.togetherText": "Nodig vrienden uit en zie wie elke week het hoogst klimt.",
@@ -12603,6 +12653,14 @@ const MAX_CAMERA_DISTANCE = 420;
 // 1:50m country shapes. Self-host these files before launch so the game doesn't
 // depend on a third-party package's example folder.
 const EARTH_IMAGE_BASE = "https://cdn.jsdelivr.net/npm/three-globe@2.31.0/example/img/";
+const OWN_TEXTURES = "textures/";
+// Phones and slower devices (little memory, or Save-Data on) get the lighter globe: the
+// 2048-px image, no relief map, and less traffic in the menu (13 November 2026, players
+// found the site slow to load on older phones).
+const LIGHT_DEVICE = window.matchMedia("(max-width: 760px)").matches
+  || (navigator.deviceMemory && navigator.deviceMemory <= 4)
+  || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4)
+  || Boolean(navigator.connection?.saveData);
 const COUNTRIES_TOPOLOGY_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json";
 
 function getPolygons(feature) {
@@ -12814,27 +12872,28 @@ class PixelGlobe {
   loadEarthTextures(material) {
     const loader = new THREE.TextureLoader();
     const anisotropy = this.renderer.capabilities.getMaxAnisotropy();
-    const load = (file, isColor) => new Promise((resolve, reject) => {
-      loader.load(EARTH_IMAGE_BASE + file, texture => {
+    const load = (url, isColor) => new Promise((resolve, reject) => {
+      loader.load(url, texture => {
         texture.anisotropy = anisotropy;
         if (isColor) texture.encoding = THREE.sRGBEncoding;
         resolve(texture);
       }, undefined, reject);
     });
+    // Our own WebP copies (textures/, tools/build-textures.mjs), with the original as the
+    // fallback (the one-file share version has no textures/ folder next to it).
+    const loadOwn = (file, fallback, isColor) => load(OWN_TEXTURES + file, isColor).catch(() => load(EARTH_IMAGE_BASE + fallback, isColor));
 
-    load("earth-blue-marble.jpg", true).then(texture => {
+    loadOwn(LIGHT_DEVICE ? "earth-2048.webp" : "earth-4096.webp", "earth-blue-marble.jpg", true).then(texture => {
       material.map = texture;
       material.color.set(0xffffff);
       material.needsUpdate = true;
       this.requestRender();
     }).catch(error => console.error("Unable to load the Earth satellite texture.", error));
 
-    // City lights for the menu's night side; they stay dark during the game.
-    load("earth-night.jpg", false).then(texture => { this.applyNightLights(material, texture); this.requestRender(); })
-      .catch(error => console.error("Unable to load the night-lights texture.", error));
-
-    // Relief shading is an extra; the globe works without it.
-    load("earth-topology.png", false).then(texture => {
+    // Relief shading is an extra; the globe works without it, and phones and slower
+    // devices go without. (No night-lights image any more: the menu is in daylight.)
+    if (LIGHT_DEVICE) return;
+    loadOwn("earth-relief.webp", "earth-topology.png", false).then(texture => {
       material.bumpMap = texture;
       material.needsUpdate = true;
       this.requestRender();
@@ -14387,7 +14446,7 @@ class PixelGlobe {
   }
 }
 
-return { PixelGlobe };
+return { LIGHT_DEVICE, PixelGlobe };
 })();
 
 // ---- audio.js
@@ -16164,11 +16223,11 @@ const REX = ["..GGGG.", ".GGEGGG", "GGGGGGG", "GWGWGW.", "GGGG..."];
 const REX_PEEK = REX.map((_, index) => REX.slice(0, index + 1));
 const REX_COLORS = { G: "#4f9a3a", E: "#ffd45c", W: "#f4f1e8" };
 // One carriage from x a to x b (both inside), its body above the rail.
-function drawCarriage(p, s, index, a, b, color, jolt) {
+function drawCarriage(p, s, index, a, b, color, jolt, trackY = TRACK_Y) {
   const width = b - a + 1;
   if (width < 1) return;
   const theme = index % 6;
-  const floor = TRACK_Y - 3;
+  const floor = trackY - 3;
   const lift = jolt ? 1 : 0;
   // Wheels and frame.
   p.rect(a, floor + 1, width, 1, "#2a3550");
@@ -16558,14 +16617,759 @@ function sled(summit) {
 
 const SCENES = { balloon, climb, mine, train, dive, sled };
 
-return { SCENES };
+return { LABEL, LABEL_AHEAD, SHADOW, eachMark, eachTrail, planned, label, paletteOf, darker, lighter, glow, drawAtlas, flag, CLOUD, CLOUD_COLORS, PINE, PINE_COLORS, GREEN_PINE, ENVELOPE, BASKET, BAG, BIRD, PLANE, STAR, drawStar, SNOWMOBILE, HUT, HUT_COLORS, BOULDER, BOULDER_COLORS, YETI, YETI_COLORS, TENT, TENT_COLORS, SIGN, MINERALS, MINE_ORDER, PACK, BONE, GEODE, LOCO, WHEELS, LOCO_COLORS, drawCarriage, SPHERE, SPHERE_COLORS, SHIP, SEA, CREATURES, SEA_PIG, BRITTLE_STAR, SLED, HUSKY, HUSKY_COLORS, BEAR, NARWHAL, STATION, SCENES };
+})();
+
+// ---- journey-scenes-tall.js
+__modules["journey-scenes-tall.js"] = (() => {
+// The score journeys standing up, for the full-screen score card on a phone (13 November
+// 2026, team request: the journey is the main way to see your score, and on a phone it
+// stands). The same six journeys as journey-scenes.js, with the same sprites, colours and
+// details, laid out for a tall canvas: TALL_W art pixels wide and as tall as the screen
+// is (journeys.js works out `h`). The whole route runs between `top` and `bottom` (the
+// space between the points bar and the card at the bottom, measured by engine.js), so
+// every 1,000 mark and the goal are always in view; above and below is scenery.
+const { ATLAS, atlasRows, clamp, lerp, makeRoute, mix, ramp, random } = __modules["journey-pixels.js"];
+const { BAG, BASKET, BEAR, BIRD, BONE, BOULDER, BOULDER_COLORS, BRITTLE_STAR, CLOUD, CLOUD_COLORS, CREATURES, ENVELOPE, GEODE, GREEN_PINE, HUSKY, HUSKY_COLORS, HUT, HUT_COLORS, LOCO, LOCO_COLORS, MINERALS, MINE_ORDER, NARWHAL, PACK, PINE, PINE_COLORS, PLANE, SEA, SEA_PIG, SHADOW, SHIP, SIGN, SLED, SNOWMOBILE, SPHERE, SPHERE_COLORS, STATION, TENT, TENT_COLORS, WHEELS, YETI, YETI_COLORS, darker, drawAtlas, drawCarriage, drawStar, eachMark, eachTrail, flag, glow, label, lighter, paletteOf, planned } = __modules["journey-scenes.js"];
+
+const TALL_W = 80;
+const W = TALL_W;
+
+// ---------------------------------------------------------------------------
+// 1. Balloon: straight up from the meadow and the village, through the clouds, to the
+// star at the top. A scale line across the sky every 1,000; sandbags land in the meadow.
+// ---------------------------------------------------------------------------
+function balloon(summit, { h: H, top: T, bottom: B }) {
+  // The basket's bottom follows the route; the envelope is 28 px above it.
+  const route = makeRoute([[30, B], [48, T + 30]]);
+  const groundTop = B + 6;
+  const rnd = random(11);
+  const stars = Array.from({ length: 34 }, () => [Math.floor(rnd() * W), Math.floor(rnd() * (T + 30))]);
+  const groundY = x => groundTop + Math.round(Math.sin(x * 0.12) * 1.5);
+  const falling = [];
+  const landed = new Map();
+  return {
+    route,
+    goal: { x: 64, y: T + 6 },
+    background(p) {
+      p.bands(0, 0, W, groundTop + 2, t => ramp([[0, "#151b44"], [0.3, "#263a7a"], [0.6, "#4b7cc8"], [0.84, "#9cc4ec"], [0.94, "#f2c09a"], [1, "#ffd29a"]], t));
+      stars.forEach(([x, y]) => p.px(x, y, y < T ? "#ffffff" : "#9fb3e8"));
+      p.disc(66, groundTop - 1, 6, "#ff8a3d");
+      p.disc(66, groundTop - 1, 4, "#ffd45c");
+      for (let x = 0; x < W; x += 1) {
+        const far = groundTop - 8 + Math.round(Math.sin(x * 0.18) * 2 + Math.sin(x * 0.06) * 2);
+        p.rect(x, far, 1, H - far, "#3d5d8c");
+      }
+      for (let x = 0; x < W; x += 1) {
+        const top = groundY(x);
+        p.rect(x, top, 1, H - top, "#2a8a4c");
+        p.px(x, top, "#5cc46a");
+        const near = groundTop + 9 + Math.round(Math.sin(x * 0.2 + 1) * 1.2);
+        p.rect(x, near, 1, H - near, "#1d6b3a");
+      }
+      // The village, with lit windows, and pines.
+      [[46, "#e0484f"], [54, "#2a6fd0"], [63, "#ffd45c"], [72, "#c58cff"]].forEach(([x, roof]) => {
+        const base = groundY(x) + 2;
+        p.rect(x, base - 4, 5, 4, "#f4f1e8");
+        p.rect(x - 1, base - 5, 7, 1, roof);
+        p.rect(x, base - 6, 5, 1, roof);
+        p.rect(x + 1, base - 7, 3, 1, roof);
+        p.px(x + 1, base - 3, "#ffd45c");
+        p.px(x + 3, base - 3, "#ffd45c");
+      });
+      [3, 10, 38].forEach(x => p.sprite(PINE, GREEN_PINE, x, groundY(x) - 6));
+      // The launch field and a windsock.
+      p.rect(22, B + 1, 17, 1, "#8a5a32");
+      p.rect(18, B - 7, 1, 8, "#c9ced9");
+      p.rect(19, B - 7, 3, 1, "#ff8a3d");
+      p.rect(19, B - 6, 2, 1, "#f4f1e8");
+    },
+    frame(p, s) {
+      stars.slice(0, 8).forEach(([x, y], index) => { if ((s.now * 1.3 + index * 0.71) % 3 < 0.25) p.px(x, y, "#ffd45c"); });
+      // A plane high up, birds and drifting clouds.
+      const planeX = ((s.now * 9) % 180) - 50;
+      const planeY = Math.max(3, T - 4);
+      for (let x = planeX - 24; x < planeX; x += 2) p.px(x, planeY + 1, `rgba(255,255,255,${0.1 + (x - planeX + 24) / 24 * 0.35})`);
+      p.sprite(PLANE, { K: "#0b1020", W: "#f4f1e8" }, planeX, planeY);
+      const birdY = Math.round(lerp(B, T, 0.3));
+      [[20, birdY], [27, birdY + 3], [34, birdY - 1]].forEach(([x0, y], index) => {
+        const x = ((x0 - s.now * 4) % (W + 20) + W + 20) % (W + 20) - 10;
+        p.sprite(BIRD[(Math.floor(s.now * 4) + index) % 2], { K: "#1a2238" }, x, y);
+      });
+      [[6, 0.82, 2.2], [50, 0.62, 1.5], [20, 0.4, 2.8], [58, 0.18, 1.1]].forEach(([x0, at, speed]) => {
+        const x = ((x0 + s.now * speed) % (W + 30)) - 15;
+        p.sprite(CLOUD, CLOUD_COLORS, x, Math.round(lerp(B, T, at)), { alpha: 0.85 });
+      });
+
+      // The scale: a line across the sky every 1,000, labelled on the left.
+      eachMark(s, (f, text, reached) => {
+        const y = Math.round(s.route.at(f).y);
+        for (let x = 0; x < W; x += 3) p.px(x, y, "rgba(255,255,255,0.18)");
+        label(p, s, text, 2, y - 6, reached);
+      });
+      label(p, s, `${s.summit / 1000}K`, 70, T + 3, s.goal);
+      drawStar(p, s.goal ? "#ffd45c" : "#8f9bbd", 64, T + 6);
+
+      planned(p, s, "rgba(255,255,255,0.4)", 3);
+      eachTrail(s, (point, color) => {
+        p.px(point.x, point.y, color);
+        p.px(point.x + 1, point.y, darker(color, 0.25));
+      });
+
+      // Sandbags in the meadow, one for every round that has ended.
+      const bags = new Map(landed);
+      s.stops.forEach(stop => bags.set(stop.value, stop.color));
+      falling.forEach(item => bags.delete(item.value));
+      let slot = 0;
+      bags.forEach((color, value) => {
+        const x = 24 + (slot++ * 4) % 18;
+        p.sprite(BAG, paletteOf("bag", color, tie => ({ c: tie, s: "#c9a66b", t: "#9a7a46" })), x - 1, groundY(x) - 1);
+      });
+      for (let index = falling.length - 1; index >= 0; index -= 1) {
+        const item = falling[index];
+        const age = s.now - item.born;
+        const ground = groundY(item.x) - 1;
+        const y = Math.min(ground, item.y + 60 * age * age);
+        if (y >= ground) {
+          landed.set(item.value, item.color);
+          falling.splice(index, 1);
+        }
+        p.sprite(BAG, paletteOf("bag", item.color, tie => ({ c: tie, s: "#c9a66b", t: "#9a7a46" })), item.x - 1, y);
+      }
+
+      // The balloon: envelope, burner, Atlas in the basket.
+      const at = s.route.at(s.f);
+      const x = Math.round(at.x + Math.sin(s.now * 1.3) * 0.8);
+      const y = Math.round(at.y);
+      p.line(x - 5, y - 21, x - 5, y - 4, "#5c3a1f");
+      p.line(x + 5, y - 21, x + 5, y - 4, "#5c3a1f");
+      drawAtlas(p, s, x, y - 3, { upper: true });
+      p.sprite(BASKET, ATLAS, x - 5, y - 3);
+      p.rect(x - 1, y - 15, 3, 1, "#8f9bbd");
+      if (s.moving || s.now % 2.6 < 0.4) {
+        const tall = Math.floor(s.now * 14) % 2;
+        p.rect(x, y - 17 - tall, 1, 2 + tall, "#ffd45c");
+        p.px(x - 1 + tall * 2, y - 16, "#ff8a3d");
+      }
+      p.sprite(ENVELOPE, ATLAS, x - 6, y - 28);
+    },
+    head(s) {
+      const at = s.route.at(s.f);
+      return { x: Math.round(at.x), y: Math.round(at.y) - 13 };
+    },
+    react(s, { points, color }) {
+      if (points <= 0) return;
+      const at = s.route.at(s.f);
+      falling.push({ x: clamp(Math.round(at.x) + 6, 22, 44), y: Math.round(at.y) - 2, born: s.now, color, value: s.value });
+    }
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 2. Climb: on the snowmobile up the switchbacks of one tall peak, from Base Camp past the
+// pines, the hut, the yeti's boulder and the avalanche sign, to the flag on the summit.
+// ---------------------------------------------------------------------------
+function climb(summit, { h: H, top: T, bottom: B }) {
+  const L = B - T;
+  const peak = { x: 46, y: T + 8 }; // room above for Atlas on the summit
+  const route = makeRoute([[8, B], [64, B - L * 0.17], [12, B - L * 0.37], [62, B - L * 0.56], [18, B - L * 0.74], [54, B - L * 0.9], [peak.x - 1, T + 14]]);
+  const slope = Math.max(1.2, (B - 2 - peak.y) / 42);
+  const top = x => Math.round(peak.y + Math.abs(x - peak.x) * slope) + (x % 7 === 3 ? 1 : 0);
+  const rnd = random(7);
+  const stars = Array.from({ length: 30 }, () => [Math.floor(rnd() * W), Math.floor(rnd() * (T + 30))]);
+  const yetiAt = route.at(0.62);
+  const yeti = { x: clamp(Math.round(yetiAt.x) - 14, 4, 60), y: Math.round(yetiAt.y) + 2 };
+  const hut = route.at(0.34);
+  return {
+    route,
+    goal: { x: peak.x, y: T + 10 },
+    background(p) {
+      p.bands(0, 0, W, H, t => ramp([[0, "#0b1030"], [0.55, "#1d2a5e"], [1, "#33478a"]], t));
+      stars.forEach(([x, y]) => p.px(x, y, y < T ? "#ffffff" : "#8fa3d8"));
+      p.disc(70, Math.max(6, T - 2), 3, "#f4f1e8");
+      // Far ridges low down.
+      for (let x = 0; x < W; x += 1) {
+        const ridge = Math.round(lerp(B, T, 0.55)) + Math.round(Math.abs(((x * 0.9) % 24) - 12) * 0.9 + Math.sin(x * 0.2) * 1.5);
+        p.rect(x, ridge, 1, H - ridge, "#26336a");
+        p.px(x, ridge, "#8fa3d8");
+      }
+      // The mountain: the lit face on the left, the shadow face on the right.
+      for (let x = 0; x < W; x += 1) {
+        const y0 = top(x);
+        for (let y = Math.max(0, y0); y < H; y += 1) {
+          const lit = x <= peak.x;
+          const depth = y - y0;
+          let color = lit ? (depth < 2 ? "#ffffff" : (x + y) % 2 && depth > 14 ? "#c3d0ea" : "#dfe7f7") : (depth < 1 ? "#b9c7e6" : (x + y) % 2 ? "#7f93c4" : "#8a9dcc");
+          if (rnd() < 0.025 && depth > 3) color = lit ? "#9aa9cc" : "#5a6a9a";
+          p.px(x, y, color);
+        }
+      }
+      for (let y = B + 4; y < H; y += 1) p.rect(0, y, W, 1, y % 2 ? "#e9eefb" : "#dfe7f7");
+      // Base Camp at the start, pines at the first bend, the hut, rocks and the sign.
+      p.sprite(TENT, TENT_COLORS, 1, B - 5);
+      flag(p, 13, B - 1, "#ff6b9d", 7);
+      const bend = route.at(0.12);
+      [[0, 0], [5, -2], [10, 1]].forEach(([dx, dy]) => p.sprite(PINE, PINE_COLORS, Math.round(bend.x) - 6 + dx, Math.round(bend.y) - 10 + dy));
+      p.sprite(HUT, HUT_COLORS, Math.round(hut.x) - 4, Math.round(hut.y) - 12);
+      const cliff = route.at(0.8);
+      p.sprite(BOULDER, BOULDER_COLORS, Math.round(cliff.x) + 4, Math.round(cliff.y) - 6);
+      p.rect(peak.x + 9, T + 20, 1, 6, "#5c3a1f");
+      p.sprite(SIGN, { K: "#0b1020", Y: "#ffd45c" }, peak.x + 7, T + 16);
+    },
+    frame(p, s) {
+      // Smoke from the hut's chimney.
+      for (let index = 0; index < 4; index += 1) {
+        const age = (s.now * 0.6 + index / 4) % 1;
+        p.px(Math.round(hut.x) + 4 + Math.round(Math.sin(age * 6 + index) + age * 4), Math.round(hut.y) - 13 - Math.round(age * 10), `rgba(230,236,250,${0.6 * (1 - age)})`);
+      }
+      // The yeti, peeking out from behind his boulder; he waves when Atlas comes by.
+      const at = s.route.at(s.f);
+      const near = Math.hypot(at.x - yeti.x, at.y - yeti.y) < 22;
+      const peek = near ? 5 : (s.now % 6 < 1.4 ? 3 : 0);
+      if (peek) {
+        p.sprite(YETI, YETI_COLORS, yeti.x, yeti.y - 4 - peek);
+        if (near && Math.floor(s.now * 4) % 2) { p.px(yeti.x + 7, yeti.y - 7 - peek, "#f4f1e8"); p.px(yeti.x + 7, yeti.y - 8 - peek, "#f4f1e8"); }
+      }
+      p.sprite(BOULDER, BOULDER_COLORS, yeti.x - 2, yeti.y - 4);
+
+      planned(p, s, "#5a6fa8", 2);
+      eachTrail(s, (point, color) => {
+        p.px(point.x, point.y, color);
+        p.px(point.x, point.y + 1, darker(color, 0.3));
+      });
+      // Marker posts every 1,000, and a flag where each round ended.
+      eachMark(s, (f, text, reached) => {
+        const point = s.route.at(f);
+        p.rect(point.x, point.y - 3, 1, 3, "#5c3a1f");
+        p.px(point.x, point.y - 3, reached ? "#ffd45c" : "#c9ced9");
+        label(p, s, text, point.x < 40 ? point.x + 2 : point.x - 10, point.y - 9, reached);
+      });
+      s.stops.forEach(stop => {
+        const point = s.route.at(stop.f);
+        flag(p, Math.round(point.x), Math.round(point.y), stop.color, 6, s.now);
+      });
+      flag(p, peak.x, T + 13, s.goal ? "#ffd45c" : "#ff6b9d", 7, s.now);
+      label(p, s, `${s.summit / 1000}K`, peak.x + 5, T + 4, s.goal);
+
+      // Atlas on his snowmobile, facing the way he goes, snow spraying behind him.
+      const flip = at.dx < -0.01;
+      const x = Math.round(at.x);
+      const y = Math.round(at.y);
+      if (s.moving) {
+        for (let index = 0; index < 5; index += 1) {
+          const back = (flip ? 1 : -1) * (7 + Math.random() * 6);
+          p.px(x + back, y - Math.random() * 4, "#ffffff");
+        }
+      }
+      drawAtlas(p, s, x + (flip ? 1 : -1), y - 4, { upper: true, flip });
+      p.sprite(SNOWMOBILE, ATLAS, x - 6, y - 7, { flip });
+    },
+    head(s) {
+      const at = s.route.at(s.f);
+      return { x: Math.round(at.x), y: Math.round(at.y) - 14 };
+    }
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 3. Mine: down the shaft under the headframe, then the tunnel winds down through one
+// layer of rock for every 1,000, coal first and diamonds at the bottom.
+// ---------------------------------------------------------------------------
+function mine(summit, { h: H, top: T, bottom: B }) {
+  const L = B - T;
+  const route = makeRoute([[18, T], [18, T + 8], [64, T + L * 0.36], [14, T + L * 0.7], [58, B - 2]]);
+  const levels = Math.max(1, Math.round(summit / 1000));
+  const order = MINE_ORDER[levels] || Array.from({ length: levels }, (_, index) => MINE_ORDER[9][Math.round(index * 8 / Math.max(1, levels - 1))]);
+  const tops = Array.from({ length: levels + 1 }, (_, index) => index === 0 ? T + 1 : index === levels ? H : Math.round(route.at(index / levels).y));
+  const rnd = random(5);
+  const gems = [];
+  const chunks = [];
+  let lastSwing = 0;
+  const layerAt = f => Math.min(levels - 1, Math.floor(f * levels + 1e-9));
+  const grass = T - 1;
+  return {
+    route,
+    goal: { x: 64, y: B - 2 },
+    background(p) {
+      p.bands(0, 0, W, grass - 1, t => ramp([[0, "#3f6fc8"], [0.6, "#7fc0ff"], [1, "#bfe3ff"]], t));
+      p.rect(0, grass - 2, W, 2, "#2fb35e");
+      p.rect(0, grass, W, 1, "#1d7a40");
+      // The headframe over the shaft, and a cart of ore.
+      p.line(11, grass, 16, grass - 8, "#8a5a32");
+      p.line(25, grass, 20, grass - 8, "#8a5a32");
+      p.rect(15, grass - 8, 7, 1, "#5c3a1f");
+      p.disc(18, grass - 8, 1, "#c9ced9");
+      p.rect(32, grass - 4, 7, 3, "#6a7a9a");
+      p.rect(33, grass - 5, 5, 1, "#ffd45c");
+      p.px(33, grass - 1, "#0b1020");
+      p.px(37, grass - 1, "#0b1020");
+      for (let level = 0; level < levels; level += 1) {
+        const y0 = tops[level];
+        const y1 = tops[level + 1];
+        const base = ramp([[0, "#7a5636"], [0.35, "#5e4a44"], [0.7, "#3e3550"], [1, "#272038"]], level / Math.max(1, levels - 1));
+        for (let y = y0; y < y1; y += 1) {
+          for (let x = 0; x < W; x += 1) {
+            const r = rnd();
+            p.px(x, y, r < 0.1 ? darker(base, 0.2) : r > 0.94 ? lighter(base, 0.12) : base);
+          }
+        }
+        if (level > 0) for (let x = 0; x < W; x += 1) p.px(x, y0 + Math.round(Math.sin(x * 0.3 + level) * 0.8), darker(base, 0.45));
+        const mineral = MINERALS[order[level]];
+        const count = mineral.gem ? 5 : 8;
+        for (let index = 0; index < count; index += 1) {
+          const x = 3 + Math.floor(rnd() * (W - 8));
+          const y = y0 + 2 + Math.floor(rnd() * Math.max(1, Math.min(y1, B + 12) - y0 - 4));
+          if (mineral.gem) {
+            p.px(x, y - 1, mineral.shine);
+            p.rect(x - 1, y, 3, 1, mineral.ore);
+            p.px(x, y + 1, darker(mineral.ore, 0.3));
+            gems.push([x, y - 1, mineral.shine]);
+          } else {
+            p.rect(x, y, 2, 2, mineral.ore);
+            p.px(x + 2, y + 1, mineral.ore);
+            p.px(x, y, mineral.shine);
+          }
+        }
+      }
+      for (let index = 0; index < 10; index += 1) {
+        const x = Math.floor(rnd() * W);
+        p.line(x, grass + 1, x + Math.round(rnd() * 4 - 2), grass + 3 + Math.floor(rnd() * 3), "#3a2414");
+      }
+      p.sprite(BONE, { W: "#e8dcc0" }, 48, Math.round(lerp(tops[0], tops[1], 0.6)));
+    },
+    frame(p, s) {
+      gems.forEach(([x, y, color], index) => { if ((s.now * 0.9 + index * 0.37) % 2.4 < 0.18) { p.px(x, y - 1, color); p.px(x - 1, y - 1, "#ffffff"); p.px(x + 1, y - 1, "#ffffff"); } });
+      s.route.samples(0, s.f).forEach(point => p.rect(point.x - 2, point.y - 6, 5, 7, "#160f0c"));
+      s.route.samples(s.f, 1).forEach((point, index) => { if (index % 3 === 0) p.px(point.x, point.y - 3, "rgba(255,255,255,0.22)"); });
+      eachTrail(s, (point, color) => p.px(point.x, point.y, color));
+      eachMark(s, (f, text, reached) => {
+        const point = s.route.at(f);
+        if (reached) {
+          p.rect(point.x - 3, point.y - 6, 1, 7, "#8a5a32");
+          p.rect(point.x + 3, point.y - 6, 1, 7, "#8a5a32");
+          p.rect(point.x - 3, point.y - 7, 7, 1, "#a8743a");
+        }
+      });
+      for (let level = 1; level < levels; level += 1) label(p, s, `${level}K`, 2, tops[level] + 2, level * 1000 <= s.value + 0.5);
+      label(p, s, `${s.summit / 1000}K`, 66, B - 12, s.goal);
+      s.stops.forEach(stop => {
+        const point = s.route.at(stop.f);
+        const x = Math.round(point.x);
+        const y = Math.round(point.y) - 5;
+        glow(p, x, y + 1, 6, stop.color, 0.45);
+        p.px(x, y - 1, SHADOW);
+        p.rect(x, y, 1, 2, stop.color);
+      });
+      p.sprite(GEODE, { K: "#0b1020", D: "#bff4ff", d: "#ffffff" }, 61, B - 5);
+      if (s.goal) glow(p, 64, B - 2, 8, "#bff4ff", 0.5);
+
+      const at = s.route.at(s.f);
+      const flip = at.dx < -0.01;
+      const x = Math.round(at.x);
+      const y = Math.round(at.y);
+      const dir = flip ? -1 : 1;
+      const swinging = s.moving && s.f > 0.01;
+      const strike = swinging && Math.floor(s.now * 6) % 2 === 1;
+      const mineral = MINERALS[order[layerAt(s.f)]];
+      if (swinging && strike && s.now - lastSwing > 0.25) {
+        lastSwing = s.now;
+        chunks.push({ born: s.now, color: mineral.ore, shine: mineral.shine });
+      }
+      p.sprite(PACK, { K: "#0b1020", P: "#8a5a32", p: "#5c3a1f", Y: "#ffd45c" }, x - 9 * dir - (flip ? 4 : 0), y - 10);
+      const found = s.f > 0 ? Math.min(levels, layerAt(s.f) + 1) : 0;
+      for (let index = 0; index < found; index += 1) {
+        const item = MINERALS[order[index]];
+        const px = x - 8 * dir + (index % 3) * dir;
+        p.px(px, y - 10 - Math.floor(index / 3), item.ore);
+        if (index === found - 1) p.px(px, y - 11 - Math.floor(index / 3), item.shine);
+      }
+      drawAtlas(p, s, x, y, { flip });
+      if (strike) {
+        p.line(x + 4 * dir, y - 5, x + 9 * dir, y - 4, "#8a5a32");
+        p.rect(x + 9 * dir, y - 6, 1, 4, "#c9ced9");
+        if (Math.random() < 0.6) p.px(x + (10 + Math.round(Math.random() * 2)) * dir, y - 5 + Math.round(Math.random() * 2), "#ffd45c");
+      } else if (swinging) {
+        p.line(x + 4 * dir, y - 5, x + 6 * dir, y - 12, "#8a5a32");
+        p.rect(x + (flip ? -8 : 4), y - 13, 5, 1, "#c9ced9");
+      } else {
+        p.line(x + 4 * dir, y - 4, x + 7 * dir, y - 10, "#8a5a32");
+        p.rect(x + (flip ? -9 : 6), y - 11, 4, 1, "#c9ced9");
+      }
+      for (let index = chunks.length - 1; index >= 0; index -= 1) {
+        const item = chunks[index];
+        const t = (s.now - item.born) / 0.45;
+        if (t >= 1) { chunks.splice(index, 1); continue; }
+        const cx = lerp(x + 10 * dir, x - 7 * dir, t);
+        const cy = lerp(y - 4, y - 11, t) - Math.sin(t * Math.PI) * 7;
+        p.px(cx, cy, item.color);
+        p.px(cx + 1, cy, item.shine);
+      }
+    },
+    head(s) {
+      const at = s.route.at(s.f);
+      return { x: Math.round(at.x), y: Math.round(at.y) - 13 };
+    }
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 4. Train: a mountain railway that zigzags up the screen in rows, the steam engine with
+// Atlas in the cab, a carriage for every round (with its load), and the station on top.
+// ---------------------------------------------------------------------------
+const ROWS = 4;
+function train(summit, { h: H, top: T, bottom: B }) {
+  const low = B - 12; // the posts and labels hang under the bottom row
+  const gap = (low - T - 22) / (ROWS - 1); // the top row leaves room for the engine and the station
+  const rowY = index => Math.round(low - index * gap);
+  const ends = [3, 77];
+  const points = [];
+  for (let row = 0; row < ROWS; row += 1) {
+    const y = rowY(row);
+    const [a, b] = row % 2 ? [ends[1], ends[0]] : ends;
+    points.push([a, y], [row === ROWS - 1 ? 60 : b, y]);
+  }
+  const route = makeRoute(points);
+  const rnd = random(3);
+  const puffs = [];
+  let lastPuff = 0;
+  const topY = rowY(ROWS - 1);
+  // Which row a point on the route is on, and whether it runs to the left there.
+  const rowOf = y => clamp(Math.round((low - y) / gap), 0, ROWS - 1);
+  return {
+    route,
+    goal: { x: 70, y: topY - 16 },
+    background(p) {
+      p.bands(0, 0, W, topY - 8, t => ramp([[0, "#3f86d8"], [0.6, "#8fc6f5"], [1, "#d8efff"]], t));
+      p.disc(14, Math.max(7, T - 6), 4, "#ffd45c");
+      p.disc(14, Math.max(7, T - 6), 2, "#fff2b0");
+      for (let x = 0; x < W; x += 1) {
+        const peak = topY - 22 + Math.round(Math.abs(((x * 1.3) % 34) - 17) * 0.7 + Math.sin(x * 0.17) * 2);
+        p.rect(x, peak, 1, H - peak, "#7f9fcf");
+        if (peak < topY - 19) p.px(x, peak, "#f4f7ff");
+      }
+      for (let x = 0; x < W; x += 1) {
+        const hill = topY - 10 + Math.round(Math.sin(x * 0.12 + 0.5) * 3 + Math.sin(x * 0.3));
+        p.rect(x, hill, 1, H - hill, "#5fbf6a");
+      }
+      p.rect(0, topY + 6, W, H - topY - 6, "#3f9a4c");
+      for (let index = 0; index < 22; index += 1) {
+        const x = Math.floor(rnd() * W);
+        const y = topY + 8 + Math.floor(rnd() * (H - topY - 10));
+        p.rect(x, y - 2, 2, 3, "#2f8a4a");
+      }
+      for (let index = 0; index < 50; index += 1) p.px(Math.floor(rnd() * W), topY + 6 + Math.floor(rnd() * (H - topY - 6)), ["#ffd45c", "#ff6b9d", "#f4f1e8"][index % 3]);
+      // The track on every row, and the bends that join them.
+      for (let row = 0; row < ROWS; row += 1) {
+        const y = rowY(row);
+        const [a, b] = [ends[0], row === ROWS - 1 ? 64 : ends[1]];
+        p.rect(a - 2, y + 1, b - a + 5, 3, "#8a7a66");
+        for (let x = a; x <= b; x += 3) p.rect(x, y + 1, 2, 1, "#5c3a1f");
+        p.rect(a - 1, y, b - a + 3, 1, "#c9ced9");
+        if (row < ROWS - 1) {
+          const side = row % 2 ? ends[0] - 2 : ends[1] + 1;
+          const next = rowY(row + 1);
+          p.rect(side, next, 2, y - next + 2, "#8a7a66");
+          p.rect(side + (row % 2 ? 0 : 1), next, 1, y - next + 1, "#c9ced9");
+        }
+      }
+      // The station at the end of the line.
+      const sy = topY - 16;
+      p.rect(62, topY - 4, W - 62, 4, "#c9b08a");
+      p.rect(62, topY - 5, W - 62, 1, "#f4f1e8");
+      p.rect(64, sy + 4, 14, 11, "#f4f1e8");
+      p.rect(62, sy + 2, 18, 2, "#ff6b9d");
+      p.rect(64, sy, 14, 2, "#ff6b9d");
+      p.rect(66, sy - 2, 10, 2, "#ff6b9d");
+      p.rect(66, sy + 7, 3, 4, "#2a6fd0");
+      p.rect(73, sy + 7, 3, 4, "#2a6fd0");
+      p.rect(69, sy + 10, 4, 5, "#8a5a32");
+      p.disc(71, sy + 4, 1, "#ffd45c");
+    },
+    frame(p, s) {
+      // Kilometre posts under the track, and the rest of the line faintly.
+      eachMark(s, (f, text, reached) => {
+        const point = s.route.at(f);
+        const x = Math.round(point.x);
+        const y = rowY(rowOf(point.y));
+        p.rect(x, y + 4, 1, 3, reached ? "#ffd45c" : "#f4f1e8");
+        label(p, s, text, clamp(x, 6, W - 7), y + 8, reached, { align: "center" });
+      });
+      label(p, s, `${s.summit / 1000}K`, 3, topY - 9, s.goal); // left of the top row (the engine ends on the right)
+      flag(p, 71, topY - 18, s.goal ? "#ffd45c" : "#ff6b9d", 5, s.now);
+      s.route.samples(s.f, 1).forEach((point, index) => { if (index % 3 === 0) p.px(point.x, point.y - 1, "rgba(255,255,255,0.45)"); });
+
+      // The carriages: each round covers its stretch of the line, row by row.
+      const shake = s.now % 2.6 < 0.16;
+      s.stretches.forEach((part, index) => {
+        if (part.b <= part.a || s.f <= part.a) return;
+        const pieces = s.route.samples(part.a, Math.min(part.b, s.f));
+        const byRow = new Map();
+        pieces.forEach(point => {
+          const row = rowOf(point.y);
+          if (Math.abs(point.y - rowY(row)) > 0.5) return; // on a bend
+          const span = byRow.get(row) || [Infinity, -Infinity];
+          byRow.set(row, [Math.min(span[0], point.x), Math.max(span[1], point.x)]);
+        });
+        byRow.forEach(([a, b], row) => drawCarriage(p, s, index, Math.round(a) + 1, Math.round(b) - 1, part.color, shake && index % 6 === 3, rowY(row)));
+      });
+
+      // The engine, Atlas in the cab, and its smoke; it faces the way the row runs.
+      const at = s.route.at(s.f);
+      const flip = at.dx < -0.01;
+      const row = rowOf(at.y);
+      const onBend = Math.abs(at.y - rowY(row)) > 0.5;
+      const x = Math.round(at.x) - (flip ? 21 : 0);
+      const bottom = Math.round(onBend ? at.y : rowY(row)) - 1;
+      if (s.now - lastPuff > (s.moving ? 0.18 : 0.9)) {
+        lastPuff = s.now;
+        puffs.push({ x: flip ? x + 5 : x + 16, y: bottom - 12, born: s.now, dir: flip ? 1 : -1 });
+      }
+      for (let index = puffs.length - 1; index >= 0; index -= 1) {
+        const item = puffs[index];
+        const age = s.now - item.born;
+        if (age > 1.6) { puffs.splice(index, 1); continue; }
+        const radius = Math.min(3, Math.floor(age * 2.5));
+        p.disc(item.x + item.dir * age * (s.moving ? 14 : 4), item.y - age * 8, radius, `rgba(244,247,255,${0.75 * (1 - age / 1.6)})`);
+      }
+      drawAtlas(p, s, flip ? x + 18 : x + 3, bottom - 6, { upper: true, flip });
+      p.sprite(LOCO, LOCO_COLORS, x, bottom - 12, { flip });
+      p.sprite(WHEELS[s.moving ? Math.floor(s.now * 10) % 2 : 0], LOCO_COLORS, x - 1, bottom - 2, { flip });
+    },
+    head(s) {
+      const at = s.route.at(s.f);
+      const flip = at.dx < -0.01;
+      const x = Math.round(at.x) - (flip ? 21 : 0);
+      return { x: flip ? x + 18 : x + 3, y: Math.round(rowY(rowOf(at.y))) - 18 };
+    }
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 5. Dive: from the ship down the cable in the bathysphere, past the animals of each depth
+// (the same real depths as journey-scenes.js), to the seabed.
+// ---------------------------------------------------------------------------
+function dive(summit, { h: H, top: T, bottom: B }) {
+  const sphereX = 38;
+  const y0 = T + 6;
+  const span = B - 8 - y0; // the seabed (and its label) just above the card
+  const surface = T - 2;
+  const depthY = depth => y0 + depth / summit * span;
+  const route = makeRoute([[sphereX, y0], [sphereX, y0 + span]]);
+  const plain = Math.min(6000, summit);
+  const plainY = Math.round(depthY(plain)) + 5;
+  const floorY = Math.round(depthY(summit)) + 5;
+  const trench = summit > 6000;
+  const rnd = random(9);
+  const bubbles = [];
+  const colorAtDepth = depth => ramp([[0, "#3fc4f0"], [200, "#1d86c4"], [1000, "#0d3c78"], [2000, "#0a2650"], [4000, "#06132e"], [6000, "#040a1e"], [9000, "#02040f"]].map(([d, c]) => [d / 9000, c]), depth / 9000);
+  const seabedTop = x => trench && (x < 26 || x > 50) ? plainY : floorY;
+  // The animals of the wide scene, spread over the narrower width.
+  const creatureX = x0 => Math.round(4 + (x0 / 176) * (W - 12));
+  return {
+    route,
+    goal: { x: sphereX, y: floorY - 1 },
+    background(p) {
+      p.bands(0, 0, W, surface, t => ramp([[0, "#4f6fb8"], [0.7, "#f2a87a"], [1, "#ffd29a"]], t));
+      for (let y = surface; y < H; y += 1) {
+        const depth = Math.max(0, (y - y0) / span * summit);
+        const here = colorAtDepth(depth);
+        const next = colorAtDepth(depth + summit / span);
+        for (let x = 0; x < W; x += 1) p.px(x, y, (x + y) % 2 && here !== next ? next : here);
+      }
+      [[48, 0.18], [62, 0.12], [72, 0.16]].forEach(([x, alpha]) => { for (let y = surface + 1; y < surface + 12; y += 1) p.rect(x + (y - surface - 1) - 8, y, 3, 1, `rgba(220,250,255,${alpha * (1 - (y - surface - 1) / 11)})`); });
+      for (let x = 0; x < W; x += 1) {
+        const top = seabedTop(x) + (x % 9 === 0 ? -1 : 0);
+        p.rect(x, top, 1, H - top, x % 2 ? "#2e2a22" : "#3a3428");
+        p.px(x, top, "#4a4434");
+        if (rnd() < 0.16) p.px(x, top + 1 + Math.floor(rnd() * 2), "#141210");
+      }
+      if (trench) {
+        for (let y = plainY; y < floorY; y += 1) {
+          p.px(25 - Math.floor((y - plainY) / 6), y, "#3a3428");
+          p.px(51 + Math.floor((y - plainY) / 6), y, "#3a3428");
+        }
+      }
+      p.sprite(SHIP, { K: "#0b1020", R: "#e0484f", W: "#f4f1e8" }, 16, surface - 8);
+      p.line(30, surface - 7, sphereX, surface - 10, "#ffd45c");
+      p.line(35, surface - 1, sphereX, surface - 10, "#ffd45c");
+    },
+    frame(p, s) {
+      for (let x = 0; x < W; x += 1) if ((x + Math.floor(s.now * 6)) % 7 === 0) p.px(x, surface, "#ffffff");
+      const leap = (s.now % 7) / 1.2;
+      if (leap < 1) {
+        const lx = 54 + leap * 14;
+        const ly = surface - Math.sin(leap * Math.PI) * 6;
+        p.sprite([".BBBB.", "BBBBBK", ".b..b."], SEA, lx, ly - 1);
+      }
+      const at = s.route.at(s.f);
+      const sy = Math.round(at.y);
+      CREATURES.forEach(([name, depth, x0, rows, sway, lights = []]) => {
+        if (depth > summit) return;
+        const x = Math.round(creatureX(x0) + Math.sin(s.now * 0.5 + x0) * Math.min(sway, 5));
+        const y = Math.round(depthY(depth)) - Math.floor(rows.length / 2);
+        const flip = Math.cos(s.now * 0.5 + x0) < 0;
+        const dark = depth > 800 ? clamp(1 - (Math.hypot(x - sphereX, y - sy) - 12) / 18, 0.2, 1) : 1;
+        p.sprite(rows, SEA, x, y, { flip, alpha: dark });
+        lights.forEach(([dx, dy]) => {
+          const lx = flip ? x + rows[0].length - 1 - dx : x + dx;
+          if ((s.now * 1.5 + x0) % 2 > 0.3) { p.px(lx, y + dy, SEA.L); glow(p, lx, y + dy, 3, SEA.L, 0.4); }
+        });
+      });
+      if (plain <= summit) {
+        [[50, 0], [60, 1]].forEach(([x0, index]) => {
+          const x = Math.round(x0 + Math.sin(s.now * 0.3 + index * 2) * 3);
+          const dark = clamp(1 - (Math.hypot(x - sphereX, plainY - sy) - 12) / 18, 0.25, 1);
+          p.sprite(SEA_PIG, SEA, x, plainY - 3, { alpha: dark });
+        });
+        p.sprite(BRITTLE_STAR, SEA, 70, plainY - 4, { alpha: clamp(1 - (Math.hypot(70 - sphereX, plainY - sy) - 12) / 18, 0.25, 1) });
+      }
+      eachMark(s, (f, text, reached) => {
+        const y = Math.round(depthY(f * summit));
+        p.rect(0, y, 3, 1, reached ? "#ffd45c" : "rgba(255,255,255,0.4)");
+        label(p, s, text, 4, y - 2, reached);
+      });
+      label(p, s, `${s.summit / 1000}K`, 4, floorY - 3, s.goal);
+      for (let y = sy + 6; y < floorY - 1; y += 3) p.px(sphereX, y, "rgba(255,255,255,0.28)");
+      p.rect(sphereX, surface - 10, 1, y0 - surface + 10, "#c9ced9");
+      eachTrail(s, (point, color) => p.px(point.x, point.y - 5, color));
+      s.stops.forEach(stop => {
+        const y = Math.round(s.route.at(stop.f).y) - 5;
+        if ((s.now * 2 + stop.f * 7) % 2 > 0.4) glow(p, sphereX, y, 4, stop.color, 0.6);
+        p.rect(sphereX - 1, y, 3, 1, stop.color);
+      });
+      p.rect(sphereX + 7, floorY - 4, 1, 4, "#c9ced9");
+      p.px(sphereX + 7, floorY - 5, s.goal ? "#ffd45c" : "#5a6a8a");
+      if (s.goal) glow(p, sphereX + 7, floorY - 5, 5, "#ffd45c", 0.6);
+      if (s.f > 0.03) glow(p, sphereX, sy + 6, 20, "#bff4ff", 0.22 + 0.08 * Math.min(1, s.f * 4));
+      if (s.moving && Math.random() < 0.5) bubbles.push({ x: sphereX + (Math.random() < 0.5 ? -4 : 4), y: sy - 2, born: s.now });
+      for (let index = bubbles.length - 1; index >= 0; index -= 1) {
+        const item = bubbles[index];
+        const age = s.now - item.born;
+        const y = item.y - age * 14;
+        if (age > 1.2 || y < surface + 1) { bubbles.splice(index, 1); continue; }
+        p.px(item.x + Math.round(Math.sin(age * 9)), y, "rgba(220,250,255,0.7)");
+      }
+      p.sprite(SPHERE, SPHERE_COLORS, sphereX - 4, sy - 4);
+      p.px(sphereX, sy + 5, "#ffd45c");
+    },
+    head(s) {
+      return { x: sphereX, y: Math.round(s.route.at(s.f).y) - 5 };
+    }
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 6. Sled: from the bottom of the screen across the sea ice to the North Pole on the
+// horizon, past the research station, the polar bear and the open lead. Every round
+// lights its own curtain of the aurora, across its share of the sky.
+// ---------------------------------------------------------------------------
+function sled(summit, { h: H, top: T, bottom: B }) {
+  const L = B - T;
+  const horizon = T + 12;
+  const route = makeRoute([[24, B], [52, B - L * 0.24], [20, B - L * 0.5], [50, B - L * 0.76], [40, T + 18]]);
+  const leadY = Math.round(B - L * 0.36);
+  const rnd = random(4);
+  const stars = Array.from({ length: 44 }, () => [Math.floor(rnd() * W), Math.floor(rnd() * horizon)]);
+  const snow = Array.from({ length: 22 }, () => [rnd() * W, rnd() * H, 0.5 + rnd()]);
+  const hop = y => (Math.abs(y - leadY) < 4 ? -Math.round(Math.cos((y - leadY) / 4 * Math.PI / 2) * 3) : 0);
+  const pole = { x: 40, y: T + 18 };
+  return {
+    route,
+    goal: { x: pole.x, y: pole.y - 8 },
+    background(p) {
+      p.bands(0, 0, W, horizon + 2, t => ramp([[0, "#050818"], [0.6, "#0d1640"], [1, "#1d2c63"]], t));
+      stars.forEach(([x, y]) => p.px(x, y, y < horizon / 2 ? "#ffffff" : "#7f8fc8"));
+      p.disc(10, 8, 3, "#f4f1e8");
+      p.disc(12, 7, 2, "#050818");
+      for (let x = 0; x < W; x += 1) {
+        const ridge = horizon + Math.round(Math.abs(((x * 1.7) % 18) - 9) * 0.4 + Math.sin(x * 0.3));
+        p.rect(x, ridge, 1, H - ridge, "#a9c1de");
+        p.px(x, ridge, "#f4f7ff");
+      }
+      p.bands(0, horizon + 5, W, H - horizon - 5, t => ramp([[0, "#c9d9ee"], [1, "#e9f1fb"]], t));
+      // Faint lines in the ice, closer together towards the horizon.
+      for (let y = horizon + 8; y < H; y += Math.max(3, Math.round((y - horizon) / 6))) p.rect(0, y, W, 1, "rgba(80,110,160,0.12)");
+      // The open lead across the ice.
+      for (let x = 0; x < W; x += 1) {
+        const y = leadY + Math.round(Math.sin(x * 0.15) * 1.5);
+        p.rect(x, y - 2, 1, 4, (x % 3) ? "#0b2a4a" : "#123a62");
+        p.px(x, y - 3, "#f4f7ff");
+      }
+      p.sprite(STATION, { O: "#ff8a3d", Y: "#ffd45c", K: "#0b1020" }, 62, Math.round(B - L * 0.62));
+      for (let y = pole.y - 8; y < pole.y + 1; y += 1) p.px(pole.x, y, Math.floor(y / 2) % 2 ? "#e0484f" : "#f4f1e8");
+      p.rect(pole.x - 3, pole.y + 1, 7, 1, "#8f9bbd");
+    },
+    frame(p, s) {
+      // The aurora: one curtain per round, across its share of the sky.
+      s.stretches.forEach((part, index) => {
+        if (part.b <= part.a || s.f <= part.a) return;
+        const a = Math.round(part.a * W);
+        const b = Math.round(Math.min(part.b, s.f) * W);
+        const base = Math.max(2, horizon - 26) + (index % 3) * 4;
+        for (let x = a; x <= b; x += 1) {
+          const wave = Math.sin(x * 0.3 + s.now * 1.1 + index * 1.7) * 3 + Math.sin(x * 0.1 - s.now * 0.4) * 2;
+          const shimmer = 0.55 + 0.45 * Math.sin(s.now * 2.3 + x * 0.4 + index);
+          const top = Math.round(base + wave);
+          const height = 13 + Math.round(Math.sin(x * 0.3 + index) * 3);
+          for (let y = 0; y < height; y += 1) {
+            const alpha = (1 - y / height) ** 0.7 * 0.85 * shimmer;
+            if (alpha > 0.05) p.rect(x, top + y, 1, 1, `${part.color}${Math.round(alpha * 255).toString(16).padStart(2, "0")}`);
+          }
+        }
+      });
+      const stationY = Math.round(B - L * 0.62);
+      if (s.now % 1.6 < 0.5) { p.px(68, stationY, "#ff3a3a"); glow(p, 68, stationY, 3, "#ff3a3a", 0.5); }
+      snow.forEach(([x0, y0, speed]) => p.px(((x0 - s.now * 10 * speed) % W + W) % W, (y0 + s.now * 3 * speed) % H, "rgba(255,255,255,0.7)"));
+      const surfacing = s.now % 6.5;
+      if (surfacing < 2) p.sprite(NARWHAL, SEA, 8, leadY - 1 - Math.round(Math.sin(surfacing / 2 * Math.PI) * 3));
+      const bearX = Math.round(14 + Math.sin(s.now * 0.25) * 6);
+      p.sprite(BEAR, { W: "#f4ecd8", K: "#0b1020" }, bearX, Math.round(B - L * 0.86), { flip: Math.cos(s.now * 0.25) < 0 });
+
+      // Stakes every 1,000 beside the route, and the goal.
+      eachMark(s, (f, text, reached) => {
+        const point = s.route.at(f);
+        const x = Math.round(point.x) + (point.x < 40 ? -6 : 6);
+        p.rect(x, Math.round(point.y) - 3, 1, 3, reached ? "#ffd45c" : "#4a5778");
+        label(p, s, text, x, Math.round(point.y) + 1, reached, { align: "center" });
+      });
+      label(p, s, `${s.summit / 1000}K`, pole.x + 4, pole.y - 9, s.goal);
+      p.disc(pole.x, pole.y - 9, 1, s.goal ? "#ffd45c" : "#c9ced9");
+      s.route.samples(s.f, 1).forEach((point, index) => { if (index % 3 === 0) p.px(point.x, point.y + 1, "rgba(74,87,120,0.6)"); });
+      eachTrail(s, (point, color) => { if (Math.abs(point.y - leadY) > 2) p.px(point.x, point.y + 1, color); });
+
+      // The team: three huskies ahead on the route, the sled and Atlas behind them.
+      const at = s.route.at(s.f);
+      const flip = at.dx < -0.01;
+      const x = Math.round(at.x);
+      const y = Math.round(at.y) + hop(at.y);
+      const dogs = [0.02, 0.04, 0.06].map(ahead => s.route.at(Math.min(1, s.f + ahead)));
+      const last = dogs[2];
+      p.line(x + (flip ? -1 : 9), y - 3, Math.round(last.x) + 3, Math.round(last.y) - 3 + hop(last.y), "#8a5a32");
+      dogs.forEach((dog, index) => {
+        const frame = s.moving ? (Math.floor(s.now * 10) + index) % 2 : 0;
+        p.sprite(HUSKY[frame], HUSKY_COLORS, Math.round(dog.x) - 4, Math.round(dog.y) - 4 + hop(dog.y), { flip: dog.dx < -0.01 });
+      });
+      drawAtlas(p, s, x + (flip ? 5 : 4), y - 3, { upper: true, flip });
+      p.sprite(SLED, ATLAS, x, y - 4, { flip });
+    },
+    head(s) {
+      const at = s.route.at(s.f);
+      return { x: Math.round(at.x) + 4, y: Math.round(at.y) + hop(at.y) - 13 };
+    }
+  };
+}
+
+const TALL_SCENES = { balloon, climb, mine, train, dive, sled };
+
+return { TALL_W, TALL_SCENES };
 })();
 
 // ---- journeys.js
 __modules["journeys.js"] = (() => {
 const { t } = __modules["i18n.js"];
-const { H, W, painter } = __modules["journey-pixels.js"];
+const { H: WIDE_H, W: WIDE_W, painter } = __modules["journey-pixels.js"];
 const { SCENES } = __modules["journey-scenes.js"];
+const { TALL_SCENES, TALL_W } = __modules["journey-scenes-tall.js"];
 // The day's score as a journey with Atlas: every point takes him one unit further, and a
 // full day reaches the goal. Each day has its own journey (getJourney in daily.js), in the
 // same 8-bit pixel style as Atlas and the menu's planes and ships:
@@ -16621,13 +17425,21 @@ const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce
 // Below this width the scale labels are left out (the score tile).
 const SMALL_WIDTH = 240;
 
-function createJourney(type, container, { summit = 6000 } = {}) {
-  const make = SCENES[type] || SCENES.climb;
-  const scene = make(summit);
+// `tall` ({ top, bottom }, fractions of the height): the standing journey for the
+// full-screen score card on a phone (journey-scenes-tall.js), as tall as the container is
+// (TALL_W art pixels wide), with the whole route between `top` and `bottom`.
+function createJourney(type, container, { summit = 6000, tall = null } = {}) {
+  const W = tall ? TALL_W : WIDE_W;
+  const box = container.getBoundingClientRect();
+  const H = tall ? Math.max(120, Math.min(260, Math.round(W * (box.height || 2) / (box.width || 1)))) : WIDE_H;
+  const make = (tall ? TALL_SCENES : SCENES)[type] || (tall ? TALL_SCENES : SCENES).climb;
+  const scene = tall
+    ? make(summit, { h: H, top: Math.round(H * tall.top), bottom: Math.round(H * tall.bottom) })
+    : make(summit);
   const route = scene.route;
 
   const canvas = document.createElement("canvas");
-  canvas.className = `journey journey-${type}`;
+  canvas.className = `journey journey-${type}${tall ? " is-tall" : ""}`;
   canvas.setAttribute("aria-hidden", "true");
   canvas.width = W * 4;
   canvas.height = H * 4;
@@ -16750,6 +17562,8 @@ function createJourney(type, container, { summit = 6000 } = {}) {
 
   return {
     type,
+    tall: Boolean(tall),
+    height: H,
     // `value` is where Atlas is now; `stretches` the rounds so far, each { from, to, color }
     // (the last can still be growing); `stops` the values where earlier rounds ended.
     draw(value, { stretches = [], stops = [] } = {}) {
@@ -24703,6 +25517,25 @@ const PLAY_ART = {
     ".KKKKKKKKKKKKKK.",
     "................"
   ],
+  // 1v1: a purple "VS" badge.
+  duel: [
+    "................",
+    "................",
+    "..KKKKKKKKKKKK..",
+    ".KPPPPPPPPPPPPK.",
+    ".KPLLLLLLLLLLPK.",
+    ".KPPPPPPPPPPPPK.",
+    ".KPWPPPWPPWWWWK.",
+    ".KPWPPPWPWPPPPK.",
+    ".KPPWPWPPPWWWPK.",
+    ".KPPWPWPPPPPPWK.",
+    ".KPPPWPPPWWWWPK.",
+    ".KPPPPPPPPPPPPK.",
+    ".KQQQQQQQQQQQQK.",
+    "..KKKKKKKKKKKK..",
+    "................",
+    "................"
+  ],
   puzzles: [
     "................",
     "......KKKK......",
@@ -24801,52 +25634,8 @@ phoneScreen.addEventListener("change", updateHowToPager);
 // Returns { showGame(mode, dateKey) } to start a game (today's, or an archive day).
 function initializeMainMenu({ onPlay, onHome, onRefresh = () => {}, describeMode = () => "", modeState = () => "new", isModeAvailable = () => true }) {
   const menu = document.getElementById("mainMenu");
-  const menuOptions = menu.querySelector(".menu-secondary");
-  const menuButtons = [...menuOptions.querySelectorAll(".menu-option")];
   const gameView = document.getElementById("gameView");
   const howToModal = document.getElementById("howToPlayModal");
-  let resumeBlinkTimer = null;
-
-  function updateMenuButtonActivity() {
-    const buttonIsActive = menuButtons.some(button =>
-      button.matches(":hover") || button === document.activeElement
-    );
-    menuOptions.classList.toggle("has-menu-button-active", buttonIsActive);
-  }
-
-  function pauseBlinkForPointer() {
-    clearTimeout(resumeBlinkTimer);
-    resumeBlinkTimer = null;
-    menuOptions.classList.add("has-hover-cooldown");
-  }
-
-  menuButtons.forEach(button => button.addEventListener("pointerenter", () => {
-    pauseBlinkForPointer();
-    updateMenuButtonActivity();
-  }));
-  menuButtons.forEach(button => button.addEventListener("pointerleave", () => {
-    updateMenuButtonActivity();
-    if (!menuButtons.some(button => button.matches(":hover"))) pauseBlinkForPointer();
-  }));
-  menuOptions.addEventListener("pointerenter", () => {
-    pauseBlinkForPointer();
-    updateMenuButtonActivity();
-  });
-  menuOptions.addEventListener("pointerleave", () => {
-    if (menuButtons.some(button => button.matches(":hover"))) return;
-
-    clearTimeout(resumeBlinkTimer);
-    resumeBlinkTimer = setTimeout(() => {
-      resumeBlinkTimer = null;
-      if (menuOptions.matches(":hover")) return;
-      menuOptions.classList.remove("has-hover-cooldown");
-      updateMenuButtonActivity();
-    }, 1000);
-  });
-  menuOptions.addEventListener("focusin", updateMenuButtonActivity);
-  menuOptions.addEventListener("focusout", updateMenuButtonActivity);
-  updateMenuButtonActivity();
-  menuOptions.classList.add("is-boot-complete");
 
   document.querySelectorAll("[data-art]").forEach(slot => slot.appendChild(createPixelArt(PLAY_ART[slot.dataset.art], PLAY_ART_COLORS)));
 
@@ -24856,7 +25645,7 @@ function initializeMainMenu({ onPlay, onHome, onRefresh = () => {}, describeMode
     document.getElementById("menuCompetitiveStatus").textContent = describeMode("competitive");
     document.getElementById("menuCasualStatus").textContent = describeMode("casual");
     document.getElementById("drawerExtremesStatus").textContent = describeMode("extremes");
-    document.getElementById("drawerExtremesButton").disabled = !isModeAvailable("extremes");
+    // (Never disabled: on a date without a game its card still has the archive.)
     // Done today: the tile turns green and offers the results; started: CONTINUE.
     [["drawerExtremesButton", "extremes"], ["menuCasualButton", "casual"]].forEach(([id, mode]) => {
       const tile = document.getElementById(id);
@@ -26391,7 +27180,7 @@ function initializePlayerStats({ getDays, getDayRecord, openArchive }) {
     sounds.playClick();
     // From a game or the archive, the stats open on that game's mode; from My Tent, on the
     // main game. (They open over My Tent, and closing them goes back to it.)
-    const fromTent = button.id === "accountStatsButton";
+    const fromTent = button.id === "accountStatsButton" || button.id === "settingsStatsButton";
     const gameMode = button.closest("#archiveModal") ? archiveModal().dataset.mode : document.getElementById("gameView").dataset.mode;
     if (fromTent) mode = MAIN_MODE;
     else if (gameMode === "extremes" || gameMode === "casual") mode = gameMode;
@@ -28870,7 +29659,9 @@ function createVehicle(kind, data) {
 // isLand(lon, lat): the globe's own land map (quarter-degree pixels). Ships the function
 // checked against its finer map carry stopKm; one without it (an older snapshot) is only
 // shown when this map has it on water too.
-function createLiveTraffic({ isActive = () => true, isLand = () => false } = {}) {
+// `thin`: show one in every `thin` vehicles of each kind (2 on phones and slower devices,
+// LIGHT_DEVICE in globe.js: half the traffic to draw every frame).
+function createLiveTraffic({ isActive = () => true, isLand = () => false, thin = 1 } = {}) {
   const source = sourceUrl();
   let vehicles = [];
   let snapshot = null;
@@ -28881,10 +29672,11 @@ function createLiveTraffic({ isActive = () => true, isLand = () => false } = {})
   function take(data) {
     const nowS = Date.now() / 1000;
     const old = new Map(vehicles.map(vehicle => [vehicle.id, vehicle]));
+    const every = (list, keep) => list.filter((item, index) => index % thin === 0 && keep(item));
     const fresh = [
-      ...(data.planes || []).filter(plane => Number.isFinite(plane.lat) && Number.isFinite(plane.lon)).map(plane => createVehicle("plane", plane)),
-      ...(data.ships || []).filter(ship => Number.isFinite(ship.lat) && Number.isFinite(ship.lon) && ("stopKm" in ship || !isLand(ship.lon, ship.lat))).map(ship => createVehicle("ship", ship)),
-      ...(data.trains || []).filter(train => Number.isFinite(train.lat) && Number.isFinite(train.lon)).map(train => createVehicle("train", train))
+      ...every(data.planes || [], plane => Number.isFinite(plane.lat) && Number.isFinite(plane.lon)).map(plane => createVehicle("plane", plane)),
+      ...every(data.ships || [], ship => Number.isFinite(ship.lat) && Number.isFinite(ship.lon) && ("stopKm" in ship || !isLand(ship.lon, ship.lat))).map(ship => createVehicle("ship", ship)),
+      ...every(data.trains || [], train => Number.isFinite(train.lat) && Number.isFinite(train.lon)).map(train => createVehicle("train", train))
     ];
     // A vehicle we already showed eases from where it was drawn to its new fix.
     fresh.forEach(vehicle => {
@@ -28937,7 +29729,7 @@ return { createLiveTraffic };
 // ---- engine.js
 __modules["engine.js"] = (() => {
 const { COUNTRIES, LEGACY_COUNTRY_ISOS, TERRITORIES } = __modules["countries.js"];
-const { PixelGlobe } = __modules["globe.js"];
+const { LIGHT_DEVICE, PixelGlobe } = __modules["globe.js"];
 const { JOURNEYS, ROUND_COLORS, createJourney, scoreTier } = __modules["journeys.js"];
 const { getAccountLanguage, getProfile, getUser, initAuth, isConfigured: isAuthConfigured, pullDays, pushDay, saveLanguage, sendEmailLink, signIn, signOut, takeAuthRedirectError, verifyEmailCode } = __modules["auth.js"];
 const { ROUND_PICTURES } = __modules["round-pictures.js"];
@@ -29392,11 +30184,28 @@ let climb = null;
 let burstRun = 0;
 // The day's journey, drawn into a container; kept while the day's journey stays the same.
 // Its goal is the mode's highest score: 9,000 in competitive, 6,000 in casual.
-function journeyIn(current, containerId) {
+// `tall`: the standing journey over the whole score card on a phone ({ top, bottom }, the
+// free band between the points bar and the card at the bottom, as fractions of its height).
+function journeyIn(current, containerId, { tall = null } = {}) {
   const type = getJourney(activeDate, activeMode);
   const summit = getMaxScore(activeMode);
-  if (current?.type === type && current.summit === summit) return current;
-  return Object.assign(createJourney(type, document.getElementById(containerId), { summit }), { summit });
+  const container = document.getElementById(containerId);
+  const tallKey = tall ? [tall.top, tall.bottom, container.clientWidth, container.clientHeight].map(value => Math.round(value * 100)).join(":") : "";
+  if (current?.type === type && current.summit === summit && current.tallKey === tallKey) return current;
+  return Object.assign(createJourney(type, container, { summit, tall }), { summit, tallKey });
+}
+// On a phone the score card is the journey, standing, over the whole screen: the points in
+// a bar at the top, the answer and NEXT in a card at the bottom, and the route in between
+// (journey-scenes-tall.js), so every 1,000 and the goal are in view.
+function burstJourneyBand() {
+  if (!window.matchMedia("(max-width: 760px)").matches) return null;
+  const card = document.querySelector(".score-burst-card");
+  const box = card.getBoundingClientRect();
+  if (!box.height) return null;
+  const barBottom = document.getElementById("scoreBurstLabel").getBoundingClientRect().bottom - box.top;
+  const panelTop = document.querySelector(".score-burst-card .burst-answer").getBoundingClientRect().top - box.top;
+  card.style.setProperty("--panel-top", `${Math.round(panelTop)}px`);
+  return { top: Math.min(0.4, (barBottom + 22) / box.height), bottom: Math.max(0.45, (panelTop - 16) / box.height) };
 }
 // The words for the day's journey ("m", "Depth", "seabed"), wherever the score is shown.
 function applyJourneyWords() {
@@ -29741,7 +30550,7 @@ function showScoreBurst(index, { keepCardsOut = false } = {}) {
     stops.push(altitude + earlier.points);
     return altitude + earlier.points;
   }, 0);
-  climb = journeyIn(climb, "scoreBurstClimb");
+  climb = journeyIn(climb, "scoreBurstClimb", { tall: burstJourneyBand() });
   applyJourneyWords();
   const stretches = getStretches(dayScore, index + 1);
   climb.stop();
@@ -31702,9 +32511,7 @@ function showMenuGlobe() {
   globe.mountTo("menuGlobe");
   globe.setMode("menu");
   globe.setBorderStrength(0);
-  // The menu opens over today's main game, its Play button one click away; the Expedition
-  // menu stays closed.
-  closeDrawerNow();
+  // The menu opens over today's main game, its Play button one click away.
   menuFlight = null;
   hero.key = featuredMode();
   hero.date = null;
@@ -31723,7 +32530,7 @@ function showMenuGlobe() {
 // really are, plus the pins and your tent.
 const menuTravel = createTravelLayer(document.getElementById("menuGlobe"), point => globe.projectLonLat(point));
 const menuShowing = () => globe.mode === "menu" && !document.getElementById("mainMenu").classList.contains("hidden");
-const liveTraffic = createLiveTraffic({ isActive: menuShowing, isLand: (lon, lat) => globe.isLand(lon, lat) });
+const liveTraffic = createLiveTraffic({ isActive: menuShowing, isLand: (lon, lat) => globe.isLand(lon, lat), thin: LIGHT_DEVICE ? 2 : 1 });
 // The vehicle whose card is pinned (see openRideCard), and whether the press that closed it
 // was on the globe (that tap then does nothing else).
 let pinnedRide = null;
@@ -31764,7 +32571,14 @@ startAmbient(menuTravel, {
         layer.ctx.strokeStyle = "#ffd45c";
         layer.ctx.lineWidth = 2;
         layer.ctx.strokeRect(Math.round(hit.x) - 19, Math.round(hit.y) - 15, 38, 30);
+        placeRideCard(hit.x, hit.y); // the card follows its vehicle
       }
+    }
+    // A previewed vehicle (hover): its card follows it too, and goes when it's out of sight.
+    if (previewedRide && !pinnedRide) {
+      const hit = layer.hits.find(item => item.route === previewedRide);
+      if (hit) placeRideCard(hit.x, hit.y);
+      else previewRide(null);
     }
     const base = getBase();
     if (base) {
@@ -31923,9 +32737,8 @@ function stopOf(key) {
 }
 const MENU_FOCUS_MS = 1400; // a glide to the place you point at
 function focusMenuStop(key) {
-  if (key === menuFocus) return;
+  if (key === menuFocus || key === "duel") return; // 1v1 has no place on the globe (yet)
   menuFocus = key;
-  queueHudUpdate();
   if (globe.mode !== "menu") return;
   const stop = stopOf(key);
   globe.glideMenuTo(stop.lat, stop.lon, MENU_FOCUS_MS);
@@ -31945,7 +32758,9 @@ const HERO_ZOOM = 128; // the camera a little closer on a selected place
 const HERO_INFO = {
   extremes: { title: () => "HIGHS & LOWS", text: () => t("menu.extremesText"), color: "#ff6b9d" },
   casual: { title: () => t("mode.casual.short"), text: () => t("menu.casualText"), color: "#ffd45c" },
-  camp: { title: () => t("menu.community"), text: () => t("menu.communityNote"), color: "#45e3ff" }
+  camp: { title: () => t("menu.community"), text: () => t("menu.communityNote"), color: "#45e3ff" },
+  // 1v1 is still being made: its card says so, without a button.
+  duel: { title: () => "1V1", text: () => t("menu.duelText"), color: "#c58cff" }
 };
 function heroArtFor(key) {
   if (key !== "camp") return createPixelArt(PLAY_ART[key], PLAY_ART_COLORS);
@@ -31955,7 +32770,7 @@ function heroArtFor(key) {
 }
 // How a game stands on a day: none (no game that day), done, started or new.
 function dayState(key, dateKey) {
-  if (key === "extremes" && !hasExtremeDay(dateKey)) return "none";
+  if (key === "duel" || key === "extremes" && !hasExtremeDay(dateKey)) return "none";
   const record = getDayRecord(dateKey, key);
   return record.noGame ? "none" : record.completed ? "done" : record.started ? "started" : "new";
 }
@@ -31970,7 +32785,7 @@ function renderHero() {
   card.dataset.state = state === "none" ? "new" : state;
   card.dataset.key = key;
   card.classList.toggle("is-archive", Boolean(date));
-  const ribbon = date ? t("common.day", { n: getPuzzleNumber(date) }).toUpperCase() : key === MAIN_MODE ? t("menu.mainGame") : "";
+  const ribbon = date ? t("common.day", { n: getPuzzleNumber(date) }).toUpperCase() : key === MAIN_MODE ? t("menu.mainGame") : key === "duel" ? t("menu.comingSoon").toUpperCase() : "";
   setText("heroRibbon", ribbon);
   document.getElementById("heroRibbon").hidden = !ribbon;
   document.getElementById("heroArt").replaceChildren(heroArtFor(key));
@@ -31978,7 +32793,8 @@ function renderHero() {
   setText("heroText", info.text());
   // Under it: how today stands (or, on a past day, whether you played it).
   let status = "";
-  if (!camp && !date) status = describeMode(key);
+  if (key === "duel") status = t("menu.duelSoon");
+  else if (!camp && !date) status = describeMode(key);
   else if (date) status = state === "none" ? t("hero.noGame") : state === "done" ? t("hero.played") : state === "started" ? t("hero.started") : t("hero.notPlayed");
   setText("heroStatus", status);
   // The day stepper, on a past day.
@@ -31996,7 +32812,12 @@ function renderHero() {
   go.hidden = state === "none" && !date;
   // ARCHIVE next to it (not for Base Camp); on a past day, the way home.
   const side = document.getElementById("heroSide");
-  side.hidden = camp;
+  side.hidden = camp || key === "duel";
+  // The dock shows which card is up.
+  document.querySelectorAll("#menuDock [data-select]").forEach(item => {
+    item.classList.toggle("is-active", item.dataset.select === key);
+    item.setAttribute("aria-pressed", String(item.dataset.select === key));
+  });
   side.textContent = date ? `⌂ ${t(getTent() ? "hero.myTent" : "hero.home")}` : `▤ ${t("menu.archive")}`;
 }
 // The place for the card on the globe now.
@@ -32004,7 +32825,7 @@ function heroStop() {
   if (hero.date) { const [lon, lat] = startLonLat(hero.key, hero.date); return { lat, lon }; }
   return stopOf(hero.key);
 }
-const refocusHero = () => (hero.date ? (menuFocus = "archive", queueHudUpdate()) : focusMenuStop(hero.key));
+const refocusHero = () => (hero.date ? (menuFocus = "archive") : focusMenuStop(hero.key));
 // Selecting a game or Base Camp (its pin, or the Expedition menu): the camera pans and zooms
 // there and the card changes.
 function selectHero(key) {
@@ -32013,9 +32834,9 @@ function selectHero(key) {
   hero.date = null;
   hero.days = null;
   renderHero();
+  if (key === "duel") return; // no place on the globe: the camera stays
   if (globe.mode !== "menu") { menuFocus = key; return; }
   menuFocus = key;
-  queueHudUpdate();
   menuFlight = null;
   const stop = stopOf(key);
   globe.glideMenuTo(stop.lat, stop.lon, FLIGHT_MS, { distance: HERO_ZOOM });
@@ -32039,7 +32860,6 @@ function showHeroDay(date) {
   hero.date = date;
   renderHero();
   menuFocus = "archive";
-  queueHudUpdate();
   if (globe.mode === "menu") flyMenuTo(startLonLat(hero.key, date));
 }
 document.getElementById("heroGo").addEventListener("click", () => {
@@ -32060,7 +32880,6 @@ document.getElementById("heroSide").addEventListener("click", () => {
   hero.days = null;
   renderHero();
   menuFocus = "tent";
-  queueHudUpdate();
   if (globe.mode === "menu") flyMenuTo(homeOrigin().lonLat);
 });
 document.getElementById("heroOlder").addEventListener("click", () => {
@@ -32073,79 +32892,66 @@ document.getElementById("heroNewer").addEventListener("click", () => {
 });
 onLangChange(renderHero);
 
-// The Expedition menu: a drawer from the top corner with today's games, Base Camp and the
-// rest (Stats, Archive, How to play, My account, Language). Closed by default; the hero card
-// plays today's main game in one click. Pointing at a game or Base Camp turns the globe to
-// its place; a click on the globe closes the drawer so you can look around.
-const drawer = document.getElementById("expeditionDrawer");
-const drawerToggle = document.getElementById("menuDrawerToggle");
-let drawerOpen = false;
+// The dock (13 November 2026, team request; replaces the Expedition drawer): five buttons
+// at the bottom of the home screen, each one click away. Highs & Lows, Casual and 1v1 put
+// their card above the dock (selectHero: PLAY, and that game's own ARCHIVE); Crew opens
+// Crew (social.js); Settings opens the settings window. Pointing at a game turns the
+// globe to its place, and back to the selected card 0.7 s after you leave.
+const dock = document.getElementById("menuDock");
 let focusBackTimer = null;
-function setDrawer(open, { refocus = true } = {}) {
-  if (open === drawerOpen) return;
-  drawerOpen = open;
-  drawer.classList.toggle("is-open", open);
-  drawer.inert = !open;
-  drawerToggle.setAttribute("aria-expanded", String(open));
-  document.getElementById("mainMenu").classList.toggle("is-drawer-open", open);
-  queueHudUpdate();
-  // On a big screen the globe moves over, so its place stays in the open part.
-  globe.setMenuShiftX(open && bigScreen() ? Math.round(drawer.offsetWidth / 2) : 0);
-  clearTimeout(focusBackTimer);
-  if (open) {
-    showMenuTip(null);
-    closeRideCard();
-    document.getElementById("menuDrawerClose").focus({ preventScroll: true });
-  } else if (refocus) refocusHero();
-}
-function closeDrawerNow() {
-  setDrawer(false, { refocus: false });
-}
-drawerToggle.addEventListener("click", () => { sounds.playClick(); setDrawer(!drawerOpen); });
-document.getElementById("menuDrawerClose").addEventListener("click", () => {
-  sounds.playClick();
-  setDrawer(false);
-  drawerToggle.focus({ preventScroll: true });
-});
-drawer.querySelectorAll("[data-focus]").forEach(item => {
+dock.querySelectorAll("[data-focus]").forEach(item => {
   const point = () => { clearTimeout(focusBackTimer); focusMenuStop(item.dataset.focus); };
   const leave = () => {
     clearTimeout(focusBackTimer);
-    focusBackTimer = setTimeout(() => { if (drawerOpen) refocusHero(); }, 700);
+    focusBackTimer = setTimeout(refocusHero, 700);
   };
   item.addEventListener("pointerenter", event => { if (event.pointerType === "mouse") point(); });
   item.addEventListener("pointerleave", event => { if (event.pointerType === "mouse") leave(); });
   item.addEventListener("focusin", point);
   item.addEventListener("focusout", leave);
 });
-// Choosing a game, in the drawer, on its pin or on the hero card, starts it at once: its
-// trip is one quick direct flight from your tent (flyFromMenu), no glide first.
 let cinematicArrival = false;
-// A game in the Expedition menu selects it: the drawer folds away, the camera pans to its
-// place and the card at the bottom becomes that game (PLAY is on the card).
-drawer.querySelectorAll("[data-select]").forEach(item => item.addEventListener("click", () => {
+dock.querySelectorAll("[data-select]").forEach(item => item.addEventListener("click", () => {
   sounds.playClick();
-  closeDrawerNow();
+  clearTimeout(focusBackTimer);
   selectHero(item.dataset.select);
 }));
-// Choosing a game or Base Camp folds the drawer away (the flight or the landing takes over).
-drawer.querySelectorAll(".menu-mode, #menuCommunityCard").forEach(item => item.addEventListener("click", () => closeDrawerNow(), true));
-// A click on the globe closes the drawer, and that click does nothing else: look around freely.
-let drawerClosedByGlobe = false;
-document.getElementById("menuGlobe").addEventListener("pointerdown", () => {
-  drawerClosedByGlobe = drawerOpen;
-  if (drawerOpen) setDrawer(false);
+
+// Settings: My Tent, your stats, how to play, language and sound. Opened over the menu;
+// the windows it opens come on top of it, and closing them comes back here.
+const settingsModal = document.getElementById("settingsModal");
+const SOUND_KEY = "daily-geography:sound:v1";
+function setSound(on) {
+  sounds.enabled = on;
+  try { localStorage.setItem(SOUND_KEY, on ? "1" : "0"); } catch {}
+  document.getElementById("soundIcon").classList.toggle("hidden", !on);
+  document.getElementById("soundOffIcon").classList.toggle("hidden", on);
+  document.getElementById("soundToggle").setAttribute("aria-label", t(on ? "game.mute" : "game.unmute"));
+  renderSettings();
+}
+function renderSettings() {
+  setText("settingsSoundValue", t(sounds.enabled ? "settings.on" : "settings.off"));
+  document.getElementById("settingsSoundButton").setAttribute("aria-pressed", String(sounds.enabled));
+  setText("settingsLangValue", LANGUAGES.find(language => language.code === getLang())?.name || "");
+}
+try { if (localStorage.getItem(SOUND_KEY) === "0") setSound(false); } catch {}
+document.getElementById("menuSettingsButton").addEventListener("click", () => {
+  sounds.playClick();
+  renderSettings();
+  settingsModal.classList.remove("hidden");
+  document.getElementById("closeSettingsButton").focus({ preventScroll: true });
 });
+const closeSettings = () => settingsModal.classList.add("hidden");
+document.getElementById("closeSettingsButton").addEventListener("click", () => { sounds.playClick(); closeSettings(); });
+settingsModal.addEventListener("click", event => { if (event.target === settingsModal) closeSettings(); });
+document.getElementById("settingsSoundButton").addEventListener("click", () => { setSound(!sounds.enabled); sounds.playClick(); });
 document.addEventListener("keydown", event => {
-  if (event.key !== "Escape" || !drawerOpen || document.querySelector(".modal-overlay:not(.hidden), .base-overlay")) return;
-  setDrawer(false);
-  drawerToggle.focus({ preventScroll: true });
+  if (event.key !== "Escape" || settingsModal.classList.contains("hidden")) return;
+  // Only when nothing is open over it.
+  if ([...document.querySelectorAll(".modal-overlay:not(.hidden)")].some(node => node !== settingsModal)) return;
+  closeSettings();
 });
-window.addEventListener("resize", () => {
-  if (!drawerOpen) return;
-  globe.setMenuShiftX(bigScreen() ? Math.round(drawer.offsetWidth / 2) : 0, 0);
-  queueHudUpdate();
-});
+onLangChange(renderSettings);
 
 // What's under the pointer on the menu globe: one of the places, a vehicle, or a country.
 function countryByCcn3(ccn3) {
@@ -32203,13 +33009,15 @@ function showMenuTip(info, event, { linger = 0 } = {}) {
 // camera pans there and the card at the bottom changes, selectHero). Moving off a selected
 // country closes its card.
 globe.onMenuHover = event => {
-  if (!bigScreen() || drawerOpen) return;
+  if (!bigScreen()) return;
   const info = menuHit(event, { countries: Boolean(selectedCountry) });
   if (pinnedRide) { document.getElementById("menuGlobe").classList.toggle("is-pointing", Boolean(info?.ride || info?.pin || info?.action)); return; }
   if (selectedCountry && info?.country !== selectedCountry) selectMenuCountry(null);
   if (selectedCountry) return;
-  showMenuTip(info && !info.pin && !info.country && !info.sea ? info : null, event);
-  document.getElementById("menuGlobe").classList.toggle("is-pointing", Boolean(info?.action || info?.pin));
+  // A vehicle under the pointer shows its whole card at once (a preview: a click pins it).
+  previewRide(info?.ride || null);
+  showMenuTip(info && !info.ride && !info.pin && !info.country && !info.sea ? info : null, event);
+  document.getElementById("menuGlobe").classList.toggle("is-pointing", Boolean(info?.ride || info?.action || info?.pin));
 };
 // Tapping a country (just for fun) selects it: its borders light up and a card tells you
 // what it is. Tapping the sea (or the same country again) lets go.
@@ -32227,10 +33035,12 @@ function selectMenuCountry(country, event) {
   }, event);
 }
 globe.onMenuTap = event => {
-  if (drawerClosedByGlobe) { drawerClosedByGlobe = false; return; }
   if (rideClosedByTap) { rideClosedByTap = false; return; }
   const info = menuHit(event, { countries: true });
-  if (info?.ride) { selectMenuCountry(null); openRideCard(info.ride, event); return; }
+  // A click while a vehicle's card is previewed (hover) means that vehicle, even if it has
+  // drifted a few pixels from under the pointer.
+  const ride = info?.ride || previewedRide;
+  if (ride) { selectMenuCountry(null); openRideCard(ride, event); return; }
   if (info?.action) { sounds.playClick(); selectMenuCountry(null); info.action(); return; }
   if (info?.pin) { sounds.playClick(); selectMenuCountry(null); selectHero(info.kind); return; }
   if (info?.title) { showMenuTip(info, event, { linger: 2600 }); return; }
@@ -32238,39 +33048,75 @@ globe.onMenuTap = event => {
   else selectMenuCountry(null);
 };
 
-// A vehicle's card (transit-card.js): a click or tap on a vehicle pins it beside the
-// vehicle, with its route in gold on the globe. It stays (the vehicle drives on) until its ✕,
-// or a click or tap anywhere else, which does nothing more than close it. Another vehicle
-// opens its own card instead.
+// A vehicle's card (transit-card.js). On a computer, hovering a vehicle shows its card
+// beside it (a preview, gone when the pointer leaves). A click or tap pins it: the globe
+// turns the vehicle to the middle (keeping the zoom), the drift holds, and the card stays
+// beside the vehicle as it moves, never over it (on a phone the card takes the bottom of
+// the screen instead of the game card, and the vehicle sits above it). It stays until its
+// ✕, or a click or tap anywhere else, which does nothing more than close it; the globe then
+// glides back to the selected game. Another vehicle opens its own card instead.
 const rideCard = Object.assign(document.createElement("div"), { className: "transit-card hidden" });
 rideCard.setAttribute("role", "dialog");
 document.getElementById("menuGlobe").appendChild(rideCard);
 const countryOfPoint = (lon, lat) => countryByCcn3(globe.countryAt(lat, lon));
-function openRideCard(route, event) {
-  pinnedRide = route;
-  sounds.playClick();
-  showMenuTip(null);
+let previewedRide = null;
+document.getElementById("menuGlobe").addEventListener("pointerleave", () => previewRide(null));
+function fillRideCard(route) {
   fillTransitCard(rideCard, route, { countryOf: countryOfPoint, sources: liveTraffic.sources() }, () => { sounds.playClick(); closeRideCard(); });
   rideCard.setAttribute("aria-label", t(`travel.kind.${route.kind}`));
   rideCard.classList.remove("hidden");
-  // Beside the vehicle where it fits (phones: across the bottom, see style.css).
+}
+// Beside the vehicle at (x, y) where it fits, never over it, and never under the game card.
+function placeRideCard(x, y) {
+  if (!bigScreen()) { rideCard.style.removeProperty("left"); rideCard.style.removeProperty("top"); return; }
   const width = rideCard.offsetWidth;
   const height = rideCard.offsetHeight;
   const margin = 12;
-  let left = event.clientX + 24;
-  if (left + width > innerWidth - margin) left = event.clientX - 24 - width;
+  const gap = 30; // clear of the vehicle and its box
+  let left = x + gap;
+  if (left + width > innerWidth - margin) left = x - gap - width;
   left = Math.round(Math.max(margin, Math.min(innerWidth - margin - width, left)));
-  // Never under the card at the bottom (the hero sits above the globe).
-  const hero = document.getElementById("heroCard")?.getBoundingClientRect();
+  const hero = document.querySelector("#mainMenu .menu-bottom")?.getBoundingClientRect();
   const heroShows = hero && hero.height && left < hero.right && left + width > hero.left;
   const bottom = heroShows ? Math.min(innerHeight, hero.top) - margin : innerHeight - margin;
   rideCard.style.left = `${left}px`;
-  rideCard.style.top = `${Math.round(Math.max(margin, Math.min(bottom - height, event.clientY - height / 2)))}px`;
+  rideCard.style.top = `${Math.round(Math.max(margin, Math.min(bottom - height, y - height / 2)))}px`;
+}
+function previewRide(route) {
+  if (pinnedRide || route === previewedRide) return;
+  previewedRide = route;
+  rideCard.classList.toggle("is-preview", Boolean(route));
+  if (!route) { rideCard.classList.add("hidden"); return; }
+  fillRideCard(route);
+}
+function openRideCard(route, event) {
+  previewedRide = null;
+  rideCard.classList.remove("is-preview");
+  pinnedRide = route;
+  sounds.playClick();
+  showMenuTip(null);
+  fillRideCard(route);
+  document.getElementById("mainMenu").classList.add("is-ride-open");
+  placeRideCard(event.clientX, event.clientY);
+  // The vehicle to the middle of the screen, at the zoom you had.
+  const here = route.here || route.position?.(Date.now() / 1000);
+  if (here && globe.mode === "menu") {
+    menuFlight = null;
+    globe.glideMenuTo(here[1], here[0], 900, { distance: globe.camera.position.z });
+  }
+  globe.holdMenu(true);
 }
 function closeRideCard() {
   if (!pinnedRide) return;
   pinnedRide = null;
   rideCard.classList.add("hidden");
+  document.getElementById("mainMenu").classList.remove("is-ride-open");
+  globe.holdMenu(false);
+  // Back to the selected game's place.
+  if (globe.mode === "menu" && hero.key !== "duel") {
+    const stop = heroStop();
+    globe.glideMenuTo(stop.lat, stop.lon, MENU_FOCUS_MS);
+  }
 }
 // A press anywhere outside the card closes it; on the globe that press does nothing else,
 // unless it's on another vehicle (that one's card opens).
@@ -32548,6 +33394,7 @@ function setBurstInfoOpen(open) {
   document.querySelector(".score-burst-card").classList.toggle("is-info-open", open);
   more.setAttribute("aria-expanded", String(open));
   if (!open) more.focus({ preventScroll: true });
+  requestAnimationFrame(burstJourneyBand); // the card at the bottom grew or shrank
 }
 document.getElementById("scoreBurstMore").addEventListener("click", () => setBurstInfoOpen(true));
 // Phones: the open info card stands in for MORE ABOUT IT; a tap on it folds it back.
@@ -32570,12 +33417,8 @@ document.getElementById("reviewRoundsButton").addEventListener("click", () => {
   goToRound(0);
 });
 
-document.getElementById("soundToggle").addEventListener("click", () => {
-  sounds.enabled = !sounds.enabled;
-  document.getElementById("soundIcon").classList.toggle("hidden", !sounds.enabled);
-  document.getElementById("soundOffIcon").classList.toggle("hidden", sounds.enabled);
-  document.getElementById("soundToggle").setAttribute("aria-label", t(sounds.enabled ? "game.mute" : "game.unmute"));
-});
+// (The same switch as in Settings, and remembered: setSound.)
+document.getElementById("soundToggle").addEventListener("click", () => setSound(!sounds.enabled));
 
 // How today's game of a mode stands: "done", "started" or "new" (the menu's tiles and pins).
 function modeState(mode) {
@@ -32633,7 +33476,6 @@ const mainMenu = initializeMainMenu({
     isGameViewVisible = false;
     showMenuGlobe();
     community?.refreshGlance();
-    updatePlaceHud();
     // A new explorer rank first means a new tent (its own party); the tent then asks for a base.
     if (hasFinishedDay) checkTentUpgrade().then(celebrated => { if (!celebrated) askForBase(); });
   },
@@ -32782,13 +33624,12 @@ function renderAccount(account) {
 document.getElementById("menuAccountButton").addEventListener("click", () => {
   sounds.playClick();
   const fromMenu = globe.mode === "menu" && !document.getElementById("mainMenu").classList.contains("hidden");
-  closeDrawerNow();
+  closeSettings();
   if (!fromMenu || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     document.getElementById("accountModal").classList.remove("hidden");
     return;
   }
   menuFocus = "tent";
-  queueHudUpdate();
   const stop = stopOf("tent");
   globe.glideMenuTo(stop.lat, stop.lon, FLIGHT_MS, { distance: 120 });
   setTimeout(() => document.getElementById("accountModal").classList.remove("hidden"), FLIGHT_MS * 0.7);
@@ -33003,7 +33844,6 @@ function updatePhoneFrame(duration = 0) {
   const top = document.querySelector(".side-left").getBoundingClientRect().bottom;
   const sheetTop = document.querySelector(".side-right").getBoundingClientRect().top;
   view.style.setProperty("--phone-top", `${Math.round(top)}px`);
-  document.getElementById("placeHud")?.style.setProperty("--phone-top", `${Math.round(top)}px`);
   view.style.setProperty("--phone-sheet", `${Math.round(window.innerHeight - sheetTop)}px`);
   // The cards slide sideways, so their heights still count while they're away. While a
   // globe-mode result is revealed, only the sheet is away.
@@ -33089,7 +33929,6 @@ function currentTentLevel({ fresh = false } = {}) {
 let celebratingTent = false;
 async function checkTentUpgrade() {
   const level = currentTentLevel({ fresh: true });
-  updatePlaceHud();
   const due = tentToCelebrate(level);
   if (!due || celebratingTent) return false;
   celebratingTent = true;
@@ -33098,7 +33937,6 @@ async function checkTentUpgrade() {
   if (!menuShown || document.querySelector(".modal-overlay:not(.hidden), .base-overlay")) { celebratingTent = false; return false; }
   await celebrateTent(due, { look: getTentLook(), hasBase: Boolean(getBase()), onPitch: () => pickBase({ first: true, afterGame: true }) });
   celebratingTent = false;
-  updatePlaceHud();
   return true;
 }
 // Your tent on the menu globe: its look (style, explorer, colour) as a pin icon, made once per look.
@@ -33108,17 +33946,8 @@ const tentPinIcon = () => (tentPinIcons[tentLookKey()] ||= createTentCanvas(getT
 setTentLevelSource(() => currentTentLevel());
 renderTentTile();
 
-// ---------------------------------------------------------------------------
-// Where you are: a small card in the top-right corner of the home screen (only there). It
-// says where you'd leave from (your tent, or without one the capital of today's country) and
-// where you're heading: the game or Base Camp you point at in the Expedition menu or on its
-// pin, with the distance. A click turns the globe to where you are.
-// ---------------------------------------------------------------------------
-
-const placeHud = Object.assign(document.createElement("button"), { type: "button", id: "placeHud", className: "place-hud hidden" });
-document.body.appendChild(placeHud);
-let hudKey = "";
-let hudTarget = null;
+// Where trips leave from and where they go (the top-right place HUD is gone: 13 November
+// 2026, team request; the home screen's focus is the games, not where you are).
 // Where trips leave from: your tent, or the capital of today's country (getDayPlace).
 function homeOrigin() {
   const spot = getTent();
@@ -33138,99 +33967,7 @@ function gameOrigin(mode, dateKey) {
   const capital = CAPITALS[country.iso];
   return { lonLat: capital ? [capital.lon, capital.lat] : placeOf(country), country, short: capital?.name || countryName(country) };
 }
-// Where you're heading: what the menu looks at (menuFocus): a game, Base Camp, or the past
-// day on the card. Pointing at My Tent: still the selected game.
-function homeTarget() {
-  if (menuFocus === "archive") {
-    const [lon, lat] = startLonLat(hero.key, hero.date);
-    return { key: `archive:${hero.date}`, label: t("common.day", { n: getPuzzleNumber(hero.date) }).toUpperCase(), country: getDayPlace(hero.date, hero.key).country, lonLat: [lon, lat], color: PIN_COLORS[hero.key] };
-  }
-  const key = menuFocus === "tent" ? (hero.key === "camp" ? featuredMode() : hero.key) : menuFocus;
-  if (key === "camp") return { key, label: t("hud.camp"), country: getCountry("NP"), lonLat: BASE_CAMP_LONLAT, color: PIN_COLORS.camp };
-  const country = todayPlace(key);
-  const capital = startCapital(key);
-  return { key, label: gameName(key).toUpperCase(), country, city: capital?.name || null, lonLat: startLonLat(key), color: PIN_COLORS[key] };
-}
 const kmBetween = (a, b) => Math.round(distanceOnGlobe(a, b) * 6371);
-// (For code that runs before the card exists: on the next frame.)
-function queueHudUpdate() { requestAnimationFrame(() => updatePlaceHud()); }
-// The HUD's room beside the open Expedition menu: a gap on each side, and below this width
-// the two would touch.
-const HUD_GAP = 24;
-const HUD_MIN_WIDTH = 260;
-function hudContext() {
-  const open = id => !document.getElementById(id).classList.contains("hidden");
-  if (open("communityModal") || open("gameView") && isGameViewVisible) return null;
-  if (document.querySelector(".modal-overlay:not(.hidden), .base-overlay, .travel-banner")) return null;
-  if (open("mainMenu") && !document.getElementById("mainMenu").classList.contains("is-leaving") && !document.getElementById("mainMenu").classList.contains("is-travelling")) {
-    // With the Expedition menu open, the HUD keeps to the free part on the right; on a
-    // screen too narrow for both (a phone), it steps away until the menu closes.
-    placeHud.style.removeProperty("--hud-room");
-    if (drawerOpen) {
-      const room = window.innerWidth - drawer.offsetWidth - HUD_GAP * 2;
-      if (room < HUD_MIN_WIDTH) return null;
-      placeHud.style.setProperty("--hud-room", `${Math.round(room)}px`);
-    }
-    return "menu";
-  }
-  return null;
-}
-function updatePlaceHud() {
-  const context = hudContext();
-  placeHud.classList.toggle("hidden", !context);
-  if (!context) return;
-  placeHud.dataset.context = context;
-  const origin = homeOrigin();
-  const target = homeTarget();
-  const km = kmBetween(origin.lonLat, target.lonLat);
-  const label = t(origin.tent ? "hud.tent" : "hud.current");
-  const key = [label, origin.name, target.key, target.label, target.country.iso, km, tentLookKey()].join("|");
-  if (key === hudKey) return;
-  const targetChanged = hudKey && hudKey.split("|")[2] !== target.key;
-  hudKey = key;
-  const icon = origin.tent ? createTentCanvas(getTentLook(), 2, "place-hud-tent") : artIcon(PLAY_ART.extremes, PLAY_ART_COLORS);
-  icon.classList.add("place-hud-icon");
-  const text = document.createElement("span");
-  text.className = "place-hud-text";
-  const where = document.createElement("span");
-  where.className = "place-hud-where";
-  where.append(createFlagImage(origin.country, "place-hud-flag"), Object.assign(document.createElement("strong"), { textContent: origin.name }));
-  // The trip: ✈ where to, and how far.
-  const trip = document.createElement("span");
-  trip.className = "place-hud-trip";
-  trip.style.setProperty("--to", target.color);
-  const plane = spriteCanvas("plane");
-  plane.className = "place-hud-plane";
-  const toName = target.city ? target.city : target.key === "camp" ? t("hud.campShort") : countryName(target.country);
-  trip.append(plane, Object.assign(document.createElement("b"), { textContent: target.label }), createFlagImage(target.country, "place-hud-flag"),
-    Object.assign(document.createElement("span"), { textContent: toName }),
-    Object.assign(document.createElement("em"), { textContent: km < 30 ? t("hud.here") : `${num(km < 1000 ? Math.round(km / 10) * 10 : Math.round(km / 50) * 50)} km` }));
-  text.append(Object.assign(document.createElement("span"), { className: "field-label", textContent: label }), where, trip);
-  placeHud.replaceChildren(icon, text);
-  placeHud.style.setProperty("--hud", origin.tent ? getTentColor() : PIN_COLORS.extremes);
-  placeHud.title = t("hud.show");
-  placeHud.setAttribute("aria-label", t("hud.aria", { from: origin.name, to: `${target.label} ${toName}`, km: num(km) }));
-  hudTarget = origin.lonLat;
-  if (targetChanged) {
-    placeHud.classList.remove("is-new-target");
-    void placeHud.offsetWidth;
-    placeHud.classList.add("is-new-target");
-  }
-}
-placeHud.addEventListener("click", () => {
-  if (!hudTarget) return;
-  sounds.playClick();
-  if (globe.mode === "menu") globe.glideMenuTo(hudTarget[1], hudTarget[0], MENU_FOCUS_MS);
-  else globe.rotateTo(hudTarget[1], hudTarget[0], 900);
-});
-// Kept up to date as screens open and close (class changes), and on a new base or language.
-const hudObserver = new MutationObserver(() => updatePlaceHud());
-["mainMenu", "gameView", "communityModal"].forEach(id => hudObserver.observe(document.getElementById(id), { attributes: true, attributeFilter: ["class"] }));
-document.querySelectorAll(".modal-overlay").forEach(node => hudObserver.observe(node, { attributes: true, attributeFilter: ["class"] }));
-hudObserver.observe(document.body, { childList: true });
-onBaseChange(() => updatePlaceHud());
-onLangChange(() => updatePlaceHud());
-updatePlaceHud();
 // The first look in this browser only notes the tent you have (no party for old badges).
 tentToCelebrate(currentTentLevel());
 // ---------------------------------------------------------------------------
