@@ -2810,14 +2810,15 @@ h1, h2, h3 { font-weight: normal; }
   display: grid;
   place-items: center;
   padding: 1rem;
-  background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.3) 25%, transparent 75%);
+  /* The globe stays out of it: it takes the heat map's colours once the climb is done. */
+  background: rgba(3, 6, 16, 0.9);
   cursor: pointer;
 }
 .climb-card {
   display: grid;
   justify-items: center;
   gap: 0.55rem;
-  width: min(100%, 420px);
+  width: min(100%, 580px);
   padding: 1.4rem 1.4rem 1rem;
   border: 1px solid var(--glass-line);
   border-radius: 26px;
@@ -2833,6 +2834,14 @@ h1, h2, h3 { font-weight: normal; }
 .climb-counter { display: flex; align-items: baseline; gap: 0.5rem; }
 .climb-counter strong { font: 700 48px/1 var(--font-mono); transition: color 0.15s; }
 .climb-counter span { color: var(--faint); font: 700 14px var(--font-mono); }
+/* The whole world in pixels (pixel-map.js), lighting up as the climb passes. The canvas
+   is sized in whole device pixels per cell (fit), so every pixel stays square and sharp. */
+.climb-map { display: grid; justify-items: center; gap: 6px; width: 100%; padding: 8px 0 6px; border-radius: 12px; background: #071027; box-shadow: inset 0 0 0 1px var(--glass-line); }
+.climb-map canvas { display: block; image-rendering: pixelated; }
+.climb-key { display: flex; gap: 14px; color: var(--muted); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.climb-key-item { display: inline-flex; align-items: center; gap: 6px; }
+.climb-key-item i { width: 8px; height: 8px; background: #ff4f9a; }
+.climb-key-item.is-far i { background: #23348c; box-shadow: 0 0 0 1px #5aa8ff; }
 .climb-window {
   position: relative;
   width: 100%;
@@ -3037,7 +3046,14 @@ h1, h2, h3 { font-weight: normal; }
 .climb-kicker { padding: 8px 14px; border: 1px solid color-mix(in srgb, #ff6b9d 70%, transparent); border-radius: 10px; background: color-mix(in srgb, #ff6b9d 10%, transparent); font: 12px/1.5 var(--font-display); }
 .climb-stat { color: var(--text); font: 600 24px/1.3 var(--font-body); }
 .climb-hint { display: inline-flex; align-items: center; min-height: 32px; padding: 0 14px; border: 1px solid var(--glass-line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--muted); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
-@media (max-width: 760px) { .climb-stat { font-size: 20px; } .climb-kicker { font-size: 9px; } .climb-hint { min-height: 44px; padding: 0 18px; } }
+@media (max-width: 760px) {
+  .climb-stat { font-size: 20px; } .climb-kicker { font-size: 9px; } .climb-hint { min-height: 44px; padding: 0 18px; }
+  /* The whole screen under the top bar (day, score and round numbers, 107 px under the
+     notch, which stays in view: the score counts up there), solid, so the globe stays out. */
+  .extreme-climb { align-items: stretch; padding: calc(env(safe-area-inset-top, 0px) + 112px) 0 0; background: none; }
+  .climb-card { background: #050816; }
+  .climb-card { width: 100%; align-content: start; gap: 0.7rem; padding: 18px 14px calc(env(safe-area-inset-bottom, 0px) + 16px); border-width: 1px 0 0; border-radius: 22px 22px 0 0; box-shadow: none; animation: none; }
+}
 /* Pinned ends of the ranking: cover the gap so no sliver of the next row peeks through. */
 .climb-points { color: #ff6b9d; text-shadow: 0 0 22px rgba(255, 107, 157, 0.4); }
 
@@ -3792,9 +3808,10 @@ h1, h2, h3 { font-weight: normal; }
   .score-burst-card,
   .score-burst-card.has-info,
   .score-burst-card.is-extreme {
-    position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; gap: 0;
+    position: relative; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; gap: 0;
     width: 100%; height: 100dvh; max-height: 100dvh; min-width: 0;
-    padding: 0 0 calc(env(safe-area-inset-bottom, 0px) + 12px); overflow-x: hidden; overflow-y: auto;
+    /* Room for the points bar on top, so nothing slides under it. */
+    padding: calc(env(safe-area-inset-top, 0px) + 92px) 0 calc(env(safe-area-inset-bottom, 0px) + 12px); overflow-x: hidden; overflow-y: auto;
     border: 0; border-radius: 0; background: #0a0f1d; box-shadow: none; animation: none; text-align: center;
   }
   /* The journey fills the card. */
@@ -3814,13 +3831,16 @@ h1, h2, h3 { font-weight: normal; }
   /* The points on the left, under the label (the shared SKIP sits top right on a phone). */
   .score-burst-card .score-burst-points { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 32px); left: 28px; z-index: 4; display: flex; align-items: center; height: 44px; font-size: 36px; }
   .score-burst-card .score-burst-streak { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 32px); right: 26px; z-index: 4; display: flex; align-items: center; height: 40px; }
-  /* The card at the bottom. */
-  .score-burst-card .burst-answer { width: auto; margin: 0; padding: 12px 16px 10px; border-bottom: 0; }
+  /* The card at the bottom: pushed down by an auto margin (not justify-content: flex-end,
+     which pushes a card taller than the screen up under the points bar, out of reach of
+     scrolling; iPhone with MORE ABOUT IT open, 15 November 2026). */
+  .score-burst-card .burst-answer { width: auto; margin: auto 0 0; padding: 12px 16px 10px; border-bottom: 0; }
   .score-burst-card .burst-answer-main strong { font-size: 24px; }
   .score-burst-card .burst-answer-flag img { width: 48px; height: 32px; }
   .score-burst-card .score-burst-total { padding: 0 16px 10px; }
   .score-burst-card .burst-more, .score-burst-card .burst-info { margin: 0 12px 10px; width: auto; }
-  .score-burst-card #scoreBurstNext { margin: 0 12px; box-shadow: none; }
+  .score-burst-card #scoreBurstNext,
+  .score-burst-card.has-info #scoreBurstNext { width: auto; align-self: stretch; margin: 0 12px; box-shadow: none; }
 }
 
 /* ---------- In a game: just the top bar and the score (13 November 2026) ----------
@@ -4298,6 +4318,8 @@ h1, h2, h3 { font-weight: normal; }
         <span class="climb-kicker" id="climbKicker">WHERE DID YOU LAND?</span>
         <span class="climb-stat" id="climbStat"></span>
         <div class="climb-counter"><strong id="climbRank">#1</strong><span id="climbOf"></span></div>
+        <!-- The whole world in pixels, lighting up as the climb passes (pixel-map.js). -->
+        <div class="climb-map" aria-hidden="true"><canvas id="climbMap"></canvas><div class="climb-key" id="climbKey"></div></div>
         <div class="climb-window"><ol class="climb-list" id="climbList"></ol></div>
         <div class="climb-result is-waiting" id="climbResult">
           <strong class="climb-points" id="climbPoints">+0</strong>
@@ -15584,10 +15606,17 @@ function planned(p, s, color, gap = 3, offsetY = 0) {
   s.route.all.forEach((point, index) => { if (index % gap === 0) p.px(point.x, point.y + offsetY, color); });
 }
 // A scale label on a soft dark plate (a drop shadow made 3 look like 9).
+// A label that would land on one drawn earlier in the frame is left out (where the marks
+// are close together, as on a short standing route), except the goal's.
 const label = (p, s, text, x, y, reached, { align = "left" } = {}) => {
   if (s.small) return;
   const width = textWidth(text);
   const left = Math.round(align === "center" ? x - width / 2 : align === "right" ? x - width : x);
+  const box = { l: left - 1, t: Math.round(y) - 1, r: left + width + 1, b: Math.round(y) + 6 };
+  const boxes = (s.labelBoxes ||= []);
+  const goal = text === `${s.summit / 1000}K`;
+  if (!goal && boxes.some(o => box.l < o.r + 1 && o.l < box.r + 1 && box.t < o.b + 1 && o.t < box.b + 1)) return;
+  boxes.push(box);
   p.rect(left - 1, Math.round(y) - 1, width + 2, 7, "#141a30");
   p.text(text, left, y, reached ? LABEL : LABEL_AHEAD);
 };
@@ -16634,8 +16663,14 @@ __modules["journey-scenes-tall.js"] = (() => {
 const { ATLAS, atlasRows, clamp, lerp, makeRoute, mix, ramp, random } = __modules["journey-pixels.js"];
 const { BAG, BASKET, BEAR, BIRD, BONE, BOULDER, BOULDER_COLORS, BRITTLE_STAR, CLOUD, CLOUD_COLORS, CREATURES, ENVELOPE, GEODE, GREEN_PINE, HUSKY, HUSKY_COLORS, HUT, HUT_COLORS, LOCO, LOCO_COLORS, MINERALS, MINE_ORDER, NARWHAL, PACK, PINE, PINE_COLORS, PLANE, SEA, SEA_PIG, SHADOW, SHIP, SIGN, SLED, SNOWMOBILE, SPHERE, SPHERE_COLORS, STATION, TENT, TENT_COLORS, WHEELS, YETI, YETI_COLORS, darker, drawAtlas, drawCarriage, drawStar, eachMark, eachTrail, flag, glow, label, lighter, paletteOf, planned } = __modules["journey-scenes.js"];
 
-const TALL_W = 80;
+// 120 art pixels across (80 until 15 November 2026: on a phone each pixel was almost 5
+// points, too coarse to see what things were). The scenes were laid out for 80, so every
+// position across goes through X(); sprites keep their own pixels and so come out smaller
+// and sharper.
+const TALL_W = 120;
 const W = TALL_W;
+const K = W / 80;
+const X = v => Math.round(v * K);
 
 // ---------------------------------------------------------------------------
 // 1. Balloon: straight up from the meadow and the village, through the clouds, to the
@@ -16643,21 +16678,21 @@ const W = TALL_W;
 // ---------------------------------------------------------------------------
 function balloon(summit, { h: H, top: T, bottom: B }) {
   // The basket's bottom follows the route; the envelope is 28 px above it.
-  const route = makeRoute([[30, B], [48, T + 30]]);
+  const route = makeRoute([[X(30), B], [X(48), T + 30]]);
   const groundTop = B + 6;
   const rnd = random(11);
-  const stars = Array.from({ length: 34 }, () => [Math.floor(rnd() * W), Math.floor(rnd() * (T + 30))]);
+  const stars = Array.from({ length: 50 }, () => [Math.floor(rnd() * W), Math.floor(rnd() * (T + 30))]);
   const groundY = x => groundTop + Math.round(Math.sin(x * 0.12) * 1.5);
   const falling = [];
   const landed = new Map();
   return {
     route,
-    goal: { x: 64, y: T + 6 },
+    goal: { x: X(64), y: T + 6 },
     background(p) {
       p.bands(0, 0, W, groundTop + 2, t => ramp([[0, "#151b44"], [0.3, "#263a7a"], [0.6, "#4b7cc8"], [0.84, "#9cc4ec"], [0.94, "#f2c09a"], [1, "#ffd29a"]], t));
       stars.forEach(([x, y]) => p.px(x, y, y < T ? "#ffffff" : "#9fb3e8"));
-      p.disc(66, groundTop - 1, 6, "#ff8a3d");
-      p.disc(66, groundTop - 1, 4, "#ffd45c");
+      p.disc(X(66), groundTop - 1, 6, "#ff8a3d");
+      p.disc(X(66), groundTop - 1, 4, "#ffd45c");
       for (let x = 0; x < W; x += 1) {
         const far = groundTop - 8 + Math.round(Math.sin(x * 0.18) * 2 + Math.sin(x * 0.06) * 2);
         p.rect(x, far, 1, H - far, "#3d5d8c");
@@ -16670,7 +16705,7 @@ function balloon(summit, { h: H, top: T, bottom: B }) {
         p.rect(x, near, 1, H - near, "#1d6b3a");
       }
       // The village, with lit windows, and pines.
-      [[46, "#e0484f"], [54, "#2a6fd0"], [63, "#ffd45c"], [72, "#c58cff"]].forEach(([x, roof]) => {
+      [[X(46), "#e0484f"], [X(54), "#2a6fd0"], [X(63), "#ffd45c"], [X(72), "#c58cff"]].forEach(([x, roof]) => {
         const base = groundY(x) + 2;
         p.rect(x, base - 4, 5, 4, "#f4f1e8");
         p.rect(x - 1, base - 5, 7, 1, roof);
@@ -16679,26 +16714,27 @@ function balloon(summit, { h: H, top: T, bottom: B }) {
         p.px(x + 1, base - 3, "#ffd45c");
         p.px(x + 3, base - 3, "#ffd45c");
       });
-      [3, 10, 38].forEach(x => p.sprite(PINE, GREEN_PINE, x, groundY(x) - 6));
+      [3, X(10), X(38)].forEach(x => p.sprite(PINE, GREEN_PINE, x, groundY(x) - 6));
       // The launch field and a windsock.
-      p.rect(22, B + 1, 17, 1, "#8a5a32");
-      p.rect(18, B - 7, 1, 8, "#c9ced9");
-      p.rect(19, B - 7, 3, 1, "#ff8a3d");
-      p.rect(19, B - 6, 2, 1, "#f4f1e8");
+      const field = X(30) - 8; // the launch field under the basket, the windsock left of it
+      p.rect(field, B + 1, 17, 1, "#8a5a32");
+      p.rect(field - 4, B - 7, 1, 8, "#c9ced9");
+      p.rect(field - 3, B - 7, 3, 1, "#ff8a3d");
+      p.rect(field - 3, B - 6, 2, 1, "#f4f1e8");
     },
     frame(p, s) {
       stars.slice(0, 8).forEach(([x, y], index) => { if ((s.now * 1.3 + index * 0.71) % 3 < 0.25) p.px(x, y, "#ffd45c"); });
       // A plane high up, birds and drifting clouds.
-      const planeX = ((s.now * 9) % 180) - 50;
+      const planeX = ((s.now * 9) % (W + 100)) - 50;
       const planeY = Math.max(3, T - 4);
       for (let x = planeX - 24; x < planeX; x += 2) p.px(x, planeY + 1, `rgba(255,255,255,${0.1 + (x - planeX + 24) / 24 * 0.35})`);
       p.sprite(PLANE, { K: "#0b1020", W: "#f4f1e8" }, planeX, planeY);
       const birdY = Math.round(lerp(B, T, 0.3));
-      [[20, birdY], [27, birdY + 3], [34, birdY - 1]].forEach(([x0, y], index) => {
+      [[X(20), birdY], [X(20) + 7, birdY + 3], [X(20) + 14, birdY - 1]].forEach(([x0, y], index) => {
         const x = ((x0 - s.now * 4) % (W + 20) + W + 20) % (W + 20) - 10;
         p.sprite(BIRD[(Math.floor(s.now * 4) + index) % 2], { K: "#1a2238" }, x, y);
       });
-      [[6, 0.82, 2.2], [50, 0.62, 1.5], [20, 0.4, 2.8], [58, 0.18, 1.1]].forEach(([x0, at, speed]) => {
+      [[X(6), 0.82, 2.2], [X(50), 0.62, 1.5], [X(20), 0.4, 2.8], [X(58), 0.18, 1.1]].forEach(([x0, at, speed]) => {
         const x = ((x0 + s.now * speed) % (W + 30)) - 15;
         p.sprite(CLOUD, CLOUD_COLORS, x, Math.round(lerp(B, T, at)), { alpha: 0.85 });
       });
@@ -16709,8 +16745,8 @@ function balloon(summit, { h: H, top: T, bottom: B }) {
         for (let x = 0; x < W; x += 3) p.px(x, y, "rgba(255,255,255,0.18)");
         label(p, s, text, 2, y - 6, reached);
       });
-      label(p, s, `${s.summit / 1000}K`, 70, T + 3, s.goal);
-      drawStar(p, s.goal ? "#ffd45c" : "#8f9bbd", 64, T + 6);
+      label(p, s, `${s.summit / 1000}K`, X(64) + 6, T + 3, s.goal);
+      drawStar(p, s.goal ? "#ffd45c" : "#8f9bbd", X(64), T + 6);
 
       planned(p, s, "rgba(255,255,255,0.4)", 3);
       eachTrail(s, (point, color) => {
@@ -16724,7 +16760,7 @@ function balloon(summit, { h: H, top: T, bottom: B }) {
       falling.forEach(item => bags.delete(item.value));
       let slot = 0;
       bags.forEach((color, value) => {
-        const x = 24 + (slot++ * 4) % 18;
+        const x = X(30) - 6 + (slot++ * 4) % 18;
         p.sprite(BAG, paletteOf("bag", color, tie => ({ c: tie, s: "#c9a66b", t: "#9a7a46" })), x - 1, groundY(x) - 1);
       });
       for (let index = falling.length - 1; index >= 0; index -= 1) {
@@ -16762,7 +16798,7 @@ function balloon(summit, { h: H, top: T, bottom: B }) {
     react(s, { points, color }) {
       if (points <= 0) return;
       const at = s.route.at(s.f);
-      falling.push({ x: clamp(Math.round(at.x) + 6, 22, 44), y: Math.round(at.y) - 2, born: s.now, color, value: s.value });
+      falling.push({ x: clamp(Math.round(at.x) + 6, X(30) - 8, X(30) + 14), y: Math.round(at.y) - 2, born: s.now, color, value: s.value });
     }
   };
 }
@@ -16773,14 +16809,14 @@ function balloon(summit, { h: H, top: T, bottom: B }) {
 // ---------------------------------------------------------------------------
 function climb(summit, { h: H, top: T, bottom: B }) {
   const L = B - T;
-  const peak = { x: 46, y: T + 8 }; // room above for Atlas on the summit
-  const route = makeRoute([[8, B], [64, B - L * 0.17], [12, B - L * 0.37], [62, B - L * 0.56], [18, B - L * 0.74], [54, B - L * 0.9], [peak.x - 1, T + 14]]);
-  const slope = Math.max(1.2, (B - 2 - peak.y) / 42);
+  const peak = { x: X(46), y: T + 8 }; // room above for Atlas on the summit
+  const route = makeRoute([[X(8), B], [X(64), B - L * 0.17], [X(12), B - L * 0.37], [X(62), B - L * 0.56], [X(18), B - L * 0.74], [X(54), B - L * 0.9], [peak.x - 1, T + 14]]);
+  const slope = Math.max(1.2 / K, (B - 2 - peak.y) / (42 * K));
   const top = x => Math.round(peak.y + Math.abs(x - peak.x) * slope) + (x % 7 === 3 ? 1 : 0);
   const rnd = random(7);
-  const stars = Array.from({ length: 30 }, () => [Math.floor(rnd() * W), Math.floor(rnd() * (T + 30))]);
+  const stars = Array.from({ length: 45 }, () => [Math.floor(rnd() * W), Math.floor(rnd() * (T + 30))]);
   const yetiAt = route.at(0.62);
-  const yeti = { x: clamp(Math.round(yetiAt.x) - 14, 4, 60), y: Math.round(yetiAt.y) + 2 };
+  const yeti = { x: clamp(Math.round(yetiAt.x) - 14, 4, X(60)), y: Math.round(yetiAt.y) + 2 };
   const hut = route.at(0.34);
   return {
     route,
@@ -16788,7 +16824,7 @@ function climb(summit, { h: H, top: T, bottom: B }) {
     background(p) {
       p.bands(0, 0, W, H, t => ramp([[0, "#0b1030"], [0.55, "#1d2a5e"], [1, "#33478a"]], t));
       stars.forEach(([x, y]) => p.px(x, y, y < T ? "#ffffff" : "#8fa3d8"));
-      p.disc(70, Math.max(6, T - 2), 3, "#f4f1e8");
+      p.disc(X(70), Math.max(6, T - 2), 3, "#f4f1e8");
       // Far ridges low down.
       for (let x = 0; x < W; x += 1) {
         const ridge = Math.round(lerp(B, T, 0.55)) + Math.round(Math.abs(((x * 0.9) % 24) - 12) * 0.9 + Math.sin(x * 0.2) * 1.5);
@@ -16844,7 +16880,7 @@ function climb(summit, { h: H, top: T, bottom: B }) {
         const point = s.route.at(f);
         p.rect(point.x, point.y - 3, 1, 3, "#5c3a1f");
         p.px(point.x, point.y - 3, reached ? "#ffd45c" : "#c9ced9");
-        label(p, s, text, point.x < 40 ? point.x + 2 : point.x - 10, point.y - 9, reached);
+        label(p, s, text, point.x < W / 2 ? point.x + 2 : point.x - 10, point.y - 9, reached);
       });
       s.stops.forEach(stop => {
         const point = s.route.at(stop.f);
@@ -16879,7 +16915,8 @@ function climb(summit, { h: H, top: T, bottom: B }) {
 // ---------------------------------------------------------------------------
 function mine(summit, { h: H, top: T, bottom: B }) {
   const L = B - T;
-  const route = makeRoute([[18, T], [18, T + 8], [64, T + L * 0.36], [14, T + L * 0.7], [58, B - 2]]);
+  const shaft = X(18);
+  const route = makeRoute([[shaft, T], [shaft, T + 8], [X(64), T + L * 0.36], [X(14), T + L * 0.7], [X(58), B - 2]]);
   const levels = Math.max(1, Math.round(summit / 1000));
   const order = MINE_ORDER[levels] || Array.from({ length: levels }, (_, index) => MINE_ORDER[9][Math.round(index * 8 / Math.max(1, levels - 1))]);
   const tops = Array.from({ length: levels + 1 }, (_, index) => index === 0 ? T + 1 : index === levels ? H : Math.round(route.at(index / levels).y));
@@ -16891,20 +16928,20 @@ function mine(summit, { h: H, top: T, bottom: B }) {
   const grass = T - 1;
   return {
     route,
-    goal: { x: 64, y: B - 2 },
+    goal: { x: X(64), y: B - 2 },
     background(p) {
       p.bands(0, 0, W, grass - 1, t => ramp([[0, "#3f6fc8"], [0.6, "#7fc0ff"], [1, "#bfe3ff"]], t));
       p.rect(0, grass - 2, W, 2, "#2fb35e");
       p.rect(0, grass, W, 1, "#1d7a40");
       // The headframe over the shaft, and a cart of ore.
-      p.line(11, grass, 16, grass - 8, "#8a5a32");
-      p.line(25, grass, 20, grass - 8, "#8a5a32");
-      p.rect(15, grass - 8, 7, 1, "#5c3a1f");
-      p.disc(18, grass - 8, 1, "#c9ced9");
-      p.rect(32, grass - 4, 7, 3, "#6a7a9a");
-      p.rect(33, grass - 5, 5, 1, "#ffd45c");
-      p.px(33, grass - 1, "#0b1020");
-      p.px(37, grass - 1, "#0b1020");
+      p.line(shaft - 7, grass, shaft - 2, grass - 8, "#8a5a32");
+      p.line(shaft + 7, grass, shaft + 2, grass - 8, "#8a5a32");
+      p.rect(shaft - 3, grass - 8, 7, 1, "#5c3a1f");
+      p.disc(shaft, grass - 8, 1, "#c9ced9");
+      p.rect(shaft + 14, grass - 4, 7, 3, "#6a7a9a");
+      p.rect(shaft + 15, grass - 5, 5, 1, "#ffd45c");
+      p.px(shaft + 15, grass - 1, "#0b1020");
+      p.px(shaft + 19, grass - 1, "#0b1020");
       for (let level = 0; level < levels; level += 1) {
         const y0 = tops[level];
         const y1 = tops[level + 1];
@@ -16937,7 +16974,7 @@ function mine(summit, { h: H, top: T, bottom: B }) {
         const x = Math.floor(rnd() * W);
         p.line(x, grass + 1, x + Math.round(rnd() * 4 - 2), grass + 3 + Math.floor(rnd() * 3), "#3a2414");
       }
-      p.sprite(BONE, { W: "#e8dcc0" }, 48, Math.round(lerp(tops[0], tops[1], 0.6)));
+      p.sprite(BONE, { W: "#e8dcc0" }, X(48), Math.round(lerp(tops[0], tops[1], 0.6)));
     },
     frame(p, s) {
       gems.forEach(([x, y, color], index) => { if ((s.now * 0.9 + index * 0.37) % 2.4 < 0.18) { p.px(x, y - 1, color); p.px(x - 1, y - 1, "#ffffff"); p.px(x + 1, y - 1, "#ffffff"); } });
@@ -16953,7 +16990,7 @@ function mine(summit, { h: H, top: T, bottom: B }) {
         }
       });
       for (let level = 1; level < levels; level += 1) label(p, s, `${level}K`, 2, tops[level] + 2, level * 1000 <= s.value + 0.5);
-      label(p, s, `${s.summit / 1000}K`, 66, B - 12, s.goal);
+      label(p, s, `${s.summit / 1000}K`, X(66), B - 12, s.goal);
       s.stops.forEach(stop => {
         const point = s.route.at(stop.f);
         const x = Math.round(point.x);
@@ -16962,8 +16999,8 @@ function mine(summit, { h: H, top: T, bottom: B }) {
         p.px(x, y - 1, SHADOW);
         p.rect(x, y, 1, 2, stop.color);
       });
-      p.sprite(GEODE, { K: "#0b1020", D: "#bff4ff", d: "#ffffff" }, 61, B - 5);
-      if (s.goal) glow(p, 64, B - 2, 8, "#bff4ff", 0.5);
+      p.sprite(GEODE, { K: "#0b1020", D: "#bff4ff", d: "#ffffff" }, X(64) - 3, B - 5);
+      if (s.goal) glow(p, X(64), B - 2, 8, "#bff4ff", 0.5);
 
       const at = s.route.at(s.f);
       const flip = at.dx < -0.01;
@@ -17023,12 +17060,12 @@ function train(summit, { h: H, top: T, bottom: B }) {
   const low = B - 12; // the posts and labels hang under the bottom row
   const gap = (low - T - 22) / (ROWS - 1); // the top row leaves room for the engine and the station
   const rowY = index => Math.round(low - index * gap);
-  const ends = [3, 77];
+  const ends = [3, W - 3];
   const points = [];
   for (let row = 0; row < ROWS; row += 1) {
     const y = rowY(row);
     const [a, b] = row % 2 ? [ends[1], ends[0]] : ends;
-    points.push([a, y], [row === ROWS - 1 ? 60 : b, y]);
+    points.push([a, y], [row === ROWS - 1 ? X(60) : b, y]);
   }
   const route = makeRoute(points);
   const rnd = random(3);
@@ -17037,13 +17074,14 @@ function train(summit, { h: H, top: T, bottom: B }) {
   const topY = rowY(ROWS - 1);
   // Which row a point on the route is on, and whether it runs to the left there.
   const rowOf = y => clamp(Math.round((low - y) / gap), 0, ROWS - 1);
+  const st = X(64) - 64; // the station, drawn for 80 across, moved to the end of the line
   return {
     route,
-    goal: { x: 70, y: topY - 16 },
+    goal: { x: 70 + st, y: topY - 16 },
     background(p) {
       p.bands(0, 0, W, topY - 8, t => ramp([[0, "#3f86d8"], [0.6, "#8fc6f5"], [1, "#d8efff"]], t));
-      p.disc(14, Math.max(7, T - 6), 4, "#ffd45c");
-      p.disc(14, Math.max(7, T - 6), 2, "#fff2b0");
+      p.disc(X(14), Math.max(7, T - 6), 4, "#ffd45c");
+      p.disc(X(14), Math.max(7, T - 6), 2, "#fff2b0");
       for (let x = 0; x < W; x += 1) {
         const peak = topY - 22 + Math.round(Math.abs(((x * 1.3) % 34) - 17) * 0.7 + Math.sin(x * 0.17) * 2);
         p.rect(x, peak, 1, H - peak, "#7f9fcf");
@@ -17063,7 +17101,7 @@ function train(summit, { h: H, top: T, bottom: B }) {
       // The track on every row, and the bends that join them.
       for (let row = 0; row < ROWS; row += 1) {
         const y = rowY(row);
-        const [a, b] = [ends[0], row === ROWS - 1 ? 64 : ends[1]];
+        const [a, b] = [ends[0], row === ROWS - 1 ? X(64) : ends[1]];
         p.rect(a - 2, y + 1, b - a + 5, 3, "#8a7a66");
         for (let x = a; x <= b; x += 3) p.rect(x, y + 1, 2, 1, "#5c3a1f");
         p.rect(a - 1, y, b - a + 3, 1, "#c9ced9");
@@ -17076,16 +17114,16 @@ function train(summit, { h: H, top: T, bottom: B }) {
       }
       // The station at the end of the line.
       const sy = topY - 16;
-      p.rect(62, topY - 4, W - 62, 4, "#c9b08a");
-      p.rect(62, topY - 5, W - 62, 1, "#f4f1e8");
-      p.rect(64, sy + 4, 14, 11, "#f4f1e8");
-      p.rect(62, sy + 2, 18, 2, "#ff6b9d");
-      p.rect(64, sy, 14, 2, "#ff6b9d");
-      p.rect(66, sy - 2, 10, 2, "#ff6b9d");
-      p.rect(66, sy + 7, 3, 4, "#2a6fd0");
-      p.rect(73, sy + 7, 3, 4, "#2a6fd0");
-      p.rect(69, sy + 10, 4, 5, "#8a5a32");
-      p.disc(71, sy + 4, 1, "#ffd45c");
+      p.rect(62 + st, topY - 4, W - 62 - st, 4, "#c9b08a");
+      p.rect(62 + st, topY - 5, W - 62 - st, 1, "#f4f1e8");
+      p.rect(64 + st, sy + 4, 14, 11, "#f4f1e8");
+      p.rect(62 + st, sy + 2, 18, 2, "#ff6b9d");
+      p.rect(64 + st, sy, 14, 2, "#ff6b9d");
+      p.rect(66 + st, sy - 2, 10, 2, "#ff6b9d");
+      p.rect(66 + st, sy + 7, 3, 4, "#2a6fd0");
+      p.rect(73 + st, sy + 7, 3, 4, "#2a6fd0");
+      p.rect(69 + st, sy + 10, 4, 5, "#8a5a32");
+      p.disc(71 + st, sy + 4, 1, "#ffd45c");
     },
     frame(p, s) {
       // Kilometre posts under the track, and the rest of the line faintly.
@@ -17097,7 +17135,7 @@ function train(summit, { h: H, top: T, bottom: B }) {
         label(p, s, text, clamp(x, 6, W - 7), y + 8, reached, { align: "center" });
       });
       label(p, s, `${s.summit / 1000}K`, 3, topY - 9, s.goal); // left of the top row (the engine ends on the right)
-      flag(p, 71, topY - 18, s.goal ? "#ffd45c" : "#ff6b9d", 5, s.now);
+      flag(p, 71 + st, topY - 18, s.goal ? "#ffd45c" : "#ff6b9d", 5, s.now);
       s.route.samples(s.f, 1).forEach((point, index) => { if (index % 3 === 0) p.px(point.x, point.y - 1, "rgba(255,255,255,0.45)"); });
 
       // The carriages: each round covers its stretch of the line, row by row.
@@ -17151,7 +17189,8 @@ function train(summit, { h: H, top: T, bottom: B }) {
 // (the same real depths as journey-scenes.js), to the seabed.
 // ---------------------------------------------------------------------------
 function dive(summit, { h: H, top: T, bottom: B }) {
-  const sphereX = 38;
+  const sphereX = X(38);
+  const d = sphereX - 38; // the ship and its crane, drawn for 80 across, moved with the sphere
   const y0 = T + 6;
   const span = B - 8 - y0; // the seabed (and its label) just above the card
   const surface = T - 2;
@@ -17164,7 +17203,7 @@ function dive(summit, { h: H, top: T, bottom: B }) {
   const rnd = random(9);
   const bubbles = [];
   const colorAtDepth = depth => ramp([[0, "#3fc4f0"], [200, "#1d86c4"], [1000, "#0d3c78"], [2000, "#0a2650"], [4000, "#06132e"], [6000, "#040a1e"], [9000, "#02040f"]].map(([d, c]) => [d / 9000, c]), depth / 9000);
-  const seabedTop = x => trench && (x < 26 || x > 50) ? plainY : floorY;
+  const seabedTop = x => trench && (x < X(26) || x > X(50)) ? plainY : floorY;
   // The animals of the wide scene, spread over the narrower width.
   const creatureX = x0 => Math.round(4 + (x0 / 176) * (W - 12));
   return {
@@ -17178,7 +17217,7 @@ function dive(summit, { h: H, top: T, bottom: B }) {
         const next = colorAtDepth(depth + summit / span);
         for (let x = 0; x < W; x += 1) p.px(x, y, (x + y) % 2 && here !== next ? next : here);
       }
-      [[48, 0.18], [62, 0.12], [72, 0.16]].forEach(([x, alpha]) => { for (let y = surface + 1; y < surface + 12; y += 1) p.rect(x + (y - surface - 1) - 8, y, 3, 1, `rgba(220,250,255,${alpha * (1 - (y - surface - 1) / 11)})`); });
+      [[X(48), 0.18], [X(62), 0.12], [X(72), 0.16]].forEach(([x, alpha]) => { for (let y = surface + 1; y < surface + 12; y += 1) p.rect(x + (y - surface - 1) - 8, y, 3, 1, `rgba(220,250,255,${alpha * (1 - (y - surface - 1) / 11)})`); });
       for (let x = 0; x < W; x += 1) {
         const top = seabedTop(x) + (x % 9 === 0 ? -1 : 0);
         p.rect(x, top, 1, H - top, x % 2 ? "#2e2a22" : "#3a3428");
@@ -17187,19 +17226,19 @@ function dive(summit, { h: H, top: T, bottom: B }) {
       }
       if (trench) {
         for (let y = plainY; y < floorY; y += 1) {
-          p.px(25 - Math.floor((y - plainY) / 6), y, "#3a3428");
-          p.px(51 + Math.floor((y - plainY) / 6), y, "#3a3428");
+          p.px(X(26) - 1 - Math.floor((y - plainY) / 6), y, "#3a3428");
+          p.px(X(50) + 1 + Math.floor((y - plainY) / 6), y, "#3a3428");
         }
       }
-      p.sprite(SHIP, { K: "#0b1020", R: "#e0484f", W: "#f4f1e8" }, 16, surface - 8);
-      p.line(30, surface - 7, sphereX, surface - 10, "#ffd45c");
-      p.line(35, surface - 1, sphereX, surface - 10, "#ffd45c");
+      p.sprite(SHIP, { K: "#0b1020", R: "#e0484f", W: "#f4f1e8" }, 16 + d, surface - 8);
+      p.line(30 + d, surface - 7, sphereX, surface - 10, "#ffd45c");
+      p.line(35 + d, surface - 1, sphereX, surface - 10, "#ffd45c");
     },
     frame(p, s) {
       for (let x = 0; x < W; x += 1) if ((x + Math.floor(s.now * 6)) % 7 === 0) p.px(x, surface, "#ffffff");
       const leap = (s.now % 7) / 1.2;
       if (leap < 1) {
-        const lx = 54 + leap * 14;
+        const lx = X(54) + leap * 14;
         const ly = surface - Math.sin(leap * Math.PI) * 6;
         p.sprite([".BBBB.", "BBBBBK", ".b..b."], SEA, lx, ly - 1);
       }
@@ -17218,12 +17257,12 @@ function dive(summit, { h: H, top: T, bottom: B }) {
         });
       });
       if (plain <= summit) {
-        [[50, 0], [60, 1]].forEach(([x0, index]) => {
+        [[X(50), 0], [X(60), 1]].forEach(([x0, index]) => {
           const x = Math.round(x0 + Math.sin(s.now * 0.3 + index * 2) * 3);
           const dark = clamp(1 - (Math.hypot(x - sphereX, plainY - sy) - 12) / 18, 0.25, 1);
           p.sprite(SEA_PIG, SEA, x, plainY - 3, { alpha: dark });
         });
-        p.sprite(BRITTLE_STAR, SEA, 70, plainY - 4, { alpha: clamp(1 - (Math.hypot(70 - sphereX, plainY - sy) - 12) / 18, 0.25, 1) });
+        p.sprite(BRITTLE_STAR, SEA, X(70), plainY - 4, { alpha: clamp(1 - (Math.hypot(X(70) - sphereX, plainY - sy) - 12) / 18, 0.25, 1) });
       }
       eachMark(s, (f, text, reached) => {
         const y = Math.round(depthY(f * summit));
@@ -17268,13 +17307,13 @@ function dive(summit, { h: H, top: T, bottom: B }) {
 function sled(summit, { h: H, top: T, bottom: B }) {
   const L = B - T;
   const horizon = T + 12;
-  const route = makeRoute([[24, B], [52, B - L * 0.24], [20, B - L * 0.5], [50, B - L * 0.76], [40, T + 18]]);
+  const route = makeRoute([[X(24), B], [X(52), B - L * 0.24], [X(20), B - L * 0.5], [X(50), B - L * 0.76], [X(40), T + 18]]);
   const leadY = Math.round(B - L * 0.36);
   const rnd = random(4);
-  const stars = Array.from({ length: 44 }, () => [Math.floor(rnd() * W), Math.floor(rnd() * horizon)]);
-  const snow = Array.from({ length: 22 }, () => [rnd() * W, rnd() * H, 0.5 + rnd()]);
+  const stars = Array.from({ length: 66 }, () => [Math.floor(rnd() * W), Math.floor(rnd() * horizon)]);
+  const snow = Array.from({ length: 33 }, () => [rnd() * W, rnd() * H, 0.5 + rnd()]);
   const hop = y => (Math.abs(y - leadY) < 4 ? -Math.round(Math.cos((y - leadY) / 4 * Math.PI / 2) * 3) : 0);
-  const pole = { x: 40, y: T + 18 };
+  const pole = { x: X(40), y: T + 18 };
   return {
     route,
     goal: { x: pole.x, y: pole.y - 8 },
@@ -17297,7 +17336,7 @@ function sled(summit, { h: H, top: T, bottom: B }) {
         p.rect(x, y - 2, 1, 4, (x % 3) ? "#0b2a4a" : "#123a62");
         p.px(x, y - 3, "#f4f7ff");
       }
-      p.sprite(STATION, { O: "#ff8a3d", Y: "#ffd45c", K: "#0b1020" }, 62, Math.round(B - L * 0.62));
+      p.sprite(STATION, { O: "#ff8a3d", Y: "#ffd45c", K: "#0b1020" }, X(62), Math.round(B - L * 0.62));
       for (let y = pole.y - 8; y < pole.y + 1; y += 1) p.px(pole.x, y, Math.floor(y / 2) % 2 ? "#e0484f" : "#f4f1e8");
       p.rect(pole.x - 3, pole.y + 1, 7, 1, "#8f9bbd");
     },
@@ -17320,17 +17359,17 @@ function sled(summit, { h: H, top: T, bottom: B }) {
         }
       });
       const stationY = Math.round(B - L * 0.62);
-      if (s.now % 1.6 < 0.5) { p.px(68, stationY, "#ff3a3a"); glow(p, 68, stationY, 3, "#ff3a3a", 0.5); }
+      if (s.now % 1.6 < 0.5) { p.px(X(62) + 6, stationY, "#ff3a3a"); glow(p, X(62) + 6, stationY, 3, "#ff3a3a", 0.5); }
       snow.forEach(([x0, y0, speed]) => p.px(((x0 - s.now * 10 * speed) % W + W) % W, (y0 + s.now * 3 * speed) % H, "rgba(255,255,255,0.7)"));
       const surfacing = s.now % 6.5;
       if (surfacing < 2) p.sprite(NARWHAL, SEA, 8, leadY - 1 - Math.round(Math.sin(surfacing / 2 * Math.PI) * 3));
-      const bearX = Math.round(14 + Math.sin(s.now * 0.25) * 6);
+      const bearX = Math.round(X(14) + Math.sin(s.now * 0.25) * X(6));
       p.sprite(BEAR, { W: "#f4ecd8", K: "#0b1020" }, bearX, Math.round(B - L * 0.86), { flip: Math.cos(s.now * 0.25) < 0 });
 
       // Stakes every 1,000 beside the route, and the goal.
       eachMark(s, (f, text, reached) => {
         const point = s.route.at(f);
-        const x = Math.round(point.x) + (point.x < 40 ? -6 : 6);
+        const x = Math.round(point.x) + (point.x < W / 2 ? -6 : 6);
         p.rect(x, Math.round(point.y) - 3, 1, 3, reached ? "#ffd45c" : "#4a5778");
         label(p, s, text, x, Math.round(point.y) + 1, reached, { align: "center" });
       });
@@ -17433,7 +17472,7 @@ const SMALL_WIDTH = 240;
 function createJourney(type, container, { summit = 6000, tall = null } = {}) {
   const W = tall ? TALL_W : WIDE_W;
   const box = container.getBoundingClientRect();
-  const H = tall ? Math.max(120, Math.min(260, Math.round(W * (box.height || 2) / (box.width || 1)))) : WIDE_H;
+  const H = tall ? Math.max(180, Math.min(400, Math.round(W * (box.height || 2) / (box.width || 1)))) : WIDE_H;
   const make = (tall ? TALL_SCENES : SCENES)[type] || (tall ? TALL_SCENES : SCENES).climb;
   const scene = tall
     ? make(summit, { h: H, top: Math.round(H * tall.top), bottom: Math.round(H * tall.bottom) })
@@ -17506,6 +17545,7 @@ function createJourney(type, container, { summit = 6000, tall = null } = {}) {
     state.goal = state.value >= summit - 0.5;
     artCtx.clearRect(0, 0, W, H);
     artCtx.drawImage(background, 0, 0);
+    state.labelBoxes = [];
     scene.frame(p, state);
     // Atlas thinking after a round without points.
     if (state.thinking) {
@@ -28856,6 +28896,108 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
 return { initializeCommunity };
 })();
 
+// ---- pixel-map-data.js
+__modules["pixel-map-data.js"] = (() => {
+// Generated by tools/build-pixel-map.mjs: the 8-bit world map of the Highs & Lows climb.
+// 264 × 101 cells, 82°N to 56°S, from Natural Earth 1:50m (world-atlas).
+// GRID (base64): one byte a cell, row by row; 0 = sea, 1 = land, 2 + i = CODES[i].
+const COLS = 264;
+const ROWS = 101;
+const CODES = ["AR","AU","AT","BD","BE","BO","BR","CA","CL","CN","CO","CU","DK","EC","EG","ET","FI","FR","DE","GH","GR","IN","ID","IR","IQ","IE","IL","IT","JP","JO","KE","MY","MX","MA","NP","NL","NZ","NG","NO","PK","PE","PH","PL","PT","RU","SA","SG","ZA","KR","ES","SE","CH","TZ","TH","TR","UA","AE","GB","US","UY","VE","VN","AF","AO","AL","AD","AM","AG","AZ","BI","BJ","BF","BG","BH","BS","BA","BY","BZ","BB","BN","BT","BW","CF","CI","CM","CD","CG","KM","CV","CR","CY","CZ","DJ","DM","DO","DZ","ER","EE","FJ","FM","GA","GE","GN","GM","GW","GQ","GD","GT","GY","HN","HR","HT","HU","IS","JM","KZ","KG","KH","KI","KN","KW","LA","LB","LR","LY","LC","LI","LK","LS","LT","LU","LV","MC","MD","MG","MV","MH","MK","ML","MT","MM","ME","MN","MZ","MR","MU","MW","NA","NE","NI","NR","OM","PA","PW","PG","KP","PY","PS","QA","RO","RW","SD","SN","SB","SL","SV","SM","SO","RS","SS","ST","SR","SK","SI","SZ","SC","SY","TD","TG","TJ","TM","TL","TO","TT","TN","TV","UG","UZ","VA","VC","VU","WS","YE","ZM","ZW"];
+const GRID = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQAACQkJCQkJCQkJCQkJCQkJCQkJAAAAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAQEBAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuAC4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJAAkJCQkJCQkACQkACQkJCQkJCQkAAAAAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAoKCgoKCgAAAAAAAAAAAAAAAAAAAAAAC4AAAAAAC4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC4ALi4uLgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJCQAAAAAJCQkACQAAAAkJCQAJCQkJCQkJCQkAAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgoKCgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuLi4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJCQkAAAAAAAAAAAAAAAAAAAAAAAAAAAAJCQkJCQAAAAAAAAAAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuAAAAAAAAAAAALi4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQAJCQkAAAkACQAJAAkJAAAJAAkJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC4uLi4uAAAAAAAAAAAAAAAAAAAAAAAAAAAALi4uLi4uLi4uLi4uLi4uAAAAAAAAAAAAAAAAAAAAAAAuLi4uAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQAAAAAAAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuLgAAAAAAAAAAAAAAAAAAAAAAAAAAAC4uLi4uLi4uLi4uLi4uLi4uAC4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkJCQkJCQAJAAAAAAAJCQAAAAkJAAAJCQkAAAkJCQkJCQkJCQAAAAAAAAAAAAAAAAAAAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALi4AAAAAAAAAAAAALgAALgAAAAAuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uAAAAAC4uLi4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJCQkACQkJCQkJCQkJCQAAAAAJCQAJAAAACQkJCQkJCQkJCQkAAAAAAAAAAAAAAAAAAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuLi4AAAAAAAAAAAAuLi4ALgAuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4AAAAAAAAALi4uLgAuLgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8PDw8PDw8PDwAAAAAAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAJCQkJCQkJAAAAAAkJCQAAAAkACQkJCQkJCQkJCQkJCQAAAAAAAAAAAAAAAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoACgoKCgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC4uLi4ALi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPDw8PDw8PDw8PDw8PDw8PDwJCQAACQAJCQkJCQkJCQkJCQAAAAkJCQkAAAkJAAAJCQkACQkJCQAAAAkJAAAAAAkJCQkJCQAAAAAAAAAAAAAAAAABAQEBAQEBAQEBAQEBAQEBAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoACgoEigoKBISLi4uLi4uAAAAAAAAAAAuLgAAAAAAAAAALi4uLgAuLi4AAAAALi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLgAuLi4uLi4uLi4uAAAAAAAAAAAAPDw8PDw8PDw8PDw8PDw8PDwJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQAJCQkJCQkJAAAJCQkJCQAACQkJAAAACQkAAAkJCQkJCQAAAAAAAAAAAQABAQEBAQEBAQEBAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoNDQ0NDQSEhISEi4uLi4uLi4uAAAuAAAuLi4uLi4uLi4uLi4uLi4uLi4AAC4uAC4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uAC4uLi4uLgAAADw8AAA8PDw8PDw8PDw8PDw8PDwJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJAAkAAAAAAAAACQkJCQAJCQkAAAAAAAAAAQEBAQEBAQEBAQEAAQAAAAAAAAAAAHMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACg0NDQ0NDQSEhISEi4uLgAALi4AAC4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uAAAALi4AAAAAADw8PDw8PDw8PDw8PDw8PDw8PDwJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkACQkAAAAACQkJCQkJCQkAAAAAAAAAAAAAAAEBAQEBAQEBAAAAAAAAAAAAAAAAc3Nzc3Nzc3MAAAAAAAAAAAAAAAAAAAAAAAAoKDQ0NDQ0NAAAABISEi4uLi4ALgAALi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uAAAAAAAAPAAAAAAAAAA8PDw8PDw8PDw8PDw8PDwJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkAAAAACQAACQAACQAAAAAJCQkJCQAAAAAAAAAAAAEBAQEBAQEBAAAAAAAAAAAAAAAAAAAAc3MAAAAAAAAAAAAAAAAAAAAAAAAAKCgoNDQ0NDQ0ABISEhISEi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4AAAAAAAAAAAAAAAA8PDw8PDw8PDw8PDw8PDw8PDwJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQAAAAAAAAAAAAkACQkJAAAAAAkJAAAAAAAAAAAAAAAAAQEBAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgoKCgoNDQ0NAAAABISEhISEi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uAAAAAAAAAAAAAAAAAAAAPDw8PDw8PDw8PDwAADw8PDwJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJAAAAAAAAAAAAAAAACQkJCQkJAAAAAAAAAAAAAAAAAAAAAAEBAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgoKCgoNDQ0NAAAABISEhISLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uAAAALgAALi4uLi4uAAAAAAAAAAAAAAAAAAAAAAAAADw8PDw8PAAAPAAAAAAAAAAAPAk8CQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkAAAAAAAAAAAAAAAAACQkJCQkJAAAACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoKCgoNDQ0NAAAAAAAY2MALi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLgAALi4uAAAAAC4uAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADw8PAAAAAAAAAAAAAAAAAA8PAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQAAAAAAAAAAAAAACQkJCQkJCQkJCQkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7AAAAAAAAAAAoAAA0NDQ0AAAAAAAAY2MuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLgAAAAAAAAAAAAAAAAAuLi4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPAAAAAAAAAAAAAAAAAAAAAAAPAAJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQAAAAAAAAAAAAkJCQkJCQkJCQkJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7OwAAAAAAAAAAAA4ANDQ0AAAAhYWFhYUuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4AAAAAAAAAAAAAAAAALi4uLi4uAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADw8PAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJAAAAAAAACQkJCQkJCQkJCQkJCQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7OzsAAAAAAAAADg4OAAAAAAAAAIODg05OTk4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi51Li4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLgAAAAAAAAAAAAAAAAAALi4uLi4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkAAAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJAAAJCQkJCQkJCQkJCQkJCQkJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABsbGwAAADs7AAAAAAAAABQUFAAsLCwsLCyDTk5OTk4uLi4uLi4uLi4uLi4uLi4uLi4uLi4udXV1dXV1dXV1LnUuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLgAALgAAAAAAAAAAAAAALi4uAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJAAAJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJAAAJCQkJCQkJCQkJCQkJCQkJCQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbGwAAOzs7OwAAJSUUFBQUFBQsLCwsLCxOTk5OTk4uLi4uLi4uLi4uLi4uLi4uLi4uLi4udXV1dXV1dXV1dXV1dS4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLgsLCwsuLi4uLi4uLi4uLi4uAAAAAAAAAAAAAC4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQAJCQkJCQkJCQkJCQkJCQkACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADs7OwAGBhQUFBQUFBQsLCwsLCw5OTk5OTk5OS4uLi4uLi4uLi4uLnV1Li4uLi4udXV1dXV1dXV1dXV1dS4uLi4uLi4uLi4uLi4ukJCQLi4uLi4uLi4uLi4uLgsLCwsLLi4uLi4uLi4uLgAuAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQAJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABMTE4QUFBQUXV1dXV0sLCw5OTk5OTk5OTk5OS4uLi4uLi4udXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXUuLi4ukJCQkJAukJCQkJCQkC4uLi6QkJAuCwsLCwsLLi4uLi4uLi4uLgAuLgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJPDw8PDw8PDw8PDw8PDw8PDw8PDw8PAkJCQkJCQkJCQkJCQkJCQkJAAkJCQAAAAAJCQkJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExMTExMTExMTFBQUFAQErq6urjk5OTk5OTk5OTk5OTkuLi4uLnV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1CwuQkJCQkJCQkJCQkJCQkJCQkJCQkAsLCwsLCwsLCwsLLi4uLi4uLgAuAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8CQkJCQkJCQkJCQkJPAkJAAAAAAAAAAkJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABMTExMTExM1gAQEBAQEcnJycqGhoaGHhzk5OTk5OQAuLi4uLi4udXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1CwsLkJCQkJCQkJCQkJCQkJCQkJCQkJCQkAsLCwsLCwsLCwsuLi4uAAAuAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDwJCQkJCQkJCQk8PAkJCQkJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATExMTExMdHR0dHa9wcHKqoaGhoaGhOQAALi4AAC4uLi4uLi4AAAAAdXV1dXV1dXV1dXV1dXV1dXV1dXV1CwsLCwsLC5CQkJCQkJCQkJCQkJCQkJCQkAsLCwsLCwsLCwsLCwsuLi4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8CQkJCTw8PDw8AAAACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATExMTExMdHR0dqABwTU2qqqqhoaGhAAAAAAAAAC4uLi4uLgAAAHV1dXW9vb29dXV1dXV1dXV1dXV1dXULCwsLCwsLCwsLkJCQkJCQkJCQkJCQkAsLCwsLCwsLCwsLCwsLLi4uLgAAAAAeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8CQk8PDw8PDwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMzMzMzMTE0MAAACGAAAdHQAAAE2PqqpKSkoAAAAAAAAAAAAAZ2cuLi4AAAB1dXW9vb29vb29dXV1dXV1dnV1dXULCwsLCwsLCwsLC5CQkJCQkJCQkJCQCwsLCwsLCwsLCwsLCwsLAC4AAAAAAB4eHgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDwJPDw8PDw8PDw8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALTMzMzMzMzMAAAAAAAAAvh0dAABCi4tKSjg4AAAAODgAAAAAAGdnZy4uAAAAAHW9tra9vb29vXV1vXZ2dnZ2dgsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLC50AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALTMzMzMzAAAAAAAAHQAAAAAdAABCFhYAAAA4ODg4ODg4ODg4ODhEREZGRgAAtra2tra2tr29vb29tb12dnYLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwAAC52dnQAAAAAAAAAAAB4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAtLTMzMzMzAAAAAAAAHQAAAAAAHQAAABYAAAA4ODg4ODg4ODg4ODgZRhlGAAAAtra2tra2tra9vb21tbW1CwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsAAAAAAACdnQAAAAAAAAAAAB4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMzMzMzMAAAAAAAAAAAAAHR0AAAAAABYAFgA4ODg4ODg4ODg4ODg4GRkZAAAAthkZGba2tra2tr21QLW1tQsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLAAsAAAAAMjIAAAAAAAAAHgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYWFhYWFhuroAAI0AAAAAAAAAAAAWAAAAOAA4srKyGhoaGRkZGRkZGRkZGRkZtrZAQEBAQCkpKSkLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsAAAAAMjIAAAAAAB4eHgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACMjIyNhYWFhYWFhuroAAAAAAAAAAAAAAAAAAAAAXACysrKyGhoaGhkZGRkZGRkZGRkZQEBAQEBAQCkpKSkXCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLAAAAAAAAMgAAAB4eHh4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIyMjIyNhYWFhYWFhuroAAAAAAAAAAAAAAAAAAAAAAAB8srIaGhoaGhkZGRkZGRkZGRkZQEBAQEBAKSkpFxcXFwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwAAAAAAAAAeHh4AHgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACIiIjw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjIyMjIyNhYWFhYWFhYbp+fn4AAAAAfn5+AAAAAAAAAJ8fHx8aGhoaGhoZGRkZGRkZGRkZQEBAQEBAKSkpKRcXFwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAiACIiIiIiIjw8PDw8PDw8PDw8PDw8PDw8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjIyMjYWFhYWFhYWFhYX5+fn5+fgAAfn5+EBAQEBAQEBwfHy8vLxoaGhoZGRkZGRkZGRkZQEBAQCkpKSkpFxcXFxcLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIgAiIiIiIiI8Ijw8PDwAAAA8AAAAAAA8PAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjI2FhYWFhYWFhYWFhYX5+fn5+fn5+fn5+EBAQEBAQEBAfLy8vLy8vGnoAABkZGRkZGRkZKSkpKSkpKSkpFxcXFxckJAsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIgAiIiIiIiIiIiI8PAAAAAAAAAAAAAA8PAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMwAAIyMjYWFhYWFhYWFhYWFhYX5+fn5+fn5+fn5+EBAQEBAQAAAvLy8vLy8vLy8vAAAZGRkZGRkZGSkpKSkpKSkXFxcXFxcXJCQkJAsLUgsXFxeOCwsLCwsLCwsLCwsLCwsLCwsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACIAACIiIiIiIiI8PAAAAAAAAAAAAAAAPABMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjIwEBYWFhYWFhYWFhYWFhYX5+fn5+fn5+fn5+EBAQEBAQEAAALy8vLy8vLy8vL0sAAAAAGRkZGSkpKSkpFxcXFxcXFxcXFxcXJCQXFxcXF46OCwsLCwsLCwsLCwsLCwsLCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAiACIiIiIiIiIiIgAAAAAAAAAAAAAAPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACMjkpKSkpJhYWFhYWFhYWFhYX5+fn5+fn5+fn5+EBAQEBAQEAAALy8vLy8vLy8vL6AAAAAAAAAZKSkAACkpKRcXFxcXFxcXFxcXFxcFFxcXjo6OCwsLCwsLCwsLCwsLCwsLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIiIiIiIiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIyMBkpKSkoyMjGFhYWFhYWFhYWFhfn5+fn5+fn5+EBAQEBAQEBAAAC8vLy8vLy8vLy86OjqZAAAAAAAAAAAXFxcXFxcXFxcXFxcXFxcFBReOjo6OCwsLCwsLCwsLCwsLCwsAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIiIiIiIiAAAAAAAAAAAAAA0ADQ0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIyOSkpKSkoyMjIxhYWFhYWFhYWGWlpazs35+fn5+EBAQEBAQEBAQAAAvLy8vLy8vLy8vLy+ZmZkAAAAAAAAAFxcXFxcXFxcXFxcXFxcFBQWOjo6OjgsLCz8/CwsLCwsAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACIiIiIiIgAAAAAAIiIAAAAAAAANDQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkpKSkpKSkoyMjIyMjGFhYWFhlpaWlpazs7Ozfn5+o6Ojo6Ojo6OjAAAvLy8vLy8vLy8vLy+ZmQAAAAAAAAAAFxcXFxcXFxcXFxcXFwAAAACOjo6Ojo57Pz8/PwALAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACIiIiIiIgAAAAAAIiIAAAAAAAAAAAAAcWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkpKSkpKSkpKMjIyMjIxhYWGWlpaWlpaWs7Ozs7N+o6Ojo6Ojo6OjAAAALy8vLy8vLy8vL5mZAAAAAAAAAAAAAAAXFxcXFxcXFxcXAAAAAAAAjo6Ojjd7e3s/AAALAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAiIiIiIiIiACIiIiIAAAAAAAAAdABxAGBgYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkpKSkpKSkpKMjIyMjIyMlpaWlpaWlpazs7Ozs7Ozo6Ojo6Ojo6OjowAALy8vLy8vwsKZmZmZAAAAAAAAAAAAAAAXFxcXFxcXFxcAAAAAAAAAjo43Nzd7e3s/AAALAAAAAAAAACsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACIiIiIiIiJtTwAAAAAAAAAAAAAAAAAAAAAAAHlFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABaAAAAAAAAkpKSkpKSkpKMjIyMjIyMlpaWlpaWlpazs7Ozs7Ozo6Ojo6Ojo6OjYmIAAC/Cwi/CwsLCmQAAAAAAAAAAAAAAAAAAFxcXFxcXAAAAAAAAAAAAjo6ONzc3Nzd7PwAAAAAAAAAAACsrAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACIAIiJtbW9vbwAAAAAAAAAAAAAAAAAAAAAAXwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAApKSSkpKSkpKMjIyMjIyMlpaWlpaWlpazs7Ozs7Ozo6Ojo6Ojo6OjYmIAAMLCwsLCwsIAAAAAAAAAAAAAAAAAAAAAFxcXFxcAAAAAAAAAAAAAAAAANzc3Nzd7ez8AAAAAAAAAACsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABtp29vb5cAAAAAAAAAAAAAAAAAAAAAfwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAApKSkjIyMjIyMjIxJlpaWlpaWlpaWlrOzs7Ozs6Ojo6Ojo6Ojo6OjYhERAADCwsLCAAAAAAAAAAAAAAAAAAAAAAAAABcXFxcAAAAAAAAAAAAAAAAANzc3N3d7dz8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACXl5cAAAAAAAAAAAAAAAAAAAAAv1AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABppKSkpIyMjIyMSUlJSZaWJycnlicnJ1azs7Ozs6Ojo6Ojo6Ojo6OjEREREQDCAAAAAAAAAAAAAAAAAAAAAAAAAAAAABcXFxcAAAAAAAAAAAAAAAAAjgA3d3d3dz8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAl5cAAAAAAAAAAAAAAAAAAABsuQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGpoaGhojIxJSUlJSUlIJycnJycnJyezs7Ozs7Ojo6Ojo6Ojo6MREREREV4AAAAAAKkAAAAAAAAAAAAAAAAAAAAAABcXFwAAAAAAAAAAAAAAAAAAjgAAAHd3Pz8AAAAAAAAAAAAAACsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAW1sAAAAAAAAMDAA+Pj4+AD4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGhoaGhoVYxJSRUVtEhIJycnJycnJ1azs7Ozs1Sjq6Ojo6OrqxEREREREQEBAQEBqQAAAAAAAAAAAAAAAAAAAAAAAAAXFwAAAAAAAAAAAAAAAAAANwAAAAA/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACaAJqaAAwMDD4+Pj4+Pj4+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACmpmhoVVVVVRUVtEgnJycnJycnVlazs7NUVFSjq6urq6urqxEREREREREBAQEBqQAAAAAAAAAAAAAAAAAAAAAAAAAXAAAAAAAAAAAAAAAAAAAANwAAAAAAAAAAAAAAAAArAAAAAAArAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAigAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDD4+Pj4+Pj4+bm4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAApn1oVVVVVRUVtEgnJycnJycnVlazVFRUVFRUq6urq6urqxERERERERERERGpAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKysrAAAAAACbAAAAAAAAAAAAAAAAAAAAAABlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDAwMDAw+Pj4+bm5uAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH19VVVVVRUVFQAAJycnJ1ZWVlZUVFRUVFRUVKurq6urq6sREREREREREampAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACBAAAAAAAAAAAAAAAAAAA3AAAAAAAAAAAAACEAAAAAACsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDAwMDD4+Pj4+CG5ura0TEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVQAAABUAAAAAACcnVlZWVlZUVFRXVFRXV1erq6urqyARERERERGpqakAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgYAAAhIQAAAAAAAAAAUSEhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDAwMDAw+PggICG5ura0TEwgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFZWVlZUWFhXV1dXV1dXV1e8vCAgICAgqampqQAAAAAAAAAAAAAAAAAAAAAAAACJAAAAAAAAAAAAAAAAAAAAAAAYGAAhIQAAAAAAAAAhIRgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDAwMDAg+PggICG5urQgICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGtmZlhWWFdXV1dXV1dXV1e8vLwgICAgqampAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGBgYIQAAAAAAACEhGBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8PDAwMDAwMCAgICAgICAgICAgICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACsAGZmZmZYWFdXV1dXV1dXV7y8vCAgICAgqakAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgYADAAAAAYGBgYGBgAABgYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8PDw8MDAwMCAgICAgICAgICAgICAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGZmZmZYWFdXV1dXV1dXV7y8vCAgICAgqQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgYGAAAAAAYGBgYGBgAAAAAAAAAGAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8PDyoqDAwMCAgICAgICAgICAgICAgICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGZmZlhYV1dXV1dXV1dXoqI2NjYgICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYGBgYAAAAGBgYGAAAGBgAAAAAAAAYABgAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8PKioqKioMCAgICAgICAgICAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABmWFhYV1dXV1dXV1dXRzY2NjY2NiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGBgYAAAAAAAYGAAAGAAYAAAYAAAYABgYGBgYGJycAAAAAAAAnAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKioqKioqKggICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAV1dXV1dXV1dXV1dXVzY2NjY2NjYAAAAAAAAAAAAAALEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgYAAAAAAAAAAAAAAAYAAAAAAAAAAAAABgYGJycnJwAAAAAnAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACoqKioqCAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQUFBV1dXV1dXV1dXVzY2NjY2NgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAYGJycnJycAACcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqKioqCAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEFBQVdBQVdXV1dXVzY2NjY2NjYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgYGBgAAAAAAAAAAAAAAAAAGAAAAAAYGJycnJycAAAAAAAAAAAAAAAAAAAAAAAAAAAAALsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqKioqCAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEFBQUFBQVdXV1dXw8M2NjY2NjYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAC3AAAAAAAAAAAAAJycAACcnAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKioqKioICAgHCAgICAgICAgICAgICAgICAgICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEFBQUFBQVdXV1dXw8PDwzY2NjYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKioqKioqBwcHCAgICAgICAgICAgICAgICAgICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEFBQUFBQUFBw1dXw8PDlJGRNpGRAABZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAMAAAAAAAADAAAAAAAAAAAAAAAApQAAAAAAAAAAAAAAAAAAAAAAAADBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACoqKioqBwcHBwcICAgICAgICAgICAgICAgICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQUFBQUFBQUFBw8PDV8PDlJGRkZGRAAAAAAAAiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDAwAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACoqKioqBwcHBwcHBwgICAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQUFBQUFBQcPDw8PDw8PDkZSRkZGRAAAAAACIiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwADAwMDAwAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqKioqBwcHBwcHBwgICAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQUFBQUFBQcPDw8PDw5GRkZSRkZGRAAAAAIiIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDAwMDAwMAAAADAwMAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACoqBwcHBwcHBwcICAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlUFBQUFBQUHDw8PExMTEkZGRkQAAAACIiIiIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDAwMDAwMDAAMDAwMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKBwcHBwcHBwcHCAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlZWVlZWVU1NTU8TExMTEkZGRAAAAAACIiIiIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDAwMDAwMDAwMDAwMDAwMAAAAAAAAAAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgcHBwcHnp4ICAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlZWVlZWVU1NTU8TExMTEkQAAAAAAAAAAiIiIAAAAAAAAkwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDAwMDAwMDAwMDAwMDAwMDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgcHBweenp6eCAgICAgICAgICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJWVlZWVU1NTU1PExMTEkZEAAAAAAACIiIgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgcCAgKenp6enggICAgICAgICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACVlZWVU1NTU1NTMTGRkZEAAAAAAACIiIgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgoCAgICnp6enggICAgICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACVlZWVU1NTU1MxMTGRkZEAAAAAAACIiIgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgICAgICAgICnp4ICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACVlZWVU1NTUzExMTGRAAAAAAAAAAAAiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgICAgICAgKenp4CCAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACVlZWVUzExMTExMTGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAgICAgICAgICAggICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlZWVMTExMTExMTExAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAgICAgICAgICCAgICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMTExMTExMTGCgjEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoCAgICAgICAgICPQgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADExMTExMTExMQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAgICAgICAgI9PT09CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADExMTExMTExAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDAwMDAwAAAAADAwMDAwMDAwMDAwMDAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoKAgICAgICAgI9PT09AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADExMTExMTEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDAwAAAAAAAAAAAwMDAwMDAwMDAwMDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoCAgICAgICAgICAD0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAAAAAAAAAAAAAAAAAwAAAwMDAwMDAwMDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoCAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwMDAwMDAwMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgoCAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDAwMAAAAAAAAAAAAAAAAAAAAAAAAmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgoCAgICAgICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAmJgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgICAgICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwAAAAAAAAAAAAAAAAAAAAAAJiYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICAgICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwAAAAAAAAAAAAAAAAAAAAAmJgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJiYmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAmJiYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoACgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+
+return { COLS, ROWS, CODES, GRID };
+})();
+
+// ---- pixel-map.js
+__modules["pixel-map.js"] = (() => {
+// The little 8-bit world map in the Highs & Lows climb (15 November 2026, team choice from
+// mockups/climb-reveal/pixel-map.html, replacing the spinning tour): the whole world at once,
+// every country lighting up in its heat colour as the climb passes it. Nothing spins.
+// The grid comes from pixel-map-data.js (tools/build-pixel-map.mjs).
+const { CODES, COLS, GRID, ROWS } = __modules["pixel-map-data.js"];
+
+const SEA = "#071027";
+const LAND = "#2a3556";
+const FLASH_MS = 160; // a white flash as a country lights up
+
+let cells = null;
+function decode() {
+  if (cells) return cells;
+  const bytes = atob(GRID);
+  cells = new Uint8Array(bytes.length);
+  for (let index = 0; index < bytes.length; index += 1) cells[index] = bytes.charCodeAt(index);
+  return cells;
+}
+
+// createPixelMap(canvas, colorOf): colorOf(iso) gives a country's heat colour.
+// fit(width): the largest size that fits `width` (CSS px) in whole device pixels per cell.
+// light(iso), lightAll([iso], overMs): light countries up (now, or in a wave);
+// setPick(iso): your pick, blinking gold once the climb lands; stop(): ends the drawing.
+function createPixelMap(canvas, colorOf) {
+  const grid = decode();
+  canvas.width = COLS;
+  canvas.height = ROWS;
+  const ctx = canvas.getContext("2d");
+  const lit = new Map(); // code → when it lit up
+  const timers = [];
+  let pick = 0;
+  let frame = 0;
+  const codeOf = iso => 2 + CODES.indexOf(iso);
+  const colors = new Map();
+  const colorFor = code => {
+    if (!colors.has(code)) colors.set(code, colorOf(CODES[code - 2]));
+    return colors.get(code);
+  };
+
+  function draw(now) {
+    ctx.fillStyle = SEA;
+    ctx.fillRect(0, 0, COLS, ROWS);
+    const blink = Math.floor(now / 300) % 2;
+    for (let index = 0; index < grid.length; index += 1) {
+      const code = grid[index];
+      if (!code) continue;
+      let color = LAND;
+      const at = lit.get(code);
+      if (at !== undefined) color = now - at < FLASH_MS ? "#ffffff" : colorFor(code);
+      if (code === pick) color = blink ? "#ffd45c" : "#fff4c2";
+      ctx.fillStyle = color;
+      ctx.fillRect(index % COLS, (index / COLS) | 0, 1, 1);
+    }
+    frame = requestAnimationFrame(draw);
+  }
+  frame = requestAnimationFrame(draw);
+
+  return {
+    fit(width) {
+      const ratio = window.devicePixelRatio || 1;
+      const cell = Math.max(1, Math.floor(width * ratio / COLS)) / ratio;
+      canvas.style.width = `${COLS * cell}px`;
+      canvas.style.height = `${ROWS * cell}px`;
+    },
+    light(iso, now = performance.now()) {
+      const code = codeOf(iso);
+      if (code > 1 && !lit.has(code)) lit.set(code, now);
+    },
+    // In order, spread over `overMs` (the first now, the last at the end).
+    lightAll(isos, overMs = 0) {
+      isos.forEach((iso, index) => {
+        const delay = isos.length > 1 ? overMs * index / (isos.length - 1) : 0;
+        if (!delay) this.light(iso);
+        else timers.push(setTimeout(() => this.light(iso), delay));
+      });
+    },
+    setPick(iso) { pick = iso ? codeOf(iso) : 0; },
+    stop() {
+      cancelAnimationFrame(frame);
+      timers.forEach(clearTimeout);
+    }
+  };
+}
+
+return { createPixelMap };
+})();
+
 // ---- travel.js
 __modules["travel.js"] = (() => {
 // Travel on the globe: little pixel vehicles. Used for the menu's traffic (real planes and
@@ -29858,6 +30000,7 @@ const { RANK_TIERS, formatTopPercent, getDayStats, getTopPercent } = __modules["
 const { initializeCommunity } = __modules["social.js"];
 const { createBaseLine, defaultBaseIso, getBase, getTent, getTentColor, getTentLook, onBaseChange, pickBase, setBase, setTentLevelSource, syncBase, tentLonLat } = __modules["base.js"];
 const { celebrateTent, createTentCanvas, tentLevel, tentToCelebrate } = __modules["tents.js"];
+const { createPixelMap } = __modules["pixel-map.js"];
 const { FLIGHT_MS, createTravelLayer, distance: distanceOnGlobe, drawSprite, getDayPlace, makeTrack, placeOf, spriteCanvas, startAmbient } = __modules["travel.js"];
 const { fillTransitCard, liveTitle } = __modules["transit-card.js"];
 const { createLiveTraffic } = __modules["live-traffic.js"];
@@ -29898,14 +30041,6 @@ const RANK_COLORS = ["#45e3ff", "#ffd45c", "#ff8a3d", "#c58cff", "#5cf28a"];
 // right guess quickly, a new clue after time to read it). Mystery Country and Rank 'Em
 // cards wait for a click (in casual, every card does); the clock is stopped meanwhile.
 const AUTO_CONTINUE_MS = 1300;
-// The globe mode: the heat map's turn around the world, and how long it all shows before
-// the score card (the turn, then a moment on the answer).
-// The globe mode's tour after locking in: one slow turn around the heat map, then a stop
-// at each highlight (the other end, your pick, the runner-up, the answer).
-const TOUR_SPIN_MS = 8000;
-const TOUR_MOVE_MS = 2200;
-const TOUR_HOLD_MS = 3200;
-const TOUR_ZOOM = 1.18;
 const PHONE_SHIFT_MS = 600;
 const AUTO_CONTINUE_CLUE_MS = 3500;
 // A wrong Pinpoint guess: time to read hot/cold before its new clue arrives on its own card.
@@ -31490,18 +31625,18 @@ const ROUND_RENDERERS = {
       ]);
     };
     // No rank markers on the globe in this mode: the tiles and the ladder name the countries.
-    // Right after locking in, the heat map spreads and the globe gives its tour straight away
-    // (no plane to your pick since 13 November 2026, team request: snappier); revisiting the
-    // round just turns to the answer.
+    // Right after locking in, the climb (with its pixel map); then the heat map on the globe
+    // (no spinning tour since 15 November 2026, team request); revisiting the round just
+    // turns to the answer.
     if (extremeRevealPending) {
       extremeRevealPending = false;
       const roundIndex = viewIndex;
       const token = revealToken;
-      // The score card waits for the flight and then the tour (see commit).
+      // The score card waits for the climb (see commit); the globe takes the heat map's
+      // colours once the climb is done (the climb's own pixel map shows them first).
       extremeFlightDone = Promise.resolve().then(() => {
         if (token !== revealToken || activeMode !== "extremes" || viewIndex !== roundIndex || !isGameViewVisible || globe.mode !== "game") return null;
-        showHeat();
-        playExtremeTour(round, state);
+        playExtremeTour(round, state, showHeat);
         return extremeTour?.done;
       });
     } else if (quietArrival) {
@@ -31897,127 +32032,24 @@ function confirmExtremePick() {
   commit();
 }
 
-// The reveal after locking in (the globe mode), in two parts, like opening a pack:
-//  1. The tour: the globe zooms out and turns slowly once around the heat map, then stops
-//     at the other end, the runner-up and the answer. A card at the bottom names each stop
-//     with a fun line.
-//  2. The climb (playExtremeClimb): the whole ranking creeps up from the last place,
-//     ticking faster and then slower, until it lands on your pick; then your points.
-// Neither gives away your rank early. SKIP (or Enter) skips the current part.
+// The reveal after locking in (the globe mode): the climb (playExtremeClimb), with the whole
+// world in pixels lighting up as it passes, from the last place up to your pick; then your
+// points, and the globe takes the heat map's colours (showHeat). Until 15 November 2026 the
+// globe first turned once around the heat map for 8 s, with a card over it (too long, and
+// it got old); the team chose this from mockups/climb-reveal/pixel-map.html. SKIP, a click,
+// Enter or space lands the climb at once, and once landed goes on to the score card.
 let extremeTour = null;
-function playExtremeTour(round, state) {
+function playExtremeTour(round, state, showHeat = () => {}) {
   stopExtremeTour({ all: true });
   const standings = getStandings(round.stat, round.find);
-  const { stat, sorted, count, find } = standings;
-  const [near, farEnd] = extremeEnds(find);
-  const winner = sorted[0];
-  const far = sorted.at(-1);
+  const winner = standings.sorted[0];
   const pick = standings.ranks[state.pick];
-  const fmt = value => formatValue(stat, value);
-  // The reveal is the spinning heat map itself: one tile (the stat and a colour key), no
-  // stops at single countries. Grabbing the globe pauses it there, to look around at your
-  // own pace, until CONTINUE (or SKIP); then the climb gives your rank.
   const view = document.getElementById("gameView");
-  const card = document.getElementById("extremeTour");
   const pickCountry = getCountry(pick.iso);
-  const highlight = (country, white = true) => globe.setHighlights([
-    ...(country ? [{ country, color: 0xffffff, pulse: true, focus: true }] : []),
-    ...(country?.iso === pick.iso ? [] : [{ country: pickCountry, color: 0xffd45c, pulse: !country, focus: true }])
-  ]);
-  // Rank markers only appear after the climb.
-  const marked = new Set();
-  const markStop = entry => {
-    if (marked.has(entry.iso)) return;
-    marked.add(entry.iso);
-    addExtremeMarker(entry, standings, pick.iso);
-  };
-  const showStop = stop => {
-    const country = stop.entry && getCountry(stop.entry.iso);
-    // One tile for every stop, styled like the round card; only its accent changes:
-    // neutral for your guess, blue for the far end, pink for the answer.
-    card.dataset.kind = stop.kind || "intro";
-    card.classList.toggle("is-match", Boolean(stop.match));
-    card.classList.toggle("is-win", Boolean(stop.match && stop.kind === "near"));
-    setText("tourKicker", stop.kicker);
-    setText("tourRank", !stop.entry ? t("tour.countries", { n: count }) : t("tour.rankOf", { rank: stop.hideRank ? "?" : stop.entry.rank, count }));
-    document.getElementById("tourFlag").replaceChildren(...(stop.entry ? [createFlagImage(country, "tour-flag-image")] : []));
-    setText("tourName", stop.entry ? countryName(country) : stat.name);
-    // The number big, the unit small underneath, so a long unit ("litres of pure alcohol
-    // per adult a year") never pushes the country's name off the card.
-    const unit = stop.entry ? fmt(stop.entry.value).slice(formatValue(stat, stop.entry.value, { unit: false }).length).trim() : "";
-    document.getElementById("tourValue").replaceChildren(...(stop.entry ? [
-      Object.assign(document.createElement("b"), { textContent: formatValue(stat, stop.entry.value, { unit: unit === "%" }) }),
-      ...(unit && unit !== "%" ? [Object.assign(document.createElement("small"), { textContent: unit })] : [])
-    ] : []));
-    // The card pops each time it changes.
-    card.classList.remove("is-popping");
-    void card.offsetWidth;
-    card.classList.add("is-popping");
-    // No rank markers on the globe during the tour: the tile names the country.
-    if (!stop.entry) return;
-    if (stop.match && stop.kind === "near") {
-      // You found the answer: your country in the mode's pink, pulsing, a little closer.
-      globe.setHighlights([{ country, color: 0xff6b9d, pulse: true, focus: true }]);
-      globe.zoomTo(1);
-      sounds.playVictory();
-    } else {
-      highlight(country);
-      if (stop.match) sounds.playError();
-      else sounds.playReveal(stop.entry.rank === 1 ? "match" : "near", stop.entry.rank === 1 ? 3 : 0);
-    }
-  };
-
-  const tour = { cancelled: false, aborted: false, timer: 0, wake: null, startedAt: performance.now(), skipPhase: null };
-  const wait = ms => new Promise(resolve => {
-    tour.wake = resolve;
-    tour.timer = setTimeout(resolve, ms);
-  });
-  tour.skipPhase = () => {
-    tour.cancelled = true;
-    clearTimeout(tour.timer);
-    tour.wake?.();
-  };
+  const tour = { cancelled: false, aborted: false, startedAt: performance.now(), skipPhase: null };
   tour.done = (async () => {
-    // Names would only flicker past while the globe turns; they come back after the tour.
-    view.classList.add("is-spinning");
-    card.classList.remove("hidden");
-    // Centre the globe between the top (on a phone, the top bar) and the card.
-    const top = phoneLayout.matches ? document.querySelector(".side-left").getBoundingClientRect().bottom : 0;
-    const cardTop = window.innerHeight - card.offsetHeight - (parseFloat(getComputedStyle(card).bottom) || 0);
-    globe.setViewShiftY(Math.round((top + cardTop) / 2 - window.innerHeight / 2), PHONE_SHIFT_MS);
-    highlight(null);
-    // The colour key: a pink dot for the end we're after, a blue one for the other end.
-    document.getElementById("tourKey").replaceChildren(...[["near", near], ["far", farEnd]].map(([side, label]) => {
-      const item = Object.assign(document.createElement("span"), { className: `tour-key-item is-${side}` });
-      item.append(Object.assign(document.createElement("i"), { ariaHidden: "true" }), label);
-      return item;
-    }));
-    showStop({ kicker: t("tour.kicker") });
-    setText("tourValue", t("tour.drag"));
-    // On a phone the globe is small already: it zooms out less, so the colours stay big.
-    globe.revealSpin(pickCountry.lat, pickCountry.lon, TOUR_SPIN_MS, phoneLayout.matches ? 0.95 : TOUR_ZOOM, phoneLayout.matches ? 1.05 : 1.45);
-    // A drag stops the spin where it is and holds the tour (no timer runs) until CONTINUE.
-    tour.pauseForDrag = () => {
-      if (tour.paused || tour.cancelled) return;
-      tour.paused = true;
-      globe.rotationToken += 1;
-      clearTimeout(tour.timer);
-      card.classList.add("is-paused");
-      // Looking around by yourself: the country names come back, as in the round.
-      view.classList.remove("is-spinning");
-      setText("tourValue", t("tour.paused"));
-    };
-    await wait(TOUR_SPIN_MS + 600);
-    tour.pauseForDrag = null;
-    card.classList.remove("is-paused");
-    // The globe stays where you left it, behind the climb.
-    globe.zoomTo(1);
-    card.classList.add("hidden");
-    updatePhoneFrame(PHONE_SHIFT_MS);
-    if (!tour.aborted) {
-      tour.cancelled = false;
-      await playExtremeClimb(standings, pick, state, tour);
-    }
+    await playExtremeClimb(standings, pick, state, tour);
+    showHeat();
     const answer = getCountry(winner.iso);
     globe.rotateTo(answer.lat, answer.lon, 700);
     globe.setHighlights([
@@ -32045,9 +32077,13 @@ function addExtremeMarker(entry, standings, pickIso) {
 }
 
 // The climb: the ranking from last to first in a window, creeping upwards (fast, then
-// slower and slower) with a tick per country, until it lands on your pick. Then your
-// row lights up, your points count up, and a click or a moment later the score card.
+// slower and slower) with a tick per country, until it lands on your pick. Above it the
+// whole world in pixels (pixel-map.js): each country lights up in its heat colour as the
+// climb passes it, and once it lands, your pick blinks gold and the countries above you
+// light up in a quick wave. Then your row lights up, your points count up, and a click or
+// a moment later the score card.
 const CLIMB_ROW = 44;
+let climbMap = null;
 function playExtremeClimb(standings, pick, state, tour) {
   const { count, stat } = standings;
   // Your pick goes first among the countries it ties with, so the climb rises through the
@@ -32090,6 +32126,24 @@ function playExtremeClimb(standings, pick, state, tour) {
   place(start);
   showRank(start);
   overlay.classList.remove("hidden");
+  // The pixel map, and its colour key (the end we're after in pink, the other in blue).
+  climbMap?.stop();
+  const map = createPixelMap(document.getElementById("climbMap"), iso => heatColor(standings.ranks[iso]?.heat ?? count, count));
+  climbMap = map;
+  map.fit(document.querySelector("#extremeClimb .climb-map").clientWidth);
+  const [keyNear, keyFar] = extremeEnds(standings.find);
+  document.getElementById("climbKey").replaceChildren(...[["near", keyNear], ["far", keyFar]].map(([side, label]) => {
+    const item = Object.assign(document.createElement("span"), { className: `climb-key-item is-${side}` });
+    item.append(Object.assign(document.createElement("i"), { ariaHidden: "true" }), label);
+    return item;
+  }));
+  map.light(sorted[start].iso);
+  // Every country from the last place up to `index`.
+  let litTo = start;
+  const lightTo = index => {
+    for (let at = litTo - 1; at >= index; at -= 1) map.light(sorted[at].iso);
+    litTo = Math.min(litTo, index);
+  };
 
   return new Promise(resolve => {
     const distance = start - target;
@@ -32104,6 +32158,10 @@ function playExtremeClimb(standings, pick, state, tour) {
       cancelAnimationFrame(frame);
       place(target);
       showRank(target);
+      lightTo(target);
+      map.setPick(pick.iso);
+      // The countries above you, in a quick wave up to the top.
+      setTimeout(() => !finished && map.lightAll(sorted.slice(0, target).reverse().map(entry => entry.iso), 650), 250);
       rows[target].classList.add("is-you");
       overlay.classList.add("is-landed");
       overlay.classList.toggle("is-perfect", pick.rank === 1);
@@ -32139,6 +32197,7 @@ function playExtremeClimb(standings, pick, state, tour) {
       finished = true;
       clearTimeout(leaveTimer);
       cancelAnimationFrame(frame);
+      map.stop();
       overlay.classList.add("hidden");
       tour.skipPhase = null;
       resolve();
@@ -32155,6 +32214,7 @@ function playExtremeClimb(standings, pick, state, tour) {
       const index = Math.round(position);
       if (index !== shown) {
         shown = index;
+        lightTo(index);
         showRank(index);
         if (now - lastTick > 40) {
           lastTick = now;
