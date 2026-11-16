@@ -12727,6 +12727,25 @@ const MENU_SAMPLE_SPACING = 48; // screen pixels between the points that pick de
 // Zoomed-in views get sharper NASA tiles (detail-tiles.js). The closest zoom stays
 // just outside the atmosphere glow sphere (radius × 1.12).
 const MIN_CAMERA_DISTANCE = 120;
+// Dragging tilts the globe at most this far (the latitude in the middle of the view), so
+// the North Pole always stays towards the top. The last SOFT_TILT of the way slows down.
+const MAX_TILT = 80 * Math.PI / 180;
+const SOFT_TILT = 25 * Math.PI / 180;
+
+// A drag's tilt from `x` by `delta`: free until near the limit, then slower and slower,
+// so it eases towards MAX_TILT instead of hitting a wall, however fast the drag (the
+// slowdown is worked out over the whole step). Away from the limit it's free again.
+function tiltBy(x, delta) {
+  const side = Math.sign(x);
+  if (!delta || Math.sign(delta) !== side) return x + delta;
+  // (An animation may have left it past the limit: then it just can't go further.)
+  if (Math.abs(x) >= MAX_TILT) return x;
+  const room = MAX_TILT - Math.abs(x);
+  const free = Math.min(Math.abs(delta), Math.max(0, room - SOFT_TILT));
+  // In the soft zone each bit of drag closes the same share of the room left.
+  const soft = Math.min(room, SOFT_TILT) * Math.exp(-(Math.abs(delta) - free) / SOFT_TILT);
+  return side * (MAX_TILT - soft - Math.max(0, room - SOFT_TILT - free));
+}
 // Vertical field of view on a wide screen; a tall one widens it (see resize).
 const BASE_FOV = 45;
 const MAX_CAMERA_DISTANCE = 420;
@@ -14032,7 +14051,7 @@ class PixelGlobe {
       // Turn more slowly when zoomed in, so the ground under the finger keeps pace.
       const speed = 0.008 * this.getZoomFactor();
       this.globeGroup.rotation.y += deltaX * speed;
-      this.globeGroup.rotation.x += deltaY * speed;
+      this.globeGroup.rotation.x = tiltBy(this.globeGroup.rotation.x, deltaY * speed);
       this.previousMousePosition = { x: event.clientX, y: event.clientY };
     });
 
