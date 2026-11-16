@@ -6835,6 +6835,7 @@ const EN = {
   "archive.moreDaysForTop": p => `${p.n} more ${plural(p.n, "day", "days")} for ${p.name}, ${p.range}`,
   "archive.onAverage": "{name}: {range} on average",
   "archive.highestBadge": "The highest badge there is.",
+  "archive.preseason": "PRE-SEASON",
   "archive.days": "DAYS",
   "archive.avg": "AVG.",
   "archive.best": "BEST",
@@ -7818,6 +7819,7 @@ const NL = {
   "archive.moreDaysForTop": p => `Nog ${p.n} ${plural(p.n, "dag", "dagen")} voor ${p.name}, ${p.range}`,
   "archive.onAverage": "{name}: gemiddeld {range}",
   "archive.highestBadge": "De hoogste badge die er is.",
+  "archive.preseason": "VOORSEIZOEN",
   "archive.days": "DAGEN",
   "archive.avg": "GEM.",
   "archive.best": "BESTE",
@@ -24222,8 +24224,11 @@ const { PROPOSED_DAYS } = __modules["extremes-proposals.js"];
 // Test mode (?preseason, 15 November 2026): the days still in review (extremes-proposals.js)
 // playable as 25–31 October, before Day 1, to try them out. Without it nothing changes.
 const PRESEASON = typeof location !== "undefined" && new URLSearchParams(location.search).has("preseason");
+// They keep those dates but form their own "month" in the archive (Pre-season, Highs & Lows
+// only), numbered 1–7; November's day numbers stay as they are.
+const PRESEASON_DATES = PRESEASON ? PROPOSED_DAYS.map((_, index) => `2026-10-${25 + index}`) : [];
 const EXTREME_DAYS = PRESEASON
-  ? { ...Object.fromEntries(PROPOSED_DAYS.map((day, index) => [`2026-10-${25 + index}`, day])), ...CALENDAR_DAYS }
+  ? { ...Object.fromEntries(PROPOSED_DAYS.map((day, index) => [PRESEASON_DATES[index], day])), ...CALENDAR_DAYS }
   : CALENDAR_DAYS;
 const { EXTREME_MAX_DAY, MODE_NAME, scorePick } = __modules["extremes.js"];
 const { countryName, localNames, locale, num, placeName, t, tOr, tr } = __modules["i18n.js"];
@@ -24873,7 +24878,7 @@ function getDayScore(plan, states) {
   };
 }
 
-return { PRESEASON, MODES, MAIN_MODE, MODE_INFO, ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, SPEED_WINDOW_MS, getSpeedWindow, MAX_SPEED_BONUS, getSpeedMultiplier, getMaxScore, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, getNeighbourHardness, getPaintPoolEntry, resolveRound, resolvePlan, getDayInfo, getDailyPlan, hasExtremeDay, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
+return { PRESEASON, PRESEASON_DATES, MODES, MAIN_MODE, MODE_INFO, ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, SPEED_WINDOW_MS, getSpeedWindow, MAX_SPEED_BONUS, getSpeedMultiplier, getMaxScore, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, getNeighbourHardness, getPaintPoolEntry, resolveRound, resolvePlan, getDayInfo, getDailyPlan, hasExtremeDay, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
 })();
 
 // ---- community.js
@@ -26599,7 +26604,7 @@ return { createArchiveMap };
 __modules["screens.js"] = (() => {
 const { sounds } = __modules["audio.js"];
 const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getScoreBucket, getTopPercent } = __modules["community.js"];
-const { MAIN_MODE, MAX_DAILY_SCORE, MODE_INFO } = __modules["daily.js"];
+const { MAIN_MODE, MAX_DAILY_SCORE, MODE_INFO, PRESEASON_DATES } = __modules["daily.js"];
 const { createBadge } = __modules["badges.js"];
 const { createFlagImage } = __modules["ui.js"];
 const { COUNTRIES } = __modules["countries.js"];
@@ -26639,7 +26644,11 @@ const toKey = date => date.toISOString().slice(0, 10);
 function groupByWeek(days) {
   const byKey = new Map(days.map(day => [day.dateKey, day]));
   const weeks = new Map();
+  // Pre-season (?preseason) is a "month" of its own: its seven days in one row.
+  const preseason = days.filter(day => PRESEASON_DATES.includes(day.dateKey));
+  if (preseason.length) weeks.set("preseason", { monday: preseason[0].dateKey, month: "preseason", cells: preseason });
   days.forEach(day => {
+    if (PRESEASON_DATES.includes(day.dateKey)) return;
     const month = day.dateKey.slice(0, 7);
     const monday = toDate(day.dateKey);
     monday.setUTCDate(monday.getUTCDate() - (monday.getUTCDay() + 6) % 7);
@@ -26652,7 +26661,8 @@ function groupByWeek(days) {
     });
     weeks.set(key, { monday: toKey(monday), month, cells });
   });
-  return [...weeks.values()].sort((left, right) => left.month.localeCompare(right.month) || left.monday.localeCompare(right.monday));
+  const order = month => month === "preseason" ? "" : month;
+  return [...weeks.values()].sort((left, right) => order(left.month).localeCompare(order(right.month)) || left.monday.localeCompare(right.monday));
 }
 
 // How a played day went, as the heat map's colours: pink for the top 10%, then gold,
@@ -26722,18 +26732,19 @@ function createDayCell(day, { isSelected, onSelect }) {
 // every day of the month in the archive is played. Badges are for the main game (MAIN_MODE) only.
 function createMonthHead(month, weeks, mode) {
   // (A date without a game doesn't count towards the month.)
-  const days = weeks.flatMap(week => week.cells).filter(day => day && !day.noGame && day.dateKey.startsWith(month));
+  const isPreseason = month === "preseason";
+  const days = weeks.flatMap(week => week.cells).filter(day => day && !day.noGame && (isPreseason || day.dateKey.startsWith(month)));
   const played = days.filter(day => day.completed);
   const head = element("div", "calendar-month");
   head.classList.toggle("is-full", played.length === days.length);
-  const name = dateText(toDate(`${month}-01`), { month: "long", year: "numeric" }).toUpperCase();
+  const name = isPreseason ? t("archive.preseason") : dateText(toDate(`${month}-01`), { month: "long", year: "numeric" }).toUpperCase();
   const summary = element("span", "calendar-month-summary");
   summary.appendChild(element("span", "", t("archive.monthDays", { played: played.length, total: days.length })));
   if (played.length) {
     const average = played.reduce((sum, day) => sum + day.topPercent, 0) / played.length;
     summary.appendChild(element("span", "calendar-month-top", t("archive.avgTop", { top: formatTopPercent(average).toLowerCase() })));
     // The badge earned that month (the main game only).
-    if (mode === MAIN_MODE) {
+    if (mode === MAIN_MODE && !isPreseason) {
       const badge = getMonthBadge(days, month);
       const earned = element("span", "calendar-month-badge");
       earned.append(createBadge(badge.tier, 20), badge.tier.name);
@@ -26789,9 +26800,11 @@ function createCalendar(days, { selected, onSelect, mode }) {
     const monthWeeks = weeks.filter(week => week.month === month);
     // The month's header with its medals, then the weekday letters, then its weeks.
     calendar.appendChild(createMonthHead(month, monthWeeks, mode));
+    if (month !== "preseason") {
     const weekdayRow = element("div", "calendar-week calendar-weekdays");
     weekdays().forEach(letter => weekdayRow.appendChild(element("span", "", letter)));
     calendar.appendChild(weekdayRow);
+    }
     monthWeeks.forEach(week => {
       const row = element("div", "calendar-week");
       week.cells.forEach(day => row.appendChild(day ? createDayCell(day, { isSelected: day === selected, onSelect }) : element("span", "day-cell is-empty")));
@@ -27035,7 +27048,7 @@ function createMonthMap(days, { month, months, selected, mode, getCountryFeature
     button.addEventListener("click", () => { sounds.playClick(); onMonth(months[index + offset]); });
     return button;
   };
-  const name = dateText(toDate(`${month}-01`), { month: "long", year: "numeric" }).toUpperCase();
+  const name = isPreseason ? t("archive.preseason") : dateText(toDate(`${month}-01`), { month: "long", year: "numeric" }).toUpperCase();
   const inMonth = days.filter(day => !day.noGame && day.dateKey.startsWith(month) && day.dateKey <= todayKey());
   const title = element("div", "archive-map-title");
   title.append(element("strong", "", name), element("small", "", t("archive.mapCount", { n: inMonth.length, played: inMonth.filter(day => day.completed).length })));
@@ -27073,7 +27086,8 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay, getCountry
 
   // The main game's days by default (badges and groups use those).
   function loadDays(mode = MAIN_MODE) {
-    return getDays().map(dateKey => withCommunity(getDayRecord(dateKey, mode)));
+    // Pre-season is Highs & Lows only.
+    return getDays().filter(dateKey => mode === "extremes" || !PRESEASON_DATES.includes(dateKey)).map(dateKey => withCommunity(getDayRecord(dateKey, mode)));
   }
 
   function playDay(dateKey, mode) {
@@ -30208,7 +30222,7 @@ const { createBadge } = __modules["badges.js"];
 const { LANGUAGES, applyI18n, clueText, countryName, getLang, localNames, locale, num, onLangChange, placeName, setLang, t, tapWords, unitText } = __modules["i18n.js"];
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
-const { hasExtremeDay, MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MAIN_MODE, MODES, MODE_INFO, getSpeedWindow, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress, PRESEASON } = __modules["daily.js"];
+const { hasExtremeDay, MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MAIN_MODE, MODES, MODE_INFO, getSpeedWindow, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress, PRESEASON_DATES } = __modules["daily.js"];
 const { showHowToSet, createFlagImage, PLAY_ART, PLAY_ART_COLORS, createPixelArt, createGuessRow, initializeCountryInput, initializeMainMenu, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, showToastNotice, showSkip, updateDailyScoreUI } = __modules["ui.js"];
 
 // v3: Deep Cut and Paint the Map replaced Capital Call and Border Patrol (October 2026).
@@ -30231,7 +30245,7 @@ const HIDE_INTRO_KEY = "daily-geography:hide-intro:v1";
 const LEGACY_SCORE_SCALE = MAX_DAILY_SCORE / 1000;
 // Day 1 of the puzzle run. The archive and leaderboard list a fixed run of days from
 // here, including upcoming ones, labelled "Day 1", "Day 2", ... instead of by date.
-const LAUNCH_DATE = PRESEASON ? "2026-10-25" : "2026-11-01"; // ?preseason: the days in review first (daily.js)
+const LAUNCH_DATE = "2026-11-01";
 const PRELOADED_DAYS = 30;
 // One colour per Rank 'Em country, on the board and on the globe.
 const RANK_COLORS = ["#45e3ff", "#ffd45c", "#ff8a3d", "#c58cff", "#5cf28a"];
@@ -30349,6 +30363,8 @@ function toUtcDateKey(date) {
 }
 
 function getPuzzleNumber(dateKey) {
+  const preseason = PRESEASON_DATES.indexOf(dateKey);
+  if (preseason >= 0) return preseason + 1; // Pre-season 1–7 (?preseason)
   return Math.round((Date.parse(`${dateKey}T00:00:00Z`) - Date.parse(`${LAUNCH_DATE}T00:00:00Z`)) / 86400000) + 1;
 }
 
@@ -30358,10 +30374,10 @@ function getPuzzleNumber(dateKey) {
 function getAllPuzzleDays() {
   const date = new Date(`${LAUNCH_DATE}T00:00:00Z`);
   const sinceLaunch = Math.round((Date.parse(`${today}T00:00:00Z`) - date.getTime()) / 86400000) + 1;
-  return Array.from({ length: Math.max(PRELOADED_DAYS, sinceLaunch) }, (_, index) => {
+  return [...PRESEASON_DATES, ...Array.from({ length: Math.max(PRELOADED_DAYS, sinceLaunch) }, (_, index) => {
     if (index > 0) date.setUTCDate(date.getUTCDate() + 1);
     return toUtcDateKey(date);
-  });
+  })];
 }
 
 function readJson(key) {
