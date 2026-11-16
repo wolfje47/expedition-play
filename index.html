@@ -3229,9 +3229,7 @@ h1, h2, h3 { font-weight: normal; }
    windows (300), so signing in opens on top of it. */
 .base-camp { position: fixed; inset: 0; z-index: 290; overflow: hidden; }
 .main-menu.is-camp .menu-cabinet,
-.main-menu.is-camp .menu-community-card { opacity: 0; transform: translateY(-24px) scale(0.97); pointer-events: none; transition: opacity 0.35s ease, transform 0.35s ease; }
-/* Coming back: the menu fades in gently as the globe settles on the horizon. */
-.main-menu:not(.is-camp) .menu-cabinet { transition: opacity 0.5s ease-out, transform 0.5s ease-out; }
+.main-menu.is-camp .menu-community-card { opacity: 0; pointer-events: none; }
 
 .camp-page {
   position: absolute;
@@ -3243,11 +3241,10 @@ h1, h2, h3 { font-weight: normal; }
   margin: 0 auto;
   padding: 1.25rem 1.5rem 1.5rem;
   opacity: 0;
-  transform: translateY(48px);
   pointer-events: none;
 }
-.base-camp.is-open .camp-page { opacity: 1; transform: none; pointer-events: auto; transition: opacity 0.25s ease-out, transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); }
-.base-camp.is-closing .camp-page { opacity: 0; transform: translateY(24px); transition: opacity 0.2s ease-in, transform 0.2s ease-in; }
+/* Opening and closing are instant, like the other screens (16 November 2026, team request). */
+.base-camp.is-open .camp-page { opacity: 1; pointer-events: auto; }
 
 .camp-head { display: flex; align-items: center; gap: 0.9rem; padding: 0.75rem 0.9rem; border: 1px solid var(--glass-line); border-radius: 18px; background: var(--glass); box-shadow: var(--glass-shine), var(--glass-shadow); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); }
 .camp-head .brand-mark { flex: none; }
@@ -3350,7 +3347,7 @@ h1, h2, h3 { font-weight: normal; }
    screen (Everest Base Camp) with a ring, a puff of dust and its height. */
 .camp-landing { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; opacity: 0; }
 .base-camp.is-landing .camp-landing { opacity: 1; }
-.base-camp.is-open .camp-landing { opacity: 0; transition: opacity 0.2s ease; }
+.base-camp.is-open .camp-landing { opacity: 0; }
 .camp-landing .atlas-flag { position: absolute; left: -2px; bottom: 0; image-rendering: pixelated; opacity: 0; transform: translateY(-240px); filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.5)); }
 .base-camp.is-pin .camp-landing .atlas-flag { animation: camp-flag-drop 0.4s cubic-bezier(0.5, 0, 1, 0.6) forwards; }
 .camp-pin-ring { position: absolute; left: -36px; top: -36px; width: 72px; height: 72px; border: 3px solid var(--pink); border-radius: 50%; opacity: 0; }
@@ -3368,10 +3365,9 @@ h1, h2, h3 { font-weight: normal; }
 /* The scene behind the page: it opens out of the pin like an old film's iris (in steps),
    and closes back into it. Atlas climbs out of the tent during the landing only (the
    page has its own Atlas). */
-.camp-backdrop { position: absolute; inset: 0; overflow: hidden; background: linear-gradient(180deg, #050816 0%, #0f1736 50%, color-mix(in srgb, #ff6b9d 28%, #1a2148) 100%); clip-path: circle(0 at 50% 50%); transition: clip-path 0.8s steps(14); }
+.camp-backdrop { position: absolute; inset: 0; overflow: hidden; background: linear-gradient(180deg, #050816 0%, #0f1736 50%, color-mix(in srgb, #ff6b9d 28%, #1a2148) 100%); clip-path: circle(0 at 50% 50%); }
 .base-camp.is-iris .camp-backdrop,
-.base-camp.is-open .camp-backdrop,
-.base-camp.is-closing .camp-backdrop { clip-path: circle(75% at 50% 50%); }
+.base-camp.is-open .camp-backdrop { clip-path: circle(75% at 50% 50%); }
 /* Everest at sunrise, drawn in whole pixels (camp-scene.js). */
 .camp-sky { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
 /* Where the page scrolls (narrower screens), it turns solid under the band, so the board
@@ -3379,10 +3375,6 @@ h1, h2, h3 { font-weight: normal; }
 @media (max-width: 1100px) {
   .camp-page { background: linear-gradient(180deg, transparent 0, transparent calc(var(--camp-band, 300px) - 24px), rgba(10, 15, 30, 0.96) calc(var(--camp-band, 300px) + 48px)) local; }
 }
-/* Closing: no iris, the scene fades out over the globe instead. */
-.base-camp.is-closing .camp-backdrop { opacity: 0; transition: opacity 0.2s ease-in; }
-/* Opening is quick (13 November 2026, team request: snappy, no flight first). */
-.base-camp.is-open .camp-backdrop { transition-duration: 0.25s; }
 /* Pixel stars, 3 px squares, twinkling in steps. */
 @keyframes camp-climb-out { to { transform: none; } }
 
@@ -28301,8 +28293,6 @@ const { countryName, locale, onLangChange, t } = __modules["i18n.js"];
 
 const PENDING_INVITE_KEY = "daily-geography:pending-invite:v1";
 const MET_ATLAS_KEY = "daily-geography:atlas-met:v1";
-// Closing: the page and scene fade out (ms).
-const CLOSE_FADE_MS = 200;
 const GLANCE_ROWS = 3;
 
 function element(tag, className, text) {
@@ -28526,11 +28516,11 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
       menu.classList.add("is-camp");
       // Straight in, no flight (13 November 2026, team request: snappy).
       globe.diveToBaseCamp(0);
-      requestAnimationFrame(() => modal.classList.add("is-open"));
     } else {
       dove = false;
-      requestAnimationFrame(() => modal.classList.add("is-open"));
     }
+    // Instant, like the other screens (16 November 2026, team request).
+    modal.classList.add("is-open");
     await rendering;
     speak();
   }
@@ -28545,21 +28535,17 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     backdrop.append(canvas);
   }
 
-  // Closing: the page and the mountain scene fade out quickly and the menu is back, the
-  // globe where it was on the menu (no flight).
+  // Closing: instant, the menu is back with the globe where it was (no fade, no flight).
+  // The globe is put back first, so the menu never shows Base Camp for a frame.
   async function close() {
     if (modal.classList.contains("hidden")) return;
     atlas.close();
-    modal.classList.remove("is-open");
-    modal.classList.add("is-closing");
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    await new Promise(resolve => setTimeout(resolve, reduceMotion ? 0 : CLOSE_FADE_MS));
-    modal.classList.add("hidden");
-    modal.classList.remove("is-closing");
     if (dove) {
       dove = false;
       await globe.riseToMenu(0);
     }
+    modal.classList.remove("is-open");
+    modal.classList.add("hidden");
     menu.classList.remove("is-camp");
     refreshGlance();
   }
