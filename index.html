@@ -2870,7 +2870,7 @@ h1, h2, h3 { font-weight: normal; }
 .climb-points { color: var(--gold); font: 700 40px/1 var(--font-mono); text-shadow: 0 0 22px rgba(255, 212, 92, 0.4); }
 .climb-line { margin: 0; color: var(--text); font-size: 14px; text-align: center; }
 .climb-hint { color: var(--faint); font-size: 12px; }
-.extreme-climb.is-landed .climb-hint { visibility: hidden; }
+.extreme-climb.is-landed .climb-hint { color: var(--text); border-color: var(--accent); }
 
 /* Highs & Lows score card: the pecking order gets room to breathe. On a computer the
    ladder already shows #1, #2 and the other end, so the left side keeps just your pick,
@@ -31831,8 +31831,10 @@ const ROUND_RENDERERS = {
 
     // The world as a heat map: the closer to the answer, the hotter the colour.
     const winner = getCountry(standings.sorted[0].iso);
+    // No heat map on the globe any more (16 November 2026, team request: it showed between
+    // the climb and the score card); the climb's pixel map has the colours.
     const showHeat = () => {
-      globe.setHeatMap(standings.sorted.map(entry => ({ country: getCountry(entry.iso), color: heatColor(entry.heat, standings.count), alpha: 0.72 })));
+      globe.setHeatMap([]);
       globe.setHighlights([
         { country: winner, color: 0xffffff, pulse: true, focus: true },
         ...(state.pick !== winner.iso ? [{ country: selected, color: 0xffd45c, pulse: false, focus: true }] : [])
@@ -32263,7 +32265,6 @@ function playExtremeTour(round, state, showHeat = () => {}) {
   const tour = { cancelled: false, aborted: false, startedAt: performance.now(), skipPhase: null };
   tour.done = (async () => {
     await playExtremeClimb(standings, pick, state, tour);
-    showHeat();
     const answer = getCountry(winner.iso);
     globe.rotateTo(answer.lat, answer.lon, 700);
     globe.setHighlights([
@@ -32366,7 +32367,8 @@ function playExtremeClimb(standings, pick, state, tour) {
     let lastTick = 0;
     let frame = 0;
     let finished = false;
-    let leaveTimer = 0;
+    const hint = overlay.querySelector(".climb-hint");
+    if (hint) hint.textContent = t("game.skip");
     const startTime = performance.now() + 500;
     const land = () => {
       cancelAnimationFrame(frame);
@@ -32404,12 +32406,12 @@ function playExtremeClimb(standings, pick, state, tour) {
         if (progress < 1 && !finished) requestAnimationFrame(countUp);
       };
       requestAnimationFrame(countUp);
-      leaveTimer = setTimeout(finish, 2600);
+      // It waits for a click (16 November 2026, team request: it used to go on by itself).
+      if (hint) hint.textContent = `${t("game.continue")} ›`;
     };
     const finish = () => {
       if (finished) return;
       finished = true;
-      clearTimeout(leaveTimer);
       cancelAnimationFrame(frame);
       map.stop();
       overlay.classList.add("hidden");
