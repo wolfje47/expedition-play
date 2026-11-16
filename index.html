@@ -3916,6 +3916,105 @@ h1, h2, h3 { font-weight: normal; }
   .score-burst-card .score-burst-climb .journey { max-height: min(44vh, 480px); }
 }
 
+/* ---------- Casual's score card on a computer (16 November 2026) ----------
+   Team request: same look, clearer layout. One grid, in the navy of the Highs & Lows
+   cards: a header (the round, the points, the outcome as a pill), a rule, then the answer
+   with the day's journey in its own panel on the left and the info card in its panel on
+   the right, and NEXT across the bottom. The card has a fixed height that fits the
+   screen: the journey takes what's left and the info card scrolls inside its panel, so
+   nothing is cut off and NEXT is always in view. The globe behind is dimmed further.
+   Phones (the standing journey) and Highs & Lows keep their own cards. */
+.burst-round { display: none; }
+@media (min-width: 761px) {
+  .score-burst:has(.score-burst-card:not(.is-extreme)) {
+    background: radial-gradient(ellipse at 50% 50%, rgba(5, 8, 18, 0.62) 30%, rgba(5, 8, 18, 0.9) 100%);
+  }
+  .score-burst-card.score-burst-card:not(.is-extreme) {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-rows: auto auto 1px auto minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      "round  status"
+      "points streak"
+      "rule   rule"
+      "answer info"
+      "climb  info"
+      "total  info"
+      "next   next";
+    align-items: start;
+    justify-items: stretch;
+    gap: 14px 24px;
+    width: min(1180px, 94vw);
+    height: min(calc(100dvh - 48px), 800px);
+    max-height: none;
+    overflow: hidden;
+    padding: 24px 28px;
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    border-radius: 26px;
+    background: rgba(10, 15, 29, 0.95);
+    box-shadow: var(--glass-shine), var(--glass-shadow), 0 0 60px color-mix(in srgb, var(--accent) 12%, transparent);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    text-align: left;
+  }
+  .score-burst-card.score-burst-card:not(.is-extreme):not(.has-info) {
+    grid-template-areas:
+      "round  status"
+      "points streak"
+      "rule   rule"
+      "answer answer"
+      "climb  climb"
+      "total  total"
+      "next   next";
+  }
+  .score-burst-card.score-burst-card:not(.is-extreme) > * { width: auto; margin: 0; }
+
+  /* Header: the round, then the points (feedback, not the biggest thing on the card). */
+  .score-burst-card.score-burst-card:not(.is-extreme) .burst-round { display: block; grid-area: round; align-self: center; color: var(--text); font: 12px/1.5 var(--font-display); letter-spacing: var(--ls-pixel); }
+  .score-burst-card.score-burst-card:not(.is-extreme) .score-burst-points { grid-area: points; justify-self: start; font-size: 44px; text-shadow: 0 0 28px color-mix(in srgb, var(--gold) 35%, transparent); }
+  .score-burst-card.score-burst-card:not(.is-extreme) .score-burst-label {
+    grid-area: status; justify-self: end; align-self: center; padding: 6px 12px; border-radius: 999px;
+    background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+  .score-burst-card.score-burst-card.is-perfect:not(.is-extreme) .score-burst-label { background: rgba(92, 242, 138, 0.12); color: var(--t-correct); box-shadow: inset 0 0 0 1px rgba(92, 242, 138, 0.5); }
+  .score-burst-card.score-burst-card.is-zero:not(.is-extreme) .score-burst-label { background: rgba(255, 138, 61, 0.1); color: #ff8a3d; box-shadow: inset 0 0 0 1px rgba(255, 138, 61, 0.45); }
+  .score-burst-card.score-burst-card:not(.is-extreme) .score-burst-streak { grid-area: streak; justify-self: end; align-self: center; }
+  .score-burst-card.score-burst-card:not(.is-extreme)::after { content: ""; grid-area: rule; align-self: stretch; background: var(--glass-line-soft); }
+
+  /* Left: the answer, as a section with its own label. */
+  .score-burst-card.score-burst-card:not(.is-extreme) .burst-answer { grid-area: answer; justify-items: start; gap: 0.6rem; padding: 0; border: 0; }
+  .score-burst-card.score-burst-card:not(.is-extreme) .burst-answer-kicker { text-align: left; }
+  .score-burst-card.score-burst-card:not(.is-extreme) .burst-answer-main { justify-content: flex-start; }
+  .score-burst-card.score-burst-card:not(.is-extreme) .burst-answer-main strong { font-size: 28px; }
+  .score-burst-card.score-burst-card:not(.is-extreme) .burst-answer-flag img { width: 54px; height: 36px; }
+  .score-burst-card.score-burst-card:not(.is-extreme) .burst-answer-note { text-align: left; }
+  .score-burst-card.score-burst-card:not(.is-extreme) .burst-answer-list { justify-content: flex-start; width: 100%; }
+  /* Deep Cut: the points and their words on one row each, beside the answers. */
+  .score-burst-card.score-burst-card:not(.is-extreme) .burst-answer-list li.burst-tier { grid-template-columns: 150px minmax(0, 1fr); padding: 0.35rem 0.6rem; }
+  .score-burst-card.score-burst-card:not(.is-extreme) .burst-tier-label { gap: 2px; line-height: 1.4; }
+
+  /* Left, below: the day's journey in a framed panel (as in Highs & Lows), with its total. */
+  .score-burst-card.score-burst-card:not(.is-extreme)::before {
+    content: attr(data-journey-label); grid-row: 5 / 7; grid-column: 1; align-self: stretch;
+    padding: 12px 14px; border: 1px solid var(--glass-line); border-radius: 16px; background: rgba(255, 255, 255, 0.025);
+    color: var(--muted); font: 9px/1.5 var(--font-display); letter-spacing: var(--ls-pixel);
+  }
+  .score-burst-card.score-burst-card:not(.is-extreme):not(.has-info)::before { grid-column: 1 / -1; }
+  .score-burst-card.score-burst-card:not(.is-extreme) .score-burst-climb { position: relative; grid-area: climb; align-self: stretch; min-height: 0; margin: 38px 14px 0; }
+  .score-burst-card.score-burst-card:not(.is-extreme) .score-burst-climb .journey { position: absolute; inset: 0; width: 100%; height: 100%; max-height: none; aspect-ratio: auto; object-fit: contain; }
+  .score-burst-card.score-burst-card:not(.is-extreme) .score-burst-total { grid-area: total; justify-self: center; margin: 0 14px 12px; }
+
+  /* Right: the info card in its own panel, scrolling inside it when it's long. */
+  .score-burst-card.score-burst-card:not(.is-extreme) .burst-info {
+    grid-area: info; align-self: stretch; min-height: 0; overflow-y: auto; align-content: start;
+    padding: 14px; border: 1px solid var(--glass-line); border-radius: 16px; background: rgba(255, 255, 255, 0.025);
+  }
+  .score-burst-card.score-burst-card:not(.is-extreme) .burst-info .info-picture img { max-height: 200px; }
+
+  /* Bottom: NEXT across the whole card. */
+  .score-burst-card.score-burst-card:not(.is-extreme) #scoreBurstNext { grid-area: next; width: 100%; margin: 0; }
+}
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -4386,6 +4485,8 @@ h1, h2, h3 { font-weight: normal; }
     </div>
     <div id="scoreBurst" class="score-burst hidden" role="status" aria-live="assertive">
       <div class="score-burst-card">
+        <!-- Computers (not Highs & Lows): the round and its name, top left of the card. -->
+        <span class="burst-round" id="scoreBurstRound"></span>
         <!-- The answer, big and first, so there's no doubt what it was. -->
         <div class="burst-answer">
           <span class="burst-answer-kicker" id="scoreBurstAnswerKicker">THE ANSWER WAS</span>
@@ -6722,6 +6823,7 @@ const EN = {
 
   // Score card
   "burst.gotIt": "YOU GOT IT",
+  "burst.yourJourney": "YOUR JOURNEY",
   "burst.answerWas": "THE ANSWER WAS",
   "burst.yourAnswer": "YOUR ANSWER · {niche}",
   "burst.wouldHave": "ANSWERS THAT WOULD HAVE COUNTED",
@@ -7710,6 +7812,7 @@ const NL = {
 
   // Scorekaart
   "burst.gotIt": "GERADEN",
+  "burst.yourJourney": "JOUW TOCHT",
   "burst.answerWas": "HET ANTWOORD WAS",
   "burst.yourAnswer": "JOUW ANTWOORD · {niche}",
   "burst.wouldHave": "ANTWOORDEN DIE GETELD HADDEN",
@@ -31449,6 +31552,12 @@ function fillScoreBurst(index) {
   const result = getDayScore(plan, day.rounds).rounds[index];
   const overlay = document.getElementById("scoreBurst");
   setText("scoreBurstLabel", t(result.isPerfect ? "result.perfect" : result.points ? "result.complete" : "result.zero"));
+  // On a computer: the round up top, its outcome as a pill, and the journey's panel title.
+  const card = document.querySelector(".score-burst-card");
+  setText("scoreBurstRound", `${t("intro.roundOf", { n: index + 1, total: plan.length })} · ${roundName(plan[index]).toUpperCase()}`);
+  card.classList.toggle("is-perfect", result.isPerfect);
+  card.classList.toggle("is-zero", !result.points);
+  card.dataset.journeyLabel = t("burst.yourJourney");
   const streak = document.getElementById("scoreBurstStreak");
   const boosts = describeBoosts(result);
   streak.classList.toggle("hidden", !boosts);
