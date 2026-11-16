@@ -559,7 +559,22 @@ h1, h2, h3 { font-weight: normal; }
 
 .game-view .pinpoint-pick .field-label { display: none; }
 .game-view .pinpoint-pick-country { flex: 1; min-width: 0; font-size: 14px; }
-#pinpointConfirm { flex: none; }
+#pinpointConfirm, #extremeConfirm { flex: none; white-space: nowrap; }
+/* Pinpoint and Highs & Lows: type a country as well as clicking it (16 November 2026), on
+   its own row above the selection; the suggestions open upwards, over the clues. */
+.game-view .pinpoint-pick { flex-wrap: wrap; }
+.game-view .pinpoint-pick .pick-type { flex: 1 0 100%; grid-template-columns: 1fr; margin-left: -9px; }
+.pick-type .autocomplete-list { top: auto; bottom: calc(100% + 4px); }
+.game-view.is-round-done .pick-type { display: none; }
+/* Where it can be typed, the box is the selection too (flag and name in it), beside the
+   button: one row (16 November 2026, team request). */
+.game-view .pinpoint-pick:has(.pick-type:not(.hidden)) { flex-wrap: nowrap; padding-left: 7px; }
+.game-view .pinpoint-pick:has(.pick-type:not(.hidden)) .pinpoint-pick-country { display: none; }
+.game-view .pinpoint-pick .pick-type:not(.hidden) { flex: 1 1 auto; min-width: 0; margin-left: 0; position: relative; }
+.pick-type-flag { position: absolute; left: 12px; top: 50%; translate: 0 -50%; display: none; pointer-events: none; }
+.pick-type-flag img { display: block; width: 26px; height: 17px; border-radius: 3px; object-fit: cover; }
+.pick-type.has-pick .pick-type-flag { display: block; }
+.pick-type.has-pick input { padding-left: 46px; color: var(--text); font-weight: 600; }
 
 /* Capital Call choices sit side by side, with the answer box out of the way until one is
    picked. */
@@ -2587,6 +2602,8 @@ h1, h2, h3 { font-weight: normal; }
   .game-view.is-typing .sheet-handle { display: none; }
   .game-view.is-typing .side-right { padding-top: 12px; }
   .game-view.is-typing .side-right .round-view > .guess-entry { position: static; box-shadow: none; }
+  .game-view.is-typing .side-right .pinpoint-pick { position: static; box-shadow: none; }
+  .game-view.is-typing .pick-type .autocomplete-list { top: calc(100% + 4px); bottom: auto; }
   .game-view.is-typing .clue-earlier,
   .game-view.is-typing .clue-locked { display: none; }
 
@@ -2853,7 +2870,7 @@ h1, h2, h3 { font-weight: normal; }
   mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent);
 }
 /* The frame round the middle row: where the climb lands. */
-.climb-window::after { content: ""; position: absolute; top: 88px; right: 4px; left: 4px; height: 44px; border: 1.5px solid rgba(255, 255, 255, 0.35); border-radius: 10px; pointer-events: none; transition: border-color 0.2s, box-shadow 0.2s; }
+.climb-window::after { content: ""; position: absolute; top: calc(var(--climb-mid, 2) * 44px); right: 4px; left: 4px; height: 44px; border: 1.5px solid rgba(255, 255, 255, 0.35); border-radius: 10px; pointer-events: none; transition: border-color 0.2s, box-shadow 0.2s; }
 .extreme-climb.is-landed .climb-window::after { border-color: var(--gold); box-shadow: 0 0 24px rgba(255, 212, 92, 0.45); }
 .extreme-climb.is-perfect .climb-window::after { border-color: #ff4f9a; box-shadow: 0 0 32px rgba(255, 79, 154, 0.6); }
 .climb-list { margin: 0; padding: 0; list-style: none; will-change: transform; }
@@ -3053,6 +3070,17 @@ h1, h2, h3 { font-weight: normal; }
   .extreme-climb { align-items: stretch; padding: calc(env(safe-area-inset-top, 0px) + 112px) 0 0; background: none; }
   .climb-card { background: #050816; }
   .climb-card { width: 100%; align-content: start; gap: 0.7rem; padding: 18px 14px calc(env(safe-area-inset-bottom, 0px) + 16px); border-width: 1px 0 0; border-radius: 22px 22px 0 0; box-shadow: none; animation: none; }
+  /* It fits the screen: the window of rows takes what's left (five rows, or three on a
+     short screen; engine.js playExtremeClimb) and CONTINUE stays at the foot. */
+  .climb-card { display: flex; flex-direction: column; align-items: center; height: 100%; min-height: 0; gap: 0.5rem; }
+  .climb-card > * { flex: none; }
+  .climb-card .climb-window { flex: 1 1 auto; min-height: 132px; max-height: 220px; }
+  .climb-card .climb-hint { margin-top: auto; }
+}
+@media (max-width: 760px) and (max-height: 760px) {
+  .climb-kicker { display: none; }
+  .climb-counter strong { font-size: 36px; }
+  .climb-points { font-size: 32px; }
 }
 /* Pinned ends of the ranking: cover the gap so no sliver of the next row peeks through. */
 .climb-points { color: #ff6b9d; text-shadow: 0 0 22px rgba(255, 107, 157, 0.4); }
@@ -3842,6 +3870,32 @@ h1, h2, h3 { font-weight: normal; }
   .score-burst-card #scoreBurstNext,
   .score-burst-card.has-info #scoreBurstNext { width: auto; align-self: stretch; margin: 0 12px; box-shadow: none; }
 }
+/* Highs & Lows on a phone: the pecking order is always open, and the card fits the screen
+   with NEXT in view: the full list scrolls in whatever room is left (at least four rows),
+   and the stat's name (the question just asked), the facts row (the same as the list)
+   and the fold-back "−" go. */
+@media (max-width: 760px) {
+  .score-burst-card.is-extreme > * { flex-shrink: 0; }
+  /* One tile, no journey (it stood behind the list anyway; it plays on the end screen):
+     your pick first, then the points it earned and the day so far, in the card's flow. */
+  .score-burst-card.is-extreme { padding-top: calc(env(safe-area-inset-top, 0px) + 64px); } /* under the shared SKIP */
+  .score-burst-card.is-extreme::before,
+  .score-burst-card.is-extreme .score-burst-climb { display: none; }
+  .score-burst-card.is-extreme .burst-answer { order: 1; margin: 0; padding-top: 0; }
+  .score-burst-card.is-extreme .score-burst-points { order: 2; position: static; justify-content: center; height: auto; font-size: 36px; }
+  .score-burst-card.is-extreme .score-burst-label { order: 3; position: static; display: block; height: auto; margin: 2px 0 6px; padding: 0; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; text-align: center; }
+  .score-burst-card.is-extreme .score-burst-streak { order: 3; position: static; justify-content: center; height: auto; margin-bottom: 6px; }
+  .score-burst-card.is-extreme .score-burst-total { order: 4; }
+  .score-burst-card.is-extreme #scoreBurstNext { margin-top: auto; }
+  .score-burst-card.is-extreme .burst-info { display: flex; flex-direction: column; flex: 0 1 auto; min-height: 0; overflow-y: auto; cursor: default; }
+  .score-burst-card.is-extreme .burst-info .info-text { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+  .score-burst-card.is-extreme .burst-info .info-text > * { flex-shrink: 0; }
+  .score-burst-card.is-extreme .burst-info h3,
+  .score-burst-card.is-extreme .burst-info .info-facts { display: none; }
+  .score-burst-card.is-extreme .burst-info .info-text > .ladder-pinned { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+  .score-burst-card.is-extreme .ladder-pinned > .ladder { flex-shrink: 0; }
+  .score-burst-card.is-extreme .ladder-pinned > .ladder.is-full { flex: 1 1 auto; min-height: 112px; max-height: 300px; }
+}
 
 /* ---------- In a game: just the top bar and the score (13 November 2026) ----------
    The icon buttons are gone (EXPEDITION goes to the menu; the rest lives there), and the
@@ -4209,6 +4263,10 @@ h1, h2, h3 { font-weight: normal; }
           </section>
           <section class="pinpoint-pick" aria-live="polite">
             <span class="field-label" data-i18n="game.yourSelection">YOUR SELECTION</span>
+            <div class="input-group pick-type">
+              <input type="text" id="pinpointType" placeholder="Or type a country…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="pinpointTypeList" aria-label="Country name" data-i18n-attr="placeholder:game.orType;aria-label:game.countryName">
+              <div id="pinpointTypeList" class="autocomplete-list hidden" role="listbox"></div>
+            </div>
             <div class="pinpoint-pick-country" id="pinpointSelection">Click a country</div>
             <button class="btn btn-primary" id="pinpointConfirm" type="button" disabled data-i18n="game.guess">GUESS</button>
           </section>
@@ -4270,6 +4328,10 @@ h1, h2, h3 { font-weight: normal; }
           </section>
           <section class="pinpoint-pick" aria-live="polite">
             <span class="field-label" data-i18n="game.yourPick">YOUR PICK</span>
+            <div class="input-group pick-type">
+              <input type="text" id="extremeType" placeholder="Or type a country…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="extremeTypeList" aria-label="Country name" data-i18n-attr="placeholder:game.orType;aria-label:game.countryName">
+              <div id="extremeTypeList" class="autocomplete-list hidden" role="listbox"></div>
+            </div>
             <div class="pinpoint-pick-country" id="extremeSelection">Click a country on the globe</div>
             <button class="btn btn-primary" id="extremeConfirm" type="button" disabled>LOCK IN</button>
           </section>
@@ -6368,6 +6430,7 @@ const EN = {
   "game.aboutQuestion": "About this question",
   "game.clues": "Clues",
   "game.cluesHead": "CLUES",
+  "game.orType": "Or type a country…",
   "game.typeCountry": "Type a country…",
   "game.countryName": "Country name",
   "game.guess": "GUESS",
@@ -7329,6 +7392,7 @@ const NL = {
   "game.aboutQuestion": "Over deze vraag",
   "game.clues": "Aanwijzingen",
   "game.cluesHead": "AANWIJZINGEN",
+  "game.orType": "Of typ een land…",
   "game.typeCountry": "Typ een land…",
   "game.countryName": "Naam van het land",
   "game.guess": "GOK",
@@ -25970,6 +26034,14 @@ function createCountryInput({ input: field, list, button, countries, isExcluded 
   function submit(value, country) {
     const result = onSubmit(value, country);
     if (result?.status === "submitted") reset();
+    // "picked": the field now shows the picked country (engine.js syncPickField); close up.
+    if (result?.status === "picked") {
+      list.replaceChildren();
+      list.classList.add("hidden");
+      field.setAttribute("aria-expanded", "false");
+      activeIndex = -1;
+      field.blur();
+    }
   }
 
   function renderSuggestions(query) {
@@ -26047,7 +26119,8 @@ function createCountryInput({ input: field, list, button, countries, isExcluded 
     else submit(field.value);
   }
 
-  button.addEventListener("click", () => {
+  // (No button: Enter, or a suggestion, submits.)
+  button?.addEventListener("click", () => {
     sounds.playClick();
     submitTyped();
   });
@@ -26074,7 +26147,7 @@ function createCountryInput({ input: field, list, button, countries, isExcluded 
     reset,
     setDisabled(disabled) {
       field.disabled = disabled;
-      button.disabled = disabled;
+      if (button) button.disabled = disabled;
       if (disabled) {
         list.classList.add("hidden");
         field.setAttribute("aria-expanded", "false");
@@ -30223,7 +30296,7 @@ const { LANGUAGES, applyI18n, clueText, countryName, getLang, localNames, locale
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
 const { hasExtremeDay, MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MAIN_MODE, MODES, MODE_INFO, getSpeedWindow, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress, PRESEASON_DATES } = __modules["daily.js"];
-const { showHowToSet, createFlagImage, PLAY_ART, PLAY_ART_COLORS, createPixelArt, createGuessRow, initializeCountryInput, initializeMainMenu, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, showToastNotice, showSkip, updateDailyScoreUI } = __modules["ui.js"];
+const { showHowToSet, createFlagImage, PLAY_ART, PLAY_ART_COLORS, createPixelArt, createGuessRow, initializeCountryInput, createCountryInput, initializeMainMenu, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, renderGuessHistory, renderProgressiveHints, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, showToastNotice, showSkip, updateDailyScoreUI } = __modules["ui.js"];
 
 // v3: Deep Cut and Paint the Map replaced Capital Call and Border Patrol (October 2026).
 const DAY_STORAGE_PREFIX = "daily-geography:day:v3:";
@@ -30318,7 +30391,7 @@ globe.onDragChange = active => {
 {
   const view = document.getElementById("gameView");
   let typingTimer = null;
-  document.querySelectorAll("#countryInput, #deepcutInput").forEach(field => {
+  document.querySelectorAll("#countryInput, #deepcutInput, #pinpointType, #extremeType").forEach(field => {
     field.addEventListener("focus", () => {
       clearTimeout(typingTimer);
       if (window.matchMedia("(max-width: 760px)").matches) view.classList.add("is-typing");
@@ -30326,7 +30399,7 @@ globe.onDragChange = active => {
     // A little later, so a tap on GUESS still lands where the button was.
     field.addEventListener("blur", () => {
       typingTimer = setTimeout(() => {
-        if (!document.activeElement?.matches?.("#countryInput, #deepcutInput")) view.classList.remove("is-typing");
+        if (!document.activeElement?.matches?.("#countryInput, #deepcutInput, #pinpointType, #extremeType")) view.classList.remove("is-typing");
       }, 300);
     });
   });
@@ -30999,8 +31072,11 @@ function showScoreBurst(index, { keepCardsOut = false } = {}) {
   const overlay = document.getElementById("scoreBurst");
   burstIndex = index;
   fillScoreBurst(index);
-  // Phones fold the info card away behind MORE ABOUT IT, so the points come first.
-  document.querySelector(".score-burst-card").classList.remove("is-info-open");
+  // Phones fold the info card away behind MORE ABOUT IT, so the points come first;
+  // Highs & Lows keeps its pecking order open (it fits, see style.css).
+  const openInfo = plan[index].type === "extreme";
+  document.querySelector(".score-burst-card").classList.toggle("is-info-open", openInfo);
+  document.getElementById("scoreBurstMore").setAttribute("aria-expanded", String(openInfo));
   const before = dayScore.total - result.points;
   setText("scoreBurstTotal", before.toLocaleString(locale()));
   setText("dailyTotalScore", before.toLocaleString(locale())); // counts up below, after the points
@@ -31399,8 +31475,9 @@ function render({ animateGlobe = true } = {}) {
   // The hot-to-cold colours only mean something in Mystery Country.
   document.getElementById("stageHint").classList.toggle("hidden", isRank);
   document.querySelector(".stage-current").classList.toggle("hidden", isRank);
-  // Pinpoint, Paint the Map and Highs & Lows are played by clicking countries on the globe.
-  const clicking = ["pinpoint", "paint", "extreme"].includes(round.type) && !progress.done;
+  // Pinpoint, Paint the Map and Highs & Lows are played by clicking countries on the globe;
+  // Mystery Country too (a click fills in the answer box), next to typing (16 November 2026).
+  const clicking = ["mystery", "pinpoint", "paint", "extreme"].includes(round.type) && !progress.done;
   globe.setClickable(clicking);
   if (clicking) {
     setText("stageHint", t(round.type === "paint" ? "hint.paint" : "hint.select"));
@@ -31632,6 +31709,8 @@ const ROUND_RENDERERS = {
     const hideTarget = funClues.length > 0 && !progress.done;
     document.querySelector('.round-view[data-round="pinpoint"] .target-country').classList.toggle("hidden", hideTarget);
     document.querySelector('.round-view[data-round="pinpoint"] .field-label').textContent = t(hideTarget ? "pin.findFromClues" : "pin.findThis");
+    // Typing only when the name isn't on screen (with it, you'd just type what you read).
+    document.querySelector('.round-view[data-round="pinpoint"] .pick-type').classList.toggle("hidden", !hideTarget);
     setFlag("pinpointFlag", target);
     setText("pinpointName", countryName(target));
     const clues = getPinpointClues(target, state.guesses, funClues);
@@ -31671,6 +31750,7 @@ const ROUND_RENDERERS = {
         : [createFlagImage(selected, "pinpoint-pick-flag"), Object.assign(document.createElement("span"), { className: "pick-name", textContent: countryName(selected) })])
       : [progress.done ? t("pin.finished") : tapWords(t("pin.clickCountry"))]));
     document.getElementById("pinpointConfirm").disabled = !selected || progress.done;
+    syncPickField("pinpoint", hideTarget && !progress.done ? selected : null);
 
     showGuessMarkers(guesses, options);
     setStageChip(t("stage.find"), hideTarget ? null : target, hideTarget ? t("stage.fromClues") : null);
@@ -31796,6 +31876,7 @@ const ROUND_RENDERERS = {
     const confirm = document.getElementById("extremeConfirm");
     confirm.disabled = !selected || progress.done;
     confirm.textContent = t(progress.done ? "extreme.lockedIn" : "extreme.lockIn");
+    syncPickField("extreme", progress.done ? null : selected);
 
     const panel = document.getElementById("extremeStandings");
     panel.classList.toggle("hidden", !progress.done);
@@ -32084,36 +32165,56 @@ function submitMysteryGuess(value, selectedCountry) {
 function handleGlobeClick({ ccn3 }) {
   const painting = isPlaying("paint");
   const extreme = isPlaying("extreme");
-  if (!isPlaying("pinpoint") && !painting && !extreme) return;
-  const state = day.rounds[viewIndex];
+  const mystery = isPlaying("mystery");
+  if (!isPlaying("pinpoint") && !painting && !extreme && !mystery) return;
   // Territories drawn as their own shape (Greenland, Puerto Rico…) count as their country.
   const iso = TERRITORIES.find(territory => territory.ccn3 && territory.ccn3 === ccn3)?.iso;
   const country = ccn3 && COUNTRIES.find(candidate => candidate.ccn3 === ccn3 || candidate.iso === iso);
   if (!country) {
-    showProblem(t(ccn3 ? "problem.notCountry" : "problem.sea"), pickCard(painting ? "paint" : extreme ? "extreme" : "pinpoint"));
+    showProblem(t(ccn3 ? "problem.notCountry" : "problem.sea"), mystery ? answerBox("countryInput") : pickCard(painting ? "paint" : extreme ? "extreme" : "pinpoint"));
     return;
+  }
+  pickCountry(country);
+}
+
+// A country chosen on the globe or typed in (Pinpoint and Highs & Lows have both since
+// 16 November 2026; Mystery Country's click fills in its answer box). Returns true if taken.
+function pickCountry(country) {
+  const painting = isPlaying("paint");
+  const extreme = isPlaying("extreme");
+  const state = day.rounds[viewIndex];
+  if (isPlaying("mystery")) {
+    if (state.guesses.includes(country.iso)) { showProblem(t("problem.guessed"), answerBox("countryInput")); return false; }
+    mysterySelection = country.iso;
+    const field = document.getElementById("countryInput");
+    field.value = countryName(country);
+    document.getElementById("autocompleteList").classList.add("hidden");
+    sounds.playClick();
+    render({ animateGlobe: false });
+    return true;
   }
   // The globe mode: select the country, unless the stat has no figure for it.
   if (extreme) {
     const round = plan[viewIndex];
     const reason = missingReason(round.stat, country.iso, countryName(country));
-    if (reason) { showProblem(reason, pickCard("extreme")); return; }
+    if (reason) { showProblem(reason, pickCard("extreme")); return false; }
     extremeSelection = country.iso;
     sounds.playClick();
     render({ animateGlobe: false });
-    return;
+    return true;
   }
   // Paint the Map: a click paints the country straight away.
   if (painting) {
-    if (state.found.includes(country.iso) || state.wrong.includes(country.iso)) { showProblem(t("problem.painted", { name: countryName(country) }), pickCard("paint")); return; }
+    if (state.found.includes(country.iso) || state.wrong.includes(country.iso)) { showProblem(t("problem.painted", { name: countryName(country) }), pickCard("paint")); return false; }
     paintCountry(country);
-    return;
+    return true;
   }
-  if (state.guesses.includes(country.iso)) { showProblem(t("problem.tried", { name: countryName(country) }), pickCard("pinpoint")); return; }
+  if (state.guesses.includes(country.iso)) { showProblem(t("problem.tried", { name: countryName(country) }), pickCard("pinpoint")); return false; }
   // Select only; confirmPinpointGuess makes it a guess.
   pinpointSelection = country.iso;
   sounds.playClick();
   render({ animateGlobe: false });
+  return true;
 }
 
 function confirmPinpointGuess() {
@@ -32332,15 +32433,25 @@ function playExtremeClimb(standings, pick, state, tour) {
   list.replaceChildren(...rows);
   const target = sorted.findIndex(entry => entry.iso === pick.iso);
   const start = count - 1;
-  // Two rows above the middle of the five-row window.
-  const place = index => { list.style.transform = `translateY(${(2 - index) * CLIMB_ROW}px)`; };
   const showRank = index => {
     rankText.textContent = `#${sorted[index].rank}`;
     rankText.style.color = heatColor(sorted[index].heat, count);
   };
-  place(start);
   showRank(start);
   overlay.classList.remove("hidden");
+  // The window shows five rows, or three on a short phone screen (it takes what's left
+  // there, so CONTINUE stays in view); `mid` rows sit above its middle row.
+  const climbWindow = overlay.querySelector(".climb-window");
+  climbWindow.style.height = climbWindow.style.flex = "";
+  let windowRows = Math.floor(climbWindow.clientHeight / CLIMB_ROW);
+  if (windowRows % 2 === 0) windowRows -= 1;
+  windowRows = Math.max(3, Math.min(5, windowRows));
+  climbWindow.style.height = `${windowRows * CLIMB_ROW}px`;
+  climbWindow.style.flex = "none";
+  const mid = (windowRows - 1) / 2;
+  climbWindow.style.setProperty("--climb-mid", mid);
+  const place = index => { list.style.transform = `translateY(${(mid - index) * CLIMB_ROW}px)`; };
+  place(start);
   // The pixel map, and its colour key (the end we're after in pink, the other in blue).
   climbMap?.stop();
   const map = createPixelMap(document.getElementById("climbMap"), iso => heatColor(standings.ranks[iso]?.heat ?? count, count));
@@ -32426,7 +32537,7 @@ function playExtremeClimb(standings, pick, state, tour) {
       // Fast at first, then slower and slower as it nears your place.
       const eased = 1 - (1 - progress) ** 4;
       const position = start - distance * eased;
-      list.style.transform = `translateY(${(2 - position) * CLIMB_ROW}px)`;
+      place(position);
       const index = Math.round(position);
       if (index !== shown) {
         shown = index;
@@ -33594,6 +33705,51 @@ const mysteryInput = initializeCountryInput({
   onGiveUp: giveUpRound
 });
 
+// Pinpoint and Highs & Lows: typing a country selects it, like a click on the globe, and
+// the box itself shows the selection (flag and name), so there's one row, not two. Enter on
+// the selection (or an empty box) confirms it.
+function syncPickField(kind, country) {
+  const input = document.getElementById(`${kind}Type`);
+  const name = country ? countryName(country) : "";
+  if (input.dataset.name === name && input.dataset.iso === (country?.iso || "")) return;
+  input.dataset.iso = country?.iso || "";
+  input.dataset.name = name;
+  if (document.activeElement !== input || !country) input.value = name;
+  const group = input.closest(".pick-type");
+  group.querySelector(".pick-type-flag").replaceChildren(...(country ? [createFlagImage(country, "pinpoint-pick-flag")] : []));
+  group.classList.toggle("has-pick", Boolean(country) && input.value === name);
+}
+for (const [kind, confirmPick] of [["pinpoint", () => confirmPinpointGuess()], ["extreme", () => confirmExtremePick()]]) {
+  const input = document.getElementById(`${kind}Type`);
+  const group = input.closest(".pick-type");
+  group.prepend(Object.assign(document.createElement("span"), { className: "pick-type-flag", ariaHidden: "true" }));
+  // Typing over the selection hides its flag; tapping in selects the name, ready to type over.
+  input.addEventListener("input", () => group.classList.toggle("has-pick", Boolean(input.dataset.iso) && input.value === input.dataset.name));
+  input.addEventListener("focus", () => input.select());
+  input.addEventListener("blur", () => {
+    if (input.value.trim()) return;
+    input.value = input.dataset.name || "";
+    group.classList.toggle("has-pick", Boolean(input.dataset.iso));
+  });
+  createCountryInput({
+    input: document.getElementById(`${kind}Type`),
+    list: document.getElementById(`${kind}TypeList`),
+    countries: COUNTRIES,
+    onSubmit(value, selected) {
+      if (!isPlaying(kind)) return { status: "locked" };
+      const current = kind === "pinpoint" ? pinpointSelection : extremeSelection;
+      if ((!value && !selected) || (current && value.trim() === input.dataset.name)) { if (current) confirmPick(); return { status: "empty" }; }
+      const country = findCountry(value, selected);
+      if (!country) { showProblem(t("problem.unknown"), pickCard(kind)); return { status: "invalid" }; }
+      if (!pickCountry(country)) return { status: "invalid" };
+      input.value = countryName(country);
+      syncPickField(kind, getCountry(country.iso));
+      group.classList.add("has-pick");
+      return { status: "picked" };
+    }
+  });
+}
+
 document.getElementById("deepcutSubmit").addEventListener("click", () => { sounds.playClick(); submitDeepCut(); });
 document.getElementById("deepcutInput").addEventListener("keydown", event => {
   if (event.key === "Enter") { event.preventDefault(); submitDeepCut(); }
@@ -33657,7 +33813,7 @@ document.getElementById("scoreBurstMore").addEventListener("click", () => setBur
 // Phones: the open info card stands in for MORE ABOUT IT; a tap on it folds it back.
 document.getElementById("scoreBurstInfo").addEventListener("click", event => {
   const card = document.querySelector(".score-burst-card");
-  if (card.classList.contains("is-info-open") && !event.target.closest("a, .source-block")) setBurstInfoOpen(false);
+  if (card.classList.contains("is-info-open") && !card.classList.contains("is-extreme") && !event.target.closest("a, .source-block, .ladder")) setBurstInfoOpen(false);
 });
 ["howToMenuButton", "closeHowToButton"].forEach(id => document.getElementById(id).addEventListener("click", closeGameIntro));
 document.addEventListener("keydown", event => {
