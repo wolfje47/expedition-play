@@ -1350,59 +1350,49 @@ h1, h2, h3 { font-weight: normal; }
   cursor: pointer;
 }
 
+/* The round's question card, the same in every mode (in the mode's own accent): a sturdy,
+   nearly opaque card that reads over any part of the globe. ROUND 4 OF 6, a segment per
+   round (done in the accent, now cyan, to come dark), a label (FIND THE HIGHEST, or the
+   round's name), the question large, the round's task small under it, and CONTINUE. The
+   whole screen still continues on a click. */
 .round-intro-card {
   position: relative;
   display: grid;
   justify-items: center;
-  gap: 0.8rem;
-  width: min(100%, 460px);
-  padding: 1.9rem 1.75rem 1.6rem;
-  border: 1px solid var(--glass-line);
+  width: min(100%, 640px);
+  padding: 28px 32px 30px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
   border-radius: 26px;
-  background: var(--glass);
+  background: rgba(10, 15, 29, 0.95);
   box-shadow: var(--glass-shine), var(--glass-shadow), 0 0 60px color-mix(in srgb, var(--accent) 12%, transparent);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   text-align: center;
 }
 
-.round-intro-count { color: var(--muted); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); text-transform: uppercase; }
-.round-intro-name { color: var(--accent); font: clamp(1.1rem, 2.6vw, 1.5rem)/1.4 var(--font-display); letter-spacing: var(--ls-pixel); text-shadow: 0 0 22px color-mix(in srgb, var(--accent) 35%, transparent); }
-.round-intro-task { color: var(--text); font-size: 16px; font-weight: 600; }
-.round-intro-clock { color: var(--accent); font: 14px var(--font-body); }
-/* Country names on the globe (casual) stay out of the round's title card. */
-.game-view:has(#roundIntro:not(.hidden)) .globe-labels,
-.game-view:has(#scoreBurst:not(.hidden)) .globe-labels,
-.game-view.is-spinning .globe-labels { opacity: 0; }
-.round-intro-start { margin-top: 0.2rem; color: var(--faint); font: 12px var(--font-body); }
-
-/* Highs & Lows: a sturdier, nearly opaque card that reads over any part of the globe:
-   ROUND 4 OF 6, six segments (done pink, now cyan, to come dark), FIND THE HIGHEST,
-   the question large, and CONTINUE. The whole screen still continues on a click. */
-.round-intro.is-extreme .round-intro-card {
-  gap: 0;
-  width: min(100%, 640px);
-  padding: 28px 32px 30px;
-  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
-  background: rgba(10, 15, 29, 0.95);
-}
-.round-intro.is-extreme .round-intro-count { color: var(--text); }
+.round-intro-count { color: var(--text); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); text-transform: uppercase; }
 .round-intro-steps { display: grid; grid-template-columns: repeat(var(--steps, 6), 1fr); gap: 6px; width: min(100%, 320px); margin-top: 10px; }
-.round-intro-steps[hidden] { display: none; }
 .round-intro-steps i { height: 8px; border-radius: 4px; background: var(--line); }
 .round-intro-steps i.is-done { background: var(--accent); }
 .round-intro-steps i.is-now { background: var(--cyan); box-shadow: 0 0 10px color-mix(in srgb, var(--cyan) 55%, transparent); }
-.round-intro.is-extreme .round-intro-name {
+.round-intro-name {
   margin: 22px 0 0;
   padding: 8px 14px;
   border: 1px solid color-mix(in srgb, var(--accent) 70%, transparent);
   border-radius: 10px;
   background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
   font: 12px/1.5 var(--font-display);
-  text-shadow: none;
+  letter-spacing: var(--ls-pixel);
 }
-.round-intro.is-extreme .round-intro-task { max-width: 30ch; margin: 18px 0 0; font: 600 26px/1.3 var(--font-body); text-wrap: balance; }
-.round-intro.is-extreme .round-intro-start { display: none; }
+.round-intro-task { max-width: 30ch; margin: 18px 0 0; color: var(--text); font: 600 26px/1.3 var(--font-body); text-wrap: balance; }
+.round-intro-note { max-width: 44ch; margin: 12px 0 0; color: var(--muted); font: 14px/1.4 var(--font-body); }
+.round-intro-note[hidden] { display: none; }
+.round-intro-clock { margin: 12px 0 0; color: var(--accent); font: 14px var(--font-body); }
+/* Country names on the globe (casual) stay out of the round's title card. */
+.game-view:has(#roundIntro:not(.hidden)) .globe-labels,
+.game-view:has(#scoreBurst:not(.hidden)) .globe-labels,
+.game-view.is-spinning .globe-labels { opacity: 0; }
 .round-intro-go {
   display: inline-flex;
   align-items: center;
@@ -1420,14 +1410,14 @@ h1, h2, h3 { font-weight: normal; }
   cursor: pointer;
   transition: background 0.15s ease;
 }
-.round-intro-go[hidden] { display: none; }
 .round-intro-play { width: 0; height: 0; border-top: 7px solid transparent; border-bottom: 7px solid transparent; border-left: 11px solid currentColor; }
 @media (hover: hover) { .round-intro-go:hover { background: var(--accent-hover); } }
 .round-intro-go:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
 @media (max-width: 760px) {
-  .round-intro.is-extreme .round-intro-card { width: calc(100vw - 32px); padding: 20px 20px 22px; }
-  .round-intro.is-extreme .round-intro-name { margin-top: 18px; font-size: 9px; }
-  .round-intro.is-extreme .round-intro-task { margin-top: 14px; font-size: 21px; }
+  .round-intro-card { width: calc(100vw - 32px); padding: 20px 20px 22px; }
+  .round-intro-name { margin-top: 18px; font-size: 9px; }
+  .round-intro-task { margin-top: 14px; font-size: 21px; }
+  .round-intro-note { font-size: 12px; }
   .round-intro-go { width: 100%; margin-top: 20px; }
 }
 
@@ -2689,7 +2679,7 @@ h1, h2, h3 { font-weight: normal; }
 /* Highs & Lows: the tour after locking in. A card at the bottom names each stop on the
    globe; its pin slides along the pecking order (hot #1 to cold last). */
 .extreme-tour {
-  /* The round card's look (.round-intro.is-extreme): nearly opaque navy, a tinted border,
+  /* The round card's look (.round-intro-card): nearly opaque navy, a tinted border,
      a pixel label in a pill, readable text in Space Grotesk, centred. The accent changes
      per stop: neutral for your guess, the far end's blue, the answer's pink. */
   --tone: var(--accent);
@@ -3023,7 +3013,7 @@ h1, h2, h3 { font-weight: normal; }
   .how-to-play-modal:not(.is-last-card) .how-to-other { display: none; }
 }
 
-/* Highs & Lows: the round's results in the round card's look (.round-intro.is-extreme):
+/* Highs & Lows: the round's results in the round card's look (.round-intro-card):
    nearly opaque navy, a pink-tinted border, white text, and the day's journey in its own
    framed panel, larger, as the reward for the round. */
 .score-burst-card.is-extreme {
@@ -3625,6 +3615,19 @@ h1, h2, h3 { font-weight: normal; }
 .settings-row:hover, .settings-row:focus-visible { border-color: var(--cyan); background: color-mix(in srgb, var(--cyan) 8%, rgba(10, 15, 30, 0.5)); outline: none; }
 #settingsSoundButton { grid-template-columns: 36px 1fr auto; }
 #settingsSoundButton em { min-width: 44px; padding: 4px 8px; border-radius: 6px; background: #5cf28a; color: #04121a; font: 9px var(--font-display); letter-spacing: var(--ls-pixel); text-align: center; text-transform: uppercase; }
+/* Measurement system: two compact choices, each with examples of its units. */
+.settings-units { grid-template-columns: 36px 1fr; cursor: default; }
+.settings-units:hover { border-color: var(--glass-line); background: rgba(10, 15, 30, 0.5); }
+.units-switch { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.units-switch button {
+  display: grid; gap: 4px; justify-items: center; padding: 8px 6px; border: 1px solid var(--glass-line); border-radius: 9px;
+  background: rgba(255, 255, 255, 0.04); color: var(--muted); cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease;
+}
+.units-switch b { grid-column: auto; color: inherit; font: 9px/1.4 var(--font-display); letter-spacing: var(--ls-pixel); text-transform: uppercase; }
+.units-switch small { font: 12px var(--font-body); }
+.units-switch button:hover, .units-switch button:focus-visible { border-color: var(--cyan); outline: none; }
+.units-switch button[aria-pressed="true"] { border-color: var(--cyan); background: color-mix(in srgb, var(--cyan) 14%, rgba(10, 15, 30, 0.5)); color: var(--text); }
+.units-switch button[aria-pressed="true"] b { color: var(--cyan); }
 #settingsSoundButton[aria-pressed="false"] em { background: rgba(255, 255, 255, 0.12); color: var(--muted); }
 
 @media (max-width: 760px) {
@@ -4036,6 +4039,15 @@ h1, h2, h3 { font-weight: normal; }
           <svg viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges"><path d="M3 12h6l8-7v22l-8-7H3zM21 11h3v3h3v4h-3v3h-3v-3h2v-4h-2zM24 5h3v3h2v3h-3V8h-2zM24 24h2v-3h3v3h-2v3h-3z" fill="currentColor"/></svg>
           <span data-i18n="settings.sound">SOUND</span><em id="settingsSoundValue"></em>
         </button>
+        <!-- Measurement system (units.js): Metric (default) or Imperial, with examples. -->
+        <div class="settings-row settings-units" role="group" aria-labelledby="settingsUnitsLabel">
+          <svg viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges"><path d="M2 10h28v12H2zm3 3v6h22v-6h-2v3h-2v-3h-2v4h-2v-4h-2v3h-2v-3h-2v4h-2v-4H9v3H7v-3z" fill="currentColor"/></svg>
+          <span id="settingsUnitsLabel" data-i18n="settings.units">MEASUREMENTS</span>
+          <div class="units-switch">
+            <button type="button" data-units="metric" aria-pressed="true"><b data-i18n="settings.metric">METRIC</b><small>km · m · °C</small></button>
+            <button type="button" data-units="imperial" aria-pressed="false"><b data-i18n="settings.imperial">IMPERIAL</b><small>mi · ft · °F</small></button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -4414,13 +4426,13 @@ h1, h2, h3 { font-weight: normal; }
     <div id="roundIntro" class="round-intro hidden" role="dialog" aria-live="assertive" aria-labelledby="roundIntroName">
       <div class="round-intro-card">
         <span class="round-intro-count" id="roundIntroCount">ROUND 1 / 5</span>
-        <!-- Highs & Lows: one segment per round (done, now, to come). -->
-        <div class="round-intro-steps" id="roundIntroSteps" aria-hidden="true" hidden></div>
+        <!-- One segment per round (done, now, to come). -->
+        <div class="round-intro-steps" id="roundIntroSteps" aria-hidden="true"></div>
         <h2 class="round-intro-name" id="roundIntroName">MYSTERY COUNTRY</h2>
         <p class="round-intro-task" id="roundIntroTask"></p>
+        <p class="round-intro-note" id="roundIntroNote" hidden></p>
         <p class="round-intro-clock hidden" id="roundIntroClock" data-i18n="game.beatClock">⚡ Beat the clock for up to ×1.5</p>
-        <span class="round-intro-start" data-i18n="game.clickToStart" data-i18n-tap>Click to start</span>
-        <button type="button" class="round-intro-go" id="roundIntroGo" hidden><span class="round-intro-play" aria-hidden="true"></span><span data-i18n="game.continue">CONTINUE</span></button>
+        <button type="button" class="round-intro-go" id="roundIntroGo"><span class="round-intro-play" aria-hidden="true"></span><span data-i18n="game.continue">CONTINUE</span></button>
       </div>
     </div>
   </div>
@@ -6366,6 +6378,9 @@ const EN = {
   "settings.close": "Close settings",
   "settings.sound": "SOUND",
   "settings.on": "On",
+  "settings.units": "MEASUREMENTS",
+  "settings.metric": "METRIC",
+  "settings.imperial": "IMPERIAL",
   "settings.off": "Off",
   "menu.archive": "ARCHIVE",
   "menu.community": "CREW",
@@ -6451,7 +6466,6 @@ const EN = {
   "game.attemptsHead": "ATTEMPTS",
   "game.moreAboutIt": "MORE ABOUT IT",
   "game.beatClock": "⚡ Beat the clock for up to ×1.5",
-  "game.clickToStart": "Click to start",
   "game.dayBadge": "DAY {n}",
   "game.today": "Today",
   "game.archiveDay": "Archive",
@@ -6465,7 +6479,7 @@ const EN = {
   "game.moreRound": "Show more of the round",
 
   "intro.roundOf": "ROUND {n} OF {total}",
-  "intro.roundSlash": "ROUND {n} / {total}",
+  "intro.findCountry": "Find {name} on the globe.",
   "intro.find.highest": "FIND THE HIGHEST",
   "intro.find.lowest": "FIND THE LOWEST",
   "intro.find.average": "FIND THE MOST AVERAGE",
@@ -7328,6 +7342,9 @@ const NL = {
   "settings.close": "Instellingen sluiten",
   "settings.sound": "GELUID",
   "settings.on": "Aan",
+  "settings.units": "MAATEENHEDEN",
+  "settings.metric": "METRISCH",
+  "settings.imperial": "IMPERIAAL",
   "settings.off": "Uit",
   "menu.archive": "ARCHIEF",
   "menu.community": "CREW",
@@ -7413,7 +7430,6 @@ const NL = {
   "game.attemptsHead": "POGINGEN",
   "game.moreAboutIt": "MEER HIEROVER",
   "game.beatClock": "⚡ Wees sneller dan de klok voor tot ×1,5",
-  "game.clickToStart": "Klik om te beginnen",
   "game.dayBadge": "DAG {n}",
   "game.today": "Vandaag",
   "game.archiveDay": "Archief",
@@ -7427,7 +7443,7 @@ const NL = {
   "game.moreRound": "Toon meer van de ronde",
 
   "intro.roundOf": "RONDE {n} VAN {total}",
-  "intro.roundSlash": "RONDE {n} / {total}",
+  "intro.findCountry": "Zoek {name} op de globe.",
   "intro.find.highest": "ZOEK DE HOOGSTE",
   "intro.find.lowest": "ZOEK DE LAAGSTE",
   "intro.find.average": "ZOEK DE GEMIDDELDSTE",
@@ -9555,6 +9571,24 @@ const NL_STATS = {
 
 // The stats' units (stats-data.js).
 const NL_UNITS = {
+  // Imperial units (units.js), shown when the player picks Imperial.
+  "lb per person a year": "pond per persoon per jaar",
+  "US gallons per person a year": "Amerikaanse gallon per persoon per jaar",
+  "US gallons of pure alcohol per adult a year": "Amerikaanse gallon pure alcohol per volwassene per jaar",
+  "°F above the 1991–2020 average": "°F boven het gemiddelde van 1991–2020",
+  "in": "inch",
+  "sq mi": "vierkante mijl",
+  "mi": "mijl",
+  "per sq mi": "per vierkante mijl",
+  "mi of coast per 1,000 sq mi": "mijl kust per 1.000 vierkante mijl",
+  "oz per person a day": "ounce per persoon per dag",
+  "billion US gallons a year": "miljard Amerikaanse gallon per jaar",
+  "sq ft per person": "vierkante voet per persoon",
+  "in a year": "inch per jaar",
+  "lb per acre": "pond per acre",
+  "acres a year": "acres per jaar",
+  "passenger-miles a year": "passagiersmijlen per jaar",
+  "US$ of GDP per US gallon": "US$ bbp per Amerikaanse gallon",
   "kg per person a year": "kg per persoon per jaar",
   "litres per person a year": "liter per persoon per jaar",
   "kcal per person a day": "kcal per persoon per dag",
@@ -11001,6 +11035,198 @@ const NL_CLUES = {
 return { NL_CLUES };
 })();
 
+// ---- units.js
+__modules["units.js"] = (() => {
+// The measurement system (16 November 2026, team request): Metric (the default) or Imperial
+// (US customary: miles, feet, square miles, pounds, US gallons, °F). The game's data always
+// stays in metric; this only changes what a player reads. Nothing here touches scoring,
+// rankings or answer checking: every conversion is a positive linear scale (or °C → °F,
+// which keeps the order), applied to the shown number only.
+//
+//   getUnits() / isImperial()     the current system
+//   storeUnits(system)            saves it in the browser (i18n.js setUnits() also redraws)
+//   statUnit(unit)                an imperial unit for a stat's metric unit, or null
+//   convertValue(value, unit)     a stat value in the current system ({ value, unit, extraDecimals })
+//   area(km2) / distance(km) / height(m) / speed(kmh)   { value, unit } for the UI
+//   convertText(text, lang)       hand-made text ("8,849 m", "about 600 km") in the system
+const UNITS_KEY = "daily-geography:units:v1";
+const UNIT_SYSTEMS = ["metric", "imperial"];
+
+let system = "metric";
+try {
+  const saved = localStorage.getItem(UNITS_KEY);
+  if (UNIT_SYSTEMS.includes(saved)) system = saved;
+} catch { /* storage blocked: metric */ }
+
+const getUnits = () => system;
+const isImperial = () => system === "imperial";
+function storeUnits(next, { save = true } = {}) {
+  if (!UNIT_SYSTEMS.includes(next) || next === system) return false;
+  system = next;
+  if (save) {
+    try { localStorage.setItem(UNITS_KEY, next); } catch { /* kept for this visit only */ }
+  }
+  return true;
+}
+
+// Exact factors (NIST): 1 mi = 1.609344 km, 1 ft = 0.3048 m, 1 in = 2.54 cm, 1 lb = 0.45359237
+// kg, 1 US gal = 3.785411784 L, 1 acre = 0.40468564224 ha, 1 oz = 28.349523125 g.
+const KM_MI = 1 / 1.609344;
+const KM2_MI2 = KM_MI * KM_MI;
+const M_FT = 1 / 0.3048;
+const KG_LB = 1 / 0.45359237;
+const L_GAL = 1 / 3.785411784;
+const M3_GAL = 1000 * L_GAL;
+const HA_ACRE = 1 / 0.40468564224;
+const G_OZ = 1 / 28.349523125;
+const fahrenheit = celsius => celsius * 9 / 5 + 32;
+
+// A stat's metric unit (stats-data.js) → its imperial unit, factor (or a function) and how
+// many more decimals it needs so close values stay apart. Units with no imperial form
+// (tonnes, µg per m³, g CO₂ per kWh, kWh, kcal) stay as they are.
+const STAT_UNITS = {
+  "kg per person a year": { unit: "lb per person a year", factor: KG_LB },
+  "litres per person a year": { unit: "US gallons per person a year", factor: L_GAL, extra: 1 },
+  "litres of pure alcohol per adult a year": { unit: "US gallons of pure alcohol per adult a year", factor: L_GAL, extra: 1 },
+  "°C": { unit: "°F", convert: fahrenheit },
+  "°C above the 1991–2020 average": { unit: "°F above the 1991–2020 average", factor: 9 / 5 },
+  "cm": { unit: "in", factor: 1 / 2.54, extra: 1 },
+  "km²": { unit: "sq mi", factor: KM2_MI2 },
+  "km": { unit: "mi", factor: KM_MI },
+  "per km²": { unit: "per sq mi", factor: 1 / KM2_MI2 },
+  "km of coast per 1,000 km²": { unit: "mi of coast per 1,000 sq mi", factor: KM_MI / KM2_MI2 },
+  "grams per person a day": { unit: "oz per person a day", factor: G_OZ, extra: 1 },
+  "m³ per person a year": { unit: "US gallons per person a year", factor: M3_GAL, extra: -2 },
+  "billion m³ a year": { unit: "billion US gallons a year", factor: M3_GAL, extra: -2 },
+  "m² per person": { unit: "sq ft per person", factor: M_FT * M_FT },
+  "mm a year": { unit: "in a year", factor: 1 / 25.4, extra: 1 },
+  "kg per hectare": { unit: "lb per acre", factor: KG_LB / HA_ACRE },
+  "hectares a year": { unit: "acres a year", factor: HA_ACRE },
+  "passenger-km a year": { unit: "passenger-miles a year", factor: KM_MI },
+  "US$ of GDP per m³": { unit: "US$ of GDP per US gallon", factor: 1 / M3_GAL, extra: 2 }
+};
+// Rank 'Em units in days.js (with their leading space).
+const RANK_UNITS = {
+  " km²": " sq mi", " km": " mi", " m": " ft", " mm": " in", " m³": " US gal", " °C": " °F", " million ha": " million acres"
+};
+const RANK_FACTORS = {
+  " km²": { factor: KM2_MI2 }, " km": { factor: KM_MI }, " m": { factor: M_FT }, " mm": { factor: 1 / 25.4, extra: 1 },
+  " m³": { factor: M3_GAL }, " °C": { convert: fahrenheit }, " million ha": { factor: HA_ACRE }
+};
+
+// Stats whose °C is a difference between two temperatures (a range, not a reading): they
+// scale by 9/5 without the +32.
+const TEMPERATURE_DIFFERENCES = new Set(["temprange"]);
+const DIFFERENCE = { unit: "°F", factor: 9 / 5 };
+
+const apply = (rule, value) => rule.convert ? rule.convert(value) : value * rule.factor;
+
+const statUnit = unit => STAT_UNITS[unit]?.unit ?? null;
+// A stat's value as shown: { value, unit, extraDecimals }.
+function convertValue(value, unit, statId = "") {
+  const rule = isImperial() && (TEMPERATURE_DIFFERENCES.has(statId) ? DIFFERENCE : STAT_UNITS[unit]);
+  if (!rule) return { value, unit, extraDecimals: 0 };
+  return { value: apply(rule, value), unit: rule.unit, extraDecimals: rule.extra || 0 };
+}
+// A Rank 'Em value (days.js `unit` with its leading space): { value, unit, extraDecimals }.
+function convertRankValue(value, unit) {
+  const rule = isImperial() && RANK_FACTORS[unit];
+  if (!rule) return { value, unit, extraDecimals: 0 };
+  return { value: apply(rule, value), unit: RANK_UNITS[unit], extraDecimals: rule.extra || 0 };
+}
+
+const area = km2 => isImperial() ? { value: km2 * KM2_MI2, unit: "sq mi" } : { value: km2, unit: "km²" };
+const distance = km => isImperial() ? { value: km * KM_MI, unit: "mi" } : { value: km, unit: "km" };
+const height = m => isImperial() ? { value: m * M_FT, unit: "ft" } : { value: m, unit: "m" };
+const speed = kmh => isImperial() ? { value: kmh * KM_MI, unit: "mph" } : { value: kmh, unit: "km/h" };
+
+// ----- Hand-made text -----
+// "8,849 m", "about 3.2 million km²", "56.7 °C", "200 metres", "per square kilometre": the
+// number is converted and the unit renamed, rounded to the precision the text had (at least
+// three significant figures, so "more than 200 metres" stays true as "more than 656 feet").
+// Numbers are read the way the language writes them (en 1,234.5; nl 1.234,5).
+const TEXT_UNITS = [
+  // [pattern for the unit, rule, imperial unit (en), (nl)]
+  ["km²|km2|square kilometres?|square kilometers?|vierkante kilometer", { factor: KM2_MI2 }, "sq mi", "vierkante mijl"],
+  ["km/h|km/u", { factor: KM_MI }, "mph", "mijl per uur"],
+  ["kilometres|kilometers|kilometer", { factor: KM_MI }, "miles", "mijl"],
+  ["km", { factor: KM_MI }, "mi", "mijl"],
+  ["metres|meters|metre|meter", { factor: M_FT }, "feet", "voet"],
+  ["m(?![²³\\w])", { factor: M_FT }, "ft", "ft"],
+  ["cm", { factor: 1 / 2.54 }, "in", "inch"],
+  ["mm", { factor: 1 / 25.4 }, "in", "inch"],
+  ["°C|° C", { convert: fahrenheit }, "°F", "°F"],
+  ["kg|kilograms?|kilo's|kilo", { factor: KG_LB }, "lb", "pond"],
+  ["hectares?", { factor: HA_ACRE }, "acres", "acres"]
+];
+// Units without a number ("people per km²", "per square kilometre", "passenger-km").
+const BARE_UNITS = [
+  [/\bper square kilometre\b/g, "per square mile"], [/\bper square kilometer\b/g, "per square mile"],
+  [/\bper vierkante kilometer\b/g, "per vierkante mijl"],
+  [/\b(per|in|elke) km²/g, "$1 sq mi"],
+  [/\bpassenger-kilometres\b/g, "passenger-miles"], [/\bPassenger-km\b/g, "Passenger-miles"], [/\bpassagierskilometers\b/g, "passagiersmijlen"],
+  [/\bevery m³/g, "every US gallon"], [/\belke m³/g, "elke Amerikaanse gallon"], [/\bper m³ (of )?water\b/g, "per US gallon $1water"]
+];
+const SCALE_WORDS = "million|billion|miljoen|miljard";
+
+function readNumber(text, lang) {
+  const plain = lang === "nl" ? text.replace(/\./g, "").replace(",", ".") : text.replace(/,/g, "");
+  return Number(plain);
+}
+function decimalsOf(text, lang) {
+  const mark = lang === "nl" ? "," : ".";
+  const at = text.indexOf(mark);
+  return at < 0 ? 0 : text.length - at - 1;
+}
+function significant(text, lang) {
+  const digits = text.replace(/[^0-9]/g, "").replace(/^0+/, "");
+  if (decimalsOf(text, lang)) return digits.length;
+  const trimmed = digits.replace(/0+$/, "").length || 1;
+  // An exact figure ("8,849 m") keeps every digit: Infinity rounds it to whole units.
+  return trimmed === digits.length ? Infinity : trimmed;
+}
+function writeNumber(value, decimals, sig, lang) {
+  const locale = lang === "nl" ? "nl-NL" : "en-US";
+  let shown = value;
+  if (!decimals) {
+    const keep = Math.max(sig, 3);
+    const magnitude = Math.floor(Math.log10(Math.abs(value) || 1)) + 1;
+    // A small result keeps two significant figures ("5 mm" → "0.20 in").
+    if (Math.abs(value) < 10) decimals = Math.min(2, Math.max(0, 2 - magnitude));
+    else shown = Math.round(value / 10 ** Math.max(0, magnitude - keep)) * 10 ** Math.max(0, magnitude - keep);
+  }
+  return shown.toLocaleString(locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
+const NUMBER = "(\\d{1,3}(?:[.,]\\d{3})+(?:[.,]\\d+)?|\\d+(?:[.,]\\d+)?)";
+const PATTERNS = TEXT_UNITS.map(([unit, rule, en, nl]) => ({
+  regex: new RegExp(`(?<![\\w.,])${NUMBER}(\\s*[–-]\\s*${NUMBER})?(\\s+(?:${SCALE_WORDS}))?([\\s\\u00a0]?)(?:${unit})(?![A-Za-z²³])`, "g"),
+  rule, en, nl
+}));
+
+function convertText(text, lang = "en") {
+  if (!isImperial() || typeof text !== "string" || !text) return text;
+  let out = text;
+  for (const { regex, rule, en, nl } of PATTERNS) {
+    out = out.replace(regex, (match, first, range, second, scale = "", space) => {
+      const one = numberText => {
+        const value = readNumber(numberText, lang);
+        if (!Number.isFinite(value)) return numberText;
+        return writeNumber(apply(rule, value), decimalsOf(numberText, lang), significant(numberText, lang), lang);
+      };
+      const unit = lang === "nl" ? nl : en;
+      const gap = unit.startsWith("°") ? (space ? " " : "") : " ";
+      const shownRange = range ? range.replace(second, one(second)) : "";
+      return `${one(first)}${shownRange}${scale}${gap}${unit}`;
+    });
+  }
+  for (const [regex, replacement] of BARE_UNITS) out = out.replace(regex, replacement);
+  return out;
+}
+
+return { UNIT_SYSTEMS, getUnits, isImperial, storeUnits, statUnit, convertValue, convertRankValue, area, distance, height, speed, convertText };
+})();
+
 // ---- i18n.js
 __modules["i18n.js"] = (() => {
 // The game's languages: English (the source, and the fallback for anything missing) and
@@ -11020,6 +11246,7 @@ const { EN } = __modules["i18n-en.js"];
 const { NL } = __modules["i18n-nl.js"];
 const { NL_TEXT, NL_STATS, NL_UNITS } = __modules["content-nl.js"];
 const { NL_CLUES } = __modules["clues-nl.js"];
+const { convertText, isImperial: isImperialShown, statUnit, storeUnits } = __modules["units.js"];
 
 const LANGUAGES = [
   // `flag` (a flagcdn code) only decorates the language window.
@@ -11054,6 +11281,16 @@ function setLang(code, { save = true } = {}) {
   });
   return true;
 }
+// Switches the measurement system (units.js) and redraws like a language change: every
+// listener of onLangChange also redraws measurements. { save: false } from the account.
+function setUnits(system, { save = true } = {}) {
+  if (!storeUnits(system, { save })) return false;
+  applyI18n();
+  listeners.forEach(listener => {
+    try { listener(lang); } catch (error) { console.error("Couldn't redraw in the new units.", error); }
+  });
+  return true;
+}
 function onLangChange(listener) {
   listeners.add(listener);
   return () => listeners.delete(listener);
@@ -11067,19 +11304,31 @@ function t(key, params = {}) {
     return key;
   }
   const text = typeof entry === "function" ? entry(params) : entry;
-  return String(text).replace(/\{(\w+)\}/g, (match, name) => name in params ? String(params[name]) : match);
+  const filled = String(text).replace(/\{(\w+)\}/g, (match, name) => name in params ? String(params[name]) : match);
+  return MEASURED_KEYS.has(key) ? convertText(filled, lang) : filled;
 }
+// Interface strings with a measurement in them, which follow the measurement system. Only
+// these: the journeys' "m" and "km" are points, not measurements, and stay as they are.
+const MEASURED_KEYS = new Set([
+  "size.covers", "menu.countryFacts", "camp.pinLabel", "hud.aria",
+  "howto.c.veryHot", "howto.c.hot", "howto.c.warm", "howto.c.cool"
+]);
 
 const num = (value, options) => Number(value).toLocaleString(locale(), options);
 
 // Hand-made content, by its English text.
-const tr = text => lang === "nl" && typeof text === "string" ? NL_TEXT[text] ?? text : text;
+// Measurements in it follow the measurement system (convertText in units.js).
+const tr = text => convertText(lang === "nl" && typeof text === "string" ? NL_TEXT[text] ?? text : text, lang);
 // A Mystery Country clue (clues.js), by country and position.
-const clueText = (iso, index, english) => lang === "nl" ? NL_CLUES[iso]?.[index] ?? english : english;
+const clueText = (iso, index, english) => convertText(lang === "nl" ? NL_CLUES[iso]?.[index] ?? english : english, lang);
 // A Highs & Lows stat's words ({ name, highest, lowest }), or null in English.
 const statWords = id => lang === "nl" ? NL_STATS[id] || null : null;
 // A stat's unit ("kg per person a year").
-const unitText = unit => lang === "nl" && unit ? NL_UNITS[unit] ?? unit : unit;
+// In Imperial, the imperial unit (units.js) when the stat has one.
+const unitText = unit => {
+  const shown = (unit && statUnit(unit) && isImperialShown()) ? statUnit(unit) : unit;
+  return lang === "nl" && shown ? NL_UNITS[shown] ?? shown : shown;
+};
 
 // Country names: English from countries.js; other languages from the browser's CLDR data,
 // with a few names put the way the game (and the Dutch) say them.
@@ -11140,7 +11389,7 @@ function applyI18n(root = document) {
   if (root === document) document.title = t("page.title");
 }
 
-return { LANGUAGES, getLang, locale, setLang, onLangChange, t, num, tr, clueText, statWords, unitText, countryName, localNames, placeName, tOr, tapWords, applyI18n };
+return { LANGUAGES, getLang, locale, setLang, setUnits, onLangChange, t, num, tr, clueText, statWords, unitText, countryName, localNames, placeName, tOr, tapWords, applyI18n };
 })();
 
 // ---- countries.js
@@ -14926,6 +15175,18 @@ async function saveLanguage(lang) {
   else if (data?.user) user = data.user;
 }
 
+// The measurement system (units.js), "metric" or "imperial", kept like the language.
+function getAccountUnits(account = user) {
+  return account?.user_metadata?.units || null;
+}
+async function saveUnits(units) {
+  const supabase = await getClient();
+  if (!supabase || !user || user.user_metadata?.units === units) return;
+  const { data, error } = await supabase.auth.updateUser({ data: { units } });
+  if (error) console.warn("Couldn't save the measurement system to your account.", error);
+  else if (data?.user) user = data.user;
+}
+
 // Your base (base.js), an ISO code kept in the account like the language.
 async function saveBase(base) {
   const supabase = await getClient();
@@ -15030,7 +15291,7 @@ const getGroups = () => call("my_groups");
 // Rows of { user_id, display_name, date, score } for the group's finished days.
 const getGroupBoard = (groupId, from, to) => call("group_board", { group_ref: groupId, from_date: from, to_date: to });
 
-return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, saveBase, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, addToGroup, leaveGroup, getGroups, getGroupBoard };
+return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, getAccountUnits, saveUnits, saveBase, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, addToGroup, leaveGroup, getGroups, getGroupBoard };
 })();
 
 // ---- atlas.js
@@ -23927,7 +24188,8 @@ __modules["extremes.js"] = (() => {
 // "Most average" means closest to the median: the middle country of all those with data.
 const { STATS } = __modules["stats-data.js"];
 const { CITATIONS } = __modules["stat-citations.js"];
-const { locale, statWords, t, tr, unitText } = __modules["i18n.js"];
+const { getLang, locale, statWords, t, tr, unitText } = __modules["i18n.js"];
+const { convertText, convertValue } = __modules["units.js"];
 
 const EXTREME_ROUNDS = 6;
 const EXTREME_MAX_ROUND = 1000;
@@ -24177,10 +24439,15 @@ const WORDED = Object.fromEntries(Object.entries(STATS).map(([id, stat]) => {
   // Name, source and questions in the language on screen (i18n.js), read when shown.
   return [id, {
     ...stat,
-    get name() { return statWords(id)?.name || name; },
+    id,
+    // Units in the words follow the measurement system ("People per km²" → "per sq mi").
+    get name() { return convertText(statWords(id)?.name || name, getLang()); },
     get source() { return tr(source); },
     citation: CITATIONS[id],
-    ask: { get highest() { return statWords(id)?.highest || words.highest; }, get lowest() { return statWords(id)?.lowest || words.lowest; } }
+    ask: {
+      get highest() { return convertText(statWords(id)?.highest || words.highest, getLang()); },
+      get lowest() { return convertText(statWords(id)?.lowest || words.lowest, getLang()); }
+    }
   }];
 }));
 
@@ -24261,11 +24528,14 @@ function missingReason(statId, iso, countryName) {
 }
 
 // A value as the game shows it, with the stat's unit ("12.4 kg per person a year").
+// In Imperial the number is converted for the screen only (units.js); unitText gives the
+// matching unit. Rankings and scores always use the stored metric value.
 function formatValue(stat, value, { unit = true } = {}) {
-  let shown = value;
+  const converted = convertValue(value, stat.unit, stat.id);
+  let shown = converted.value;
   let suffix = "";
-  if (stat.scale === "billion" && Math.abs(value) >= 1e9) { shown = value / 1e9; suffix = ` ${t("metric.billionWord")}`; }
-  const decimals = suffix ? 1 : stat.decimals;
+  if (stat.scale === "billion" && Math.abs(shown) >= 1e9) { shown /= 1e9; suffix = ` ${t("metric.billionWord")}`; }
+  const decimals = suffix ? 1 : Math.max(0, stat.decimals + converted.extraDecimals);
   const number = shown.toLocaleString(locale(), { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   const text = `${stat.prefix || ""}${number}${suffix}`;
   if (!unit || !stat.unit || stat.prefix) return stat.unit === "US$ a year" && unit ? `${text} ${t("extreme.aYear")}` : text;
@@ -24307,6 +24577,7 @@ const EXTREME_DAYS = PRESEASON
   : CALENDAR_DAYS;
 const { EXTREME_MAX_DAY, MODE_NAME, scorePick } = __modules["extremes.js"];
 const { countryName, localNames, locale, num, placeName, t, tOr, tr } = __modules["i18n.js"];
+const { area: areaIn, convertRankValue } = __modules["units.js"];
 
 const MODES = ["competitive", "casual", "extremes"];
 // The main game: the one that earns badges and counts for the statistics, Community and
@@ -24398,7 +24669,11 @@ const RANK_METRICS = {
     get label() { return t("metric.density"); },
     unit: "people per km²",
     value: country => country.density,
-    format: value => `${value < 10 ? num1(value) : num(Math.round(value))} / km²`
+    // In Imperial: people per square mile (units.js), for the screen only.
+    format: value => {
+      const perArea = value / areaIn(1).value;
+      return `${perArea < 10 ? num1(perArea) : num(Math.round(perArea))} / ${areaIn(1).unit}`;
+    }
   }
 };
 
@@ -24437,7 +24712,13 @@ function getRankMetric(round) {
     top: endWord(topic.top || (topic.years ? "EARLIEST" : lowestFirst ? "LOWEST" : "HIGHEST")),
     bottom: endWord(topic.bottom || (topic.years ? "LATEST" : lowestFirst ? "HIGHEST" : "LOWEST")),
     value: country => topic.values[country.iso],
-    format: value => `${topic.approx ? "≈ " : ""}${topic.prefix || ""}${value.toLocaleString(locale(), digits)}${tr(topic.unit || "")}`
+    // Measurements follow the measurement system (units.js); the order uses the stored value.
+    format: value => {
+      const shown = convertRankValue(value, topic.unit);
+      const places = (topic.decimals || 0) + shown.extraDecimals;
+      const options = { ...digits, minimumFractionDigits: places, maximumFractionDigits: places };
+      return `${topic.approx ? "≈ " : ""}${topic.prefix || ""}${shown.value.toLocaleString(locale(), options)}${tr(shown.unit || "")}`;
+    }
   };
 }
 
@@ -29924,6 +30205,7 @@ const { getCountry } = __modules["daily.js"];
 const { countryName, locale, num, t, tr } = __modules["i18n.js"];
 const { CITIES, SEAS } = __modules["place-data.js"];
 const { spriteIcon } = __modules["travel.js"];
+const { height, speed } = __modules["units.js"];
 const { createFlagImage } = __modules["ui.js"];
 
 const RAD = Math.PI / 180;
@@ -30108,6 +30390,7 @@ function fillTransitCard(card, vehicle, { countryOf }, onClose) {
   card.appendChild(rows);
 
   const facts = element("div", "transit-facts");
+  const speedText = kmh => (({ value, unit }) => `${num(Math.round(value))} ${unit}`)(speed(kmh));
   const fact = (label, value, note) => {
     const item = element("span", "transit-fact");
     item.append(element("span", "field-label", label), element("b", "", value));
@@ -30115,14 +30398,17 @@ function fillTransitCard(card, vehicle, { countryOf }, onClose) {
     facts.appendChild(item);
   };
   if (plane) {
-    fact(t("live.altitude"), `${num(Math.round(data.altM / 10) * 10)} m`);
-    fact(t("live.speed"), `${num(data.kmh)} km/h`, t("live.overGround"));
+    // Metric or Imperial (units.js): altitude to 10 m or 100 ft, speed in km/h or mph.
+    const altitude = height(data.altM);
+    const step = altitude.unit === "ft" ? 100 : 10;
+    fact(t("live.altitude"), `${num(Math.round(altitude.value / step) * step)} ${altitude.unit}`);
+    fact(t("live.speed"), speedText(data.kmh), t("live.overGround"));
     if (data.reg) fact(t("live.reg"), data.reg);
   } else if (vehicle.kind === "train") {
-    fact(t("live.speed"), Number.isFinite(data.kmh) ? `${num(data.kmh)} km/h` : t("live.stillOrUnknown"), data.timetable ? t("live.fromTimetable") : data.kmhFromFixes ? t("live.computed") : null);
+    fact(t("live.speed"), Number.isFinite(data.kmh) ? speedText(data.kmh) : t("live.stillOrUnknown"), data.timetable ? t("live.fromTimetable") : data.kmhFromFixes ? t("live.computed") : null);
     if (data.number && data.name && data.number !== data.name) fact(t("live.trainNumber"), data.number);
   } else {
-    fact(t("live.speed"), `${num(data.knots)} kn`, `${num(Math.round(data.kmh))} km/h`);
+    fact(t("live.speed"), `${num(data.knots)} kn`, speedText(data.kmh));
     fact(t("live.course"), `${Math.round(data.course)}°`);
   }
   card.appendChild(facts);
@@ -30281,6 +30567,7 @@ __modules["engine.js"] = (() => {
 const { COUNTRIES, LEGACY_COUNTRY_ISOS, TERRITORIES } = __modules["countries.js"];
 const { LIGHT_DEVICE, PixelGlobe } = __modules["globe.js"];
 const { JOURNEYS, ROUND_COLORS, createJourney, scoreTier } = __modules["journeys.js"];
+const { getAccountUnits, saveUnits } = __modules["auth.js"];
 const { getAccountLanguage, getProfile, getUser, initAuth, isConfigured: isAuthConfigured, pullDays, pushDay, saveLanguage, sendEmailLink, signIn, signOut, takeAuthRedirectError, verifyEmailCode } = __modules["auth.js"];
 const { ROUND_PICTURES } = __modules["round-pictures.js"];
 const { CLUES } = __modules["clues.js"];
@@ -30297,6 +30584,8 @@ const { createLiveTraffic } = __modules["live-traffic.js"];
 const { CAPITALS } = __modules["capital-data.js"];
 const { FIND_LABELS, askQuestion, formatValue, getStandings, getStat, missingReason, scorePick } = __modules["extremes.js"];
 const { createBadge } = __modules["badges.js"];
+const { area: areaIn, getUnits } = __modules["units.js"];
+const { setUnits } = __modules["i18n.js"];
 const { LANGUAGES, applyI18n, clueText, countryName, getLang, localNames, locale, num, onLangChange, placeName, setLang, t, tapWords, unitText } = __modules["i18n.js"];
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
@@ -30567,29 +30856,27 @@ const CARD_SLIDE_MS = 380;
 function slideCardsOut() { document.getElementById("gameView").classList.add("is-switching"); updatePhoneFrame(PHONE_SHIFT_MS); }
 function slideCardsIn() { document.getElementById("gameView").classList.remove("is-switching"); updatePhoneFrame(PHONE_SHIFT_MS); }
 
-// Title shown over the globe when a round starts (once per round per visit), with the
-// cards slid out of the way. It waits for a click or Enter, so there's time to read it.
+// The round's question, shown over the globe as a round starts (once per round per visit),
+// with the cards slid out of the way. It comes up by itself and waits for CONTINUE, a click
+// or Enter, so there's time to read it; the same card in every mode.
 const shownIntros = new Set();
 function showRoundIntro(index) {
   const key = `${dayRef()}:${index}`;
   if (shownIntros.has(key)) { slideCardsIn(); return; }
   shownIntros.add(key);
   slideCardsOut();
-  const round = plan[index];
   const overlay = document.getElementById("roundIntro");
-  // Highs & Lows: the round and a bar of segments, which end to find, the question itself
-  // (the stat's name would only repeat it) and a CONTINUE button.
-  const extreme = round.type === "extreme";
-  overlay.classList.toggle("is-extreme", extreme);
   introIndex = index;
+  // Mystery Country and Pinpoint: the question is the round's first clue, so it's on this
+  // card and goes straight into the clue list afterwards (no second card to click away).
+  introClue = getFirstClue(index);
   fillRoundIntro(index);
+  // A bar of segments: rounds done, this one, rounds to come.
   const steps = document.getElementById("roundIntroSteps");
-  steps.hidden = !extreme;
   steps.style.setProperty("--steps", plan.length);
-  document.getElementById("roundIntroGo").hidden = !extreme;
-  steps.replaceChildren(...(extreme ? plan.map((_, i) => Object.assign(document.createElement("i"), {
+  steps.replaceChildren(...plan.map((_, i) => Object.assign(document.createElement("i"), {
     className: i < index ? "is-done" : i === index ? "is-now" : ""
-  })) : []));
+  })));
   // Competitive: the clock, as its own short line.
   const clock = document.getElementById("roundIntroClock");
   clock.classList.toggle("hidden", activeMode !== "competitive");
@@ -30598,14 +30885,37 @@ function showRoundIntro(index) {
   overlay.classList.add("is-showing");
 }
 
-// The title card's words (again after a language switch).
+// The title card's words (again after a language switch): ROUND 2 OF 5, a label (which
+// end to find in Highs & Lows, the round's name otherwise), the question itself, and the
+// round's one-line task under it where the question doesn't say it already.
 let introIndex = 0;
+let introClue = null;
 function fillRoundIntro(index) {
   const round = plan[index];
-  const extreme = round.type === "extreme";
-  setText("roundIntroCount", t(extreme ? "intro.roundOf" : "intro.roundSlash", { n: index + 1, total: plan.length }));
-  setText("roundIntroName", extreme ? t(`intro.find.${round.find}`) : ROUND_INFO[round.type].name.toUpperCase());
-  setText("roundIntroTask", extreme ? round.question : ROUND_INFO[round.type].task);
+  const { label, question, note } = getIntroWords(round, index);
+  setText("roundIntroCount", t("intro.roundOf", { n: index + 1, total: plan.length }));
+  setText("roundIntroName", label);
+  setText("roundIntroTask", question);
+  setText("roundIntroNote", note);
+  document.getElementById("roundIntroNote").hidden = !note;
+}
+
+function getIntroWords(round, index) {
+  const name = ROUND_INFO[round.type].name.toUpperCase();
+  const task = ROUND_INFO[round.type].task;
+  if (round.type === "extreme") return { label: t(`intro.find.${round.find}`), question: round.question, note: "" };
+  const clue = index === introIndex && introClue ? getFirstClue(index) : null;
+  if (clue) return { label: name, question: clue.text, note: task };
+  switch (round.type) {
+    case "pinpoint":
+      return round.funClues?.length
+        ? { label: name, question: task, note: "" }
+        : { label: name, question: t("intro.findCountry", { name: countryName(getCountry(round.answer)) }), note: "" };
+    case "deepcut": return { label: name, question: round.question, note: task };
+    case "paint": return { label: name, question: tapWords(round.question), note: task };
+    case "rank": return { label: name, question: getRankMetric(round).label, note: task };
+    default: return { label: name, question: task, note: "" };
+  }
 }
 
 function hideRoundIntro() {
@@ -30613,13 +30923,15 @@ function hideRoundIntro() {
   if (overlay.classList.contains("hidden") || overlay.classList.contains("is-leaving")) return;
   overlay.classList.add("is-leaving");
   slideCardsIn();
+  // The first clue was on the card: it's simply in its place in the list now.
+  if (introClue) flownClues.add(`${dayRef()}:${introIndex}:${introClue.label}`);
+  introClue = null;
   setTimeout(() => {
     overlay.classList.add("hidden");
     overlay.classList.remove("is-showing", "is-leaving");
     // Put the cursor in the round's text box, if it has one.
     const field = { mystery: "countryInput", deepcut: "deepcutInput" }[plan[viewIndex].type];
     if (field && !onTouch && !document.getElementById(field).disabled) document.getElementById(field).focus();
-    revealFirstClue();
   }, 320);
 }
 
@@ -30645,17 +30957,15 @@ function revealClue({ label, text, cover, target }) {
   }).then(() => document.querySelectorAll(".is-clue-incoming").forEach(item => item.classList.remove("is-clue-incoming")));
 }
 
-// The round's first clue, once its title card is gone (Mystery Country, Pinpoint).
-function revealFirstClue() {
-  const round = plan[viewIndex];
-  const state = day.rounds[viewIndex];
-  if (viewIndex !== getActiveRoundIndex() || progressOf(viewIndex).done || state.guesses?.length) return;
-  if (round.type === "mystery") {
-    const answer = { ...getCountry(round.answer), ...round.clues };
-    revealClue({ ...getMysteryClue(answer, 0), cover: t("clue.first"), target: ".clue-current" });
-  } else if (round.type === "pinpoint" && round.funClues?.length) {
-    revealClue({ label: t("clue.n", { n: 1 }), text: round.funClues[0], cover: t("clue.first"), target: "#pinpointClues li.is-latest" });
-  }
+// The round's first clue (Mystery Country, Pinpoint with fun clues), for a round that
+// hasn't had a guess yet: shown as the question on the round's title card.
+function getFirstClue(index) {
+  const round = plan[index];
+  const state = day.rounds[index];
+  if (index !== getActiveRoundIndex() || progressOf(index).done || state.guesses?.length) return null;
+  if (round.type === "mystery") return getMysteryClue({ ...getCountry(round.answer), ...round.clues }, 0);
+  if (round.type === "pinpoint" && round.funClues?.length) return { label: t("clue.n", { n: 1 }), text: round.funClues[0] };
+  return null;
 }
 
 // Set when a guess card has just played its "right" sound, so it isn't played again.
@@ -30785,7 +31095,7 @@ function getRoundInfo(round) {
         facts: [
           [t("info.capital"), country.capital[0] || t("info.none")],
           [t("info.population"), RANK_METRICS.population.format(country.population)],
-          [t("info.area"), `${Math.round(country.area).toLocaleString(locale())} km²`]
+          [t("info.area"), (({ value, unit }) => `${Math.round(value).toLocaleString(locale())} ${unit}`)(areaIn(country.area))]
         ],
         // A photo of its capital, or else its flag.
         picture: photo || flagPicture(country)
@@ -33350,7 +33660,14 @@ function renderSettings() {
   setText("settingsSoundValue", t(sounds.enabled ? "settings.on" : "settings.off"));
   document.getElementById("settingsSoundButton").setAttribute("aria-pressed", String(sounds.enabled));
   setText("settingsLangValue", LANGUAGES.find(language => language.code === getLang())?.name || "");
+  document.querySelectorAll(".units-switch [data-units]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.units === getUnits())));
 }
+// The measurement system: redraws at once (setUnits) and goes to the account when signed in.
+document.querySelectorAll(".units-switch [data-units]").forEach(button => button.addEventListener("click", () => {
+  sounds.playClick();
+  if (setUnits(button.dataset.units) && getUser()) saveUnits(button.dataset.units);
+  renderSettings();
+}));
 try { if (localStorage.getItem(SOUND_KEY) === "0") setSound(false); } catch {}
 document.getElementById("menuSettingsButton").addEventListener("click", () => {
   sounds.playClick();
@@ -34245,6 +34562,11 @@ initAuth(account => {
     const accountLanguage = getAccountLanguage(account);
     if (accountLanguage) setLang(accountLanguage);
     else saveLanguage(getLang());
+    // The measurement system the same way.
+    const accountUnits = getAccountUnits(account);
+    if (accountUnits) setUnits(accountUnits);
+    else if (getUnits() !== "metric") saveUnits(getUnits());
+    renderSettings();
   }
   renderAccount(account);
   if (account) mergeAccountDays();
