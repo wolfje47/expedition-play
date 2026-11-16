@@ -232,6 +232,7 @@ h1, h2, h3 { font-weight: normal; }
    up without smoothing, under scanlines and a dark wash so the name stays readable. */
 .lang-modal { display: grid; gap: 14px; width: min(460px, 94vw); border: 1px solid color-mix(in srgb, var(--cyan) 40%, transparent); border-radius: 26px; background: rgba(10, 15, 29, 0.97); }
 .lang-options { display: grid; gap: 10px; }
+.lang-section { margin: 4px 0 -4px; color: var(--muted); font: 9px/1.4 var(--font-display); letter-spacing: var(--ls-pixel); }
 .lang-option {
   position: relative;
   display: flex;
@@ -3616,9 +3617,7 @@ h1, h2, h3 { font-weight: normal; }
 #settingsSoundButton { grid-template-columns: 36px 1fr auto; }
 #settingsSoundButton em { min-width: 44px; padding: 4px 8px; border-radius: 6px; background: #5cf28a; color: #04121a; font: 9px var(--font-display); letter-spacing: var(--ls-pixel); text-align: center; text-transform: uppercase; }
 /* Measurement system: two compact choices, each with examples of its units. */
-.settings-units { grid-template-columns: 36px 1fr; cursor: default; }
-.settings-units:hover { border-color: var(--glass-line); background: rgba(10, 15, 30, 0.5); }
-.units-switch { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.units-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .units-switch button {
   display: grid; gap: 4px; justify-items: center; padding: 8px 6px; border: 1px solid var(--glass-line); border-radius: 9px;
   background: rgba(255, 255, 255, 0.04); color: var(--muted); cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease;
@@ -4033,21 +4032,12 @@ h1, h2, h3 { font-weight: normal; }
             <path d="M10 1h1v1h-1zM7 2h7v1h-7zM8 3h1v1h-1zM12 3h1v1h-1zM9 4h1v1h-1zM11 4h1v1h-1zM1 5h8v1h-8zM10 5h1v1h-1zM0 6h1v1h-1zM9 6h1v1h-1zM11 6h1v1h-1zM0 7h1v1h-1zM4 7h2v1h-2zM9 7h1v1h-1zM12 7h2v1h-2zM0 8h1v1h-1zM3 8h1v1h-1zM6 8h1v1h-1zM9 8h1v1h-1zM0 9h1v1h-1zM2 9h1v1h-1zM7 9h1v1h-1zM9 9h1v1h-1zM0 10h1v1h-1zM2 10h6v1h-6zM9 10h1v1h-1zM0 11h1v1h-1zM2 11h1v1h-1zM7 11h1v1h-1zM9 11h1v1h-1zM0 12h1v1h-1zM2 12h1v1h-1zM7 12h1v1h-1zM9 12h1v1h-1zM0 13h1v1h-1zM9 13h1v1h-1zM1 14h1v1h-1zM4 14h5v1h-5z" fill="#0b1020"/>
             <path d="M2 6h6v1h-6zM1 7h3v1h-3zM6 7h3v1h-3zM1 8h2v1h-2zM4 8h2v1h-2zM7 8h2v1h-2zM1 9h1v1h-1zM3 9h4v1h-4zM8 9h1v1h-1zM1 10h1v1h-1zM8 10h1v1h-1zM1 11h1v1h-1zM3 11h4v1h-4zM8 11h1v1h-1zM1 12h1v1h-1zM3 12h4v1h-4zM8 12h1v1h-1zM2 13h6v1h-6zM2 14h2v1h-2zM2 15h1v1h-1z" fill="#45e3ff"/>
           </svg>
-          <span data-i18n="lang.label">Language</span><em id="settingsLangValue"></em><b aria-hidden="true">›</b>
+          <span data-i18n="settings.langUnits">LANGUAGE &amp; UNITS</span><em id="settingsLangValue"></em><b aria-hidden="true">›</b>
         </button>
         <button class="settings-row" id="settingsSoundButton" type="button" aria-pressed="true">
           <svg viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges"><path d="M3 12h6l8-7v22l-8-7H3zM21 11h3v3h3v4h-3v3h-3v-3h2v-4h-2zM24 5h3v3h2v3h-3V8h-2zM24 24h2v-3h3v3h-2v3h-3z" fill="currentColor"/></svg>
           <span data-i18n="settings.sound">SOUND</span><em id="settingsSoundValue"></em>
         </button>
-        <!-- Measurement system (units.js): Metric (default) or Imperial, with examples. -->
-        <div class="settings-row settings-units" role="group" aria-labelledby="settingsUnitsLabel">
-          <svg viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges"><path d="M2 10h28v12H2zm3 3v6h22v-6h-2v3h-2v-3h-2v4h-2v-4h-2v3h-2v-3h-2v4h-2v-4H9v3H7v-3z" fill="currentColor"/></svg>
-          <span id="settingsUnitsLabel" data-i18n="settings.units">MEASUREMENTS</span>
-          <div class="units-switch">
-            <button type="button" data-units="metric" aria-pressed="true"><b data-i18n="settings.metric">METRIC</b><small>km · m · °C</small></button>
-            <button type="button" data-units="imperial" aria-pressed="false"><b data-i18n="settings.imperial">IMPERIAL</b><small>mi · ft · °F</small></button>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -4705,15 +4695,21 @@ h1, h2, h3 { font-weight: normal; }
     </div>
   </div>
 
-  <!-- Language: one tile per language; hovering shows its flag in big 8-bit pixels. -->
+  <!-- Language & Units: one tile per language (hovering shows its flag in big 8-bit pixels), then Metric or Imperial. -->
   <div id="langModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="langTitle">
     <div class="modal lang-modal">
       <div class="modal-head">
-        <h2 id="langTitle" data-i18n="lang.title">LANGUAGE</h2>
+        <h2 id="langTitle" data-i18n="settings.langUnits">LANGUAGE &amp; UNITS</h2>
         <button class="modal-close" id="closeLangButton" type="button" aria-label="Close" data-i18n-attr="aria-label:lang.close">×</button>
       </div>
-      <p class="modal-note" data-i18n="lang.note">The whole game, in your language.</p>
+      <h3 class="lang-section" data-i18n="lang.title">LANGUAGE</h3>
       <div class="lang-options" id="langOptions" role="radiogroup" data-i18n-attr="aria-label:lang.label"></div>
+      <!-- Measurement system (units.js): Metric (default) or Imperial, with examples. -->
+      <h3 class="lang-section" id="settingsUnitsLabel" data-i18n="settings.units">MEASUREMENTS</h3>
+      <div class="units-switch" role="group" aria-labelledby="settingsUnitsLabel">
+        <button type="button" data-units="metric" aria-pressed="true"><b data-i18n="settings.metric">METRIC</b><small>km · m · °C</small></button>
+        <button type="button" data-units="imperial" aria-pressed="false"><b data-i18n="settings.imperial">IMPERIAL</b><small>mi · ft · °F</small></button>
+      </div>
     </div>
   </div>
 
@@ -6378,6 +6374,7 @@ const EN = {
   "settings.close": "Close settings",
   "settings.sound": "SOUND",
   "settings.on": "On",
+  "settings.langUnits": "LANGUAGE & UNITS",
   "settings.units": "MEASUREMENTS",
   "settings.metric": "METRIC",
   "settings.imperial": "IMPERIAL",
@@ -7342,6 +7339,7 @@ const NL = {
   "settings.close": "Instellingen sluiten",
   "settings.sound": "GELUID",
   "settings.on": "Aan",
+  "settings.langUnits": "TAAL & EENHEDEN",
   "settings.units": "MAATEENHEDEN",
   "settings.metric": "METRISCH",
   "settings.imperial": "IMPERIAAL",
@@ -21118,7 +21116,24 @@ __modules["extremes-proposals.js"] = (() => {
 // time). All 42 stats were fetched for real (tools/build-stats.mjs, 2026-11-15); the sources
 // still need the team's review: node tools/list-extreme-sources.mjs --proposals.
 const REVIEW = "proposed 2026-11-15, sources in review";
+// "Wait, Really?" (2026-11-16): a test day written to docs/casual-question-guidelines.md
+// (answers people wouldn't guess first, but can reason towards, from six parts of the
+// world), first in the list so it plays as Pre-season 1, next to the Casual test day in
+// casual-proposals.js. All six stats were already in stats-data.js; sources in review.
 const PROPOSED_DAYS = [
+  {
+    name: "Wait, Really?",
+    theme: "Surprising extremes, one from each part of the world. A test day for the question guidelines.",
+    status: "test day 2026-11-16, sources in review",
+    rounds: [
+      ["tempmean", "lowest", "Which country was the coldest on average in 2025?"],
+      ["refugeesout", "highest", "Which country have the most refugees fled?"],
+      ["womenheight", "lowest", "Where are women the shortest?"],
+      ["threatenedmammals", "highest", "Where are the most mammal species threatened?"],
+      ["inflation", "lowest", "In 2025, where did consumer prices rise the slowest (or fall)?"],
+      ["pricelevel", "lowest", "In 2025, which country was the cheapest, with prices compared with the US?"]
+    ]
+  },
   {
     name: "Back of the Net",
     theme: "Football: the men's and women's World Cups and the Olympics.",
@@ -21213,6 +21228,79 @@ const PROPOSED_DAYS = [
 ];
 
 return { PROPOSED_DAYS };
+})();
+
+// ---- casual-proposals.js
+__modules["casual-proposals.js"] = (() => {
+// Casual days on trial (see CLAUDE.md, "Pre-season"): played only with ?preseason, on a
+// Pre-season date, next to the Highs & Lows day of that date (extremes-proposals.js). Same
+// format as days.js. They never reach the real calendar until the team approves them.
+//
+// "Origin Story" (2026-11-16): a test day written to docs/casual-question-guidelines.md,
+// as Pre-season 1 (2026-10-24, the first Pre-season date while extremes-proposals.js has
+// eight days). Facts still need the team's check.
+//
+// Check with: node tools/check-days.mjs
+
+const PROPOSED_CASUAL_DAYS = {
+  "2026-10-24": {
+    name: "Origin Story",
+    theme: "Where things come from: brands, dishes, the Olympics. A test day for the question guidelines.",
+    journey: "balloon",
+    mystery: "MN",
+    pinpoint: {
+      answer: "VN",
+      clues: [
+        "Motorbikers ride the Hà Giang and Cao Bằng loops through the mountains of its far north.",
+        "It grows more robusta coffee than any other country, and drinks it with sweet condensed milk.",
+        "Phở, a noodle soup with beef or chicken, comes from here."
+      ]
+    },
+    deepcut: {
+      question: "Name a country that has hosted the Summer Olympics.",
+      // Niche = how unlikely a player is to think of it: the longer ago a country last
+      // hosted, the more niche; hosting more than once makes it more obvious.
+      answers: {
+        1000: ["Belgium", "Netherlands", "Finland", "Sweden"],
+        800: ["Italy", "Mexico", "Canada", "Russia"],
+        600: ["Germany", "South Korea", "Spain"],
+        400: ["Australia", "Greece", "China", "Brazil"],
+        200: ["United States", "United Kingdom", "France", "Japan"]
+      },
+      aliases: { "Russia": ["Soviet Union", "USSR"], "United States": ["USA", "America"], "United Kingdom": ["England", "Great Britain"] },
+      info: {
+        title: "Summer Olympics",
+        text: "The modern Games began in Athens in 1896. Three were cancelled by the world wars (1916, 1940 and 1944). Moscow 1980 is counted for Russia, as host of the Soviet Union's Games.",
+        facts: [["Games held", "30"], ["Host countries", "19"], ["Most often", "United States (4)"]],
+        picture: "Panathenaic Stadium"
+      }
+    },
+    paint: {
+      question: "Click the country where each brand was founded (8): IKEA, Nokia, Heineken, Toyota, Tata, Havaianas, Corona, Vegemite.",
+      answers: ["SE", "FI", "NL", "JP", "IN", "BR", "MX", "AU"],
+      labels: { SE: "IKEA", FI: "Nokia", NL: "Heineken", JP: "Toyota", IN: "Tata", BR: "Havaianas", MX: "Corona", AU: "Vegemite" },
+      picture: "Vegemite"
+    },
+    rank: {
+      topic: "Year the brand was founded",
+      detail: "Peugeot, Nestlé, Coca-Cola, Nintendo and Samsung, by the year each company began.",
+      values: { FR: 1810, CH: 1866, US: 1886, JP: 1889, KR: 1938 },
+      labels: { FR: "Peugeot", CH: "Nestlé", US: "Coca-Cola", JP: "Nintendo", KR: "Samsung" },
+      years: true,
+      note: "Peugeot began in 1810 as a family steel foundry, Nestlé in 1866, Coca-Cola in 1886, Nintendo in 1889 as a maker of playing cards, and Samsung in 1938 as a trading firm selling dried fish and noodles. From each company's own history.",
+      picture: "Nintendo",
+      reroll: {
+        topic: "Population of five brand home countries",
+        values: { US: 341.8, JP: 123.4, FR: 68.7, KR: 51.7, CH: 9.1 },
+        decimals: 1,
+        unit: " million",
+        note: "The homes of Coca-Cola, Nintendo, Peugeot, Samsung and Nestlé. World Bank, 2025."
+      }
+    }
+  }
+};
+
+return { PROPOSED_CASUAL_DAYS };
 })();
 
 // ---- stats-data.js
@@ -24566,15 +24654,24 @@ const { PAINT_POOL } = __modules["paint-pool.js"];
 const { DAYS } = __modules["days.js"];
 const { EXTREME_DAYS: CALENDAR_DAYS } = __modules["extremes-days.js"];
 const { PROPOSED_DAYS } = __modules["extremes-proposals.js"];
+const { PROPOSED_CASUAL_DAYS } = __modules["casual-proposals.js"];
 // Test mode (?preseason, 15 November 2026): the days still in review (extremes-proposals.js)
-// playable as 25–31 October, before Day 1, to try them out. Without it nothing changes.
+// playable on the last days of October, before Day 1, to try them out. Without it nothing
+// changes.
 const PRESEASON = typeof location !== "undefined" && new URLSearchParams(location.search).has("preseason");
-// They keep those dates but form their own "month" in the archive (Pre-season, Highs & Lows
-// only), numbered 1–7; November's day numbers stay as they are.
-const PRESEASON_DATES = PRESEASON ? PROPOSED_DAYS.map((_, index) => `2026-10-${25 + index}`) : [];
+// They end on 31 October (so a day added at the front of the list gets an earlier date and
+// the others keep theirs, with their saved progress), but form their own "month" in the
+// archive (Pre-season), numbered from 1; November's day numbers stay as they are.
+const PRESEASON_DATES = PRESEASON ? PROPOSED_DAYS.map((_, index) => `2026-10-${32 - PROPOSED_DAYS.length + index}`) : [];
 const EXTREME_DAYS = PRESEASON
   ? { ...Object.fromEntries(PROPOSED_DAYS.map((day, index) => [PRESEASON_DATES[index], day])), ...CALENDAR_DAYS }
   : CALENDAR_DAYS;
+// Casual (and competitive) days on trial (casual-proposals.js), on Pre-season dates.
+const CASUAL_DAYS = PRESEASON
+  ? { ...Object.fromEntries(Object.entries(PROPOSED_CASUAL_DAYS).filter(([dateKey]) => PRESEASON_DATES.includes(dateKey))), ...DAYS }
+  : DAYS;
+// Whether a Pre-season date has a day in this mode (Highs & Lows has all of them).
+const hasPreseasonDay = (dateKey, mode) => mode === "extremes" || Boolean(PROPOSED_CASUAL_DAYS[dateKey]);
 const { EXTREME_MAX_DAY, MODE_NAME, scorePick } = __modules["extremes.js"];
 const { countryName, localNames, locale, num, placeName, t, tOr, tr } = __modules["i18n.js"];
 const { area: areaIn, convertRankValue } = __modules["units.js"];
@@ -24591,7 +24688,7 @@ const MODE_INFO = {
   extremes: { name: MODE_NAME, short: MODE_NAME.toUpperCase() }
 };
 // Casual plays the competitive days (without the clock), so both share one calendar.
-const calendarOf = mode => mode === "extremes" ? EXTREME_DAYS : DAYS;
+const calendarOf = mode => mode === "extremes" ? EXTREME_DAYS : CASUAL_DAYS;
 
 const ROUND_TYPES = ["mystery", "pinpoint", "deepcut", "paint", "rank"];
 
@@ -25234,7 +25331,7 @@ function getDayScore(plan, states) {
   };
 }
 
-return { PRESEASON, PRESEASON_DATES, MODES, MAIN_MODE, MODE_INFO, ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, SPEED_WINDOW_MS, getSpeedWindow, MAX_SPEED_BONUS, getSpeedMultiplier, getMaxScore, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, getNeighbourHardness, getPaintPoolEntry, resolveRound, resolvePlan, getDayInfo, getDailyPlan, hasExtremeDay, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
+return { PRESEASON, PRESEASON_DATES, hasPreseasonDay, MODES, MAIN_MODE, MODE_INFO, ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, SPEED_WINDOW_MS, getSpeedWindow, MAX_SPEED_BONUS, getSpeedMultiplier, getMaxScore, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, getNeighbourHardness, getPaintPoolEntry, resolveRound, resolvePlan, getDayInfo, getDailyPlan, hasExtremeDay, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
 })();
 
 // ---- community.js
@@ -26969,7 +27066,7 @@ return { createArchiveMap };
 __modules["screens.js"] = (() => {
 const { sounds } = __modules["audio.js"];
 const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getScoreBucket, getTopPercent } = __modules["community.js"];
-const { MAIN_MODE, MAX_DAILY_SCORE, MODE_INFO, PRESEASON_DATES } = __modules["daily.js"];
+const { MAIN_MODE, MAX_DAILY_SCORE, MODE_INFO, PRESEASON_DATES, hasPreseasonDay } = __modules["daily.js"];
 const { createBadge } = __modules["badges.js"];
 const { createFlagImage } = __modules["ui.js"];
 const { COUNTRIES } = __modules["countries.js"];
@@ -27451,8 +27548,8 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay, getCountry
 
   // The main game's days by default (badges and groups use those).
   function loadDays(mode = MAIN_MODE) {
-    // Pre-season is Highs & Lows only.
-    return getDays().filter(dateKey => mode === "extremes" || !PRESEASON_DATES.includes(dateKey)).map(dateKey => withCommunity(getDayRecord(dateKey, mode)));
+    // Pre-season: Highs & Lows has every date, Casual only those with a day on trial.
+    return getDays().filter(dateKey => !PRESEASON_DATES.includes(dateKey) || hasPreseasonDay(dateKey, mode)).map(dateKey => withCommunity(getDayRecord(dateKey, mode)));
   }
 
   function playDay(dateKey, mode) {
@@ -33659,7 +33756,7 @@ function setSound(on) {
 function renderSettings() {
   setText("settingsSoundValue", t(sounds.enabled ? "settings.on" : "settings.off"));
   document.getElementById("settingsSoundButton").setAttribute("aria-pressed", String(sounds.enabled));
-  setText("settingsLangValue", LANGUAGES.find(language => language.code === getLang())?.name || "");
+  setText("settingsLangValue", `${LANGUAGES.find(language => language.code === getLang())?.name || ""} · ${t(getUnits() === "imperial" ? "settings.imperial" : "settings.metric").toLowerCase().replace(/^./, c => c.toUpperCase())}`);
   document.querySelectorAll(".units-switch [data-units]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.units === getUnits())));
 }
 // The measurement system: redraws at once (setUnits) and goes to the account when signed in.
@@ -34744,7 +34841,10 @@ function showLanguage() {
     option.addEventListener("click", () => {
       sounds.playClick();
       if (setLang(code) && getUser()) saveLanguage(code);
-      langModal.classList.add("hidden");
+      // Units sit in the same window, so it stays open: redraw the tiles for the new choice.
+      showLanguage();
+      renderSettings();
+      langModal.querySelector('.lang-option[aria-checked="true"]')?.focus();
     });
     return option;
   }));
