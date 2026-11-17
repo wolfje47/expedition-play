@@ -24758,13 +24758,13 @@ const { DAYS } = __modules["days.js"];
 const { EXTREME_DAYS: CALENDAR_DAYS } = __modules["extremes-days.js"];
 const { PROPOSED_DAYS } = __modules["extremes-proposals.js"];
 const { PROPOSED_CASUAL_DAYS } = __modules["casual-proposals.js"];
-// Test mode (?preseason, 15 November 2026): the days still in review (extremes-proposals.js)
-// playable on the last days of October, before Day 1, to try them out. Without it nothing
-// changes.
-const PRESEASON = typeof location !== "undefined" && new URLSearchParams(location.search).has("preseason");
-// They end on 31 October (so a day added at the front of the list gets an earlier date and
-// the others keep theirs, with their saved progress), but form their own "month" in the
-// archive (Pre-season), numbered from 1; November's day numbers stay as they are.
+// Pre-season (15 November 2026; for everyone since 17 November 2026, team request): the
+// days in extremes-proposals.js and casual-proposals.js, on the last days of October,
+// before Day 1. They end on 31 October (so a day added at the front of the list gets an
+// earlier date and the others keep theirs, with their saved progress), but form their own
+// "month" in the archive (Pre-season), numbered from 1; November's day numbers stay as
+// they are. They earn no monthly badge (isPreseasonMonth).
+const PRESEASON = true;
 const PRESEASON_DATES = PRESEASON ? PROPOSED_DAYS.map((_, index) => `2026-10-${32 - PROPOSED_DAYS.length + index}`) : [];
 const EXTREME_DAYS = PRESEASON
   ? { ...Object.fromEntries(PROPOSED_DAYS.map((day, index) => [PRESEASON_DATES[index], day])), ...CALENDAR_DAYS }
@@ -24775,6 +24775,8 @@ const CASUAL_DAYS = PRESEASON
   : DAYS;
 // Whether a Pre-season date has a day in this mode (Highs & Lows has all of them).
 const hasPreseasonDay = (dateKey, mode) => mode === "extremes" || Boolean(PROPOSED_CASUAL_DAYS[dateKey]);
+// The month Pre-season is dated in ("2026-10"): no badge, shield or Crew podium for it.
+const isPreseasonMonth = month => PRESEASON_DATES.some(dateKey => dateKey.startsWith(month));
 const { EXTREME_MAX_DAY, MODE_NAME, scorePick } = __modules["extremes.js"];
 const { countryName, localNames, locale, num, placeName, t, tOr, tr } = __modules["i18n.js"];
 const { area: areaIn, convertRankValue } = __modules["units.js"];
@@ -25434,7 +25436,7 @@ function getDayScore(plan, states) {
   };
 }
 
-return { PRESEASON, PRESEASON_DATES, hasPreseasonDay, MODES, MAIN_MODE, MODE_INFO, ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, SPEED_WINDOW_MS, getSpeedWindow, MAX_SPEED_BONUS, getSpeedMultiplier, getMaxScore, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, getNeighbourHardness, getPaintPoolEntry, resolveRound, resolvePlan, getDayInfo, getDailyPlan, hasExtremeDay, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
+return { PRESEASON, PRESEASON_DATES, hasPreseasonDay, isPreseasonMonth, MODES, MAIN_MODE, MODE_INFO, ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, SPEED_WINDOW_MS, getSpeedWindow, MAX_SPEED_BONUS, getSpeedMultiplier, getMaxScore, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, getNeighbourHardness, getPaintPoolEntry, resolveRound, resolvePlan, getDayInfo, getDailyPlan, hasExtremeDay, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
 })();
 
 // ---- community.js
@@ -27169,7 +27171,7 @@ return { createArchiveMap };
 __modules["screens.js"] = (() => {
 const { sounds } = __modules["audio.js"];
 const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getScoreBucket, getTopPercent } = __modules["community.js"];
-const { MAIN_MODE, MAX_DAILY_SCORE, MODE_INFO, PRESEASON_DATES, hasPreseasonDay } = __modules["daily.js"];
+const { MAIN_MODE, MAX_DAILY_SCORE, MODE_INFO, PRESEASON_DATES, hasPreseasonDay, isPreseasonMonth } = __modules["daily.js"];
 const { createBadge } = __modules["badges.js"];
 const { createFlagImage } = __modules["ui.js"];
 const { COUNTRIES } = __modules["countries.js"];
@@ -27964,7 +27966,7 @@ function initializePlayerStats({ getDays, getDayRecord, openArchive }) {
     // Highs & Lows: the badge you earned in each month you played.
     const badges = element("div", "player-stats-badges");
     if (mode === MAIN_MODE) {
-      [...new Set(records.filter(day => day.completed).map(day => day.dateKey.slice(0, 7)))].sort().forEach(month => {
+      [...new Set(records.filter(day => day.completed).map(day => day.dateKey.slice(0, 7)))].filter(month => !isPreseasonMonth(month)).sort().forEach(month => {
         const tier = getMonthBadge(records, month).tier;
         if (!tier) return;
         const item = element("span", "player-stats-badge");
@@ -28052,6 +28054,7 @@ const { sounds } = __modules["audio.js"];
 const { createAtlasSprite } = __modules["atlas.js"];
 const { createBadge } = __modules["badges.js"];
 const { RANK_TIERS, getMonthBadge } = __modules["community.js"];
+const { isPreseasonMonth } = __modules["daily.js"];
 const { t } = __modules["i18n.js"];
 
 const TENT_KEY = "daily-geography:tent-level:v1";
@@ -28074,7 +28077,7 @@ const levelOf = tier => (tier ? RANK_TIERS.length - RANK_TIERS.indexOf(tier) : 0
 
 // The best rank of any month, from archive records of the main game (screens.js loadDays).
 function tentLevel(days) {
-  const months = [...new Set(days.filter(day => day.completed).map(day => day.dateKey.slice(0, 7)))];
+  const months = [...new Set(days.filter(day => day.completed).map(day => day.dateKey.slice(0, 7)))].filter(month => !isPreseasonMonth(month));
   return months.reduce((best, month) => Math.max(best, levelOf(getMonthBadge(days, month).tier)), 0);
 }
 
@@ -28787,6 +28790,7 @@ const { createAtlas, createAtlasSprite, isAtlasQuiet, onAtlasQuietChange, setAtl
 const { createBadge, createMedal, getGroupMedal } = __modules["badges.js"];
 const { createBaseLine } = __modules["base.js"];
 const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getTopPercent } = __modules["community.js"];
+const { isPreseasonMonth } = __modules["daily.js"];
 const { showToastNotice } = __modules["ui.js"];
 const { drawCampScene } = __modules["camp-scene.js"];
 const { countryName, locale, onLangChange, t } = __modules["i18n.js"];
@@ -29313,7 +29317,7 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     const card = element("div", "community-card camp-shields");
     card.appendChild(element("span", "field-label", t("camp.shields")));
     const days = getDays();
-    const months = [...new Set(days.filter(day => day.completed && !day.noGame).map(day => day.dateKey.slice(0, 7)))].sort().reverse();
+    const months = [...new Set(days.filter(day => day.completed && !day.noGame).map(day => day.dateKey.slice(0, 7)))].filter(month => !isPreseasonMonth(month)).sort().reverse();
     const list = element("ul", "camp-shield-list");
     months.forEach(month => {
       const badge = getMonthBadge(days, month);
@@ -29490,7 +29494,7 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     const history = element("div", "community-history");
     const months = [];
     for (let month = firstDay.slice(0, 7); month < today.slice(0, 7); month = addDays(`${month}-28`, 7).slice(0, 7)) months.unshift(month);
-    months.forEach(month => {
+    months.filter(month => !isPreseasonMonth(month)).forEach(month => {
       const podium = withPlaces(standings(people, `${month}-01`, `${month}-31`)).filter(entry => entry.place <= 3);
       if (!podium.length) return;
       const block = element("section", "community-podium");
