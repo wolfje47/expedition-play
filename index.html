@@ -4161,6 +4161,25 @@ h1, h2, h3 { font-weight: normal; }
   .duel-toast { bottom: calc(52dvh + 12px); }
 }
 
+/* 1v1, round 2 (team feedback 17 November 2026): a bigger clock, the question card in the
+   middle, who picked the category, and Bid It's auction. */
+.duel-clock { height: 26px; border-radius: 13px; min-width: 220px; }
+.duel-clock-text { font: 700 16px/26px var(--font-mono); }
+.duel-view[data-phase="intro"] .duel-panel { right: auto; bottom: auto; left: 50%; transform: translate(-50%, -50%); top: calc(50% + 40px); max-height: calc(100dvh - 140px); width: min(560px, calc(100% - 32px)); border-width: 2px; border-color: var(--duel); box-shadow: 0 0 40px color-mix(in srgb, var(--duel) 35%, transparent), var(--glass-shadow); }
+.duel-view[data-phase="intro"] .duel-ask { font-size: 20px; }
+.duel-picked { display: grid; gap: 6px; padding: 12px; border-radius: 12px; text-align: center; background: color-mix(in srgb, var(--duel) 18%, transparent); border: 2px solid var(--duel); }
+.duel-picked[data-who="you"] { background: color-mix(in srgb, var(--gold) 14%, transparent); border-color: var(--gold); }
+.duel-picked[data-who="you"] .duel-kicker { color: var(--gold); }
+.duel-picked strong { font: 14px/1.4 var(--font-display); letter-spacing: var(--ls-pixel); }
+.duel-auction { display: grid; justify-items: center; gap: 2px; }
+.duel-wait.is-turn { border: 2px solid var(--duel); }
+@media (max-width: 760px) {
+  .duel-clock { min-width: 0; height: 22px; }
+  .duel-clock-text { font-size: 14px; line-height: 22px; }
+  .duel-view[data-phase="intro"] .duel-panel { top: auto; bottom: 0; transform: none; left: 0; width: auto; max-height: 75dvh; }
+  .duel-view[data-phase="intro"] .duel-ask { font-size: 17px; }
+}
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -7617,7 +7636,7 @@ const EN = {
   "duel.how.pin": "Drop a pin on a place. The closer, the more points.",
   "duel.how.guess": "Guess a country's number. Points drop for every country that lies between your guess and the real value.",
   "duel.how.route": "Travel from one country to another through countries that border each other. The shortest route scores 1,000.",
-  "duel.how.bid": "Bid how many answers you can name. The higher bid names them: all of them and you score 100 per name, too few and you lose 100 per name missed.",
+  "duel.how.bid": "Take turns bidding how many answers you can name; each raise gives the other player a fresh clock. The highest bidder names them: all of them scores 100 per name, too few loses 100 per name missed.",
   "duel.how.paint": "Paint every country that fits. Nothing shows right or wrong until you both lock in.",
   "duel.task.pin": "Drop your pin",
   "duel.task.guess": "Make your guess",
@@ -7648,7 +7667,7 @@ const EN = {
   "duel.undo": "↶ Undo the last country",
   "duel.unknownCountry": "That isn't one of the game's countries.",
   "duel.paintHint": p => `Click countries to paint them; click again to unpaint. ${p.n} painted.`,
-  "duel.bidHint": "The higher bid names them, in 40 seconds. All of them: 100 a name. Too few: −100 for each one missed.",
+  "duel.bidHint": "Take turns raising. The highest bidder names them in 40 seconds: all of them is 100 a name, too few is −100 for each one missed.",
   "duel.bidPick": "PICK A NUMBER",
   "duel.bidGo": "BID {n}",
   "duel.bidWait": "You bid {n}. Waiting for {name}…",
@@ -7686,6 +7705,19 @@ const EN = {
   "duel.theyLeft": "{name} left the match",
   "duel.newMatch": "▶ NEW MATCH",
   "duel.menu": "Back to the menu",
+  "duel.continue": "CONTINUE",
+  "duel.youPicked": "YOU PICKED",
+  "duel.theyPicked": "{name} PICKED",
+  "duel.highest": "HIGHEST BID",
+  "duel.youLead": "Yours",
+  "duel.theyLead": "{name}'s",
+  "duel.noBidYet": "Nobody has bid yet",
+  "duel.theirTurn": "{name}'s turn: raise or let the other name…",
+  "duel.yourTurnRaise": "Your turn: bid more than {n}, or let them name.",
+  "duel.yourTurnFirst": "Your turn: bid first, or pass.",
+  "duel.letThem": "LET {name} NAME THEM",
+  "duel.pass": "PASS",
+  "duel.nameHint": "Type a country or click it on the globe.",
   "duel.paintReveal": "Here come the countries…",
   "duel.paintedCountries": "countries painted"
 };
@@ -8750,7 +8782,7 @@ const NL = {
   "duel.how.pin": "Zet een speld op een plek. Hoe dichterbij, hoe meer punten.",
   "duel.how.guess": "Raad het getal van een land. Je verliest punten voor elk land dat tussen je gok en de echte waarde ligt.",
   "duel.how.route": "Reis van het ene land naar het andere via landen die aan elkaar grenzen. De kortste route is 1.000 punten.",
-  "duel.how.bid": "Bied hoeveel antwoorden je kunt noemen. Het hoogste bod noemt ze: allemaal goed is 100 per naam, te weinig kost 100 per gemiste naam.",
+  "duel.how.bid": "Bied om de beurt hoeveel antwoorden je kunt noemen; elk hoger bod geeft de ander een nieuwe klok. Het hoogste bod noemt ze: allemaal goed is 100 per naam, te weinig kost 100 per gemiste naam.",
   "duel.how.paint": "Kleur elk land dat past. Goed of fout zie je pas als jullie allebei vastzetten.",
   "duel.task.pin": "Zet je speld",
   "duel.task.guess": "Doe je gok",
@@ -8781,7 +8813,7 @@ const NL = {
   "duel.undo": "↶ Laatste land ongedaan maken",
   "duel.unknownCountry": "Dat is geen van de landen in het spel.",
   "duel.paintHint": p => `Klik landen om ze te kleuren; nog eens klikken haalt de kleur weg. ${p.n} gekleurd.`,
-  "duel.bidHint": "Het hoogste bod noemt ze, in 40 seconden. Allemaal: 100 per naam. Te weinig: −100 per gemiste naam.",
+  "duel.bidHint": "Om de beurt hoger bieden. Het hoogste bod noemt ze in 40 seconden: allemaal is 100 per naam, te weinig kost 100 per gemiste naam.",
   "duel.bidPick": "KIES EEN GETAL",
   "duel.bidGo": "BIED {n}",
   "duel.bidWait": "Je bood {n}. Wachten op {name}…",
@@ -8819,6 +8851,19 @@ const NL = {
   "duel.theyLeft": "{name} heeft de wedstrijd verlaten",
   "duel.newMatch": "▶ NIEUWE WEDSTRIJD",
   "duel.menu": "Terug naar het menu",
+  "duel.continue": "VERDER",
+  "duel.youPicked": "JIJ KOOS",
+  "duel.theyPicked": "{name} KOOS",
+  "duel.highest": "HOOGSTE BOD",
+  "duel.youLead": "Van jou",
+  "duel.theyLead": "Van {name}",
+  "duel.noBidYet": "Nog niemand heeft geboden",
+  "duel.theirTurn": "{name} is aan de beurt: hoger bieden of jou laten noemen…",
+  "duel.yourTurnRaise": "Jouw beurt: bied meer dan {n}, of laat de ander noemen.",
+  "duel.yourTurnFirst": "Jouw beurt: bied als eerste, of pas.",
+  "duel.letThem": "LAAT {name} ZE NOEMEN",
+  "duel.pass": "PAS",
+  "duel.nameHint": "Typ een land of klik het aan op de globe.",
   "duel.paintReveal": "Daar komen de landen…",
   "duel.paintedCountries": "landen gekleurd"
 };
@@ -31020,9 +31065,10 @@ const DUEL_ROUNDS = ["pin", "guess", "route", "bid", "paint"];
 // How long each round's clock runs, in ms. Bid It has two clocks: bidding, then naming.
 const DUEL_TIMES = {
   pin: 20000,
-  guess: 20000,
+  guess: 30000,
   route: 60000,
-  bidding: 10000,
+  bidding: 15000, // per turn: every raise gives the other player a fresh 15 s
+  intro: 20000, // the question card, until both press CONTINUE
   naming: 40000,
   paint: 45000,
   pick: 10000 // choosing a category
@@ -31433,7 +31479,7 @@ function createDuel({ globe, onExit, onSignIn }) {
   function tick() {
     frame = requestAnimationFrame(tick);
     const s = state();
-    const running = s && s.deadline && ["pick", "play", "bid", "name", "reveal"].includes(s.phase);
+    const running = s && s.deadline && ["pick", "intro", "play", "bid", "name", "reveal"].includes(s.phase);
     top.classList.toggle("has-clock", Boolean(running));
     if (!running) return;
     const now = serverNow();
@@ -31450,7 +31496,7 @@ function createDuel({ globe, onExit, onSignIn }) {
     clockFill.style.transform = `scaleX(${left / total})`;
     clockText.textContent = `${Math.ceil(left / 1000)} s`;
     top.dataset.clock = left < 5000 ? "low" : "run";
-    const grace = s.phase === "pick" || s.phase === "reveal" ? 0 : GRACE_MS;
+    const grace = ["pick", "reveal", "intro"].includes(s.phase) ? 0 : GRACE_MS;
     if (now > s.deadline + grace + 300 && syncedFor !== s.deadline) {
       syncedFor = s.deadline;
       sync();
@@ -31468,6 +31514,13 @@ function createDuel({ globe, onExit, onSignIn }) {
   }
   function onGlobeClick({ lat, lon, ccn3 }) {
     const s = state();
+    // Bid It: the bidder can also click the countries to name them.
+    if (s?.phase === "name" && s.bid?.bidder === me()) {
+      const country = countryAtClick(ccn3);
+      if (country) nameCountry(country);
+      else showToastNotice(t(ccn3 ? "problem.notCountry" : "problem.sea"), { problem: true });
+      return;
+    }
     if (!s || s.phase !== "play" || s.locked[me()] || serverNow() < s.opensAt) return;
     const style = s.rounds[s.round].style;
     if (style === "pin") {
@@ -31559,7 +31612,7 @@ function createDuel({ globe, onExit, onSignIn }) {
   // sheet on a phone. Before and after a match (the panel in the middle) it stays centred.
   function frameGlobe() {
     if (!open) return;
-    const centred = ["start", "lobby", "done"].includes(view.dataset.phase) || !panel.childElementCount;
+    const centred = ["start", "lobby", "done", "intro"].includes(view.dataset.phase) || !panel.childElementCount;
     if (centred) { globe.setViewShift(0); globe.setViewShiftY(0); return; }
     if (matchMedia("(max-width: 760px)").matches) {
       const topBottom = top.hidden ? 0 : top.getBoundingClientRect().bottom;
@@ -31593,8 +31646,8 @@ function createDuel({ globe, onExit, onSignIn }) {
       dot.title = styleName(style);
       return dot;
     }));
-    document.getElementById("duelYouLock").hidden = !(s.locked?.[me()] && ["play", "bid"].includes(s.phase));
-    document.getElementById("duelThemLock").hidden = !(s.locked?.[them()] && ["play", "bid"].includes(s.phase));
+    document.getElementById("duelYouLock").hidden = !((s.phase === "play" && s.locked?.[me()]) || (s.phase === "intro" && s.ready?.[me()]));
+    document.getElementById("duelThemLock").hidden = !((s.phase === "play" && s.locked?.[them()]) || (s.phase === "intro" && s.ready?.[them()]));
   }
 
   function renderPanel() {
@@ -31619,8 +31672,9 @@ function createDuel({ globe, onExit, onSignIn }) {
       if (s.phase === "play") { drawPlay(); focusRound(round); }
       if (s.phase === "name" || s.phase === "bid") drawList(null);
     }
-    globe.setClickable(s.phase === "play" && !s.locked[me()] && ["pin", "route", "paint"].includes(s.rounds[s.round]?.style));
+    globe.setClickable((s.phase === "play" && !s.locked[me()] && ["pin", "route", "paint"].includes(s.rounds[s.round]?.style)) || (s.phase === "name" && s.bid?.bidder === me()));
     if (s.phase === "pick") return renderPick();
+    if (s.phase === "intro") return renderIntro();
     if (s.phase === "play") return renderPlay();
     if (s.phase === "bid") return renderBid();
     if (s.phase === "name") return renderName();
@@ -31856,26 +31910,54 @@ function createDuel({ globe, onExit, onSignIn }) {
   }
   const focusSoon = field => requestAnimationFrame(() => { if (!matchMedia("(hover: none)").matches) field.focus(); });
 
+  // Bid It is an auction: on your turn raise the bid or let the other player name.
   function renderBid() {
     const s = state();
     const round = s.rounds[s.round];
-    const ready = serverNow() >= s.opensAt;
+    const { high, leader, turn } = s.bid;
+    const mine = turn === me();
     const parts = [head(roundKicker(), t("duel.task.bid")), questionBlock(round)];
-    if (s.locked[me()]) {
-      parts.push(el("p", "duel-wait", s.locked[them()] ? t("duel.bothLocked") : t("duel.bidWait", { name: nameOf(them()), n: local.bid })));
+    const standing = el("div", "duel-auction");
+    standing.append(el("span", "duel-kicker", t("duel.highest")), el("strong", "duel-count", high ? String(high) : "–"),
+      el("small", "duel-detail", leader ? (leader === me() ? t("duel.youLead") : t("duel.theyLead", { name: nameOf(leader) })) : t("duel.noBidYet")));
+    parts.push(standing);
+    if (!mine) {
+      parts.push(el("p", "duel-wait", t("duel.theirTurn", { name: nameOf(turn) })));
       panel.replaceChildren(...parts);
       return;
     }
+    if (!(local.bid > high)) local.bid = null;
     const grid = el("div", "duel-bids");
     for (let bid = BID_MIN; bid <= BID_MAX; bid++) {
       const option = button(String(bid), `duel-bid${local.bid === bid ? " is-on" : ""}`, () => { local.bid = bid; renderPanel(); });
-      option.disabled = !ready;
+      option.disabled = bid <= high;
       grid.append(option);
     }
     const go = button(local.bid ? t("duel.bidGo", { n: local.bid }) : t("duel.bidPick"), "duel-go", () => move({ type: "bid", bid: local.bid }));
-    go.disabled = !local.bid || !ready;
-    parts.push(el("p", "duel-hint", t("duel.bidHint")), grid, go);
+    go.disabled = !local.bid;
+    const pass = button(leader ? t("duel.letThem", { name: nameOf(leader) }) : t("duel.pass"), "duel-go is-small is-ghost", () => move({ type: "pass" }));
+    parts.push(el("p", "duel-wait is-turn", leader ? t("duel.yourTurnRaise", { n: high }) : t("duel.yourTurnFirst")), el("p", "duel-hint", t("duel.bidHint")), grid, go, pass);
     panel.replaceChildren(...parts);
+  }
+
+  // The question card, in the middle: who picked which category, and the question. The
+  // round's clock starts when both press CONTINUE (or this card's clock runs out).
+  function renderIntro() {
+    const s = state();
+    const round = s.rounds[s.round];
+    const picked = el("div", "duel-picked");
+    picked.dataset.who = round.pickedBy === me() ? "you" : "them";
+    picked.append(el("span", "duel-kicker", round.pickedBy === me() ? t("duel.youPicked") : t("duel.theyPicked", { name: nameOf(round.pickedBy) })), el("strong", "", categoryName(round.category)));
+    const ready = s.ready[me()];
+    const go = button(ready ? t("duel.waitingNext", { name: nameOf(them()) }) : t("duel.continue"), "duel-go", () => move({ type: "ready" }));
+    go.disabled = ready;
+    panel.replaceChildren(
+      head(roundKicker(), t(`duel.task.${round.style}`), t(`duel.how.${round.style}`)),
+      picked,
+      questionBlock(round),
+      go
+    );
+    if (round.style === "guess" || round.style === "route") focusRound(round);
   }
 
   // Bid It on the globe: what's been named, and (after the round) the rest of the list.
@@ -31887,6 +31969,14 @@ function createDuel({ globe, onExit, onSignIn }) {
       ...answers.filter(iso => !named.includes(iso)).map(iso => ({ country: COUNTRY.get(iso), color: hex(COLORS.missed), fill: true })),
       ...named.map(iso => ({ country: COUNTRY.get(iso), color: hex(COLORS.answer), fill: true }))
     ].filter(item => item.country));
+  }
+
+  async function nameCountry(country) {
+    if (serverNow() < state().opensAt) return;
+    const outcome = await move({ type: "name", iso: country.iso });
+    if (outcome?.right) sounds.playGuess();
+    if (outcome?.wrong) { sounds.playError(); showToastNotice(t("duel.notOnList", { name: countryName(country) }), { problem: true }); }
+    if (outcome?.already) showToastNotice(t("duel.already"), { problem: true });
   }
 
   function renderName() {
@@ -31906,12 +31996,8 @@ function createDuel({ globe, onExit, onSignIn }) {
     named.forEach(iso => chips.append(chip(COUNTRY.get(iso), "is-right")));
     parts.push(chips);
     if (mine) {
-      parts.push(countryEntry(async country => {
-        const outcome = await move({ type: "name", iso: country.iso });
-        if (outcome?.right) sounds.playGuess();
-        if (outcome?.wrong) { sounds.playError(); showToastNotice(t("duel.notOnList", { name: countryName(country) }), { problem: true }); }
-        if (outcome?.already) showToastNotice(t("duel.already"), { problem: true });
-      }, t("duel.typeName"), !ready));
+      parts.push(el("p", "duel-hint", t("duel.nameHint")));
+      parts.push(countryEntry(nameCountry, t("duel.typeName"), !ready));
     } else parts.push(el("p", "duel-wait", t("duel.watchNaming")));
     panel.replaceChildren(...parts);
   }
@@ -32126,7 +32212,7 @@ function createDuel({ globe, onExit, onSignIn }) {
     if (!open || event.key !== "Enter" || event.target.closest?.("input")) return;
     const s = state();
     if (s?.phase === "play" && ["pin", "guess", "paint"].includes(s.rounds[s.round].style) && !s.locked[me()]) lockIn();
-    if (s?.phase === "reveal" && !s.ready[me()]) move({ type: "ready" });
+    if ((s?.phase === "reveal" || s?.phase === "intro") && !s.ready[me()]) move({ type: "ready" });
   });
   onLangChange(() => render());
   // Once you're signed in, an invite waiting for you goes on.
