@@ -4859,6 +4859,7 @@ h1, h2, h3 { font-weight: normal; }
 .lobby-pill-dot { width: 10px; height: 10px; border-radius: 2px; background: #c58cff; animation: lobby-blink 1.4s steps(2) infinite; }
 .lobby-pill-text { flex: 1; min-width: 0; overflow: hidden; color: var(--muted); font: 12px var(--font-body); text-align: left; text-overflow: ellipsis; white-space: nowrap; }
 .lobby-pill-text b { color: #c58cff; font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.lobby-pill-text span::before { content: "·"; margin: 0 8px 0 4px; color: var(--faint); }
 .lobby-pill-go { color: #c58cff; font: 8px var(--font-display); letter-spacing: var(--ls-pixel); white-space: nowrap; }
 #menuDuelButton[data-lobby]::after { content: ""; position: absolute; top: 6px; left: 6px; width: 8px; height: 8px; background: #c58cff; box-shadow: 0 0 0 2px #04121a; animation: lobby-blink 1.4s steps(2) infinite; }
 @media (prefers-reduced-motion: reduce) { .lobby-empty, .lobby-pill-dot, #menuDuelButton[data-lobby]::after { animation: none; } }
