@@ -3732,43 +3732,6 @@ h1, h2, h3 { font-weight: normal; }
 .tent-talk { text-align: left; }
 @media (prefers-reduced-motion: reduce) { .tent-rays, .tent-big { animation: none; } }
 
-/* ---------- The archive's map (archive-map.js, createMonthMap in screens.js) ---------- */
-.archive-views { display: flex; flex: none; gap: 4px; align-self: flex-start; padding: 3px; border-radius: 10px; background: rgba(0, 0, 0, 0.25); }
-.archive-view { padding: 7px 12px; border: 0; border-radius: 8px; background: none; color: var(--muted); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
-.archive-view:hover { color: var(--text); }
-.archive-view[aria-selected="true"] { background: color-mix(in srgb, var(--accent) 22%, transparent); box-shadow: inset 0 0 0 1px var(--accent); color: var(--text); }
-.archive-map-view { display: grid; gap: 10px; justify-items: center; padding: 4px 0 8px; }
-.archive-map-head { display: flex; align-items: center; gap: 10px; width: 100%; }
-.archive-map-title { display: grid; flex: 1; gap: 4px; text-align: center; }
-.archive-map-title strong { font: 12px var(--font-display); letter-spacing: var(--ls-pixel); }
-.archive-map-title small { color: var(--muted); font: 12px var(--font-body); }
-.archive-map-step { width: 36px; height: 36px; border: 0; border-radius: 8px; background: rgba(255, 255, 255, 0.06); box-shadow: inset 0 0 0 1px var(--glass-line); color: var(--text); font: 12px var(--font-display); cursor: pointer; }
-.archive-map-step:hover:not(:disabled) { background: var(--accent); color: #04121a; }
-.archive-map-step:disabled { opacity: 0.3; cursor: default; }
-.archive-map { display: grid; place-items: center; width: 100%; }
-.archive-map-canvas { display: block; touch-action: none; cursor: grab; }
-.archive-map-note { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0; color: var(--muted); font: 14px/1.4 var(--font-body); text-align: center; }
-.archive-map-flag { width: 22px; height: 15px; flex: none; border: 1px solid var(--line-strong); object-fit: cover; }
-.transit-title small.is-fleet { color: var(--cyan); }
-.transit-fleet-note { margin: -2px 0 0; color: var(--faint); font: 12px/1.35 var(--font-body); }
-.base-chosen .field-label { margin-left: 6px; }
-.base-city { min-width: 0; max-width: 170px; padding: 6px 8px; border: 0; border-radius: 6px; background: rgba(255, 255, 255, 0.08); box-shadow: inset 0 0 0 1px var(--glass-line); color: var(--text); font: 14px var(--font-body); }
-.base-city option { background: #111830; }
-.base-chosen { flex-wrap: wrap; }
-
-/* ---------- The archive's globe in full screen (openFullMap in screens.js) ---------- */
-.archive-map { position: relative; }
-.archive-map-expand { position: absolute; right: 4px; bottom: 4px; padding: 7px 10px; border: 0; border-radius: 8px; background: var(--glass-strong); box-shadow: inset 0 0 0 1px var(--glass-line); color: var(--text); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
-.archive-map-expand:hover,
-.archive-map-expand:focus-visible { background: var(--accent); color: #04121a; outline: none; }
-.archive-globe-full { position: fixed; inset: 0; z-index: 30; display: grid; grid-template-rows: auto 1fr auto; gap: 8px; padding: calc(16px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom)); background: radial-gradient(ellipse at 50% 40%, #121c3d, #060a16 70%); animation: transit-in 0.25s ease-out; }
-.archive-globe-head { display: flex; align-items: center; gap: 10px; width: min(100%, 720px); margin: 0 auto; }
-.archive-globe-head .modal-close { margin-left: 8px; }
-.archive-globe-body { display: grid; place-items: center; min-height: 0; }
-.archive-globe-body .archive-map { width: 100%; height: 100%; }
-.archive-globe-foot { margin: 0; color: var(--muted); font: 14px var(--font-body); text-align: center; }
-@media (max-width: 760px) { .archive-globe-foot { font-size: 12px; } }
-
 /* ---------- Today's game done: the tile turns green (refreshPlayTiles in ui.js) ---------- */
 .play-tile[data-state="done"] { --tile: #5cf28a !important; }
 .play-tile[data-state="done"] .play-tile-ribbon { background: #5cf28a; color: #04121a; }
@@ -5805,11 +5768,6 @@ h1, h2, h3 { font-weight: normal; }
       </div>
       <div class="screen-body archive-layout">
         <div class="screen-column">
-          <!-- Calendar, or a map of where each day of one month started (archive-map.js). -->
-          <div class="archive-views" id="archiveViews" role="tablist" data-i18n-attr="aria-label:archive.views">
-            <button class="archive-view" type="button" role="tab" data-view="calendar" aria-selected="true" data-i18n="archive.viewCalendar">CALENDAR</button>
-            <button class="archive-view" type="button" role="tab" data-view="map" aria-selected="false" data-i18n="archive.viewMap">MAP</button>
-          </div>
           <div id="archiveListContainer" class="archive-calendar"></div>
           <!-- Start, continue or "played" for the selected day, under the calendar. -->
           <div id="archivePlay"></div>
@@ -29753,312 +29711,6 @@ function setGuessHighlight(index, active) {
 return { redactCountryName, showToastNotice, resetCountryInput, normalizeCountryName, updateDailyScoreUI, createFlagImage, showSkip, showTripCard, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, renderGlobeMarkerTooltip, PLAY_ART, PLAY_ART_COLORS, createPixelArt, showHowToSet, initializeMainMenu, createCountryInput, initializeCountryInput, isCloseMatch, createGuessRow, setGuessHighlight };
 })();
 
-// ---- archive-map.js
-__modules["archive-map.js"] = (() => {
-// The archive's map: a small globe of its own (a canvas, not the game's globe, which stays
-// clean) with where the game started on each past day of one month. Drag to turn it; a pin
-// picks its day. The countries come from the game's globe (Natural Earth via world-atlas);
-// each pin is the day's starting place (getDayPlace in travel.js), which never gives an
-// answer away.
-const RAD = Math.PI / 180;
-// The archive's heat colours (screens.js heatOf): top 10% pink, 25% gold, 50% cyan, lower blue.
-const HEAT = { 1: "#ff6b9d", 2: "#ffd45c", 3: "#45e3ff", 4: "#5aa8ff" };
-
-// points: [{ dateKey, lonLat, number, heat (1–4, or 0 not played), progress, badge }].
-// `badge`: the score and top % of a played day, shown over its pin in full screen.
-// `anchor`: your tent ({ lonLat, icon: a canvas }), the hub every day's trip leaves from.
-// `full`: the full-screen globe (bigger, zoomable, badges); `onExpand` for a click on the
-// small one (not on a pin). Returns { element, redraw, update }.
-function createArchiveMap({ features, points, selected = null, onPick, label = "", anchor = null, full = false, onExpand = null }) {
-  const wrap = document.createElement("div");
-  wrap.className = full ? "archive-map is-full" : "archive-map";
-  const canvas = document.createElement("canvas");
-  canvas.className = "archive-map-canvas";
-  canvas.setAttribute("role", "img");
-  canvas.setAttribute("aria-label", label);
-  wrap.appendChild(canvas);
-  const ctx = canvas.getContext("2d");
-
-  // Face the middle of the month's pins.
-  const centre = () => {
-    if (!points.length) return [10, 25];
-    const v = points.reduce((sum, { lonLat: [lon, lat] }) => [sum[0] + Math.cos(lat * RAD) * Math.cos(lon * RAD), sum[1] + Math.cos(lat * RAD) * Math.sin(lon * RAD), sum[2] + Math.sin(lat * RAD)], [0, 0, 0]);
-    return [Math.atan2(v[1], v[0]) / RAD, Math.max(-50, Math.min(50, Math.atan2(v[2], Math.hypot(v[0], v[1])) / RAD))];
-  };
-  let [lon0, lat0] = centre();
-  let size = 0;
-  let ratio = 1;
-  let pins = [];
-  let zoom = 1;
-
-  // Orthographic projection round (lon0, lat0). Points on the far side are pushed onto the
-  // rim, so a country across the horizon still fills up to it.
-  function project([lon, lat]) {
-    const l = (lon - lon0) * RAD;
-    const p = lat * RAD;
-    const p0 = lat0 * RAD;
-    const x = Math.cos(p) * Math.sin(l);
-    const y = Math.cos(p0) * Math.sin(p) - Math.sin(p0) * Math.cos(p) * Math.cos(l);
-    const z = Math.sin(p0) * Math.sin(p) + Math.cos(p0) * Math.cos(p) * Math.cos(l);
-    const r = (size / 2 - 6) * zoom;
-    if (z >= 0) return { x: size / 2 + x * r, y: size / 2 - y * r, visible: true };
-    const length = Math.hypot(x, y) || 1;
-    return { x: size / 2 + x / length * r, y: size / 2 - y / length * r, visible: false };
-  }
-
-  function ring(points) {
-    let started = false;
-    let lastX = 0;
-    let lastY = 0;
-    let anyVisible = false;
-    points.forEach((point, index) => {
-      const p = project(point);
-      anyVisible ||= p.visible;
-      // Skip points closer than half a pixel to the last one (the map is detailed).
-      if (started && index < points.length - 1 && Math.abs(p.x - lastX) + Math.abs(p.y - lastY) < 0.6) return;
-      if (!started) { ctx.moveTo(p.x, p.y); started = true; } else ctx.lineTo(p.x, p.y);
-      lastX = p.x;
-      lastY = p.y;
-    });
-    ctx.closePath();
-    return anyVisible;
-  }
-
-  function draw() {
-    const box = full ? Math.min(wrap.clientWidth, wrap.clientHeight) : wrap.clientWidth;
-    if (!box) return;
-    ratio = Math.min(2, window.devicePixelRatio || 1);
-    size = full ? box : Math.min(box, 420);
-    canvas.width = Math.round(size * ratio);
-    canvas.height = Math.round(size * ratio);
-    canvas.style.width = `${size}px`;
-    canvas.style.height = `${size}px`;
-    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    ctx.clearRect(0, 0, size, size);
-    const r = (size / 2 - 6) * zoom;
-    // The sea, with a soft rim.
-    const sea = ctx.createRadialGradient(size / 2 - r * 0.3, size / 2 - r * 0.3, r * 0.1, size / 2, size / 2, r);
-    sea.addColorStop(0, "#16306a");
-    sea.addColorStop(1, "#0b1838");
-    ctx.fillStyle = sea;
-    ctx.beginPath();
-    ctx.arc(size / 2, size / 2, r, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(size / 2, size / 2, r, 0, Math.PI * 2);
-    ctx.clip();
-    // Lines of latitude and longitude every 30°.
-    ctx.strokeStyle = "rgba(143, 155, 189, 0.16)";
-    ctx.lineWidth = 1;
-    for (let lon = -180; lon < 180; lon += 30) {
-      ctx.beginPath();
-      let pen = false;
-      for (let lat = -90; lat <= 90; lat += 5) {
-        const p = project([lon, lat]);
-        if (!p.visible) { pen = false; continue; }
-        if (pen) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y);
-        pen = true;
-      }
-      ctx.stroke();
-    }
-    for (let lat = -60; lat <= 60; lat += 30) {
-      ctx.beginPath();
-      let pen = false;
-      for (let lon = -180; lon <= 180; lon += 5) {
-        const p = project([lon, lat]);
-        if (!p.visible) { pen = false; continue; }
-        if (pen) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y);
-        pen = true;
-      }
-      ctx.stroke();
-    }
-    // The countries.
-    ctx.fillStyle = "#2b3a6b";
-    ctx.strokeStyle = "#4a5c94";
-    ctx.lineWidth = 0.6;
-    (features() || []).forEach(feature => {
-      const geometry = feature.geometry;
-      if (!geometry) return;
-      const polygons = geometry.type === "Polygon" ? [geometry.coordinates] : geometry.type === "MultiPolygon" ? geometry.coordinates : [];
-      polygons.forEach(polygon => {
-        ctx.beginPath();
-        const seen = polygon.map(ring).some(Boolean);
-        if (!seen) return;
-        ctx.fill("evenodd");
-        ctx.stroke();
-      });
-    });
-    ctx.restore();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(size / 2, size / 2, r, 0, Math.PI * 2);
-    ctx.stroke();
-
-    const visible = points.map(point => ({ ...point, at: project(point.lonLat) })).filter(point => point.at.visible);
-    // Your tent, the hub: a faint line from it to every day's place.
-    const home = anchor ? project(anchor.lonLat) : null;
-    if (home?.visible) {
-      ctx.fillStyle = "rgba(255, 212, 92, 0.28)";
-      visible.forEach(point => {
-        const length = Math.hypot(point.at.x - home.x, point.at.y - home.y);
-        for (let step = 10; step < length - 8; step += 5) ctx.fillRect(Math.round(home.x + (point.at.x - home.x) * step / length), Math.round(home.y + (point.at.y - home.y) * step / length), 1.5, 1.5);
-      });
-    }
-    // The route through the month, day by day, as a faint dotted line.
-    ctx.fillStyle = "rgba(244, 241, 232, 0.35)";
-    for (let index = 1; index < visible.length; index += 1) {
-      const a = visible[index - 1].at;
-      const b = visible[index].at;
-      if (visible[index - 1].dateKey > visible[index].dateKey) continue;
-      const length = Math.hypot(b.x - a.x, b.y - a.y);
-      for (let step = 0; step < length; step += 6) ctx.fillRect(Math.round(a.x + (b.x - a.x) * step / length) - 1, Math.round(a.y + (b.y - a.y) * step / length) - 1, 2, 2);
-    }
-    if (home?.visible && anchor.icon) {
-      const scale = full ? 3 : 2;
-      const w = anchor.icon.width * scale;
-      const h = anchor.icon.height * scale;
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(anchor.icon, Math.round(home.x - w / 2), Math.round(home.y - h + 4), w, h);
-    }
-    // The pins: a square with the day's number, in the day's heat colour once played.
-    pins = [];
-    const badges = [];
-    const pinFont = full ? 12 : 9;
-    ctx.font = `${pinFont}px 'Press Start 2P', monospace`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    // The selected pin last, on top.
-    [...visible].sort((a, b) => (a.dateKey === selected) - (b.dateKey === selected)).forEach(point => {
-      const x = Math.round(point.at.x);
-      const y = Math.round(point.at.y);
-      const text = String(point.number);
-      const width = Math.max(full ? 28 : 20, ctx.measureText(text).width + (full ? 14 : 10));
-      const height = full ? 26 : 18;
-      const top = y - height - 6;
-      const left = x - width / 2;
-      const color = point.heat ? HEAT[point.heat] : "#f4f1e8";
-      const isSelected = point.dateKey === selected;
-      ctx.fillStyle = "#0b1020";
-      ctx.fillRect(x - 2, top + height, 4, 6);
-      ctx.fillRect(left - 2, top - 2, width + 4, height + 4);
-      ctx.fillStyle = isSelected ? "#ffffff" : color;
-      ctx.fillRect(left - (isSelected ? 2 : 0), top - (isSelected ? 2 : 0), width + (isSelected ? 4 : 0), height + (isSelected ? 4 : 0));
-      ctx.fillStyle = point.heat ? color : "#0b1020";
-      ctx.fillRect(left + 2, top + 2, width - 4, height - 4);
-      if (!point.heat && point.progress) { ctx.fillStyle = "rgba(255, 212, 92, 0.35)"; ctx.fillRect(left + 2, top + 2, (width - 4) * point.progress, height - 4); }
-      ctx.fillStyle = point.heat ? "#0b1020" : "#f4f1e8";
-      ctx.fillText(text, x + 0.5, top + height / 2 + 1);
-      ctx.fillStyle = color;
-      ctx.fillRect(x - 2, y - 2, 4, 4);
-      let boxTop = top;
-      // Full screen: a played day's score and top % float over its pin, in its colour.
-      ctx.font = "bold 12px 'Space Mono', monospace";
-      const badgeWidth = point.badge ? ctx.measureText(point.badge).width + 14 : 0;
-      const badgeTop = top - 30;
-      const badgeBox = { left: x - badgeWidth / 2 - 2, right: x + badgeWidth / 2 + 2, top: badgeTop - 2, bottom: badgeTop + 22 };
-      // (A badge that would sit on another one waits until you zoom in.)
-      const crowded = badges.some(other => badgeBox.left < other.right && badgeBox.right > other.left && badgeBox.top < other.bottom && badgeBox.bottom > other.top);
-      ctx.font = `${pinFont}px 'Press Start 2P', monospace`;
-      if (full && point.badge && !crowded) {
-        badges.push(badgeBox);
-        ctx.font = "bold 12px 'Space Mono', monospace";
-        ctx.fillStyle = "#0b1020";
-        ctx.fillRect(Math.round(x - badgeWidth / 2) - 2, badgeTop - 2, Math.round(badgeWidth) + 4, 24);
-        ctx.fillStyle = color;
-        ctx.fillRect(Math.round(x - badgeWidth / 2), badgeTop, Math.round(badgeWidth), 20);
-        ctx.fillStyle = "#0b1020";
-        ctx.fillText(point.badge, x, badgeTop + 11);
-        ctx.font = `${pinFont}px 'Press Start 2P', monospace`;
-        boxTop = badgeTop - 2;
-      }
-      pins.push({ left: left - 4, right: left + width + 4, top: boxTop - 4, bottom: y + 4, point });
-    });
-  }
-
-  // Dragging turns the globe; a tap on a pin picks its day.
-  let drag = null;
-  canvas.addEventListener("pointerdown", event => {
-    drag = { x: event.clientX, y: event.clientY, lon: lon0, lat: lat0, moved: false };
-    canvas.setPointerCapture(event.pointerId);
-  });
-  canvas.addEventListener("pointermove", event => {
-    const box = canvas.getBoundingClientRect();
-    const x = event.clientX - box.left;
-    const y = event.clientY - box.top;
-    if (!drag) { canvas.style.cursor = pins.some(pin => x >= pin.left && x <= pin.right && y >= pin.top && y <= pin.bottom) ? "pointer" : "grab"; return; }
-    const dx = event.clientX - drag.x;
-    const dy = event.clientY - drag.y;
-    if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
-    if (!drag.moved) return;
-    const degreesPerPixel = 180 / ((size || 300) * zoom);
-    lon0 = drag.lon - dx * degreesPerPixel;
-    lat0 = Math.max(-80, Math.min(80, drag.lat + dy * degreesPerPixel));
-    canvas.style.cursor = "grabbing";
-    requestAnimationFrame(draw);
-  });
-  const release = event => {
-    if (!drag) return;
-    const moved = drag.moved;
-    drag = null;
-    canvas.style.cursor = "grab";
-    if (moved || event.type === "pointercancel") return;
-    const box = canvas.getBoundingClientRect();
-    const x = event.clientX - box.left;
-    const y = event.clientY - box.top;
-    const hit = [...pins].reverse().find(pin => x >= pin.left && x <= pin.right && y >= pin.top && y <= pin.bottom);
-    if (hit) onPick(hit.point.dateKey);
-    else if (onExpand) onExpand();
-  };
-  // Full screen: the wheel or two fingers zoom (1× to 5×).
-  if (full) {
-    const setZoom = value => { zoom = Math.max(1, Math.min(5, value)); requestAnimationFrame(draw); };
-    canvas.addEventListener("wheel", event => { event.preventDefault(); setZoom(zoom * Math.exp(-event.deltaY * 0.0015)); }, { passive: false });
-    const touches = new Map();
-    let pinch = null;
-    canvas.addEventListener("pointerdown", event => {
-      touches.set(event.pointerId, [event.clientX, event.clientY]);
-      if (touches.size === 2) {
-        const [a, b] = [...touches.values()];
-        pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), zoom };
-        drag = null;
-      }
-    });
-    canvas.addEventListener("pointermove", event => {
-      if (!touches.has(event.pointerId)) return;
-      touches.set(event.pointerId, [event.clientX, event.clientY]);
-      if (pinch && touches.size === 2) {
-        const [a, b] = [...touches.values()];
-        setZoom(pinch.zoom * Math.hypot(a[0] - b[0], a[1] - b[1]) / pinch.d);
-      }
-    });
-    const lift = event => { touches.delete(event.pointerId); if (touches.size < 2) pinch = null; };
-    canvas.addEventListener("pointerup", lift);
-    canvas.addEventListener("pointercancel", lift);
-  }
-  canvas.addEventListener("pointerup", release);
-  canvas.addEventListener("pointercancel", release);
-
-  const resize = new ResizeObserver(() => draw());
-  resize.observe(wrap);
-  // Drawn once it's on the page (it needs its width), and again when the map comes in.
-  requestAnimationFrame(draw);
-  return {
-    element: wrap,
-    redraw: draw,
-    update(nextPoints, nextSelected = selected, { recentre = false } = {}) {
-      points = nextPoints;
-      selected = nextSelected;
-      if (recentre) [lon0, lat0] = centre();
-      draw();
-    }
-  };
-}
-
-return { createArchiveMap };
-})();
-
 // ---- screens.js
 __modules["screens.js"] = (() => {
 const { sounds } = __modules["audio.js"];
@@ -30068,7 +29720,6 @@ const { createBadge } = __modules["badges.js"];
 const { createFlagImage } = __modules["ui.js"];
 const { COUNTRIES } = __modules["countries.js"];
 const { countryName, locale, num, onLangChange, t, tapWords } = __modules["i18n.js"];
-const { createArchiveMap } = __modules["archive-map.js"];
 
 const sampleNote = () => t("archive.sample");
 // A month or day in the language on screen.
@@ -30438,107 +30089,7 @@ function describeYourRound({ type, state, plan, solved, ...rest }) {
   }
 }
 
-// The archive's map view: one month at a time (‹ month ›), with a pin where each past day's
-// game started. `getDayStart(dateKey, mode)` gives { lonLat, iso }.
-// The pins of one month: past days with a game, with a played day's score and top %.
-function monthPoints(days, month, mode, getDayStart) {
-  return days.filter(day => !day.noGame && day.dateKey.startsWith(month) && day.dateKey <= todayKey()).map(day => ({
-    dateKey: day.dateKey,
-    lonLat: getDayStart(day.dateKey, mode).lonLat,
-    number: day.puzzleNumber,
-    heat: day.completed ? heatOf(day.topPercent) : 0,
-    progress: !day.completed && day.started && day.rounds ? day.rounds.filter(round => round.done).length / day.rounds.length : 0,
-    badge: day.completed ? `${num(day.score)} · ${formatTopPercent(day.topPercent).toUpperCase()}` : null
-  }));
-}
-
-// The archive's globe in full screen: one month at a time, zoomable, with each played day's
-// score and top % over its pin and your tent as the hub. A pin opens its day in the archive.
-function openFullMap(days, { month, months, mode, getCountryFeatures, getDayStart, getAnchor, onPick, onMonth }) {
-  const overlay = element("div", "archive-globe-full");
-  overlay.setAttribute("role", "dialog");
-  overlay.setAttribute("aria-modal", "true");
-  const head = element("div", "archive-globe-head");
-  const body = element("div", "archive-globe-body");
-  const foot = element("p", "archive-globe-foot");
-  const close = element("button", "modal-close", "×");
-  close.type = "button";
-  close.setAttribute("aria-label", t("archive.mapClose"));
-  let current = month;
-  const finish = () => { document.removeEventListener("keydown", onKey, true); overlay.remove(); };
-  const onKey = event => { if (event.key === "Escape") { event.stopPropagation(); event.preventDefault(); sounds.playClick(); finish(); } };
-  document.addEventListener("keydown", onKey, true);
-  close.addEventListener("click", () => { sounds.playClick(); finish(); });
-  const render = () => {
-    const index = months.indexOf(current);
-    const step = (offset, text, labelKey) => {
-      const button = element("button", "archive-map-step", text);
-      button.type = "button";
-      button.setAttribute("aria-label", t(labelKey));
-      button.disabled = !months[index + offset];
-      button.addEventListener("click", () => { sounds.playClick(); current = months[index + offset]; onMonth(current); render(); });
-      return button;
-    };
-    const name = dateText(toDate(`${current}-01`), { month: "long", year: "numeric" }).toUpperCase();
-    const points = monthPoints(days, current, mode, getDayStart);
-    const title = element("div", "archive-map-title");
-    title.append(element("strong", "", name), element("small", "", t("archive.mapCount", { n: points.length, played: points.filter(point => point.heat).length })));
-    head.replaceChildren(step(-1, "‹", "archive.mapPrev"), title, step(1, "›", "archive.mapNext"), close);
-    const map = createArchiveMap({ features: getCountryFeatures, points, full: true, anchor: getAnchor?.() || null, label: t("archive.mapLabel", { month: name }),
-      onPick: dateKey => { finish(); onPick(days.find(day => day.dateKey === dateKey)); } });
-    body.replaceChildren(map.element);
-    foot.textContent = tapWords(t(points.length ? "archive.mapFullHint" : "archive.mapEmpty"));
-  };
-  overlay.append(head, body, foot);
-  document.getElementById("archiveModal").appendChild(overlay);
-  render();
-  close.focus({ preventScroll: true });
-}
-
-function createMonthMap(days, { month, months, selected, mode, getCountryFeatures, getDayStart, getAnchor, onMonth, onSelect }) {
-  const view = element("div", "archive-map-view");
-  const head = element("div", "archive-map-head");
-  const index = months.indexOf(month);
-  const step = (offset, text, labelKey) => {
-    const button = element("button", "archive-map-step", text);
-    button.type = "button";
-    button.setAttribute("aria-label", t(labelKey));
-    button.disabled = !months[index + offset];
-    button.addEventListener("click", () => { sounds.playClick(); onMonth(months[index + offset]); });
-    return button;
-  };
-  const name = isPreseason ? t("archive.preseason") : dateText(toDate(`${month}-01`), { month: "long", year: "numeric" }).toUpperCase();
-  const inMonth = days.filter(day => !day.noGame && day.dateKey.startsWith(month) && day.dateKey <= todayKey());
-  const title = element("div", "archive-map-title");
-  title.append(element("strong", "", name), element("small", "", t("archive.mapCount", { n: inMonth.length, played: inMonth.filter(day => day.completed).length })));
-  head.append(step(-1, "‹", "archive.mapPrev"), title, step(1, "›", "archive.mapNext"));
-  const points = monthPoints(days, month, mode, getDayStart);
-  const expand = () => {
-    sounds.playClick();
-    openFullMap(days, { month, months, mode, getCountryFeatures, getDayStart, getAnchor, onPick: onSelect, onMonth });
-  };
-  const map = createArchiveMap({ features: getCountryFeatures, points, selected: selected?.dateKey || null, anchor: getAnchor?.() || null, onExpand: expand,
-    onPick: dateKey => onSelect(days.find(day => day.dateKey === dateKey)), label: t("archive.mapLabel", { month: name }) });
-  // A button too, for the full-screen globe (a click on the globe itself does the same).
-  const full = element("button", "archive-map-expand", t("archive.mapExpand"));
-  full.type = "button";
-  full.addEventListener("click", expand);
-  map.element.appendChild(full);
-  view.append(head, map.element);
-  // The selected day: where it started.
-  const pick = inMonth.find(day => day.dateKey === selected?.dateKey);
-  const note = element("p", "archive-map-note");
-  if (pick) {
-    const start = getDayStart(pick.dateKey, mode);
-    const country = COUNTRIES.find(item => item.iso === start.iso);
-    if (country) note.append(createFlagImage(country, "archive-map-flag"));
-    note.append(element("span", "", t("archive.mapStart", { n: pick.puzzleNumber, place: start.name || (country ? countryName(country) : "") })));
-  } else note.textContent = inMonth.length ? tapWords(t("archive.mapHint")) : t("archive.mapEmpty");
-  view.appendChild(note);
-  return view;
-}
-
-function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay, getCountryFeatures = () => [], getDayStart = null, getAnchor = null }) {
+function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay }) {
   const archiveModal = document.getElementById("archiveModal");
   const archiveGrid = document.getElementById("archiveListContainer");
   const overview = document.getElementById("dayOverview");
@@ -30561,18 +30112,6 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay, getCountry
   // selected when switching.
   let archiveMode = MAIN_MODE;
   let currentSelection = null;
-  // Calendar or map (the map shows one month: mapMonth, the selected day's by default).
-  let archiveView = "calendar";
-  let mapMonth = null;
-  const viewTabs = [...document.querySelectorAll("#archiveViews button")];
-  viewTabs.forEach(tab => tab.addEventListener("click", () => {
-    if (tab.dataset.view === archiveView) return;
-    sounds.playClick();
-    archiveView = tab.dataset.view;
-    mapMonth = null;
-    openArchive(currentSelection, archiveMode);
-  }));
-  if (!getDayStart) viewTabs.forEach(tab => { tab.hidden = true; });
   const modeTabs = [...document.querySelectorAll("#archiveModeTabs button")];
   modeTabs.forEach(tab => tab.addEventListener("click", () => {
     sounds.playClick();
@@ -30609,8 +30148,6 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay, getCountry
       || playable.filter(day => day.dateKey <= todayKey()).at(-1) || playable[0] || null;
     currentSelection = selected?.dateKey || null;
 
-    viewTabs.forEach(tab => tab.setAttribute("aria-selected", String(tab.dataset.view === archiveView)));
-    archiveModal.dataset.view = archiveView;
     const onSelect = picked => {
       selected = picked;
       currentSelection = picked.dateKey;
@@ -30619,17 +30156,6 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay, getCountry
       openDaySheet();
     };
     const renderGrid = () => {
-      if (archiveView === "map" && getDayStart) {
-        // The months with a past day that has a game, oldest first.
-        const months = [...new Set(days.filter(day => !day.noGame && day.dateKey <= todayKey()).map(day => day.dateKey.slice(0, 7)))];
-        if (!months.includes(mapMonth)) mapMonth = months.includes(selected?.dateKey.slice(0, 7)) ? selected.dateKey.slice(0, 7) : months.at(-1);
-        archiveGrid.replaceChildren(mapMonth ? createMonthMap(days, {
-          month: mapMonth, months, selected, mode, getCountryFeatures, getDayStart, getAnchor,
-          onMonth: month => { mapMonth = month; renderGrid(); },
-          onSelect
-        }) : element("p", "archive-map-note", t("archive.mapEmpty")));
-        return;
-      }
       archiveGrid.replaceChildren(createCalendar(days, { selected, mode, onSelect }));
     };
     renderGrid();
@@ -40244,15 +39770,6 @@ const archive = initializeHistoryScreens({
   getDays: getAllPuzzleDays,
   getDayRecord,
   onPlayDay: (...args) => { if (!lobbyBlocks()) enterGameView(...args); },
-  // The archive's map: the game globe's countries, where each day's game started, and your
-  // tent as the hub every trip leaves from.
-  getCountryFeatures: () => globe.countryFeatures,
-  getAnchor: () => { const lonLat = tentLonLat(); return lonLat ? { lonLat, icon: createTentCanvas(getTentLook(), 1, "tent-pin-icon") } : null; },
-  getDayStart: (dateKey, mode) => {
-    const country = getDayPlace(dateKey, mode).country;
-    const capital = startCapital(mode, dateKey);
-    return { lonLat: startLonLat(mode, dateKey), iso: country.iso, name: capital ? t("hud.capital", { city: capital.name, country: countryName(country) }) : countryName(country) };
-  }
 });
 duel = createDuel({
   globe,
