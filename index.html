@@ -4808,6 +4808,84 @@ h1, h2, h3 { font-weight: normal; }
 .hero-actions.is-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .hero-actions.is-three > * { min-width: 0; padding-left: 6px; padding-right: 6px; text-align: center; }
 
+/* ---------- The Versus lobby on the menu (19 November 2026, mockups/versus-lobby) ----------
+   The match you made or joined waits on the shared card: seats (yours with ✎ TENT), the code
+   and link, START WITH 3 and LEAVE. YOUR VERSUS beside it (a strip on narrower screens), a
+   pill above the dock while you look around, and a dot on VERSUS. */
+.main-menu .menu-hero { display: grid; gap: 10px; }
+.lobby-kicker { color: var(--muted); font: 7px var(--font-display); letter-spacing: var(--ls-pixel); }
+.hero-join { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.hero-join-field { min-width: 0; padding: 10px 12px; border: 2px solid color-mix(in srgb, var(--tile) 40%, transparent); border-radius: 10px; background: rgba(10, 15, 30, 0.6); color: var(--text); font: 12px var(--font-display); letter-spacing: 0.12em; text-transform: uppercase; }
+.hero-join-field::placeholder { color: var(--faint); font: 12px var(--font-body); letter-spacing: 0; text-transform: none; }
+.hero-join-field:focus { border-color: var(--tile); outline: none; }
+.hero-lobby { grid-column: 1 / -1; display: grid; gap: 8px; }
+.lobby-seats { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: 8px; }
+.lobby-seat { position: relative; display: grid; justify-items: center; gap: 5px; min-width: 0; padding: 10px 6px 8px; border: 2px solid var(--me, var(--glass-line)); border-radius: 12px; background: color-mix(in srgb, var(--me, #000) 10%, rgba(10, 15, 30, 0.6)); }
+.lobby-seat canvas { width: 44px; height: 44px; image-rendering: pixelated; }
+.lobby-seat b { overflow: hidden; max-width: 100%; color: var(--me); font: 8px var(--font-display); letter-spacing: var(--ls-pixel); text-overflow: ellipsis; white-space: nowrap; }
+.lobby-seat small { color: var(--muted); font: 7px var(--font-display); letter-spacing: var(--ls-pixel); }
+.lobby-seat.is-empty { border-style: dashed; border-color: var(--glass-line); background: rgba(10, 15, 30, 0.4); }
+.lobby-seat.is-empty b { color: var(--faint); }
+.lobby-empty { display: grid; place-items: center; width: 44px; height: 44px; border: 2px dashed var(--faint); border-radius: 10px; color: var(--faint); font: 14px var(--font-display); animation: lobby-blink 1.4s steps(2) infinite; }
+@keyframes lobby-blink { 50% { opacity: 0.35; } }
+.lobby-host { position: absolute; top: -8px; left: 50%; padding: 2px 5px; border-radius: 4px; background: var(--me); color: #04060d; font: 6px var(--font-display); letter-spacing: var(--ls-pixel); transform: translateX(-50%); }
+.lobby-tent-edit { padding: 3px 6px; border: 1px solid color-mix(in srgb, var(--me) 60%, transparent); border-radius: 6px; background: none; color: var(--me); font: 6px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
+.lobby-tent-edit:hover, .lobby-tent-edit:focus-visible { background: color-mix(in srgb, var(--me) 18%, transparent); outline: none; }
+.lobby-invite { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; }
+.lobby-invite [hidden] { display: none; }
+.lobby-code { display: flex; align-items: baseline; justify-content: center; gap: 10px; padding: 8px 12px; border: 2px dashed color-mix(in srgb, var(--tile) 60%, transparent); border-radius: 10px; background: rgba(10, 15, 30, 0.5); }
+.lobby-code small { color: var(--muted); font: 7px var(--font-display); letter-spacing: var(--ls-pixel); }
+.lobby-code b { color: var(--tile); font: 16px var(--font-display); letter-spacing: 0.18em; }
+
+.lobby-stats { position: fixed; left: 20px; top: 50%; z-index: 2; width: 270px; padding: 14px; border: 1px solid color-mix(in srgb, #c58cff 40%, transparent); border-radius: 18px; background: rgba(10, 15, 30, 0.86); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45); transform: translateY(-50%); pointer-events: auto; }
+.lobby-stats[hidden] { display: none; }
+.lobby-stats-head { display: none; }
+.lobby-stats-body { display: grid; gap: 10px; }
+.lobby-stats-body::before { content: attr(data-title); color: #c58cff; font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.lobby-big { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.lobby-big div { display: grid; justify-items: center; gap: 4px; padding: 10px 4px; border-radius: 10px; background: rgba(255, 255, 255, 0.04); }
+.lobby-big b { color: var(--text); font: 700 20px var(--font-mono); }
+.lobby-big small { color: var(--muted); font: 6px var(--font-display); letter-spacing: var(--ls-pixel); }
+.lobby-stats .is-win { color: #5cf28a; }
+.lobby-line { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--glass-line-soft); color: var(--muted); font: 12px var(--font-body); }
+.lobby-line b { color: var(--text); font: 700 13px var(--font-body); }
+.lobby-pips { display: flex; gap: 3px; }
+.lobby-pips i { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 4px; color: #04060d; font: 7px var(--font-display); font-style: normal; }
+.lobby-pips .is-w { background: #ffd45c; } .lobby-pips .is-l { background: #c58cff; } .lobby-pips .is-d { background: var(--muted); } .lobby-pips .is-p { background: #45e3ff; }
+.lobby-note { margin: 0; color: var(--muted); font: 12px/1.45 var(--font-body); }
+
+.lobby-pill { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 14px; border: 2px solid #c58cff; border-radius: 14px; background: rgba(10, 15, 30, 0.9); color: var(--text); cursor: pointer; box-shadow: 0 0 24px rgba(197, 140, 255, 0.3); }
+.lobby-pill[hidden] { display: none; }
+.lobby-pill-dot { width: 10px; height: 10px; border-radius: 2px; background: #c58cff; animation: lobby-blink 1.4s steps(2) infinite; }
+.lobby-pill-text { flex: 1; min-width: 0; overflow: hidden; color: var(--muted); font: 12px var(--font-body); text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+.lobby-pill-text b { color: #c58cff; font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.lobby-pill-go { color: #c58cff; font: 8px var(--font-display); letter-spacing: var(--ls-pixel); white-space: nowrap; }
+#menuDuelButton[data-lobby]::after { content: ""; position: absolute; top: 6px; left: 6px; width: 8px; height: 8px; background: #c58cff; box-shadow: 0 0 0 2px #04121a; animation: lobby-blink 1.4s steps(2) infinite; }
+@media (prefers-reduced-motion: reduce) { .lobby-empty, .lobby-pill-dot, #menuDuelButton[data-lobby]::after { animation: none; } }
+
+@media (max-width: 1199px) {
+  .lobby-stats { position: relative; left: auto; top: auto; align-self: center; width: min(600px, 100%); margin: 10px 0 auto; padding: 0; transform: none; border-radius: 14px; }
+  .lobby-stats-head { display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 12px; border: 0; background: none; color: var(--text); text-align: left; cursor: pointer; }
+  .lobby-stats-head .lobby-kicker { color: #c58cff; }
+  .lobby-stats-mini { flex: 1; color: var(--muted); font: 7px var(--font-display); letter-spacing: var(--ls-pixel); text-align: right; }
+  .lobby-stats-mini b { color: var(--text); font: 700 12px var(--font-mono); }
+  .lobby-stats-chev { color: var(--muted); font-size: 12px; transition: transform 0.2s; }
+  .lobby-stats-body { display: none; padding: 0 12px 12px; }
+  .lobby-stats-body::before { display: none; }
+  .lobby-stats.is-open .lobby-stats-body { display: grid; }
+  .lobby-stats.is-open .lobby-stats-chev { transform: rotate(180deg); }
+}
+@media (max-width: 760px) {
+  .lobby-seats { gap: 6px; }
+  .lobby-seat { padding: 9px 4px 7px; }
+  .lobby-seat canvas, .lobby-empty { width: 34px; height: 34px; }
+  .lobby-code b { font-size: 13px; }
+  .lobby-invite { grid-template-columns: minmax(0, 1fr) auto; }
+  .lobby-invite #lobbyShare { display: none; }
+  .hero-card.is-lobby .play-tile-text span { display: none; }
+  .lobby-pill-text span { display: none; }
+}
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -4833,6 +4911,16 @@ h1, h2, h3 { font-weight: normal; }
           <svg viewBox="0 0 32 32" shape-rendering="crispEdges" aria-hidden="true"><path d="M8 8h16v16H8zm4 4v8h8v-8z" fill-rule="evenodd" fill="currentColor"/><path d="M13 3h6v5h-6zm0 21h6v5h-6zM3 13h5v6H3zm21 0h5v6h-5zM6 6h5v5H6zm15 0h5v5h-5zM6 21h5v5H6zm15 0h5v5h-5z" fill="currentColor"/></svg>
         </button>
       </div>
+      <!-- YOUR VERSUS (engine.js renderVersusStats): your record from finished matches, on
+           VERSUS. Beside the card on a wide screen; a strip that opens with a tap otherwise. -->
+      <aside class="lobby-stats" id="versusStats" hidden>
+        <button class="lobby-stats-head" type="button" id="versusStatsToggle" aria-expanded="false">
+          <span class="lobby-kicker" data-i18n="lobby.yourVersus">YOUR VERSUS</span>
+          <span class="lobby-stats-mini" id="versusStatsMini"></span>
+          <span class="lobby-stats-chev" aria-hidden="true">▾</span>
+        </button>
+        <div class="lobby-stats-body" id="versusStatsBody" data-title="YOUR VERSUS"></div>
+      </aside>
       <!-- The bottom: the card for the selected area over a dock of three (19 November 2026):
            DAILY (both solo quizzes, against the world), VERSUS (live: Duel 1v1, Party of 3 or 4)
            and CREW (your friends). -->
@@ -4853,6 +4941,20 @@ h1, h2, h3 { font-weight: normal; }
               <button type="button" role="tab" data-pick="extremes" style="--tile: #ff6b9d"><b>HIGHS &amp; LOWS</b><small></small></button>
               <button type="button" role="tab" data-pick="casual" style="--tile: #ffd45c"><b data-i18n="mode.casual.short">CASUAL</b><small></small></button>
             </div>
+            <!-- VERSUS: join with a code; and, in a match you made or joined, the lobby (engine.js
+                 renderLobby, mockups/versus-lobby): the seats, the code and the link. -->
+            <div class="hero-join" id="heroJoin" hidden>
+              <input class="hero-join-field" id="heroJoinField" maxlength="6" autocapitalize="characters" autocomplete="off" spellcheck="false" data-i18n-attr="placeholder:lobby.codePlaceholder;aria-label:lobby.codePlaceholder">
+              <button class="hero-side" id="heroJoinGo" type="button" data-i18n="duel.join">JOIN</button>
+            </div>
+            <div class="hero-lobby" id="heroLobby" hidden>
+              <div class="lobby-seats" id="lobbySeats"></div>
+              <div class="lobby-invite">
+                <div class="lobby-code"><small data-i18n="lobby.code">CODE</small><b id="lobbyCode"></b></div>
+                <button class="hero-side" id="lobbyCopy" type="button" data-i18n="lobby.copyLink">⧉ COPY LINK</button>
+                <button class="hero-side" id="lobbyShare" type="button" data-i18n="lobby.share">↗ SHARE</button>
+              </div>
+            </div>
             <div class="hero-days hidden" id="heroDays">
               <button class="hero-step" id="heroOlder" type="button" data-i18n-attr="aria-label:hero.older">‹</button>
               <span class="hero-day"><strong id="heroDayLabel"></strong><small id="heroDayName"></small></span>
@@ -4865,6 +4967,12 @@ h1, h2, h3 { font-weight: normal; }
               <button class="hero-side" id="heroSide2" type="button" hidden></button>
             </div>
           </div>
+          <!-- Away from your lobby (on DAILY or CREW): it waits here; a click goes back to it. -->
+          <button class="lobby-pill" id="lobbyPill" type="button" hidden>
+            <span class="lobby-pill-dot" aria-hidden="true"></span>
+            <span class="lobby-pill-text"><b id="lobbyPillMode"></b> <span id="lobbyPillCount"></span></span>
+            <span class="lobby-pill-go" data-i18n="lobby.back">BACK TO LOBBY ›</span>
+          </button>
         </div>
         <nav class="menu-dock" id="menuDock" aria-label="Main menu" data-i18n-attr="aria-label:menu.mainMenu">
           <button class="dock-item" id="menuDailyButton" type="button" data-select="daily" style="--tile: #ff6b9d">
@@ -5934,6 +6042,41 @@ const EN = {
   "menu.inProgress": "IN PROGRESS",
   "menu.notPlayed": "NOT PLAYED",
   "menu.noDayShort": "NO DAY TODAY",
+  // The Versus lobby on the menu (19 November 2026)
+  "lobby.codePlaceholder": "Have a code? Type it",
+  "lobby.code": "CODE",
+  "lobby.copyLink": "⧉ COPY LINK",
+  "lobby.share": "↗ SHARE",
+  "lobby.back": "BACK TO LOBBY ›",
+  "lobby.yourVersus": "YOUR VERSUS",
+  "lobby.inLobby": "IN A LOBBY",
+  "lobby.dailyBlocked": "You're in a Versus lobby: a game would be cut off when the match starts. Leave the lobby to play.",
+  "lobby.waitingFor": ({ n }) => n === 1 ? "WAITING FOR 1 MORE" : `WAITING FOR ${n} MORE`,
+  "lobby.waitingFriend": "WAITING FOR YOUR FRIEND",
+  "lobby.text": "Send the code or the link. The match starts when every seat is taken.",
+  "lobby.statusHost": "{have} of {n} in · you made this match",
+  "lobby.statusGuest": "{have} of {n} in · {name}'s match",
+  "lobby.open": "OPEN",
+  "lobby.waiting": "WAITING…",
+  "lobby.host": "HOST",
+  "lobby.editTent": "✎ TENT",
+  "lobby.joined": "JOINED",
+  "lobby.leave": "✕ LEAVE",
+  "lobby.count": "{have} of {n} in",
+  "lobby.badCode": "A code is 6 letters and numbers.",
+  "lobby.left": "You left the lobby.",
+  "lobby.matches": "MATCHES",
+  "lobby.won": "WON",
+  "lobby.streak": "STREAK",
+  "lobby.lastFive": "Last five",
+  "lobby.avg": "Average match",
+  "lobby.best": "Best match",
+  "lobby.bestRound": "Best round",
+  "lobby.parties": "Parties",
+  "lobby.partiesLine": "{n} played · {w} won",
+  "lobby.note": "While you wait you can change your tent or look around in Crew. When the last seat fills, we bring you back for the match.",
+  "lobby.noMatches": "NO MATCHES YET",
+  "lobby.firstMatch": "No finished matches yet: your record starts with your first one.",
   "menu.party3": "▶ PARTY · 3",
   "menu.party4": "▶ PARTY · 4",
   "menu.guest": "Guest",
@@ -7154,6 +7297,41 @@ const NL = {
   "menu.inProgress": "BEZIG",
   "menu.notPlayed": "NOG NIET GESPEELD",
   "menu.noDayShort": "VANDAAG GEEN DAG",
+  // De Versus-lobby in het menu (19 november 2026)
+  "lobby.codePlaceholder": "Een code? Typ hem hier",
+  "lobby.code": "CODE",
+  "lobby.copyLink": "⧉ KOPIEER LINK",
+  "lobby.share": "↗ DELEN",
+  "lobby.back": "TERUG NAAR LOBBY ›",
+  "lobby.yourVersus": "JOUW VERSUS",
+  "lobby.inLobby": "IN EEN LOBBY",
+  "lobby.dailyBlocked": "Je zit in een Versus-lobby: een spel zou worden afgebroken als de wedstrijd begint. Verlaat de lobby om te spelen.",
+  "lobby.waitingFor": ({ n }) => n === 1 ? "WACHTEN OP NOG 1" : `WACHTEN OP NOG ${n}`,
+  "lobby.waitingFriend": "WACHTEN OP JE VRIEND",
+  "lobby.text": "Stuur de code of de link. De wedstrijd begint als alle plekken bezet zijn.",
+  "lobby.statusHost": "{have} van de {n} zijn er · jij maakte deze wedstrijd",
+  "lobby.statusGuest": "{have} van de {n} zijn er · wedstrijd van {name}",
+  "lobby.open": "VRIJ",
+  "lobby.waiting": "WACHTEN…",
+  "lobby.host": "HOST",
+  "lobby.editTent": "✎ TENT",
+  "lobby.joined": "ERBIJ",
+  "lobby.leave": "✕ VERLATEN",
+  "lobby.count": "{have} van de {n}",
+  "lobby.badCode": "Een code is 6 letters en cijfers.",
+  "lobby.left": "Je hebt de lobby verlaten.",
+  "lobby.matches": "MATCHES",
+  "lobby.won": "GEWONNEN",
+  "lobby.streak": "REEKS",
+  "lobby.lastFive": "Laatste vijf",
+  "lobby.avg": "Gemiddelde match",
+  "lobby.best": "Beste match",
+  "lobby.bestRound": "Beste ronde",
+  "lobby.parties": "Parties",
+  "lobby.partiesLine": "{n} gespeeld · {w} gewonnen",
+  "lobby.note": "Terwijl je wacht, kun je je tent aanpassen of in Crew rondkijken. Als de laatste plek bezet is, halen we je terug voor de wedstrijd.",
+  "lobby.noMatches": "NOG GEEN MATCHES",
+  "lobby.firstMatch": "Nog geen uitgespeelde matches: je record begint bij je eerste.",
   "menu.party3": "▶ PARTY · 3",
   "menu.party4": "▶ PARTY · 4",
   "menu.guest": "Gast",
@@ -11738,6 +11916,15 @@ async function watchDuel(id, onRow) {
   return () => supabase.removeChannel(channel);
 }
 
+// Your finished matches (for YOUR VERSUS in the lobby): every row you sat in, newest first.
+async function getDuelHistory() {
+  const supabase = await getClient();
+  if (!supabase || !user) return [];
+  const { data } = await supabase.from("duels").select("player_a, player_b, player_c, player_d, status, state")
+    .eq("status", "done").order("updated_at", { ascending: false }).limit(300);
+  return data || [];
+}
+
 // Your match still going (waiting for a friend or being played), if any.
 async function findOpenDuel() {
   const supabase = await getClient();
@@ -11750,7 +11937,7 @@ async function findOpenDuel() {
   return row ? { ...row, you: seatOf(row) } : null;
 }
 
-return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, getAccountUnits, saveUnits, saveBase, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, addToGroup, leaveGroup, getGroups, getGroupBoard, callDuel, watchDuel, findOpenDuel };
+return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, getAccountUnits, saveUnits, saveBase, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, addToGroup, leaveGroup, getGroups, getGroupBoard, callDuel, watchDuel, getDuelHistory, findOpenDuel };
 })();
 
 // ---- atlas.js
@@ -19607,6 +19794,282 @@ const BUBBLE_COLORS = { K: "#0b1020", W: "#f4f1e8" };
 const drawBubble = (p, x, y) => p.sprite(BUBBLE, BUBBLE_COLORS, x - 3, y - BUBBLE.length);
 
 return { ROUND_COLORS, JOURNEYS, scoreTier, createJourney };
+})();
+
+// ---- duel-rules.js
+__modules["duel-rules.js"] = (() => {
+// The rules of 1v1 and Party (3 or 4 players; docs/1v1-plan.md), without DOM, network or imports, so the same file
+// runs in the browser (to explain a score) and in the Edge Function (to decide it):
+// tools/build-duel-bank.mjs copies it to supabase/functions/duel/. Change it here only.
+
+// Five rounds, always in this order; one of each style.
+const DUEL_ROUNDS = ["pin", "guess", "route", "bid", "paint"];
+
+// How long each round's clock runs, in ms. Bid It has two clocks: bidding, then naming.
+const DUEL_TIMES = {
+  pin: 20000,
+  guess: 20000,
+  route: 60000,
+  bidding: 10000, // per turn: every raise gives the other player a fresh 10 s
+  intro: 20000, // the question card, until both press CONTINUE
+  naming: 40000,
+  paint: 45000,
+  pick: 10000, // choosing a category
+  versus: 15000 // the versus screen before round 1, until both press READY
+};
+const roundTime = style => style === "bid" ? DUEL_TIMES.naming : DUEL_TIMES[style];
+
+const DUEL_MAX_ROUND = 1000;
+const DUEL_CATEGORY_OFFER = 3; // categories shown at each pick
+const BID_MIN = 1;
+const BID_MAX = 10; // 100 × bid, so at most 1,000
+const BID_POINTS = 100; // per name bid, won or (as damage) per name missed
+const ROUTE_STEP_PENALTY = 200;
+const GRACE_MS = 1500; // answers this late after the deadline still count (latency)
+
+// Speed, as in Competitive but at most ×1.3: ×1.3 for an instant answer, falling evenly to
+// ×1.0 when the clock runs out. Nothing is accepted after the deadline (plus GRACE_MS).
+const DUEL_MAX_SPEED_BONUS = 0.3;
+function speedMultiplier(elapsedMs, windowMs) {
+  const used = Math.min(1, Math.max(0, elapsedMs / windowMs));
+  return 1 + DUEL_MAX_SPEED_BONUS * (1 - used);
+}
+// Points with the speed bonus. Damage (below 0) never grows with speed.
+const withSpeed = (points, elapsedMs, windowMs) =>
+  points > 0 ? Math.round(points * speedMultiplier(elapsedMs, windowMs)) : points;
+
+// ---------------------------------------------------------------------------
+// Drop a Pin: full points within `exact` km, falling evenly to 0 at `zero` km.
+// ---------------------------------------------------------------------------
+const PIN_RADII = {
+  spot: { exact: 25, zero: 2000 }, // a town, a building, a waterfall
+  area: { exact: 100, zero: 2500 } // a lake, a canal, a mountain range
+};
+
+const EARTH_KM = 6371.0088; // mean radius (IUGG)
+function kmBetween(lat1, lon1, lat2, lon2) {
+  const rad = Math.PI / 180;
+  const dLat = (lat2 - lat1) * rad;
+  const dLon = (lon2 - lon1) * rad;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLon / 2) ** 2;
+  return 2 * EARTH_KM * Math.asin(Math.min(1, Math.sqrt(a)));
+}
+
+function scorePin(answer, pin, { exact, zero }) {
+  if (!pin) return 0;
+  const km = kmBetween(answer.lat, answer.lon, pin.lat, pin.lon);
+  if (km <= exact) return DUEL_MAX_ROUND;
+  return Math.max(0, Math.round(DUEL_MAX_ROUND * (1 - (km - exact) / (zero - exact))));
+}
+
+// ---------------------------------------------------------------------------
+// Closest Guess: points by how many countries lie between your guess and the real value
+// (on the stat's own ladder), so a narrow stat like life expectancy and a wide one like
+// population are equally hard. Each country between costs 25; 40 between scores 0.
+// ---------------------------------------------------------------------------
+const GUESS_COST_PER_COUNTRY = 25;
+
+// `values`: every country's value for the stat (numbers). Counts the countries strictly
+// between the guess and the answer, other than the country asked about.
+function countriesBetween(values, answer, guess) {
+  const low = Math.min(answer, guess);
+  const high = Math.max(answer, guess);
+  return values.filter(value => value > low && value < high).length;
+}
+
+function scoreGuess(values, answer, guess) {
+  if (!Number.isFinite(guess)) return 0;
+  const between = countriesBetween(values, answer, guess);
+  return Math.max(0, DUEL_MAX_ROUND - GUESS_COST_PER_COUNTRY * between);
+}
+
+// ---------------------------------------------------------------------------
+// Border Run: from `start` to `end` through countries that border each other.
+// `graph`: { ISO: [neighbour ISO, …] }, without borders through overseas territories.
+// ---------------------------------------------------------------------------
+
+// Borders that only exist through an overseas territory: France–Brazil and France–Suriname
+// (French Guiana), France–Netherlands (Saint Martin). A Border Run can't use them.
+const OVERSEAS_BORDERS = [["FR", "BR"], ["FR", "SR"], ["FR", "NL"]];
+
+// The Border Run graph from border-data.js's BORDER_KM: { ISO: [neighbour, …] }, without
+// overseas borders and without anything `isCountry` doesn't know.
+function routeGraph(borderKm, isCountry = () => true) {
+  const overseas = new Set(OVERSEAS_BORDERS.flatMap(([a, b]) => [`${a}-${b}`, `${b}-${a}`]));
+  return Object.fromEntries(Object.entries(borderKm)
+    .map(([iso, borders]) => [iso, Object.keys(borders).filter(other => !overseas.has(`${iso}-${other}`) && isCountry(other))])
+    .filter(([iso, borders]) => isCountry(iso) && borders.length));
+}
+
+// Fewest borders crossed from start to end (breadth-first), or Infinity.
+function shortestRoute(graph, start, end) {
+  if (start === end) return 0;
+  const seen = new Set([start]);
+  let frontier = [start];
+  for (let steps = 1; frontier.length; steps++) {
+    const next = [];
+    for (const iso of frontier) {
+      for (const neighbour of graph[iso] || []) {
+        if (neighbour === end) return steps;
+        if (!seen.has(neighbour)) { seen.add(neighbour); next.push(neighbour); }
+      }
+    }
+    frontier = next;
+  }
+  return Infinity;
+}
+
+// Can `iso` come next on a route that is now at `at`?
+const canStep = (graph, at, iso) => (graph[at] || []).includes(iso);
+
+// `route`: the countries after the start, in order. Scores only a route that arrives.
+function scoreRoute(graph, start, end, route) {
+  let at = start;
+  for (const iso of route) {
+    if (!canStep(graph, at, iso)) return 0;
+    at = iso;
+  }
+  if (at !== end) return 0;
+  const shortest = shortestRoute(graph, start, end);
+  return Math.max(0, DUEL_MAX_ROUND - ROUTE_STEP_PENALTY * (route.length - shortest));
+}
+
+// ---------------------------------------------------------------------------
+// Bid It: both bid at the same time; the higher bid names (a tie goes to the faster bid).
+// ---------------------------------------------------------------------------
+
+// bids: { a: { bid, ms } | null, b: …, c: … } → the seat with the highest bid (a tie goes
+// to the faster bid), or null (nobody bid).
+function bidWinner(bids) {
+  const valid = Object.entries(bids).filter(([, entry]) => entry?.bid >= BID_MIN);
+  if (!valid.length) return null;
+  valid.sort(([, x], [, y]) => y.bid - x.bid || x.ms - y.ms);
+  return valid[0][0];
+}
+
+// The bidder's points before speed: 100 × bid if they named them all, otherwise damage,
+// −100 for each name missed. The other player scores 0.
+function scoreBid(bid, named) {
+  return named >= bid ? BID_POINTS * bid : -BID_POINTS * (bid - named);
+}
+
+// ---------------------------------------------------------------------------
+// Blind Paint: nothing is marked while you paint; at the end every right country counts,
+// every wrong one counts against you.
+// ---------------------------------------------------------------------------
+function scorePaint(answers, painted) {
+  const answerSet = new Set(answers);
+  const unique = [...new Set(painted)];
+  const right = unique.filter(iso => answerSet.has(iso)).length;
+  const wrong = unique.length - right;
+  return Math.max(0, Math.round(DUEL_MAX_ROUND * (right - wrong) / answers.length));
+}
+
+// ---------------------------------------------------------------------------
+// The match.
+// ---------------------------------------------------------------------------
+
+// Who picks the category of round `index` (0–4): `first` (drawn at random when the match
+// starts, 19 November 2026) picks rounds 1 and 3, the other player rounds 2 and 4, and whoever
+// is behind picks round 5 (a tie is decided by `coin`, 0 or 1, from the server).
+function picker(index, totals = { a: 0, b: 0 }, coin = 0, first = "a") {
+  const second = first === "a" ? "b" : "a";
+  if (index < 4) return index % 2 === 0 ? first : second;
+  if (totals.a !== totals.b) return totals.a < totals.b ? "a" : "b";
+  return coin ? "b" : "a";
+}
+
+// Round winner: more points wins; equal points (above 0), the faster lock-in wins; else a
+// draw (null).
+function roundWinner(a, b) {
+  return roundWinnerOf({ a, b });
+}
+// The same for any number of players: results is { seat: { points, ms } }.
+function roundWinnerOf(results) {
+  const entries = Object.entries(results);
+  const top = Math.max(...entries.map(([, entry]) => entry.points));
+  const best = entries.filter(([, entry]) => entry.points === top);
+  if (best.length === 1) return best[0][0];
+  if (top <= 0) return null; // nobody scored: speed doesn't win it
+  const fastest = Math.min(...best.map(([, entry]) => entry.ms));
+  const quick = best.filter(([, entry]) => entry.ms === fastest);
+  return quick.length === 1 ? quick[0][0] : null;
+}
+
+// ---------------------------------------------------------------------------
+// Party (19 November 2026): 3 or 4 players, everyone against everyone, on the same rounds.
+// Seats are "a", "b", "c", "d"; a match plays `state.seats` (1v1: a and b).
+// ---------------------------------------------------------------------------
+const SEATS = ["a", "b", "c", "d"];
+const PARTY_SIZES = [2, 3, 4];
+const PARTY_MIN_START = 3; // a Party of 4 can start once 3 are in
+const seatsOf = state => state?.seats || SEATS.slice(0, state?.size || 2);
+// Seats still playing (a player who leaves a Party is out; their score stays as it was).
+const activeSeats = state => seatsOf(state).filter(seat => !state?.gone?.[seat]);
+
+// The standings: more points first, then more rounds won; whoever left goes below everyone
+// still playing. Equal on both shares a place. → [{ seat, place, total }]
+function standings(state) {
+  const seats = seatsOf(state);
+  const key = seat => [state.gone?.[seat] ? 1 : 0, -(state.totals?.[seat] || 0), -(state.wins?.[seat] || 0)];
+  const order = [...seats].sort((x, y) => {
+    const kx = key(x), ky = key(y);
+    for (let i = 0; i < kx.length; i++) if (kx[i] !== ky[i]) return kx[i] - ky[i];
+    return seats.indexOf(x) - seats.indexOf(y);
+  });
+  const list = [];
+  order.forEach((seat, index) => {
+    const previous = list[index - 1];
+    const same = previous && key(previous.seat).join() === key(seat).join();
+    list.push({ seat, place: same ? previous.place : index + 1, total: state.totals?.[seat] || 0 });
+  });
+  return list;
+}
+// Who you race against at the top of the screen: the number 1, or the number 2 if you're
+// the number 1 (the first in the standings who isn't you).
+const rivalOf = (state, you) => standings(state).find(entry => entry.seat !== you)?.seat || null;
+
+// Who picks the category of round `index` in a Party: round 1 a random player (the coin,
+// `first`), then whoever is last. Several last (all on 0 after round 1, say): the one of them
+// who has picked the fewest times, and never the same player twice in a row if another can.
+function partyPicker(index, state, random, first) {
+  const active = activeSeats(state);
+  if (index === 0 && first && active.includes(first)) return first;
+  const low = Math.min(...active.map(seat => state.totals?.[seat] || 0));
+  let pool = active.filter(seat => (state.totals?.[seat] || 0) === low);
+  if (pool.length > 1) {
+    const picked = seat => (state.rounds || []).filter(round => round?.pickedBy === seat).length;
+    const fewest = Math.min(...pool.map(picked));
+    pool = pool.filter(seat => picked(seat) === fewest);
+  }
+  const previous = state.rounds?.[index - 1]?.pickedBy;
+  if (pool.length > 1 && pool.includes(previous)) pool = pool.filter(seat => seat !== previous);
+  return pool[Math.floor(random() * pool.length)];
+}
+
+// A small seeded random (mulberry32), so the server can pick offers reproducibly.
+function seededRandom(seed) {
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// `count` categories for a pick, from those not yet used in the match.
+function offerCategories(all, used, random, count = DUEL_CATEGORY_OFFER) {
+  const open = all.filter(id => !used.includes(id));
+  for (let i = open.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [open[i], open[j]] = [open[j], open[i]];
+  }
+  return open.slice(0, count);
+}
+
+return { DUEL_ROUNDS, DUEL_TIMES, roundTime, DUEL_MAX_ROUND, DUEL_CATEGORY_OFFER, BID_MIN, BID_MAX, BID_POINTS, ROUTE_STEP_PENALTY, GRACE_MS, DUEL_MAX_SPEED_BONUS, speedMultiplier, withSpeed, PIN_RADII, kmBetween, scorePin, GUESS_COST_PER_COUNTRY, countriesBetween, scoreGuess, OVERSEAS_BORDERS, routeGraph, shortestRoute, canStep, scoreRoute, bidWinner, scoreBid, scorePaint, picker, roundWinner, roundWinnerOf, SEATS, PARTY_SIZES, PARTY_MIN_START, seatsOf, activeSeats, standings, rivalOf, partyPicker, seededRandom, offerCategories };
 })();
 
 // ---- round-pictures.js
@@ -31981,282 +32444,6 @@ const NO_GUESS = new Set(["euros", "afcon", "eurobasket", "olyfootball", "olybas
 return { DUEL_CATEGORIES, CATEGORY_IDS, categoryOf, NO_GUESS };
 })();
 
-// ---- duel-rules.js
-__modules["duel-rules.js"] = (() => {
-// The rules of 1v1 and Party (3 or 4 players; docs/1v1-plan.md), without DOM, network or imports, so the same file
-// runs in the browser (to explain a score) and in the Edge Function (to decide it):
-// tools/build-duel-bank.mjs copies it to supabase/functions/duel/. Change it here only.
-
-// Five rounds, always in this order; one of each style.
-const DUEL_ROUNDS = ["pin", "guess", "route", "bid", "paint"];
-
-// How long each round's clock runs, in ms. Bid It has two clocks: bidding, then naming.
-const DUEL_TIMES = {
-  pin: 20000,
-  guess: 20000,
-  route: 60000,
-  bidding: 10000, // per turn: every raise gives the other player a fresh 10 s
-  intro: 20000, // the question card, until both press CONTINUE
-  naming: 40000,
-  paint: 45000,
-  pick: 10000, // choosing a category
-  versus: 15000 // the versus screen before round 1, until both press READY
-};
-const roundTime = style => style === "bid" ? DUEL_TIMES.naming : DUEL_TIMES[style];
-
-const DUEL_MAX_ROUND = 1000;
-const DUEL_CATEGORY_OFFER = 3; // categories shown at each pick
-const BID_MIN = 1;
-const BID_MAX = 10; // 100 × bid, so at most 1,000
-const BID_POINTS = 100; // per name bid, won or (as damage) per name missed
-const ROUTE_STEP_PENALTY = 200;
-const GRACE_MS = 1500; // answers this late after the deadline still count (latency)
-
-// Speed, as in Competitive but at most ×1.3: ×1.3 for an instant answer, falling evenly to
-// ×1.0 when the clock runs out. Nothing is accepted after the deadline (plus GRACE_MS).
-const DUEL_MAX_SPEED_BONUS = 0.3;
-function speedMultiplier(elapsedMs, windowMs) {
-  const used = Math.min(1, Math.max(0, elapsedMs / windowMs));
-  return 1 + DUEL_MAX_SPEED_BONUS * (1 - used);
-}
-// Points with the speed bonus. Damage (below 0) never grows with speed.
-const withSpeed = (points, elapsedMs, windowMs) =>
-  points > 0 ? Math.round(points * speedMultiplier(elapsedMs, windowMs)) : points;
-
-// ---------------------------------------------------------------------------
-// Drop a Pin: full points within `exact` km, falling evenly to 0 at `zero` km.
-// ---------------------------------------------------------------------------
-const PIN_RADII = {
-  spot: { exact: 25, zero: 2000 }, // a town, a building, a waterfall
-  area: { exact: 100, zero: 2500 } // a lake, a canal, a mountain range
-};
-
-const EARTH_KM = 6371.0088; // mean radius (IUGG)
-function kmBetween(lat1, lon1, lat2, lon2) {
-  const rad = Math.PI / 180;
-  const dLat = (lat2 - lat1) * rad;
-  const dLon = (lon2 - lon1) * rad;
-  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLon / 2) ** 2;
-  return 2 * EARTH_KM * Math.asin(Math.min(1, Math.sqrt(a)));
-}
-
-function scorePin(answer, pin, { exact, zero }) {
-  if (!pin) return 0;
-  const km = kmBetween(answer.lat, answer.lon, pin.lat, pin.lon);
-  if (km <= exact) return DUEL_MAX_ROUND;
-  return Math.max(0, Math.round(DUEL_MAX_ROUND * (1 - (km - exact) / (zero - exact))));
-}
-
-// ---------------------------------------------------------------------------
-// Closest Guess: points by how many countries lie between your guess and the real value
-// (on the stat's own ladder), so a narrow stat like life expectancy and a wide one like
-// population are equally hard. Each country between costs 25; 40 between scores 0.
-// ---------------------------------------------------------------------------
-const GUESS_COST_PER_COUNTRY = 25;
-
-// `values`: every country's value for the stat (numbers). Counts the countries strictly
-// between the guess and the answer, other than the country asked about.
-function countriesBetween(values, answer, guess) {
-  const low = Math.min(answer, guess);
-  const high = Math.max(answer, guess);
-  return values.filter(value => value > low && value < high).length;
-}
-
-function scoreGuess(values, answer, guess) {
-  if (!Number.isFinite(guess)) return 0;
-  const between = countriesBetween(values, answer, guess);
-  return Math.max(0, DUEL_MAX_ROUND - GUESS_COST_PER_COUNTRY * between);
-}
-
-// ---------------------------------------------------------------------------
-// Border Run: from `start` to `end` through countries that border each other.
-// `graph`: { ISO: [neighbour ISO, …] }, without borders through overseas territories.
-// ---------------------------------------------------------------------------
-
-// Borders that only exist through an overseas territory: France–Brazil and France–Suriname
-// (French Guiana), France–Netherlands (Saint Martin). A Border Run can't use them.
-const OVERSEAS_BORDERS = [["FR", "BR"], ["FR", "SR"], ["FR", "NL"]];
-
-// The Border Run graph from border-data.js's BORDER_KM: { ISO: [neighbour, …] }, without
-// overseas borders and without anything `isCountry` doesn't know.
-function routeGraph(borderKm, isCountry = () => true) {
-  const overseas = new Set(OVERSEAS_BORDERS.flatMap(([a, b]) => [`${a}-${b}`, `${b}-${a}`]));
-  return Object.fromEntries(Object.entries(borderKm)
-    .map(([iso, borders]) => [iso, Object.keys(borders).filter(other => !overseas.has(`${iso}-${other}`) && isCountry(other))])
-    .filter(([iso, borders]) => isCountry(iso) && borders.length));
-}
-
-// Fewest borders crossed from start to end (breadth-first), or Infinity.
-function shortestRoute(graph, start, end) {
-  if (start === end) return 0;
-  const seen = new Set([start]);
-  let frontier = [start];
-  for (let steps = 1; frontier.length; steps++) {
-    const next = [];
-    for (const iso of frontier) {
-      for (const neighbour of graph[iso] || []) {
-        if (neighbour === end) return steps;
-        if (!seen.has(neighbour)) { seen.add(neighbour); next.push(neighbour); }
-      }
-    }
-    frontier = next;
-  }
-  return Infinity;
-}
-
-// Can `iso` come next on a route that is now at `at`?
-const canStep = (graph, at, iso) => (graph[at] || []).includes(iso);
-
-// `route`: the countries after the start, in order. Scores only a route that arrives.
-function scoreRoute(graph, start, end, route) {
-  let at = start;
-  for (const iso of route) {
-    if (!canStep(graph, at, iso)) return 0;
-    at = iso;
-  }
-  if (at !== end) return 0;
-  const shortest = shortestRoute(graph, start, end);
-  return Math.max(0, DUEL_MAX_ROUND - ROUTE_STEP_PENALTY * (route.length - shortest));
-}
-
-// ---------------------------------------------------------------------------
-// Bid It: both bid at the same time; the higher bid names (a tie goes to the faster bid).
-// ---------------------------------------------------------------------------
-
-// bids: { a: { bid, ms } | null, b: …, c: … } → the seat with the highest bid (a tie goes
-// to the faster bid), or null (nobody bid).
-function bidWinner(bids) {
-  const valid = Object.entries(bids).filter(([, entry]) => entry?.bid >= BID_MIN);
-  if (!valid.length) return null;
-  valid.sort(([, x], [, y]) => y.bid - x.bid || x.ms - y.ms);
-  return valid[0][0];
-}
-
-// The bidder's points before speed: 100 × bid if they named them all, otherwise damage,
-// −100 for each name missed. The other player scores 0.
-function scoreBid(bid, named) {
-  return named >= bid ? BID_POINTS * bid : -BID_POINTS * (bid - named);
-}
-
-// ---------------------------------------------------------------------------
-// Blind Paint: nothing is marked while you paint; at the end every right country counts,
-// every wrong one counts against you.
-// ---------------------------------------------------------------------------
-function scorePaint(answers, painted) {
-  const answerSet = new Set(answers);
-  const unique = [...new Set(painted)];
-  const right = unique.filter(iso => answerSet.has(iso)).length;
-  const wrong = unique.length - right;
-  return Math.max(0, Math.round(DUEL_MAX_ROUND * (right - wrong) / answers.length));
-}
-
-// ---------------------------------------------------------------------------
-// The match.
-// ---------------------------------------------------------------------------
-
-// Who picks the category of round `index` (0–4): `first` (drawn at random when the match
-// starts, 19 November 2026) picks rounds 1 and 3, the other player rounds 2 and 4, and whoever
-// is behind picks round 5 (a tie is decided by `coin`, 0 or 1, from the server).
-function picker(index, totals = { a: 0, b: 0 }, coin = 0, first = "a") {
-  const second = first === "a" ? "b" : "a";
-  if (index < 4) return index % 2 === 0 ? first : second;
-  if (totals.a !== totals.b) return totals.a < totals.b ? "a" : "b";
-  return coin ? "b" : "a";
-}
-
-// Round winner: more points wins; equal points (above 0), the faster lock-in wins; else a
-// draw (null).
-function roundWinner(a, b) {
-  return roundWinnerOf({ a, b });
-}
-// The same for any number of players: results is { seat: { points, ms } }.
-function roundWinnerOf(results) {
-  const entries = Object.entries(results);
-  const top = Math.max(...entries.map(([, entry]) => entry.points));
-  const best = entries.filter(([, entry]) => entry.points === top);
-  if (best.length === 1) return best[0][0];
-  if (top <= 0) return null; // nobody scored: speed doesn't win it
-  const fastest = Math.min(...best.map(([, entry]) => entry.ms));
-  const quick = best.filter(([, entry]) => entry.ms === fastest);
-  return quick.length === 1 ? quick[0][0] : null;
-}
-
-// ---------------------------------------------------------------------------
-// Party (19 November 2026): 3 or 4 players, everyone against everyone, on the same rounds.
-// Seats are "a", "b", "c", "d"; a match plays `state.seats` (1v1: a and b).
-// ---------------------------------------------------------------------------
-const SEATS = ["a", "b", "c", "d"];
-const PARTY_SIZES = [2, 3, 4];
-const PARTY_MIN_START = 3; // a Party of 4 can start once 3 are in
-const seatsOf = state => state?.seats || SEATS.slice(0, state?.size || 2);
-// Seats still playing (a player who leaves a Party is out; their score stays as it was).
-const activeSeats = state => seatsOf(state).filter(seat => !state?.gone?.[seat]);
-
-// The standings: more points first, then more rounds won; whoever left goes below everyone
-// still playing. Equal on both shares a place. → [{ seat, place, total }]
-function standings(state) {
-  const seats = seatsOf(state);
-  const key = seat => [state.gone?.[seat] ? 1 : 0, -(state.totals?.[seat] || 0), -(state.wins?.[seat] || 0)];
-  const order = [...seats].sort((x, y) => {
-    const kx = key(x), ky = key(y);
-    for (let i = 0; i < kx.length; i++) if (kx[i] !== ky[i]) return kx[i] - ky[i];
-    return seats.indexOf(x) - seats.indexOf(y);
-  });
-  const list = [];
-  order.forEach((seat, index) => {
-    const previous = list[index - 1];
-    const same = previous && key(previous.seat).join() === key(seat).join();
-    list.push({ seat, place: same ? previous.place : index + 1, total: state.totals?.[seat] || 0 });
-  });
-  return list;
-}
-// Who you race against at the top of the screen: the number 1, or the number 2 if you're
-// the number 1 (the first in the standings who isn't you).
-const rivalOf = (state, you) => standings(state).find(entry => entry.seat !== you)?.seat || null;
-
-// Who picks the category of round `index` in a Party: round 1 a random player (the coin,
-// `first`), then whoever is last. Several last (all on 0 after round 1, say): the one of them
-// who has picked the fewest times, and never the same player twice in a row if another can.
-function partyPicker(index, state, random, first) {
-  const active = activeSeats(state);
-  if (index === 0 && first && active.includes(first)) return first;
-  const low = Math.min(...active.map(seat => state.totals?.[seat] || 0));
-  let pool = active.filter(seat => (state.totals?.[seat] || 0) === low);
-  if (pool.length > 1) {
-    const picked = seat => (state.rounds || []).filter(round => round?.pickedBy === seat).length;
-    const fewest = Math.min(...pool.map(picked));
-    pool = pool.filter(seat => picked(seat) === fewest);
-  }
-  const previous = state.rounds?.[index - 1]?.pickedBy;
-  if (pool.length > 1 && pool.includes(previous)) pool = pool.filter(seat => seat !== previous);
-  return pool[Math.floor(random() * pool.length)];
-}
-
-// A small seeded random (mulberry32), so the server can pick offers reproducibly.
-function seededRandom(seed) {
-  let state = seed >>> 0;
-  return () => {
-    state = (state + 0x6d2b79f5) >>> 0;
-    let t = state;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-// `count` categories for a pick, from those not yet used in the match.
-function offerCategories(all, used, random, count = DUEL_CATEGORY_OFFER) {
-  const open = all.filter(id => !used.includes(id));
-  for (let i = open.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
-    [open[i], open[j]] = [open[j], open[i]];
-  }
-  return open.slice(0, count);
-}
-
-return { DUEL_ROUNDS, DUEL_TIMES, roundTime, DUEL_MAX_ROUND, DUEL_CATEGORY_OFFER, BID_MIN, BID_MAX, BID_POINTS, ROUTE_STEP_PENALTY, GRACE_MS, DUEL_MAX_SPEED_BONUS, speedMultiplier, withSpeed, PIN_RADII, kmBetween, scorePin, GUESS_COST_PER_COUNTRY, countriesBetween, scoreGuess, OVERSEAS_BORDERS, routeGraph, shortestRoute, canStep, scoreRoute, bidWinner, scoreBid, scorePaint, picker, roundWinner, roundWinnerOf, SEATS, PARTY_SIZES, PARTY_MIN_START, seatsOf, activeSeats, standings, rivalOf, partyPicker, seededRandom, offerCategories };
-})();
-
 // ---- duel-view.js
 __modules["duel-view.js"] = (() => {
 // 1v1 and Party (3–4 players) in the browser (docs/1v1-plan.md): the screen (#duelView)
@@ -32322,7 +32509,9 @@ function countryAtClick(ccn3) {
 const categoryName = id => t(`duel.cat.${id}`);
 // The game's own notice lives in the game screen; 1v1 has its own (#duelToast).
 let toastTimer = null;
+let menuNotice = null; // the menu's own notice, while the lobby waits there (engine.js)
 function showToastNotice(message, { problem = false } = {}) {
+  if (document.getElementById("duelView").classList.contains("hidden") && menuNotice) { menuNotice(message, { problem }); return; }
   const toast = document.getElementById("duelToast");
   toast.textContent = message;
   toast.classList.toggle("is-problem", problem);
@@ -32332,7 +32521,11 @@ function showToastNotice(message, { problem = false } = {}) {
 }
 const styleName = style => t(`duel.style.${style}`);
 
-function createDuel({ globe, onExit, onSignIn }) {
+// The lobby is on the menu (19 November 2026, mockups/versus-lobby): the match is made and
+// waited for there (engine.js renders it from `current()`), and this screen opens once it
+// fills (onMatchStart). onChange(match) is called on every change, and when it's forgotten.
+function createDuel({ globe, onExit, onSignIn, onMatchStart = () => {}, notice = null }) {
+  menuNotice = notice;
   const view = document.getElementById("duelView");
   const panel = document.getElementById("duelPanel");
   const top = document.getElementById("duelTop");
@@ -32354,6 +32547,8 @@ function createDuel({ globe, onExit, onSignIn }) {
   let readyFor = "";
   let entry = null; // the country box kept across renders: { key, node, onCountry, field }
   let startSize = 2; // the match you'll make: 2 (1v1), 3 or 4 (Party), from the menu
+  const changeListeners = [];
+  const notify = () => changeListeners.forEach(listener => listener(match));
 
   const serverNow = () => Date.now() + offset;
   const state = () => match?.state;
@@ -32383,7 +32578,11 @@ function createDuel({ globe, onExit, onSignIn }) {
     const changed = !match || match.id !== data.id;
     match = { id: data.id, code: data.code ?? match?.code, you: data.you ?? match?.you, status: data.status, state: data.state, version: data.version ?? match?.version };
     if (changed) watch();
+    // The lobby filled while you waited on the menu: to the match.
+    const live = match.state.phase !== "lobby" && match.status !== "done" && match.status !== "abandoned" && match.state.phase !== "done";
+    if (!open && live) { onMatchStart(); show(); }
     render();
+    notify();
   }
   async function send(action, body = {}) {
     try {
@@ -32418,7 +32617,8 @@ function createDuel({ globe, onExit, onSignIn }) {
       take({ id: row.id, code: row.code, status: row.status, state: row.state, version: row.version, you: match.you });
     });
     clearInterval(syncTimer);
-    syncTimer = setInterval(() => { if (open && !document.hidden) sync(); }, SYNC_MS);
+    // Also while the lobby waits on the menu (Realtime first; this is the fallback).
+    syncTimer = setInterval(() => { if (!document.hidden && (open || match?.state?.phase === "lobby")) sync(); }, SYNC_MS);
   }
 
   // -------------------------------------------------------------------------
@@ -32461,7 +32661,25 @@ function createDuel({ globe, onExit, onSignIn }) {
   // Coming in through an invite link (?duel=CODE): kept until you're signed in.
   function openCode(code) {
     store.set(CODE_KEY, code.toUpperCase());
-    show();
+    if (isConfigured && getUser()) restore();
+    else onSignIn();
+  }
+  // Signed in (or the page loaded signed in): your match still going, and an invite waiting.
+  // A lobby stays on the menu; a match being played opens this screen.
+  async function restore() {
+    if (!isConfigured || !getUser()) return;
+    if (!match) { const found = await findOpenDuel(); if (found) take(found); }
+    const code = store.get(CODE_KEY);
+    if (code && (!match || match.code !== code)) {
+      store.set(CODE_KEY, null);
+      if (match && match.state.phase === "lobby") { await move({ type: "leave" }); forget(); }
+      await send("join", { code });
+    }
+  }
+  async function create(size) {
+    if (!isConfigured || !getUser()) { onSignIn(); return null; }
+    startSize = size;
+    return send("create", { size });
   }
   async function leaveMatch() {
     if (!match) return;
@@ -32480,6 +32698,7 @@ function createDuel({ globe, onExit, onSignIn }) {
     revealPlayed = "";
     clearGlobe();
     render();
+    notify();
   }
 
   // -------------------------------------------------------------------------
@@ -33542,7 +33761,7 @@ function createDuel({ globe, onExit, onSignIn }) {
       dots.children[1].classList.toggle("is-on", onSecond);
     }, { passive: true });
     const actions = el("div", "duel-actions");
-    actions.append(button(t("duel.menu"), "duel-go is-small is-ghost", () => { forget(); hide(); }), button(t("duel.newMatch"), "duel-go is-small is-ghost", () => { forget(); send("create"); }));
+    actions.append(button(t("duel.menu"), "duel-go is-small is-ghost", () => { forget(); hide(); }), button(t("duel.newMatch"), "duel-go is-small is-ghost", () => { forget(); hide(); create(2); }));
     panel.replaceChildren(pages, dots, actions);
   }
 
@@ -33620,7 +33839,7 @@ function createDuel({ globe, onExit, onSignIn }) {
     }, { passive: true });
     const size = seats().length;
     const actions = el("div", "duel-actions");
-    actions.append(button(t("duel.menu"), "duel-go is-small is-ghost", () => { forget(); hide(); }), button(t("duel.newMatch"), "duel-go is-small is-ghost", () => { forget(); send("create", { size }); }));
+    actions.append(button(t("duel.menu"), "duel-go is-small is-ghost", () => { forget(); hide(); }), button(t("duel.newMatch"), "duel-go is-small is-ghost", () => { forget(); hide(); create(size); }));
     panel.replaceChildren(pages, dots, actions);
   }
 
@@ -33647,12 +33866,23 @@ function createDuel({ globe, onExit, onSignIn }) {
   });
   onLangChange(() => render());
   // Once you're signed in, an invite waiting for you goes on.
-  const signedIn = () => { if (open) { render(); if (getUser()) show(); } };
+  const signedIn = () => { if (open) render(); restore(); };
 
   return {
     open: show, // { size }: 2 (1v1), 3 or 4 (Party), for a match you make
     openCode,
     signedIn,
+    restore,
+    // The lobby on the menu.
+    create,
+    join: code => send("join", { code: String(code).trim().toUpperCase() }),
+    async leave() { if (!match) return; await move({ type: "leave" }); forget(); },
+    startNow: () => move({ type: "start" }),
+    // Your tent changed under My tent while you wait: the others see the new one.
+    refreshTent: () => { if (match && ["lobby", "versus"].includes(match.state.phase)) move({ type: "tent" }); },
+    current: () => match,
+    inLobby: () => match?.state?.phase === "lobby",
+    onChange: listener => changeListeners.push(listener),
     isOpen: () => open,
     // An invite still waiting (you went to sign in): open the match screen again.
     hasPendingCode: () => Boolean(store.get(CODE_KEY)),
@@ -34953,7 +35183,8 @@ const { createJourneyStrip } = __modules["journey-strip.js"];
 const { COUNTRIES, LEGACY_COUNTRY_ISOS, TERRITORIES } = __modules["countries.js"];
 const { LIGHT_DEVICE, PixelGlobe } = __modules["globe.js"];
 const { JOURNEYS, ROUND_COLORS, createJourney, scoreTier } = __modules["journeys.js"];
-const { getAccountUnits, saveUnits } = __modules["auth.js"];
+const { getAccountUnits, getDuelHistory, saveUnits } = __modules["auth.js"];
+const { PARTY_MIN_START, seatsOf, standings } = __modules["duel-rules.js"];
 const { getAccountLanguage, getProfile, getUser, initAuth, isConfigured: isAuthConfigured, pullDays, pushDay, saveLanguage, sendEmailLink, signIn, signOut, takeAuthRedirectError, verifyEmailCode } = __modules["auth.js"];
 const { ROUND_PICTURES } = __modules["round-pictures.js"];
 const { CLUES } = __modules["clues.js"];
@@ -38070,6 +38301,8 @@ function focusMenuStop(key) {
 // Next to the button: ARCHIVE, which opens that game's archive (every day on a calendar).
 // ---------------------------------------------------------------------------
 const hero = { key: "extremes", date: null, days: null };
+// 1v1 and Party (duel-view.js), made further down once the menu exists; the card reads it.
+let duel = null;
 const HERO_ZOOM = 128; // the camera a little closer on a selected place
 const HERO_INFO = {
   extremes: { title: () => "HIGHS & LOWS", text: () => t("menu.extremesText"), color: "#ff6b9d" },
@@ -38155,13 +38388,18 @@ function renderHero() {
   go.textContent = key === "duel" ? t("menu.duelGoShort") : key === "tent" ? t("menu.tentGo") : camp ? t("menu.pinGoCamp")
     : daily ? (state === "done" ? `✓ ${num(record.score ?? 0)}` : state === "started" ? t("menu.continueGo") : t("menu.startGame", { name: info.title() }))
     : t(state === "done" ? "menu.seeResults" : state === "started" ? "menu.continueGo" : "menu.playNow");
+  // In a Versus lobby no game starts (the match would cut it off): look, don't play.
+  if (daily && duel?.inLobby()) {
+    go.textContent = t("lobby.inLobby");
+    setText("heroStatus", t("lobby.dailyBlocked"));
+  }
   // DAILY's START names the game; a phone has the name in the title already (one line).
-  if (daily && state === "new") {
+  if (daily && state === "new" && !duel?.inLobby()) {
     const [start, name] = t("menu.startGame", { name: "\u0000" }).split("\u0000");
     go.replaceChildren(start.trimEnd(), Object.assign(document.createElement("span"), { className: "hero-go-name", textContent: ` ${info.title()}${name}` }));
   }
   go.title = daily && state === "done" ? t("menu.seeResults").replace(/^✓\s*/, "") : "";
-  go.disabled = state === "none";
+  go.disabled = state === "none" || (daily && Boolean(duel?.inLobby()));
   go.hidden = state === "none" && !date && !daily;
   // ARCHIVE next to it (not for Base Camp); on a past day, the way home.
   const side = document.getElementById("heroSide");
@@ -38176,7 +38414,205 @@ function renderHero() {
   const unplayed = daily ? getAllPuzzleDays().filter(day => day < today && (record => !record.completed && !record.noGame)(getDayRecord(day, key))).length : 0;
   side.textContent = versus ? t("menu.party3") : date ? `⌂ ${t(getTent() ? "hero.myTent" : "hero.home")}` : `▤ ${t("menu.archive")}`;
   side.title = unplayed ? t("menu.archiveOpen", { n: unplayed }) : "";
+  // VERSUS: a code to join; in a match of yours that's waiting, the lobby takes the card.
+  document.getElementById("heroJoin").hidden = !(versus && !duel?.inLobby());
+  document.getElementById("heroLobby").hidden = true;
+  card.classList.remove("is-lobby");
+  if (versus && duel?.inLobby()) renderLobby(card);
+  renderLobbyAround();
 }
+
+// ---------------------------------------------------------------------------
+// The Versus lobby (19 November 2026, mockups/versus-lobby): the match you made or joined
+// waits on the menu's own card, so you can change your tent or look around in Crew while
+// friends come in. When the last seat fills, the match screen opens (duel-view.js).
+// ---------------------------------------------------------------------------
+const LOBBY_COLORS = ["#c58cff", "#45e3ff", "#ff8a5c"]; // the others, as in the match
+function renderLobby(card) {
+  const match = duel.current();
+  const { state, you } = match;
+  const seats = seatsOf(state);
+  const filled = seats.filter(seat => state.players[seat]);
+  const party = seats.length > 2;
+  const host = you === "a";
+  const missing = seats.length - filled.length;
+  card.classList.add("is-lobby");
+  setText("heroRibbon", `${party ? t("duel.party.label", { n: seats.length }) : "1V1"} · ${t("menu.versusRibbon")}`);
+  document.getElementById("heroRibbon").hidden = false;
+  setText("heroTitle", party ? t("lobby.waitingFor", { n: missing }) : t("lobby.waitingFriend"));
+  setText("heroText", party ? t("lobby.text") : t("duel.waitingText"));
+  setText("heroStatus", t(host ? "lobby.statusHost" : "lobby.statusGuest", { have: filled.length, n: seats.length, name: state.players.a?.name || "" }));
+  document.getElementById("heroLobby").hidden = false;
+  // The seats: yours with your tent as it is now (✎ TENT changes it), the others' from the match.
+  const others = seats.filter(seat => seat !== you);
+  const box = document.getElementById("lobbySeats");
+  box.style.setProperty("--n", String(seats.length));
+  box.replaceChildren(...seats.map(seat => {
+    const player = state.players[seat];
+    const item = document.createElement("div");
+    if (!player) {
+      item.className = "lobby-seat is-empty";
+      item.append(Object.assign(document.createElement("span"), { className: "lobby-empty", textContent: "?" }), Object.assign(document.createElement("b"), { textContent: t("lobby.open") }), Object.assign(document.createElement("small"), { textContent: t("lobby.waiting") }));
+      return item;
+    }
+    const mine = seat === you;
+    item.className = `lobby-seat${mine ? " is-you" : ""}`;
+    item.style.setProperty("--me", mine ? "#ffd45c" : LOBBY_COLORS[others.indexOf(seat)] || LOBBY_COLORS[0]);
+    if (seat === "a") item.append(Object.assign(document.createElement("span"), { className: "lobby-host", textContent: t("lobby.host") }));
+    const look = mine ? getTentLook() : player.tent || { style: "aframe", avatar: "none", color: "#5b8cff" };
+    item.append(createTentCanvas(look, 3, "lobby-tent", { centred: true }), Object.assign(document.createElement("b"), { textContent: mine ? t("duel.you") : player.name }));
+    if (mine) {
+      const edit = Object.assign(document.createElement("button"), { type: "button", className: "lobby-tent-edit", textContent: t("lobby.editTent") });
+      edit.addEventListener("click", () => { sounds.playClick(); openMyTent(); });
+      item.append(edit);
+    } else item.append(Object.assign(document.createElement("small"), { textContent: t("lobby.joined") }));
+    return item;
+  }));
+  setText("lobbyCode", match.code);
+  document.getElementById("lobbyShare").hidden = !navigator.share;
+  // START WITH 3 (the host of a Party of 4, once 3 are in) and LEAVE.
+  const go = document.getElementById("heroGo");
+  const canStart = host && seats.length > PARTY_MIN_START && filled.length >= PARTY_MIN_START;
+  go.hidden = !(host && seats.length > PARTY_MIN_START);
+  go.disabled = !canStart;
+  go.textContent = t("duel.party.startNow", { n: Math.max(filled.length, PARTY_MIN_START) });
+  go.title = canStart ? "" : t("duel.party.startAt", { n: PARTY_MIN_START });
+  const side = document.getElementById("heroSide");
+  side.hidden = false;
+  side.textContent = t("lobby.leave");
+  side.title = "";
+  document.getElementById("heroSide2").hidden = true;
+  card.querySelector(".hero-actions").classList.remove("is-three");
+}
+// Around the card: the pill when you're away from your lobby, the dot on VERSUS, and YOUR
+// VERSUS on the VERSUS card.
+function renderLobbyAround() {
+  const match = duel?.current();
+  const lobby = duel?.inLobby() ? match : null;
+  const pill = document.getElementById("lobbyPill");
+  pill.hidden = !lobby || hero.key === "duel";
+  document.getElementById("menuDuelButton").toggleAttribute("data-lobby", Boolean(lobby));
+  if (lobby) {
+    const seats = seatsOf(lobby.state);
+    setText("lobbyPillMode", seats.length > 2 ? t("duel.party.label", { n: seats.length }) : "1V1");
+    setText("lobbyPillCount", t("lobby.count", { have: seats.filter(seat => lobby.state.players[seat]).length, n: seats.length }));
+  }
+  renderVersusStats();
+}
+// Lobby buttons.
+document.getElementById("lobbyPill").addEventListener("click", () => { sounds.playClick(); selectHero("duel"); });
+const inviteLink = () => {
+  const url = new URL(location.href);
+  url.search = `?duel=${duel.current().code}`;
+  url.hash = "";
+  return url.toString();
+};
+document.getElementById("lobbyCopy").addEventListener("click", async () => {
+  sounds.playClick();
+  const link = inviteLink();
+  try { await navigator.clipboard.writeText(link); showToastNotice(t("duel.copied")); } catch { prompt(t("duel.copyLink"), link); }
+});
+document.getElementById("lobbyShare").addEventListener("click", () => {
+  sounds.playClick();
+  const size = seatsOf(duel.current().state).length;
+  navigator.share?.({ title: "Expedition", text: size > 2 ? t("duel.party.shareText", { n: size }) : t("duel.shareText"), url: inviteLink() }).catch(() => {});
+});
+const joinWithCode = () => {
+  const code = document.getElementById("heroJoinField").value.trim().toUpperCase();
+  if (!/^[A-Z0-9]{6}$/.test(code)) { showToastNotice(t("lobby.badCode"), { problem: true }); return; }
+  if (!getUser()) { document.getElementById("accountModal").classList.remove("hidden"); return; }
+  duel.join(code);
+};
+document.getElementById("heroJoinGo").addEventListener("click", () => { sounds.playClick(); joinWithCode(); });
+document.getElementById("heroJoinField").addEventListener("keydown", event => { if (event.key === "Enter") joinWithCode(); });
+
+// YOUR VERSUS: your record from your finished matches (a 1v1 is won by the higher score or
+// when the other leaves; a Party by first place on its own), loaded once and after a match.
+let versusHistory = null; // { at, rows }
+async function loadVersusHistory(force = false) {
+  if (!getUser()) { versusHistory = null; return; }
+  if (!force && versusHistory && Date.now() - versusHistory.at < 60000) return;
+  versusHistory = { at: Date.now(), rows: await getDuelHistory() };
+  renderVersusStats();
+}
+function versusRecord(rows, userId) {
+  const results = [];
+  for (const row of [...rows].reverse()) { // oldest first
+    const state = row.state || {};
+    if (row.status !== "done" || state.phase !== "done") continue;
+    const seat = ["a", "b", "c", "d"].find(id => row[`player_${id}`] === userId);
+    if (!seat) continue;
+    const size = seatsOf(state).length;
+    const list = standings(state);
+    const leftDuel = size === 2 && state.left;
+    const firsts = list.filter(entry => entry.place === 1);
+    const winner = leftDuel ? (state.left === "a" ? "b" : "a") : firsts.length === 1 ? firsts[0].seat : null;
+    const place = leftDuel ? (winner === seat ? 1 : 2) : list.find(entry => entry.seat === seat)?.place || size;
+    results.push({ size, won: winner === seat, drew: !winner, place, total: state.totals?.[seat] || 0, rounds: (state.rounds || []).map(round => ({ style: round.style, points: round.result?.[seat]?.points })) });
+  }
+  if (!results.length) return null;
+  let streak = null;
+  for (let index = results.length - 1; index >= 0; index--) {
+    const kind = results[index].won ? "W" : results[index].drew ? "D" : "L";
+    if (!streak) streak = { kind, n: 1 };
+    else if (streak.kind === kind) streak.n += 1;
+    else break;
+  }
+  const byStyle = {};
+  results.forEach(result => result.rounds.forEach(({ style, points }) => { if (points != null) (byStyle[style] ||= []).push(points); }));
+  const bestStyle = Object.entries(byStyle).filter(([, list]) => list.length >= 2).map(([style, list]) => ({ style, avg: list.reduce((sum, n) => sum + n, 0) / list.length })).sort((x, y) => y.avg - x.avg)[0]?.style || null;
+  const parties = results.filter(result => result.size > 2);
+  return {
+    matches: results.length,
+    wins: results.filter(result => result.won).length,
+    streak,
+    last: results.slice(-5),
+    avg: Math.round(results.reduce((sum, result) => sum + result.total, 0) / results.length),
+    best: Math.max(...results.map(result => result.total)),
+    bestStyle,
+    parties: parties.length,
+    partyWins: parties.filter(result => result.won).length
+  };
+}
+function renderVersusStats() {
+  const panel = document.getElementById("versusStats");
+  const show = hero.key === "duel" && Boolean(getUser());
+  panel.hidden = !show;
+  if (!show) return;
+  if (!versusHistory) { loadVersusHistory(); }
+  const record = versusHistory ? versusRecord(versusHistory.rows, getUser().id) : null;
+  const mini = document.getElementById("versusStatsMini");
+  const body = document.getElementById("versusStatsBody");
+  const el = (tag, className, text) => Object.assign(document.createElement(tag), { className, textContent: text ?? "" });
+  const note = el("p", "lobby-note", t("lobby.note"));
+  if (!record) {
+    mini.textContent = versusHistory ? t("lobby.noMatches") : "…";
+    body.replaceChildren(el("p", "lobby-note", versusHistory ? t("lobby.firstMatch") : "…"), note);
+    return;
+  }
+  const pct = Math.round(100 * record.wins / record.matches);
+  const streak = record.streak ? `${t(`duel.vs.${record.streak.kind.toLowerCase()}`)}${record.streak.n}` : "–";
+  mini.replaceChildren(el("b", "", num(record.matches)), ` ${t("lobby.matches")} · `, el("b", "", `${pct}%`), ` ${t("lobby.won")} · `, el("b", record.streak?.kind === "W" ? "is-win" : "", streak));
+  const big = el("div", "lobby-big");
+  [[num(record.matches), t("lobby.matches")], [`${pct}%`, t("lobby.won")], [streak, t("lobby.streak")]].forEach(([value, label], index) => {
+    const cell = el("div");
+    cell.append(el("b", index === 2 && record.streak?.kind === "W" ? "is-win" : "", value), el("small", "", label));
+    big.append(cell);
+  });
+  const line = (label, value) => { const row = el("div", "lobby-line"); row.append(el("span", "", label), typeof value === "string" ? el("b", "", value) : value); return row; };
+  const pips = el("span", "lobby-pips");
+  record.last.forEach(result => pips.append(el("i", result.size > 2 ? "is-p" : result.won ? "is-w" : result.drew ? "is-d" : "is-l", result.size > 2 ? String(result.place) : result.won ? t("duel.vs.w") : result.drew ? t("duel.vs.d") : t("duel.vs.l"))));
+  body.replaceChildren(big, line(t("lobby.lastFive"), pips), line(t("lobby.avg"), num(record.avg)), line(t("lobby.best"), num(record.best)),
+    ...(record.bestStyle ? [line(t("lobby.bestRound"), t(`duel.style.${record.bestStyle}`))] : []),
+    ...(record.parties ? [line(t("lobby.parties"), t("lobby.partiesLine", { n: num(record.parties), w: num(record.partyWins) }))] : []),
+    note);
+}
+document.getElementById("versusStatsToggle").addEventListener("click", () => {
+  sounds.playClick();
+  const panel = document.getElementById("versusStats");
+  panel.classList.toggle("is-open");
+  document.getElementById("versusStatsToggle").setAttribute("aria-expanded", String(panel.classList.contains("is-open")));
+});
 // The game DAILY shows: the one you picked (or pointed at on the globe), else today's main game.
 const dailyGame = () => (menuFocus === "casual" || menuFocus === "extremes") && modeState(menuFocus) !== "none" ? menuFocus : featuredMode();
 const nextDayIn = () => {
@@ -38216,20 +38652,38 @@ document.getElementById("heroGo").addEventListener("click", () => {
   sounds.playClick();
   if (hero.key === "camp") { selectMenuCountry(null); community.open(); return; }
   if (hero.key === "tent") { openMyTent(); return; }
-  if (hero.key === "duel") { duel.open({ size: 2 }); return; }
+  if (hero.key === "duel") { createVersus(2); return; }
+  if (lobbyBlocks()) return;
   mainMenu.showGame(hero.key === "daily" ? dailyGame() : hero.key, hero.date);
 });
 // ARCHIVE opens the archive of that game: every day on a calendar (13 November 2026, team
 // request; it used to step through past days on the card, a plane flying to each).
 document.getElementById("heroSide").addEventListener("click", () => {
   sounds.playClick();
-  if (hero.key === "duel") { duel.open({ size: 3 }); return; }
+  if (hero.key === "duel") { if (duel.inLobby()) leaveLobby(); else createVersus(3); return; }
   archive.openArchive(null, hero.key === "daily" ? dailyGame() : hero.key);
 });
 document.getElementById("heroSide2").addEventListener("click", () => {
   sounds.playClick();
-  duel.open({ size: 4 });
+  createVersus(4);
 });
+// VERSUS: make a match (its lobby comes up on this card), or, in a lobby, start a Party of 4
+// with 3 (heroGo) or leave (heroSide).
+function createVersus(size) {
+  if (duel.inLobby()) { if (duel.current().you === "a") duel.startNow(); return; }
+  if (!getUser()) { document.getElementById("accountModal").classList.remove("hidden"); return; }
+  duel.create(size);
+}
+async function leaveLobby() {
+  await duel.leave();
+  showToastNotice(t("lobby.left"));
+}
+// No game starts while a lobby waits (the match would cut it off).
+function lobbyBlocks() {
+  if (!duel?.inLobby()) return false;
+  showToastNotice(t("lobby.dailyBlocked"), { problem: true });
+  return true;
+}
 onLangChange(renderHero);
 
 // The dock (13 November 2026, team request; replaces the Expedition drawer): five buttons
@@ -39171,8 +39625,6 @@ document.getElementById("signOutButton").addEventListener("click", async () => {
   showToastNotice(t(cleared ? "account.signedOut" : "account.signedOutKept"));
 });
 renderAccount(null);
-// 1v1 (duel-view.js), made further down once the menu exists.
-let duel = null;
 initAuth(account => {
   // Signed in: the account's language wins; an account without one takes this browser's.
   if (account) {
@@ -39263,7 +39715,7 @@ function setSheetStep(step) {
 const archive = initializeHistoryScreens({
   getDays: getAllPuzzleDays,
   getDayRecord,
-  onPlayDay: enterGameView,
+  onPlayDay: (...args) => { if (!lobbyBlocks()) enterGameView(...args); },
   // The archive's map: the game globe's countries, where each day's game started, and your
   // tent as the hub every trip leaves from.
   getCountryFeatures: () => globe.countryFeatures,
@@ -39282,8 +39734,26 @@ duel = createDuel({
     mainMenu.refreshPlayTiles();
   },
   // The sign-in window; Google brings you back here, and the invite waits (duel-view.js).
-  onSignIn: () => document.getElementById("accountModal").classList.remove("hidden")
+  onSignIn: () => document.getElementById("accountModal").classList.remove("hidden"),
+  // The lobby filled while you were on the menu (or in Crew, My tent, the archive): back
+  // for the match.
+  onMatchStart: () => {
+    ["accountModal", "archiveModal", "statsModal", "howToPlayModal", "langModal"].forEach(id => document.getElementById(id)?.classList.add("hidden"));
+    closeSettings();
+    if (!document.getElementById("communityModal")?.classList.contains("hidden")) community?.close();
+    selectHero("daily");
+  },
+  notice: (message, options) => showToastNotice(message, options)
 });
+// The lobby lives on the VERSUS card: every change redraws it (and the pill, the dot).
+duel.onChange(match => {
+  if (match?.state?.phase === "lobby" && duelLobbyShown !== match.id) { duelLobbyShown = match.id; selectHero("duel"); }
+  if (!match) { duelLobbyShown = null; loadVersusHistory(true); }
+  renderHero();
+});
+let duelLobbyShown = null;
+// Your tent changed (My tent) while you wait: the others get the new one.
+onBaseChange(() => { if (duel.inLobby()) { renderHero(); setTimeout(() => duel.refreshTent(), 1500); } });
 community = initializeCommunity({ globe, getDays: archive.loadDays, today, dayLabel: dateKey => t("common.day", { n: getPuzzleNumber(dateKey) }), getOrigin: () => gameOrigin(featuredMode(), today) });
 
 // ---------------------------------------------------------------------------
@@ -39448,7 +39918,7 @@ document.getElementById("accountBase").appendChild(createBaseLine());
     params.delete("duel");
     history.replaceState(null, "", `${location.pathname}${params.size ? `?${params}` : ""}${location.hash}`);
     duel.openCode(code);
-  } else if (duel.hasPendingCode()) duel.open();
+  }
 }
 
 return { getPuzzleNumber, getAllPuzzleDays, getAnswerText };
