@@ -4891,8 +4891,8 @@ h1, h2, h3 { font-weight: normal; }
 .hero-actions.is-three > button:hover, .hero-actions.is-three > button:focus-visible { border-color: var(--tile); background: color-mix(in srgb, var(--tile) 22%, rgba(10, 15, 30, 0.7)); transform: translateY(-2px); outline: none; filter: none; }
 .hero-actions.is-three > button b { color: var(--text); font: 11px var(--font-display); letter-spacing: var(--ls-pixel); }
 .hero-actions.is-three > button small { color: var(--muted); font: 7px var(--font-display); letter-spacing: var(--ls-pixel); }
-.mode-pips { display: flex; gap: 3px; }
-.mode-pips i { width: 10px; height: 10px; border-radius: 2px; background: var(--pip); box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.25); }
+.mode-pips { display: flex; align-items: flex-end; gap: 3px; }
+.mode-head { width: 21px; height: 24px; image-rendering: pixelated; }
 .hero-join { order: 1; }
 
 </style>
@@ -38633,9 +38633,26 @@ document.getElementById("versusStatsToggle").addEventListener("click", () => {
   document.getElementById("versusStatsToggle").setAttribute("aria-expanded", String(panel.classList.contains("is-open")));
 });
 const VERSUS_PIPS = ["#ffd45c", "#c58cff", "#45e3ff", "#ff8a5c"]; // you, then the others
+// A player's head in the explorers' pixel style: a bobble hat in the player's colour.
+const HEAD_ROWS = ["...C...", ".KCCCK.", "KCCCCCK", "KcccccK", "KFFFFFK", "KFKFKFK", "KFFFFFK", ".KKKKK."];
+const HEAD_SKIN = ["#f2c29b", "#c98f6a", "#e8b48a", "#8d5a3b"];
+function playerHead(color, index) {
+  const scale = 3;
+  const canvas = Object.assign(document.createElement("canvas"), { width: 7 * scale, height: HEAD_ROWS.length * scale, className: "mode-head" });
+  const ctx = canvas.getContext("2d");
+  const value = parseInt(color.slice(1), 16);
+  const dark = `rgb(${[16, 8, 0].map(shift => Math.round(((value >> shift) & 255) * 0.62)).join(",")})`;
+  const colors = { K: "#0b1020", C: color, c: dark, F: HEAD_SKIN[index % HEAD_SKIN.length] };
+  HEAD_ROWS.forEach((row, y) => [...row].forEach((key, x) => {
+    if (!colors[key]) return;
+    ctx.fillStyle = colors[key];
+    ctx.fillRect(x * scale, y * scale, scale, scale);
+  }));
+  return canvas;
+}
 function versusModeTile(button, n) {
   const pips = Object.assign(document.createElement("span"), { className: "mode-pips" });
-  for (let i = 0; i < n; i++) pips.append(Object.assign(document.createElement("i"), { style: `--pip: ${VERSUS_PIPS[i]}` }));
+  for (let i = 0; i < n; i++) pips.append(playerHead(VERSUS_PIPS[i], i));
   button.replaceChildren(pips,
     Object.assign(document.createElement("b"), { textContent: n === 2 ? t("versus.duel") : t("versus.party") }),
     Object.assign(document.createElement("small"), { textContent: t("versus.players", { n }) }));
