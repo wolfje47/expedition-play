@@ -6073,6 +6073,7 @@ const EN = {
   "lobby.avg": "Average match",
   "lobby.best": "Best match",
   "lobby.bestRound": "Best round",
+  "lobby.roundStyle": "Round {n} · {style}",
   "lobby.parties": "Parties",
   "lobby.partiesLine": "{n} played · {w} won",
   "lobby.note": "While you wait you can change your tent or look around in Crew. When the last seat fills, we bring you back for the match.",
@@ -7328,6 +7329,7 @@ const NL = {
   "lobby.avg": "Gemiddelde match",
   "lobby.best": "Beste match",
   "lobby.bestRound": "Beste ronde",
+  "lobby.roundStyle": "Ronde {n} · {style}",
   "lobby.parties": "Parties",
   "lobby.partiesLine": "{n} gespeeld · {w} gewonnen",
   "lobby.note": "Terwijl je wacht, kun je je tent aanpassen of in Crew rondkijken. Als de laatste plek bezet is, halen we je terug voor de wedstrijd.",
@@ -35185,7 +35187,7 @@ const { COUNTRIES, LEGACY_COUNTRY_ISOS, TERRITORIES } = __modules["countries.js"
 const { LIGHT_DEVICE, PixelGlobe } = __modules["globe.js"];
 const { JOURNEYS, ROUND_COLORS, createJourney, scoreTier } = __modules["journeys.js"];
 const { getAccountUnits, getDuelHistory, saveUnits } = __modules["auth.js"];
-const { PARTY_MIN_START, seatsOf, standings } = __modules["duel-rules.js"];
+const { DUEL_ROUNDS, PARTY_MIN_START, seatsOf, standings } = __modules["duel-rules.js"];
 const { getAccountLanguage, getProfile, getUser, initAuth, isConfigured: isAuthConfigured, pullDays, pushDay, saveLanguage, sendEmailLink, signIn, signOut, takeAuthRedirectError, verifyEmailCode } = __modules["auth.js"];
 const { ROUND_PICTURES } = __modules["round-pictures.js"];
 const { CLUES } = __modules["clues.js"];
@@ -38604,7 +38606,7 @@ function renderVersusStats() {
   const pips = el("span", "lobby-pips");
   record.last.forEach(result => pips.append(el("i", result.size > 2 ? "is-p" : result.won ? "is-w" : result.drew ? "is-d" : "is-l", result.size > 2 ? String(result.place) : result.won ? t("duel.vs.w") : result.drew ? t("duel.vs.d") : t("duel.vs.l"))));
   body.replaceChildren(big, line(t("lobby.lastFive"), pips), line(t("lobby.avg"), num(record.avg)), line(t("lobby.best"), num(record.best)),
-    ...(record.bestStyle ? [line(t("lobby.bestRound"), t(`duel.style.${record.bestStyle}`))] : []),
+    ...(record.bestStyle ? [line(t("lobby.bestRound"), t("lobby.roundStyle", { n: DUEL_ROUNDS.indexOf(record.bestStyle) + 1, style: t(`duel.style.${record.bestStyle}`) }))] : []),
     ...(record.parties ? [line(t("lobby.parties"), t("lobby.partiesLine", { n: num(record.parties), w: num(record.partyWins) }))] : []),
     note);
 }
