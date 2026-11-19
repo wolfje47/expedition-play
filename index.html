@@ -4886,6 +4886,14 @@ h1, h2, h3 { font-weight: normal; }
   .hero-card.is-lobby .play-tile-text span { display: none; }
   .lobby-pill-text span { display: none; }
 }
+/* VERSUS: the three modes as tiles (DUEL 2 / PARTY 3 / PARTY 4), a block per player on top. */
+.hero-actions.is-three > button { display: grid; justify-items: center; gap: 6px; padding: 12px 6px 10px; border: 2px solid color-mix(in srgb, var(--tile) 45%, transparent); border-radius: 12px; background: color-mix(in srgb, var(--tile) 10%, rgba(10, 15, 30, 0.7)); color: var(--text); box-shadow: none; cursor: pointer; transition: border-color 0.12s, background 0.12s, transform 0.12s; }
+.hero-actions.is-three > button:hover, .hero-actions.is-three > button:focus-visible { border-color: var(--tile); background: color-mix(in srgb, var(--tile) 22%, rgba(10, 15, 30, 0.7)); transform: translateY(-2px); outline: none; filter: none; }
+.hero-actions.is-three > button b { color: var(--text); font: 11px var(--font-display); letter-spacing: var(--ls-pixel); }
+.hero-actions.is-three > button small { color: var(--muted); font: 7px var(--font-display); letter-spacing: var(--ls-pixel); }
+.mode-pips { display: flex; gap: 3px; }
+.mode-pips i { width: 10px; height: 10px; border-radius: 2px; background: var(--pip); box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.25); }
+.hero-join { order: 1; }
 
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -6079,6 +6087,9 @@ const EN = {
   "lobby.note": "While you wait you can change your tent or look around in Crew. When the last seat fills, we bring you back for the match.",
   "lobby.noMatches": "NO MATCHES YET",
   "lobby.firstMatch": "No finished matches yet: your record starts with your first one.",
+  "versus.duel": "DUEL",
+  "versus.party": "PARTY",
+  "versus.players": "{n} PLAYERS",
   "menu.party3": "▶ PARTY · 3",
   "menu.party4": "▶ PARTY · 4",
   "menu.guest": "Guest",
@@ -7335,6 +7346,9 @@ const NL = {
   "lobby.note": "Terwijl je wacht, kun je je tent aanpassen of in Crew rondkijken. Als de laatste plek bezet is, halen we je terug voor de wedstrijd.",
   "lobby.noMatches": "NOG GEEN MATCHES",
   "lobby.firstMatch": "Nog geen uitgespeelde matches: je record begint bij je eerste.",
+  "versus.duel": "DUEL",
+  "versus.party": "PARTY",
+  "versus.players": "{n} SPELERS",
   "menu.party3": "▶ PARTY · 3",
   "menu.party4": "▶ PARTY · 4",
   "menu.guest": "Gast",
@@ -38416,6 +38430,8 @@ function renderHero() {
   // DAILY's archive says how many earlier days of the main game are still open.
   const unplayed = daily ? getAllPuzzleDays().filter(day => day < today && (record => !record.completed && !record.noGame)(getDayRecord(day, key))).length : 0;
   side.textContent = versus ? t("menu.party3") : date ? `⌂ ${t(getTent() ? "hero.myTent" : "hero.home")}` : `▤ ${t("menu.archive")}`;
+  // VERSUS: three mode tiles, each with a block per player in the match's colours.
+  if (versus) [[go, 2], [side, 3], [document.getElementById("heroSide2"), 4]].forEach(([button, n]) => versusModeTile(button, n));
   side.title = unplayed ? t("menu.archiveOpen", { n: unplayed }) : "";
   // VERSUS: a code to join; in a match of yours that's waiting, the lobby takes the card.
   document.getElementById("heroJoin").hidden = !(versus && !duel?.inLobby());
@@ -38616,6 +38632,15 @@ document.getElementById("versusStatsToggle").addEventListener("click", () => {
   panel.classList.toggle("is-open");
   document.getElementById("versusStatsToggle").setAttribute("aria-expanded", String(panel.classList.contains("is-open")));
 });
+const VERSUS_PIPS = ["#ffd45c", "#c58cff", "#45e3ff", "#ff8a5c"]; // you, then the others
+function versusModeTile(button, n) {
+  const pips = Object.assign(document.createElement("span"), { className: "mode-pips" });
+  for (let i = 0; i < n; i++) pips.append(Object.assign(document.createElement("i"), { style: `--pip: ${VERSUS_PIPS[i]}` }));
+  button.replaceChildren(pips,
+    Object.assign(document.createElement("b"), { textContent: n === 2 ? t("versus.duel") : t("versus.party") }),
+    Object.assign(document.createElement("small"), { textContent: t("versus.players", { n }) }));
+  button.setAttribute("aria-label", `${n === 2 ? t("versus.duel") : t("versus.party")} · ${t("versus.players", { n })}`);
+}
 // The game DAILY shows: the one you picked (or pointed at on the globe), else today's main game.
 const dailyGame = () => (menuFocus === "casual" || menuFocus === "extremes") && modeState(menuFocus) !== "none" ? menuFocus : featuredMode();
 const nextDayIn = () => {
