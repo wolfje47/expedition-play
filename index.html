@@ -2859,7 +2859,7 @@ h1, h2, h3 { font-weight: normal; }
 /* The whole world in pixels (pixel-map.js), lighting up as the climb passes. The canvas
    is sized in whole device pixels per cell (fit), so every pixel stays square and sharp. */
 .climb-map { display: grid; justify-items: center; gap: 6px; width: 100%; padding: 8px 0 6px; border-radius: 12px; background: #071027; box-shadow: inset 0 0 0 1px var(--glass-line); }
-.climb-map canvas { display: block; image-rendering: pixelated; }
+.climb-map canvas { display: block; border-radius: 8px; }
 .climb-key { display: flex; gap: 14px; color: var(--muted); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
 .climb-key-item { display: inline-flex; align-items: center; gap: 6px; }
 .climb-key-item i { width: 8px; height: 8px; background: #ff4f9a; }
@@ -4674,6 +4674,89 @@ h1, h2, h3 { font-weight: normal; }
   #duelTop .duel-clock { margin: 2px -12px 0; }
 }
 
+/* ---------- The menu in three areas (19 November 2026, mockups/menu option A) ----------
+   At the top the word, your profile (tent, name, this month's badge; opens My tent) and a
+   gear for the settings. At the bottom the card for the selected area over a dock of three:
+   DAILY (both solo games on one card), VERSUS (live) and CREW. */
+.main-menu .menu-topbar { display: flex; align-items: center; gap: 8px; }
+.main-menu .menu-topbar .menu-marquee { margin-right: auto; }
+.menu-profile {
+  display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 12px 4px 4px;
+  border: 1px solid var(--glass-line); border-radius: 12px; background: rgba(10, 15, 30, 0.84);
+  -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+  color: var(--text); text-align: left; cursor: pointer; transition: border-color 0.15s ease;
+}
+.menu-profile:hover, .menu-profile:focus-visible { border-color: var(--gold); outline: none; }
+.menu-profile-tent { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 9px; background: #16213f; }
+.menu-profile-tent .menu-tent-canvas { width: 28px; height: 28px; image-rendering: pixelated; }
+.menu-profile-text { display: grid; gap: 3px; min-width: 0; }
+.menu-profile-text b { max-width: 140px; overflow: hidden; font: 600 13px/1.1 var(--font-body); white-space: nowrap; text-overflow: ellipsis; }
+.menu-profile-text small { display: flex; align-items: center; gap: 4px; color: var(--muted); font: 7px/1 var(--font-display); letter-spacing: var(--ls-pixel); }
+.menu-profile-text small svg { width: 12px; height: 12px; }
+.menu-gear {
+  display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--glass-line); border-radius: 12px;
+  background: rgba(10, 15, 30, 0.84); color: #cfd8dc; cursor: pointer; transition: border-color 0.15s ease, color 0.15s ease;
+}
+.menu-gear svg { width: 22px; height: 22px; }
+.menu-gear:hover, .menu-gear:focus-visible { border-color: var(--cyan); color: var(--cyan); outline: none; }
+
+/* The dock: three big buttons, each with a word on what it's against. */
+.main-menu .menu-dock { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.dock-item { gap: 5px; }
+.dock-sub { color: var(--muted); font: 11px/1.1 var(--font-body); text-align: center; }
+.dock-item.is-active .dock-sub { color: color-mix(in srgb, var(--tile) 70%, var(--text)); }
+#menuDailyButton .dock-art svg { width: 26px; height: 26px; }
+
+/* DAILY: both of today's games. */
+.menu-hero [hidden] { display: none !important; }
+.daily-card {
+  display: grid; gap: 8px; padding: 12px; border: 1px solid color-mix(in srgb, #ff6b9d 45%, transparent); border-radius: 20px;
+  background: rgba(10, 15, 30, 0.86); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45), 0 0 40px color-mix(in srgb, #ff6b9d 12%, transparent);
+}
+.daily-head { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.daily-head span:first-child { color: #ff6b9d; }
+.daily-head span:last-child { font: 12px var(--font-mono); letter-spacing: 0; }
+.daily-game {
+  position: relative; display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px;
+  border: 1px solid color-mix(in srgb, var(--tile) 35%, transparent); border-radius: 14px;
+  background: color-mix(in srgb, var(--tile) 7%, rgba(255, 255, 255, 0.02)); cursor: pointer; transition: border-color 0.15s ease;
+}
+.daily-game.is-main { border-width: 2px; box-shadow: 0 0 22px color-mix(in srgb, var(--tile) 22%, transparent); }
+.daily-game:hover { border-color: var(--tile); }
+.daily-game .play-tile-ribbon { top: -9px; right: 12px; }
+.daily-art { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 11px; background: #0b1226; }
+.daily-art svg { width: 36px; height: 36px; }
+.daily-text { display: grid; gap: 4px; min-width: 0; }
+.daily-text strong { color: var(--text); font: 11px/1.3 var(--font-display); letter-spacing: var(--ls-pixel); }
+.daily-text em { overflow: hidden; color: var(--tile); font: 7px/1.3 var(--font-display); font-style: normal; letter-spacing: var(--ls-pixel); white-space: nowrap; text-overflow: ellipsis; }
+.daily-text small { color: var(--muted); font: 12px/1.3 var(--font-body); }
+.daily-text small:empty { display: none; }
+.daily-go {
+  padding: 11px 13px; border: 0; border-radius: 10px; background: var(--tile); color: #0a0f1e;
+  font: 10px var(--font-display); letter-spacing: var(--ls-pixel); white-space: nowrap; cursor: pointer;
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--tile) 55%, #000); transition: transform 0.12s, filter 0.12s;
+}
+.daily-go:hover:not(:disabled), .daily-go:focus-visible { transform: translateY(-2px); filter: brightness(1.08); outline: none; }
+.daily-go:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+.daily-game[data-state="done"] .daily-go { background: transparent; color: #5cf28a; box-shadow: inset 0 0 0 1px color-mix(in srgb, #5cf28a 60%, transparent); font: 700 13px var(--font-mono); }
+.daily-archive { padding: 4px; border: 0; background: none; color: var(--muted); font: 8px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
+.daily-archive:hover, .daily-archive:focus-visible { color: var(--text); outline: none; }
+.hero-side:disabled { opacity: 0.55; cursor: default; }
+.hero-side:disabled:hover { border-color: color-mix(in srgb, var(--tile) 55%, transparent); background: rgba(10, 15, 30, 0.6); }
+
+@media (max-width: 760px) {
+  .main-menu .menu-topbar { gap: 6px; }
+  .menu-profile-text b { max-width: 96px; }
+  .main-menu .menu-dock { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .dock-label { font-size: 8px; }
+  .daily-card { padding: 10px; gap: 7px; }
+  .daily-game { grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; padding: 9px; }
+  .daily-art { width: 40px; height: 40px; }
+  .daily-art svg { width: 32px; height: 32px; }
+  .daily-text strong { font-size: 10px; }
+}
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -4682,19 +4765,45 @@ h1, h2, h3 { font-weight: normal; }
   <section id="mainMenu" class="main-menu" aria-labelledby="menuTitle">
     <div id="menuGlobe" class="menu-globe" aria-hidden="true"></div>
     <div class="menu-cabinet">
-      <div class="menu-marquee">
-        <span class="brand-mark menu-logo" aria-hidden="true"></span>
-        <h1 id="menuTitle">EXPEDITION</h1>
-        <p class="menu-tagline" data-i18n="menu.tagline">The daily geography challenge</p>
+      <!-- The top (19 November 2026, mockups/menu option A): the word, then your profile (your
+           tent, name and this month's badge; opens My tent) and a gear for the settings. -->
+      <div class="menu-topbar">
+        <div class="menu-marquee">
+          <span class="brand-mark menu-logo" aria-hidden="true"></span>
+          <h1 id="menuTitle">EXPEDITION</h1>
+          <p class="menu-tagline" data-i18n="menu.tagline">The daily geography challenge</p>
+        </div>
+        <button class="menu-profile" id="menuAccountButton" type="button" data-i18n-attr="aria-label:menu.account">
+          <span class="menu-profile-tent" id="menuTentIcon" aria-hidden="true"></span>
+          <span class="menu-profile-text"><b id="menuProfileName"></b><small id="menuProfileBadge"></small></span>
+          <span hidden><small id="menuTentWhere"></small><small id="menuAccountLabel"></small><span class="account-avatar" id="menuAccountAvatar" aria-hidden="true" hidden></span></span>
+        </button>
+        <button class="menu-gear" id="menuSettingsButton" type="button" aria-haspopup="dialog" data-i18n-attr="aria-label:menu.settings;title:menu.settings">
+          <svg viewBox="0 0 32 32" shape-rendering="crispEdges" aria-hidden="true"><path d="M8 8h16v16H8zm4 4v8h8v-8z" fill-rule="evenodd" fill="currentColor"/><path d="M13 3h6v5h-6zm0 21h6v5h-6zM3 13h5v6H3zm21 0h5v6h-5zM6 6h5v5H6zm15 0h5v5h-5zM6 21h5v5H6zm15 0h5v5h-5z" fill="currentColor"/></svg>
+        </button>
       </div>
-      <!-- The bottom of the home screen (13 November 2026): the card for the selected game
-           (PLAY, and its own ARCHIVE) over a dock of six, each one click away: Highs & Lows,
-           Casual, 1v1 (coming soon), Crew, your tent and Settings. -->
+      <!-- The bottom: the card for the selected area over a dock of three (19 November 2026):
+           DAILY (both solo quizzes, against the world), VERSUS (live: Duel, and Party to come)
+           and CREW (your friends). -->
       <div class="menu-bottom">
         <div class="menu-hero" id="menuHero">
-          <!-- The card for what's selected (engine.js renderHero): today's main game at first,
-               or the game or Base Camp you picked on the globe or in the Expedition menu, or a
-               past day while stepping through the archive. -->
+          <!-- DAILY: both of today's games on one card (engine.js renderDaily). -->
+          <div class="daily-card" id="dailyCard" aria-live="polite">
+            <div class="daily-head"><span id="dailyDay"></span><span id="dailyNext"></span></div>
+            <div class="daily-game is-main" data-mode="extremes" style="--tile: #ff6b9d">
+              <span class="play-tile-ribbon" data-i18n="menu.mainGame">MAIN GAME</span>
+              <span class="daily-art" data-art="extremes" aria-hidden="true"></span>
+              <span class="daily-text"><strong>HIGHS &amp; LOWS</strong><em data-i18n="menu.extremesTag">6 QUESTIONS · RANKED</em><small data-status></small></span>
+              <button class="daily-go" type="button" data-go></button>
+            </div>
+            <div class="daily-game" data-mode="casual" style="--tile: var(--gold)">
+              <span class="daily-art" data-art="casual" aria-hidden="true"></span>
+              <span class="daily-text"><strong data-i18n="mode.casual.short">CASUAL</strong><em data-i18n="menu.casualTag">5 ROUNDS · RANKED</em><small data-status></small></span>
+              <button class="daily-go" type="button" data-go></button>
+            </div>
+            <button class="daily-archive" id="dailyArchive" type="button"></button>
+          </div>
+          <!-- VERSUS and CREW: the card for what's selected (engine.js renderHero). -->
           <div class="play-tile is-main hero-card" id="heroCard" style="--tile: #ff6b9d" aria-live="polite">
             <span class="play-tile-ribbon" id="heroRibbon"></span>
             <span class="play-tile-art" id="heroArt" aria-hidden="true"></span>
@@ -4715,19 +4824,17 @@ h1, h2, h3 { font-weight: normal; }
           </div>
         </div>
         <nav class="menu-dock" id="menuDock" aria-label="Main menu" data-i18n-attr="aria-label:menu.mainMenu">
-          <button class="dock-item" id="drawerExtremesButton" type="button" data-select="extremes" data-focus="extremes" style="--tile: #ff6b9d">
-            <span class="dock-art" data-art="extremes" aria-hidden="true"></span>
-            <span class="dock-label">HIGHS &amp; LOWS</span>
-            <small class="dock-status" id="drawerExtremesStatus"></small>
-          </button>
-          <button class="dock-item" id="menuCasualButton" type="button" data-select="casual" data-focus="casual" style="--tile: var(--gold)">
-            <span class="dock-art" data-art="casual" aria-hidden="true"></span>
-            <span class="dock-label" data-i18n="mode.casual.short">CASUAL</span>
-            <small class="dock-status" id="menuCasualStatus"></small>
+          <button class="dock-item" id="menuDailyButton" type="button" data-select="daily" style="--tile: #ff6b9d">
+            <span class="dock-art" aria-hidden="true">
+              <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M2 2h12v12H2zm1 3v8h10V5z" fill-rule="evenodd" fill="currentColor"/><path d="M4 6h2v2H4zm3 0h2v2H7zm3 0h2v2h-2zM4 9h2v2H4zm3 0h2v2H7z" fill="currentColor" opacity=".55"/><path d="M10 9h2v2h-2z" fill="#ffd45c"/><path d="M4 1h1v2H4zm7 0h1v2h-1z" fill="currentColor"/></svg>
+            </span>
+            <span class="dock-label" data-i18n="menu.daily">DAILY</span>
+            <small class="dock-sub" data-i18n="menu.dailySub">vs the world</small>
           </button>
           <button class="dock-item" id="menuDuelButton" type="button" data-select="duel" style="--tile: #c58cff">
             <span class="dock-art" data-art="duel" aria-hidden="true"></span>
-            <span class="dock-label">1V1</span>
+            <span class="dock-label" data-i18n="menu.versus">VERSUS</span>
+            <small class="dock-sub" data-i18n="menu.versusSub">live</small>
             <small class="dock-soon" data-i18n="menu.beta">BETA</small>
           </button>
           <button class="dock-item" id="menuCommunityButton" data-select="camp" type="button" style="--tile: var(--cyan)">
@@ -4735,20 +4842,8 @@ h1, h2, h3 { font-weight: normal; }
               <svg viewBox="0 0 32 32" shape-rendering="crispEdges"><path d="M8 5h6v6H8zm10 0h6v6h-6zM5 13h12v3H5zm12 0h10v3H17zM5 16h3v11H5zm9 0h3v11h-3zm10 0h3v11h-3zM8 22h6v3H8zm9 0h7v3h-7z" fill="currentColor"/></svg>
             </span>
             <span class="dock-label" data-i18n="menu.community">CREW</span>
+            <small class="dock-sub" data-i18n="menu.crewSub">your friends</small>
             <small class="menu-option-note" hidden></small>
-          </button>
-          <!-- Your tent, drawn as it looks (style, explorer, colour): opens My Tent (your account
-               and your tent). Pointing at it turns the globe to your tent. -->
-          <button class="dock-item dock-tent" id="menuAccountButton" data-select="tent" type="button" style="--tile: #ffd45c">
-            <span class="dock-art" id="menuTentIcon" aria-hidden="true"></span>
-            <span class="dock-label" data-i18n="menu.tentShort">MY TENT</span>
-            <span hidden><small id="menuTentWhere"></small><small id="menuAccountLabel"></small><span class="account-avatar" id="menuAccountAvatar" aria-hidden="true" hidden></span></span>
-          </button>
-          <button class="dock-item" id="menuSettingsButton" type="button" aria-haspopup="dialog" style="--tile: #cfd8dc">
-            <span class="dock-art" aria-hidden="true">
-              <svg viewBox="0 0 32 32" shape-rendering="crispEdges"><path d="M8 8h16v16H8zm4 4v8h8v-8z" fill-rule="evenodd" fill="currentColor"/><path d="M13 3h6v5h-6zm0 21h6v5h-6zM3 13h5v6H3zm21 0h5v6h-5zM6 6h5v5H6zm15 0h5v5h-5zM6 21h5v5H6zm15 0h5v5h-5z" fill="currentColor"/></svg>
-            </span>
-            <span class="dock-label" data-i18n="menu.settingsShort">SETTINGS</span>
           </button>
         </nav>
       </div>
@@ -4764,6 +4859,8 @@ h1, h2, h3 { font-weight: normal; }
             </span>
           </button>
         <div class="menu-community-card" id="menuCommunityCard"></div>
+          <span id="drawerExtremesButton"><small id="drawerExtremesStatus"></small></span>
+          <span id="menuCasualButton"><small id="menuCasualStatus"></small></span>
       </div>
     </div>
   </section>
@@ -5776,6 +5873,22 @@ const EN = {
   "menu.tagline": "The daily geography challenge",
   "menu.play": "Play",
   "menu.mainMenu": "Main menu",
+  // The menu's three areas (19 November 2026): Daily, Versus, Crew.
+  "menu.daily": "DAILY",
+  "menu.dailySub": "vs the world",
+  "menu.versus": "VERSUS",
+  "menu.versusSub": "live",
+  "menu.crewSub": "your friends",
+  "menu.today": "TODAY",
+  "menu.extremesTag": "6 QUESTIONS · RANKED",
+  "menu.casualTag": "5 ROUNDS · RANKED",
+  "menu.archiveOpen": "ARCHIVE · {n} DAYS STILL OPEN",
+  "menu.versusText": "Live against friends, on the same questions and the same clock.",
+  "menu.versusRibbon": "BETA",
+  "menu.duelGoShort": "▶ DUEL 1V1",
+  "menu.partySoon": "PARTY · 3–4 · SOON",
+  "menu.guest": "Guest",
+  "menu.noBadge": "NO BADGE YET",
   "menu.mainGame": "MAIN GAME",
   "menu.extremesText": "A daily ranking quiz. Earn badges and reach the world's top 1%.",
   "menu.casualText": "Five country puzzles a day.",
@@ -6942,6 +7055,22 @@ const NL = {
   "menu.tagline": "De dagelijkse aardrijkskunde-uitdaging",
   "menu.play": "Spelen",
   "menu.mainMenu": "Hoofdmenu",
+  // De drie delen van het menu (19 november 2026): Dagelijks, Versus, Crew.
+  "menu.daily": "DAGELIJKS",
+  "menu.dailySub": "tegen de wereld",
+  "menu.versus": "VERSUS",
+  "menu.versusSub": "live",
+  "menu.crewSub": "je vrienden",
+  "menu.today": "VANDAAG",
+  "menu.extremesTag": "6 VRAGEN · RANGLIJST",
+  "menu.casualTag": "5 RONDES · RANGLIJST",
+  "menu.archiveOpen": "ARCHIEF · NOG {n} DAGEN OPEN",
+  "menu.versusText": "Live tegen vrienden, met dezelfde vragen en dezelfde klok.",
+  "menu.versusRibbon": "BETA",
+  "menu.duelGoShort": "▶ DUEL 1V1",
+  "menu.partySoon": "PARTY · 3–4 · BINNENKORT",
+  "menu.guest": "Gast",
+  "menu.noBadge": "NOG GEEN BADGE",
   "menu.mainGame": "HOOFDSPEL",
   "menu.extremesText": "Een dagelijkse quiz met ranglijsten. Verdien badges en haal de top 1% van de wereld.",
   "menu.casualText": "Elke dag vijf landenpuzzels.",
@@ -33167,90 +33296,272 @@ function createDuel({ globe, onExit, onSignIn }) {
 return { createDuel };
 })();
 
-// ---- pixel-map-data.js
-__modules["pixel-map-data.js"] = (() => {
-// Generated by tools/build-pixel-map.mjs: the 8-bit world map of the Highs & Lows climb.
-// 264 × 101 cells, 82°N to 56°S, from Natural Earth 1:50m (world-atlas).
-// GRID (base64): one byte a cell, row by row; 0 = sea, 1 = land, 2 + i = CODES[i].
-const COLS = 264;
-const ROWS = 101;
-const CODES = ["AR","AU","AT","BD","BE","BO","BR","CA","CL","CN","CO","CU","DK","EC","EG","ET","FI","FR","DE","GH","GR","IN","ID","IR","IQ","IE","IL","IT","JP","JO","KE","MY","MX","MA","NP","NL","NZ","NG","NO","PK","PE","PH","PL","PT","RU","SA","SG","ZA","KR","ES","SE","CH","TZ","TH","TR","UA","AE","GB","US","UY","VE","VN","AF","AO","AL","AD","AM","AG","AZ","BI","BJ","BF","BG","BH","BS","BA","BY","BZ","BB","BN","BT","BW","CF","CI","CM","CD","CG","KM","CV","CR","CY","CZ","DJ","DM","DO","DZ","ER","EE","FJ","FM","GA","GE","GN","GM","GW","GQ","GD","GT","GY","HN","HR","HT","HU","IS","JM","KZ","KG","KH","KI","KN","KW","LA","LB","LR","LY","LC","LI","LK","LS","LT","LU","LV","MC","MD","MG","MV","MH","MK","ML","MT","MM","ME","MN","MZ","MR","MU","MW","NA","NE","NI","NR","OM","PA","PW","PG","KP","PY","PS","QA","RO","RW","SD","SN","SB","SL","SV","SM","SO","RS","SS","ST","SR","SK","SI","SZ","SC","SY","TD","TG","TJ","TM","TL","TO","TT","TN","TV","UG","UZ","VA","VC","VU","WS","YE","ZM","ZW"];
-const GRID = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQAACQkJCQkJCQkJCQkJCQkJCQkJAAAAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAQEBAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuAC4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJAAkJCQkJCQkACQkACQkJCQkJCQkAAAAAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAoKCgoKCgAAAAAAAAAAAAAAAAAAAAAAC4AAAAAAC4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC4ALi4uLgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJCQAAAAAJCQkACQAAAAkJCQAJCQkJCQkJCQkAAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgoKCgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuLi4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJCQkAAAAAAAAAAAAAAAAAAAAAAAAAAAAJCQkJCQAAAAAAAAAAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuAAAAAAAAAAAALi4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQAJCQkAAAkACQAJAAkJAAAJAAkJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC4uLi4uAAAAAAAAAAAAAAAAAAAAAAAAAAAALi4uLi4uLi4uLi4uLi4uAAAAAAAAAAAAAAAAAAAAAAAuLi4uAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQAAAAAAAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuLgAAAAAAAAAAAAAAAAAAAAAAAAAAAC4uLi4uLi4uLi4uLi4uLi4uAC4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkJCQkJCQAJAAAAAAAJCQAAAAkJAAAJCQkAAAkJCQkJCQkJCQAAAAAAAAAAAAAAAAAAAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALi4AAAAAAAAAAAAALgAALgAAAAAuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uAAAAAC4uLi4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJCQkACQkJCQkJCQkJCQAAAAAJCQAJAAAACQkJCQkJCQkJCQkAAAAAAAAAAAAAAAAAAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuLi4AAAAAAAAAAAAuLi4ALgAuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4AAAAAAAAALi4uLgAuLgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8PDw8PDw8PDwAAAAAAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAJCQkJCQkJAAAAAAkJCQAAAAkACQkJCQkJCQkJCQkJCQAAAAAAAAAAAAAAAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoACgoKCgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC4uLi4ALi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPDw8PDw8PDw8PDw8PDw8PDwJCQAACQAJCQkJCQkJCQkJCQAAAAkJCQkAAAkJAAAJCQkACQkJCQAAAAkJAAAAAAkJCQkJCQAAAAAAAAAAAAAAAAABAQEBAQEBAQEBAQEBAQEBAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoACgoEigoKBISLi4uLi4uAAAAAAAAAAAuLgAAAAAAAAAALi4uLgAuLi4AAAAALi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLgAuLi4uLi4uLi4uAAAAAAAAAAAAPDw8PDw8PDw8PDw8PDw8PDwJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQAJCQkJCQkJAAAJCQkJCQAACQkJAAAACQkAAAkJCQkJCQAAAAAAAAAAAQABAQEBAQEBAQEBAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoNDQ0NDQSEhISEi4uLi4uLi4uAAAuAAAuLi4uLi4uLi4uLi4uLi4uLi4AAC4uAC4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uAC4uLi4uLgAAADw8AAA8PDw8PDw8PDw8PDw8PDwJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJAAkAAAAAAAAACQkJCQAJCQkAAAAAAAAAAQEBAQEBAQEBAQEAAQAAAAAAAAAAAHMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACg0NDQ0NDQSEhISEi4uLgAALi4AAC4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uAAAALi4AAAAAADw8PDw8PDw8PDw8PDw8PDw8PDwJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkACQkAAAAACQkJCQkJCQkAAAAAAAAAAAAAAAEBAQEBAQEBAAAAAAAAAAAAAAAAc3Nzc3Nzc3MAAAAAAAAAAAAAAAAAAAAAAAAoKDQ0NDQ0NAAAABISEi4uLi4ALgAALi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uAAAAAAAAPAAAAAAAAAA8PDw8PDw8PDw8PDw8PDwJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkAAAAACQAACQAACQAAAAAJCQkJCQAAAAAAAAAAAAEBAQEBAQEBAAAAAAAAAAAAAAAAAAAAc3MAAAAAAAAAAAAAAAAAAAAAAAAAKCgoNDQ0NDQ0ABISEhISEi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4AAAAAAAAAAAAAAAA8PDw8PDw8PDw8PDw8PDw8PDwJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQAAAAAAAAAAAAkACQkJAAAAAAkJAAAAAAAAAAAAAAAAAQEBAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgoKCgoNDQ0NAAAABISEhISEi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uAAAAAAAAAAAAAAAAAAAAPDw8PDw8PDw8PDwAADw8PDwJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJAAAAAAAAAAAAAAAACQkJCQkJAAAAAAAAAAAAAAAAAAAAAAEBAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgoKCgoNDQ0NAAAABISEhISLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uAAAALgAALi4uLi4uAAAAAAAAAAAAAAAAAAAAAAAAADw8PDw8PAAAPAAAAAAAAAAAPAk8CQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkAAAAAAAAAAAAAAAAACQkJCQkJAAAACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoKCgoNDQ0NAAAAAAAY2MALi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLgAALi4uAAAAAC4uAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADw8PAAAAAAAAAAAAAAAAAA8PAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQAAAAAAAAAAAAAACQkJCQkJCQkJCQkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7AAAAAAAAAAAoAAA0NDQ0AAAAAAAAY2MuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLgAAAAAAAAAAAAAAAAAuLi4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPAAAAAAAAAAAAAAAAAAAAAAAPAAJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQAAAAAAAAAAAAkJCQkJCQkJCQkJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7OwAAAAAAAAAAAA4ANDQ0AAAAhYWFhYUuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4AAAAAAAAAAAAAAAAALi4uLi4uAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADw8PAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJAAAAAAAACQkJCQkJCQkJCQkJCQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7OzsAAAAAAAAADg4OAAAAAAAAAIODg05OTk4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi51Li4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLgAAAAAAAAAAAAAAAAAALi4uLi4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkAAAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJAAAJCQkJCQkJCQkJCQkJCQkJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABsbGwAAADs7AAAAAAAAABQUFAAsLCwsLCyDTk5OTk4uLi4uLi4uLi4uLi4uLi4uLi4uLi4udXV1dXV1dXV1LnUuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLgAALgAAAAAAAAAAAAAALi4uAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJAAAJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJAAAJCQkJCQkJCQkJCQkJCQkJCQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbGwAAOzs7OwAAJSUUFBQUFBQsLCwsLCxOTk5OTk4uLi4uLi4uLi4uLi4uLi4uLi4uLi4udXV1dXV1dXV1dXV1dS4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLgsLCwsuLi4uLi4uLi4uLi4uAAAAAAAAAAAAAC4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQAJCQkJCQkJCQkJCQkJCQkACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADs7OwAGBhQUFBQUFBQsLCwsLCw5OTk5OTk5OS4uLi4uLi4uLi4uLnV1Li4uLi4udXV1dXV1dXV1dXV1dS4uLi4uLi4uLi4uLi4ukJCQLi4uLi4uLi4uLi4uLgsLCwsLLi4uLi4uLi4uLgAuAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQAJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABMTE4QUFBQUXV1dXV0sLCw5OTk5OTk5OTk5OS4uLi4uLi4udXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXUuLi4ukJCQkJAukJCQkJCQkC4uLi6QkJAuCwsLCwsLLi4u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CAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGZmZlhYV1dXV1dXV1dXoqI2NjYgICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYGBgYAAAAGBgYGAAAGBgAAAAAAAAYABgAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8PKioqKioMCAgICAgICAgICAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABmWFhYV1dXV1dXV1dXRzY2NjY2NiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGBgYAAAAAAAYGAAAGAAYAAAYAAAYABgYGBgYGJycAAAAAAAAnAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKioqKioqKggICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAV1dXV1dXV1dXV1dXVzY2NjY2NjYAAAAAAAAAAAAAALEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgYAAAAAAAAAAAAAAAYAAAAAAAAAAAAABgYGJycnJwAAAAAnAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACoqKioqCAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQUFBV1dXV1dXV1dXVzY2NjY2NgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAYGJycnJycAACcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqKioqCAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEFBQVdBQVdXV1dXVzY2NjY2NjYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgYGBgAAAAAAAAAAAAAAAAAGAAAAAAYGJycnJycAAAAAAAAAAAAAAAAAAAAAAAAAAAAALsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqKioqCAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEFBQUFBQVdXV1dXw8M2NjY2NjYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAC3AAAAAAAAAAAAAJycAACcnAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKioqKioICAgHCAgICAgICAgICAgICAgICAgICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEFBQUFBQVdXV1dXw8PDwzY2NjYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKioqKioqBwcHCAgICAgICAgICAgICAgICAgICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEFBQUFBQUFBw1dXw8PDlJGRNpGRAABZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAMAAAAAAAADAAAAAAAAAAAAAAAApQAAAAAAAAAAAAAAAAAAAAAAAADBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACoqKioqBwcHBwcICAgICAgICAgICAgICAgICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQUFBQUFBQUFBw8PDV8PDlJGRkZGRAAAAAAAAiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDAwAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACoqKioqBwcHBwcHBwgICAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQUFBQUFBQcPDw8PDw8PDkZSRkZGRAAAAAACIiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwADAwMDAwAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqKioqBwcHBwcHBwgICAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQUFBQUFBQcPDw8PDw5GRkZSRkZGRAAAAAIiIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDAwMDAwMAAAADAwMAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACoqBwcHBwcHBwcICAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlUFBQUFBQUHDw8PExMTEkZGRkQAAAACIiIiIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDAwMDAwMDAAMDAwMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKBwcHBwcHBwcHCAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlZWVlZWVU1NTU8TExMTEkZGRAAAAAACIiIiIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDAwMDAwMDAwMDAwMDAwMAAAAAAAAAAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgcHBwcHnp4ICAgICAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlZWVlZWVU1NTU8TExMTEkQAAAAAAAAAAiIiIAAAAAAAAkwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDAwMDAwMDAwMDAwMDAwMDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgcHBweenp6eCAgICAgICAgICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJWVlZWVU1NTU1PExMTEkZEAAAAAAACIiIgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgcCAgKenp6enggICAgICAgICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACVlZWVU1NTU1NTMTGRkZEAAAAAAACIiIgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgoCAgICnp6enggICAgICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACVlZWVU1NTU1MxMTGRkZEAAAAAAACIiIgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgICAgICAgICnp4ICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACVlZWVU1NTUzExMTGRAAAAAAAAAAAAiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgICAgICAgKenp4CCAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACVlZWVUzExMTExMTGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAgICAgICAgICAggICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlZWVMTExMTExMTExAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAgICAgICAgICCAgICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMTExMTExMTGCgjEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoCAgICAgICAgICPQgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADExMTExMTExMQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAgICAgICAgI9PT09CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADExMTExMTExAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDAwMDAwAAAAADAwMDAwMDAwMDAwMDAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoKAgICAgICAgI9PT09AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADExMTExMTEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDAwAAAAAAAAAAAwMDAwMDAwMDAwMDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoCAgICAgICAgICAD0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAAAAAAAAAAAAAAAAAwAAAwMDAwMDAwMDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoCAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwMDAwMDAwMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgoCAgICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDAwMAAAAAAAAAAAAAAAAAAAAAAAAmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgoCAgICAgICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAmJgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgICAgICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwAAAAAAAAAAAAAAAAAAAAAAJiYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICAgICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwAAAAAAAAAAAAAAAAAAAAAmJgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJiYmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAmJiYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgICAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoACgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+// ---- world-map.js
+__modules["world-map.js"] = (() => {
+// A detailed flat world map (19 November 2026, mockups/casual-standard/round-8.html): the real
+// country shapes from the globe's own map (Natural Earth 1:50m, world-atlas), drawn sharp on a
+// canvas in the Natural Earth projection, without Antarctica. Same job and the same calls as
+// the 8-bit pixel-map.js: countries light up in a colour (with a short white flash), one can
+// blink gold as your pick, and a view can zoom in on a region. Countries too small to see get
+// a dot, so everything on a list has somewhere to light up.
+const COUNTRIES = __modules["countries.js"].default;
 
-return { COLS, ROWS, CODES, GRID };
-})();
-
-// ---- pixel-map.js
-__modules["pixel-map.js"] = (() => {
-// The little 8-bit world map in the Highs & Lows climb (15 November 2026, team choice from
-// mockups/climb-reveal/pixel-map.html, replacing the spinning tour): the whole world at once,
-// every country lighting up in its heat colour as the climb passes it. Nothing spins.
-// The grid comes from pixel-map-data.js (tools/build-pixel-map.mjs).
-const { CODES, COLS, GRID, ROWS } = __modules["pixel-map-data.js"];
-
+const MAP_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json";
 const SEA = "#071027";
 const LAND = "#2a3556";
-const FLASH_MS = 160; // a white flash as a country lights up
+const BORDER = "#0b1430";
+const FLASH_MS = 180;
+const DOT_PX = 3.5; // a country smaller than this on screen is drawn as a dot this big
+const NORTH = 83;
+const SOUTH = -57;
 
-let cells = null;
-function decode() {
-  if (cells) return cells;
-  const bytes = atob(GRID);
-  cells = new Uint8Array(bytes.length);
-  for (let index = 0; index < bytes.length; index += 1) cells[index] = bytes.charCodeAt(index);
-  return cells;
+// Natural Earth I (Šavrič et al. 2011): lon, lat in degrees → x, y (unitless, y up).
+function project(lon, lat) {
+  const l = lon * Math.PI / 180, p = lat * Math.PI / 180;
+  const p2 = p * p, p4 = p2 * p2;
+  return [
+    l * (0.8707 - 0.131979 * p2 + p4 * (-0.013791 + p4 * (0.003971 * p2 - 0.001529 * p4))),
+    p * (1.007226 + p2 * (0.015085 + p4 * (-0.044475 + 0.028874 * p2 - 0.005916 * p4)))
+  ];
 }
 
-// createPixelMap(canvas, colorOf): colorOf(iso) gives a country's heat colour.
-// fit(width): the largest size that fits `width` (CSS px) in whole device pixels per cell.
-// light(iso), lightAll([iso], overMs): light countries up (now, or in a wave);
-// setPick(iso): your pick, blinking gold once the climb lands; stop(): ends the drawing.
-function createPixelMap(canvas, colorOf) {
-  const grid = decode();
-  canvas.width = COLS;
-  canvas.height = ROWS;
+const normalize = name => name.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+// The shapes, once: per game country (ISO) a list of rings in projected units, plus a box.
+let shapesPromise = null;
+function loadShapes() {
+  if (shapesPromise) return shapesPromise;
+  shapesPromise = fetch(MAP_URL).then(response => response.json()).then(topology => {
+    const { scale: [sx, sy], translate: [tx, ty] } = topology.transform;
+    const arcs = topology.arcs.map(arc => {
+      let x = 0, y = 0;
+      return arc.map(([dx, dy]) => [(x += dx) * sx + tx, (y += dy) * sy + ty]);
+    });
+    // A ring that crosses the antimeridian (Chukotka, Fiji) is unwrapped so it never jumps
+    // 360° between two points, then drawn a second time shifted by 360°; the world's outline
+    // clips both.
+    const ringsOf = indexes => {
+      const points = indexes.flatMap((index, n) => {
+        const part = index < 0 ? [...arcs[~index]].reverse() : arcs[index];
+        return n ? part.slice(1) : part;
+      });
+      let shift = 0;
+      const lonlat = points.map(([lon, lat], n) => {
+        if (n) {
+          const before = points[n - 1][0];
+          if (lon - before > 180) shift -= 360;
+          else if (before - lon > 180) shift += 360;
+        }
+        return [lon + shift, Math.max(SOUTH - 3, lat)];
+      });
+      const lons = lonlat.map(p => p[0]);
+      const copies = [0];
+      if (Math.max(...lons) > 180) copies.push(-360);
+      if (Math.min(...lons) < -180) copies.push(360);
+      return copies.map(by => Object.assign(lonlat.map(([lon, lat]) => project(lon + by, lat)), { copy: by !== 0 }));
+    };
+    const byIso = new Map();
+    const other = []; // land outside the game (territories, disputed places)
+    const features = topology.objects.countries.geometries.filter(g => String(g.id) !== "010"); // no Antarctica
+    const isoOf = new Map();
+    for (const country of COUNTRIES) {
+      const names = [country.name, ...(country.aliases || [])].map(normalize);
+      const feature = (country.ccn3 && features.find(g => String(g.id) === country.ccn3)) || features.find(g => names.includes(normalize(g.properties?.name || "")));
+      if (feature && !isoOf.has(feature)) isoOf.set(feature, country.iso);
+    }
+    for (const geometry of features) {
+      const polygons = geometry.type === "Polygon" ? [geometry.arcs] : geometry.type === "MultiPolygon" ? geometry.arcs : [];
+      const rings = polygons.flatMap(polygon => polygon.flatMap(ringsOf));
+      if (!rings.length) continue;
+      const iso = isoOf.get(geometry);
+      // Framing uses the country's main part: France is drawn with French Guiana, but a view
+      // that fits France stays in Europe.
+      if (iso) byIso.set(iso, { rings, box: boxOf([mainRing(rings.filter(ring => !ring.copy))]), all: boxOf(rings) });
+      else other.push(...rings);
+    }
+    // Too small for the map at all: a dot where the country is.
+    for (const country of COUNTRIES) {
+      if (!byIso.has(country.iso)) byIso.set(country.iso, { rings: [], dot: project(country.lon, country.lat), box: null });
+    }
+    for (const shape of byIso.values()) {
+      if (!shape.box) shape.box = [shape.dot[0], shape.dot[1], shape.dot[0], shape.dot[1]];
+      shape.centre = shape.dot || [(shape.box[0] + shape.box[2]) / 2, (shape.box[1] + shape.box[3]) / 2];
+    }
+    return { byIso, other };
+  });
+  return shapesPromise;
+}
+function mainRing(rings) {
+  const area = ring => Math.abs(ring.reduce((sum, [x, y], n) => { const [x2, y2] = ring[(n + 1) % ring.length]; return sum + x * y2 - x2 * y; }, 0));
+  return rings.reduce((best, ring) => area(ring) > area(best) ? ring : best, rings[0]);
+}
+function boxOf(rings) {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  rings.forEach(ring => ring.forEach(([x, y]) => {
+    if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+  }));
+  return [Math.max(x0, WEST), y0, Math.min(x1, EAST), y1];
+}
+
+// The world's extent in projected units (180°W–180°E, NORTH–SOUTH).
+const [WEST] = project(-180, 0);
+const [EAST] = project(180, 0);
+const TOP = project(0, NORTH)[1];
+const BOTTOM = project(0, SOUTH)[1];
+
+// createWorldMap(canvas, colorOf, { view }): colorOf(iso) gives a country's lit colour.
+// view: { lat, lon, scale } zooms in on a region (scale 1 = the whole world), or `fit: [iso]`
+// frames those countries. size(width, height) sets the canvas size (CSS px); without a
+// height the map keeps its own shape. light(iso), lightAll([iso], overMs), setPick(iso),
+// pin({ lat, lon, color, big }) and stop() work like pixel-map.js.
+function createWorldMap(canvas, colorOf, { view = null } = {}) {
   const ctx = canvas.getContext("2d");
-  const lit = new Map(); // code → when it lit up
-  const timers = [];
-  let pick = 0;
-  let frame = 0;
-  const codeOf = iso => 2 + CODES.indexOf(iso);
+  const lit = new Map();
   const colors = new Map();
-  const colorFor = code => {
-    if (!colors.has(code)) colors.set(code, colorOf(CODES[code - 2]));
-    return colors.get(code);
+  const pins = [];
+  const timers = [];
+  let pick = null;
+  let shapes = null;
+  let frame = 0;
+  let width = 0, height = 0, ratio = 1;
+  let transform = null; // projected → CSS px
+  const colorFor = iso => {
+    if (!colors.has(iso)) colors.set(iso, colorOf(iso));
+    return colors.get(iso);
   };
 
-  function draw(now) {
-    ctx.fillStyle = SEA;
-    ctx.fillRect(0, 0, COLS, ROWS);
-    const blink = Math.floor(now / 300) % 2;
-    for (let index = 0; index < grid.length; index += 1) {
-      const code = grid[index];
-      if (!code) continue;
-      let color = LAND;
-      const at = lit.get(code);
-      if (at !== undefined) color = now - at < FLASH_MS ? "#ffffff" : colorFor(code);
-      if (code === pick) color = blink ? "#ffd45c" : "#fff4c2";
-      ctx.fillStyle = color;
-      ctx.fillRect(index % COLS, (index / COLS) | 0, 1, 1);
+  function layout() {
+    if (!width || !height) return;
+    const worldW = EAST - WEST, worldH = TOP - BOTTOM;
+    const base = Math.min(width / worldW, height / worldH);
+    let k = base, cx = (WEST + EAST) / 2, cy = (TOP + BOTTOM) / 2;
+    if (view?.fit && shapes) {
+      const boxes = view.fit.map(iso => shapes.byIso.get(iso)?.box).filter(Boolean);
+      const [x0, y0, x1, y1] = boxes.reduce((a, b) => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])]);
+      const pad = 1.25;
+      k = Math.max(base, Math.min(width / ((x1 - x0) * pad || 1), height / ((y1 - y0) * pad || 1), base * 8));
+      cx = (x0 + x1) / 2; cy = (y0 + y1) / 2;
+    } else if (view?.lat !== undefined) {
+      k = base * (view.scale || 1);
+      [cx, cy] = project(view.lon, view.lat);
     }
-    frame = requestAnimationFrame(draw);
+    // Keep the world's edge out of view when zoomed in.
+    const halfW = width / 2 / k, halfH = height / 2 / k;
+    if (worldW > 2 * halfW) cx = Math.max(WEST + halfW, Math.min(EAST - halfW, cx));
+    if (worldH > 2 * halfH) cy = Math.max(BOTTOM + halfH, Math.min(TOP - halfH, cy));
+    transform = { k, x: width / 2 - cx * k, y: height / 2 + cy * k };
   }
-  frame = requestAnimationFrame(draw);
+  const toScreen = ([x, y]) => [transform.x + x * transform.k, transform.y - y * transform.k];
+
+  function trace(rings) {
+    ctx.beginPath();
+    for (const ring of rings) {
+      ring.forEach((point, n) => {
+        const [x, y] = toScreen(point);
+        if (n) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+      });
+      ctx.closePath();
+    }
+  }
+  // The outline of the whole map (Natural Earth's rounded sides), as the sea.
+  function traceWorld() {
+    ctx.beginPath();
+    for (let lat = NORTH; lat >= SOUTH; lat -= 2) { const [x, y] = toScreen(project(180, lat)); lat === NORTH ? ctx.moveTo(x, y) : ctx.lineTo(x, y); }
+    for (let lat = SOUTH; lat <= NORTH; lat += 2) { const [x, y] = toScreen(project(-180, lat)); ctx.lineTo(x, y); }
+    ctx.closePath();
+  }
+
+  function colourOf(iso, now) {
+    if (iso === pick) return Math.floor(now / 300) % 2 ? "#ffd45c" : "#fff4c2";
+    const at = lit.get(iso);
+    if (at === undefined) return LAND;
+    return now - at < FLASH_MS ? "#ffffff" : colorFor(iso);
+  }
+
+  function draw(now) {
+    frame = 0;
+    if (!shapes || !transform) return;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.fillStyle = "#050a1a";
+    ctx.fillRect(0, 0, width, height);
+    traceWorld();
+    ctx.fillStyle = SEA;
+    ctx.fill();
+    ctx.save();
+    ctx.clip();
+    ctx.lineJoin = "round";
+    ctx.lineWidth = Math.min(1, 0.5 + transform.k / 400);
+    ctx.strokeStyle = BORDER;
+    trace(shapes.other);
+    ctx.fillStyle = LAND;
+    ctx.fill();
+    ctx.stroke();
+    const dots = [];
+    for (const [iso, shape] of shapes.byIso) {
+      const all = shape.all || shape.box;
+      const [ax0, ay0] = toScreen([all[0], all[3]]);
+      const [ax1, ay1] = toScreen([all[2], all[1]]);
+      if (ax1 < 0 || ax0 > width || ay1 < 0 || ay0 > height) continue;
+      const [x0, y0] = toScreen([shape.box[0], shape.box[3]]);
+      const [x1, y1] = toScreen([shape.box[2], shape.box[1]]);
+      const fill = colourOf(iso, now);
+      if (shape.rings.length) {
+        trace(shape.rings);
+        ctx.fillStyle = fill;
+        ctx.fill();
+        ctx.stroke();
+      }
+      // Too small to see (Singapore, the islands): a dot, but only once it means something.
+      if (Math.max(x1 - x0, y1 - y0) < DOT_PX && (fill !== LAND)) dots.push([toScreen(shape.centre), fill]);
+    }
+    ctx.restore();
+    for (const [[x, y], fill] of dots) {
+      ctx.beginPath();
+      ctx.arc(x, y, DOT_PX / 2 + 0.5, 0, Math.PI * 2);
+      ctx.fillStyle = fill;
+      ctx.fill();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "#04060d";
+      ctx.stroke();
+    }
+    for (const p of [...pins].sort((a, b) => (a.big ? 1 : 0) - (b.big ? 1 : 0))) {
+      const [x, y] = toScreen(project(p.lon, p.lat));
+      const r = p.big ? 6 : 4.5;
+      ctx.beginPath();
+      ctx.arc(x, y, r + 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = "#04060d";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+      if (p.big) { ctx.lineWidth = 1.5; ctx.strokeStyle = "#ffffff"; ctx.stroke(); }
+    }
+    // Keep drawing while something flashes or blinks.
+    const flashing = [...lit.values()].some(at => now - at < FLASH_MS + 20);
+    if (flashing || pick) frame = requestAnimationFrame(draw);
+  }
+  const redraw = () => { if (!frame) frame = requestAnimationFrame(draw); };
+
+  loadShapes().then(loaded => { shapes = loaded; layout(); redraw(); });
 
   return {
-    fit(width) {
-      const ratio = window.devicePixelRatio || 1;
-      const cell = Math.max(1, Math.floor(width * ratio / COLS)) / ratio;
-      canvas.style.width = `${COLS * cell}px`;
-      canvas.style.height = `${ROWS * cell}px`;
+    size(w, h) {
+      ratio = window.devicePixelRatio || 1;
+      width = w;
+      height = h || Math.round(w * (TOP - BOTTOM) / (EAST - WEST));
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      layout();
+      redraw();
     },
+    // Same as pixel-map.js: the map at `width` CSS px, at its own shape.
+    fit(w) { this.size(w); },
     light(iso, now = performance.now()) {
-      const code = codeOf(iso);
-      if (code > 1 && !lit.has(code)) lit.set(code, now);
+      if (!lit.has(iso)) { lit.set(iso, now); redraw(); }
     },
-    // In order, spread over `overMs` (the first now, the last at the end).
     lightAll(isos, overMs = 0) {
       isos.forEach((iso, index) => {
         const delay = isos.length > 1 ? overMs * index / (isos.length - 1) : 0;
@@ -33258,15 +33569,18 @@ function createPixelMap(canvas, colorOf) {
         else timers.push(setTimeout(() => this.light(iso), delay));
       });
     },
-    setPick(iso) { pick = iso ? codeOf(iso) : 0; },
+    setColor(iso, color) { colors.set(iso, color); redraw(); },
+    setPick(iso) { pick = iso || null; redraw(); },
+    pin(p) { pins.push(p); redraw(); },
     stop() {
       cancelAnimationFrame(frame);
+      frame = 0;
       timers.forEach(clearTimeout);
     }
   };
 }
 
-return { createPixelMap };
+return { createWorldMap };
 })();
 
 // ---- travel.js
@@ -34274,12 +34588,12 @@ const { ROUND_PICTURES } = __modules["round-pictures.js"];
 const { CLUES } = __modules["clues.js"];
 const { sounds } = __modules["audio.js"];
 const { createDistributionChart, initializeHistoryScreens } = __modules["screens.js"];
-const { RANK_TIERS, formatTopPercent, getDayStats, getTopPercent } = __modules["community.js"];
+const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getTopPercent } = __modules["community.js"];
 const { initializeCommunity } = __modules["social.js"];
 const { createDuel } = __modules["duel-view.js"];
 const { createBaseLine, defaultBaseIso, getBase, getTent, getTentColor, getTentLook, onBaseChange, pickBase, setBase, setTentLevelSource, syncBase, tentLonLat } = __modules["base.js"];
 const { celebrateTent, createTentCanvas, tentLevel, tentToCelebrate } = __modules["tents.js"];
-const { createPixelMap } = __modules["pixel-map.js"];
+const { createWorldMap } = __modules["world-map.js"];
 const { FLIGHT_MS, createTravelLayer, distance: distanceOnGlobe, drawSprite, getDayPlace, makeTrack, placeOf, spriteCanvas, startAmbient } = __modules["travel.js"];
 const { fillTransitCard, liveTitle } = __modules["transit-card.js"];
 const { createLiveTraffic } = __modules["live-traffic.js"];
@@ -36550,7 +36864,8 @@ function addExtremeMarker(entry, standings, pickIso) {
 
 // The climb: the ranking from last to first in a window, creeping upwards (fast, then
 // slower and slower) with a tick per country, until it lands on your pick. Above it the
-// whole world in pixels (pixel-map.js): each country lights up in its heat colour as the
+// whole world on a detailed flat map (world-map.js; the 8-bit pixel-map.js until 19 November
+// 2026): each country lights up in its heat colour as the
 // climb passes it, and once it lands, your pick blinks gold and the countries above you
 // light up in a quick wave. Then your row lights up, your points count up, and a click or
 // a moment later the score card.
@@ -36610,9 +36925,10 @@ function playExtremeClimb(standings, pick, state, tour) {
   place(start);
   // The pixel map, and its colour key (the end we're after in pink, the other in blue).
   climbMap?.stop();
-  const map = createPixelMap(document.getElementById("climbMap"), iso => heatColor(standings.ranks[iso]?.heat ?? count, count));
+  const map = createWorldMap(document.getElementById("climbMap"), iso => heatColor(standings.ranks[iso]?.heat ?? count, count));
   climbMap = map;
-  map.fit(document.querySelector("#extremeClimb .climb-map").clientWidth);
+  const mapWidth = document.querySelector("#extremeClimb .climb-map").clientWidth - 16;
+  map.size(mapWidth, Math.round(mapWidth * 0.44)); // a little flatter than the world, so CONTINUE keeps its room
   const [keyNear, keyFar] = extremeEnds(standings.find);
   document.getElementById("climbKey").replaceChildren(...[["near", keyNear], ["far", keyFar]].map(([side, label]) => {
     const item = Object.assign(document.createElement("span"), { className: `climb-key-item is-${side}` });
@@ -37157,11 +37473,11 @@ function showMenuGlobe() {
   globe.setMode("menu");
   globe.setBorderStrength(0);
   // The menu opens over today's main game, its Play button one click away.
-  hero.key = featuredMode();
+  hero.key = "daily";
   hero.date = null;
   hero.days = null;
-  renderHero();
   menuFocus = featuredMode();
+  renderHero();
   const stop = stopOf(menuFocus);
   globe.faceOnMenu(stop.lat, stop.lon);
 }
@@ -37389,7 +37705,9 @@ const HERO_INFO = {
   casual: { title: () => t("mode.casual.short"), text: () => t("menu.casualText"), color: "#ffd45c" },
   camp: { title: () => t("menu.community"), text: () => t("menu.communityNote"), color: "#45e3ff" },
   // 1v1 (duel-view.js): a live match against a friend; the button opens the match screen.
-  duel: { title: () => "1V1", text: () => t("menu.duelText"), color: "#c58cff" },
+  duel: { title: () => t("menu.versus"), text: () => t("menu.versusText"), color: "#c58cff" },
+  // DAILY (19 November 2026): both solo games on one card of their own (renderDaily).
+  daily: { title: () => t("menu.daily"), text: () => "", color: "#ff6b9d" },
   // My Tent: where your tent stands (the camera pans there); OPEN MY TENT opens the window.
   tent: { title: () => t("menu.account"), text: () => t("menu.tentText"), color: () => getTentColor() }
 };
@@ -37410,6 +37728,15 @@ function renderHero() {
   const card = document.getElementById("heroCard");
   if (!card) return;
   const { key, date } = hero;
+  // DAILY has its own card with both games; VERSUS and CREW use this one.
+  const daily = key === "daily";
+  card.hidden = daily;
+  document.getElementById("dailyCard").hidden = !daily;
+  document.querySelectorAll("#menuDock [data-select]").forEach(item => {
+    item.classList.toggle("is-active", item.dataset.select === key);
+    item.setAttribute("aria-pressed", String(item.dataset.select === key));
+  });
+  if (daily) { renderDaily(); return; }
   const info = HERO_INFO[key];
   const camp = key === "camp" || key === "tent"; // places, not games: no day, no archive
   const state = camp || key === "duel" ? "new" : dayState(key, date || today);
@@ -37417,7 +37744,7 @@ function renderHero() {
   card.dataset.state = state === "none" ? "new" : state;
   card.dataset.key = key;
   card.classList.toggle("is-archive", Boolean(date));
-  const ribbon = date ? t("common.day", { n: getPuzzleNumber(date) }).toUpperCase() : key === MAIN_MODE ? t("menu.mainGame") : key === "duel" ? t("menu.beta") : "";
+  const ribbon = date ? t("common.day", { n: getPuzzleNumber(date) }).toUpperCase() : key === MAIN_MODE ? t("menu.mainGame") : key === "duel" ? t("menu.versusRibbon") : "";
   setText("heroRibbon", ribbon);
   document.getElementById("heroRibbon").hidden = !ribbon;
   document.getElementById("heroArt").replaceChildren(heroArtFor(key));
@@ -37425,7 +37752,7 @@ function renderHero() {
   setText("heroText", info.text());
   // Under it: how today stands (or, on a past day, whether you played it).
   let status = "";
-  if (key === "duel") status = t("menu.duelStatus");
+  if (key === "duel") status = "";
   else if (key === "tent") status = tentWhere();
   else if (!camp && !date) status = describeMode(key);
   else if (date) status = state === "none" ? t("hero.noGame") : state === "done" ? t("hero.played") : state === "started" ? t("hero.started") : t("hero.notPlayed");
@@ -37440,36 +37767,81 @@ function renderHero() {
     document.getElementById("heroNewer").disabled = index <= 0;
   }
   const go = document.getElementById("heroGo");
-  go.textContent = key === "duel" ? t("menu.duelGo") : key === "tent" ? t("menu.tentGo") : camp ? t("menu.pinGoCamp") : t(state === "done" ? "menu.seeResults" : state === "started" ? "menu.continueGo" : "menu.playNow");
+  go.textContent = key === "duel" ? t("menu.duelGoShort") : key === "tent" ? t("menu.tentGo") : camp ? t("menu.pinGoCamp") : t(state === "done" ? "menu.seeResults" : state === "started" ? "menu.continueGo" : "menu.playNow");
   go.disabled = state === "none";
   go.hidden = state === "none" && !date;
   // ARCHIVE next to it (not for Base Camp); on a past day, the way home.
   const side = document.getElementById("heroSide");
-  side.hidden = camp || key === "duel";
+  side.hidden = camp;
+  // On VERSUS the second button is Party (3–4 players), still being built.
+  side.disabled = key === "duel";
   // The dock shows which card is up.
   document.querySelectorAll("#menuDock [data-select]").forEach(item => {
     item.classList.toggle("is-active", item.dataset.select === key);
     item.setAttribute("aria-pressed", String(item.dataset.select === key));
   });
-  side.textContent = date ? `⌂ ${t(getTent() ? "hero.myTent" : "hero.home")}` : `▤ ${t("menu.archive")}`;
+  side.textContent = key === "duel" ? t("menu.partySoon") : date ? `⌂ ${t(getTent() ? "hero.myTent" : "hero.home")}` : `▤ ${t("menu.archive")}`;
 }
+// The DAILY card (19 November 2026, mockups/menu option A): today's two solo games, both
+// against the world. Highs & Lows first and biggest (the main game), Casual under it, each
+// with how today stands and its own button; under them the archive (with how many earlier
+// days are still open) and, at the top, when the next day opens (midnight UTC).
+function renderDaily() {
+  setText("dailyDay", `${t("menu.today")} · ${t("common.day", { n: getPuzzleNumber(today) }).toUpperCase()}`);
+  const now = new Date();
+  const left = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1) - now.getTime();
+  setText("dailyNext", t("end.nextDay", { h: Math.floor(left / 3600000), m: Math.floor(left / 60000) % 60 }));
+  document.querySelectorAll("#dailyCard .daily-game").forEach(row => {
+    const mode = row.dataset.mode;
+    const state = modeState(mode);
+    row.dataset.state = state;
+    row.classList.toggle("is-focus", mode === menuFocus);
+    const record = state === "done" ? getDayRecord(today, mode) : null;
+    row.querySelector("[data-status]").textContent = state === "none" ? t("menu.noDay") : state === "started" ? describeMode(mode) : "";
+    const go = row.querySelector("[data-go]");
+    go.textContent = state === "done" ? `✓ ${num(record.score ?? 0)}` : t(state === "started" ? "menu.continueGo" : "menu.playNow");
+    go.disabled = state === "none";
+  });
+  const unplayed = getAllPuzzleDays().filter(date => date < today && (record => !record.completed && !record.noGame)(getDayRecord(date, MAIN_MODE))).length;
+  setText("dailyArchive", `▤ ${unplayed ? t("menu.archiveOpen", { n: unplayed }) : t("menu.archive")} ›`);
+}
+document.querySelectorAll("#dailyCard .daily-game").forEach(row => {
+  const mode = row.dataset.mode;
+  row.querySelector("[data-go]").addEventListener("click", () => { sounds.playClick(); mainMenu.showGame(mode); });
+  // A click on the row (not its button) turns the globe to that game's start.
+  row.addEventListener("click", event => {
+    if (event.target.closest("[data-go]")) return;
+    sounds.playClick();
+    selectHero(mode);
+  });
+});
+document.getElementById("dailyArchive").addEventListener("click", () => {
+  sounds.playClick();
+  archive.openArchive(null, menuFocus === "casual" ? "casual" : MAIN_MODE);
+});
+
 // The place for the card on the globe now.
 function heroStop() {
   if (hero.date) { const [lon, lat] = startLonLat(hero.key, hero.date); return { lat, lon }; }
-  return stopOf(hero.key);
+  return stopOf(hero.key === "daily" ? menuFocus : hero.key);
 }
 // Selecting a game or Base Camp (its pin, or the Expedition menu): the camera pans and zooms
 // there and the card changes.
 function selectHero(key) {
+  // A game (its pin on the globe, or its row on the card) opens DAILY, looking at that game.
+  const game = key === "extremes" || key === "casual" ? key : key === "daily" ? featuredMode() : null;
+  if (game) key = "daily";
   if (!HERO_INFO[key]) return;
   hero.key = key;
   hero.date = null;
   hero.days = null;
   renderHero();
   if (key === "duel") return; // no place on the globe: the camera stays
-  if (globe.mode !== "menu") { menuFocus = key; return; }
-  menuFocus = key;
-  const stop = stopOf(key);
+  const focus = game || key;
+  menuFocus = focus;
+  if (game) renderDaily();
+  if (globe.mode !== "menu") return;
+  const stop = stopOf(focus);
   globe.glideMenuTo(stop.lat, stop.lon, FLIGHT_MS, { distance: HERO_ZOOM });
 }
 document.getElementById("heroGo").addEventListener("click", () => {
@@ -37482,6 +37854,7 @@ document.getElementById("heroGo").addEventListener("click", () => {
 // ARCHIVE opens the archive of that game: every day on a calendar (13 November 2026, team
 // request; it used to step through past days on the card, a plane flying to each).
 document.getElementById("heroSide").addEventListener("click", () => {
+  if (hero.key === "duel") return;
   sounds.playClick();
   archive.openArchive(null, hero.key);
 });
@@ -38054,7 +38427,7 @@ function askForBase() {
 
 const mainMenu = initializeMainMenu({
   onPlay: (mode, dateKey) => enterGameView(dateKey || today, mode),
-  onRefresh: () => renderHero(),
+  onRefresh: () => { renderHero(); renderProfileChip(); },
   onHome: () => {
     cancelPendingReveal();
     stopExtremeTour({ all: true });
@@ -38189,6 +38562,7 @@ function renderAccount(account) {
   const profile = account ? getProfile(account) : null;
   const avatar = profile?.avatar ? Object.assign(document.createElement("img"), { src: profile.avatar, alt: "", referrerPolicy: "no-referrer" }) : null;
   setText("menuAccountLabel", profile ? profile.name : t("menu.tentGuest"));
+  renderProfileChip();
   const menuAvatar = document.getElementById("menuAccountAvatar");
   menuAvatar.hidden = !avatar;
   if (avatar) menuAvatar.replaceChildren(avatar);
@@ -38222,6 +38596,7 @@ function tentWhere() {
 function renderTentTile() {
   const spot = getTent();
   document.getElementById("menuTentIcon").replaceChildren(createTentCanvas(getTentLook(), 2, "menu-tent-canvas", { centred: true }));
+  renderProfileChip();
   const where = spot ? (spot.city ? t("hud.capital", { city: spot.city, country: countryName(getCountry(spot.iso)) }) : countryName(getCountry(spot.iso))) : t("menu.tentNone");
   setText("menuTentWhere", where);
   // The dock's tent button in your tent's colour, saying where it stands.
@@ -38230,6 +38605,21 @@ function renderTentTile() {
   button.title = `${t("menu.account")} · ${where}`;
   if (hero.key === "tent") renderHero();
 }
+// The profile at the top of the menu (19 November 2026): your tent, your name (or Guest)
+// and this month's badge in the main game. A click opens My tent.
+function renderProfileChip() {
+  const account = getUser();
+  setText("menuProfileName", account ? getProfile(account).name : t("menu.guest"));
+  // (The archive is set up further down; until then, no badge yet.)
+  let days = [];
+  try { days = archive.loadDays(); } catch {}
+  const badge = getMonthBadge(days, today.slice(0, 7));
+  const line = document.getElementById("menuProfileBadge");
+  line.replaceChildren();
+  if (badge.tier) line.append(createBadge(badge.tier, 12), badge.tier.name.toUpperCase());
+  else line.textContent = t("menu.noBadge");
+}
+document.getElementById("menuAccountButton").addEventListener("click", () => { sounds.playClick(); openMyTent(); });
 onBaseChange(renderTentTile);
 onLangChange(renderTentTile);
 document.getElementById("closeAccountButton").addEventListener("click", () => {
