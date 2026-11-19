@@ -29,8 +29,9 @@
   --line: #263259;
   --line-strong: #3a4a7d;
   --text: #e9eefb;
-  --muted: #8f9bbd;
-  --faint: #5d6890;
+  /* Secondary text, lightened 19 November 2026 (mockups/casual-standard/round-6.html, A): 11:1 and 7:1 on the dark background. */
+  --muted: #b9c2dd;
+  --faint: #8f9bbd;
   --accent: #45e3ff;
   --accent-hover: #8af0ff;
   --accent-soft: rgba(69, 227, 255, 0.12);
@@ -4436,6 +4437,188 @@ h1, h2, h3 { font-weight: normal; }
 @media (max-width: 760px) { .duel-view[data-phase="intro"] .duel-title { font-size: 17px; } }
 .duel-row strong.is-negative { color: var(--danger); }
 
+/* ---------- The end of the day as two pages (18 November 2026, docs/design-standard-plan.md) ----------
+   A screen of its own (no globe), like the score card. Page 1: the day, the total, the
+   squares SHARE sends, the day's journey filling the rest, SHARE as the one main button, and
+   when the next day opens. Page 2: the rounds (VIEW opens one), you vs the world (sample
+   numbers for now) and your stats. HOME and ARCHIVE (with how many days are left) under both. */
+#victoryModal { padding: 0; background: #070b17; }
+#victoryModal .end-screen {
+  display: grid; grid-template-rows: minmax(0, 1fr) auto auto; gap: 12px;
+  width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; overflow: hidden;
+  padding: calc(env(safe-area-inset-top, 0px) + 28px) 40px calc(env(safe-area-inset-bottom, 0px) + 24px);
+  border: 0; border-radius: 0; background: #070b17; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+#victoryModal .end-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 36px; min-height: 0; overflow: hidden; }
+#victoryModal .end-page { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+#victoryModal .end-more { overflow-y: auto; }
+#victoryModal .end-head { gap: 6px; }
+#victoryModal .end-head .modal-badge { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+#victoryModal .end-head h2 { color: var(--gold); font-size: 16px; }
+#victoryModal .end-score .score-display { color: var(--accent); font-size: 64px; text-shadow: 0 0 30px color-mix(in srgb, var(--accent) 35%, transparent); }
+#victoryModal .end-squares { display: flex; gap: 6px; }
+#victoryModal .end-squares span { flex: 1; display: grid; place-items: center; height: 24px; border-radius: 6px; color: #04060d; font: 8px var(--font-display); }
+#victoryModal .end-squares .is-perfect { background: var(--t-correct); }
+#victoryModal .end-squares .is-partial { background: var(--gold); }
+#victoryModal .end-squares .is-zero { background: var(--danger); }
+#victoryModal .end-climb-chart { position: relative; flex: 1 1 auto; min-height: 0; margin: 0; overflow: hidden; border: 1px solid var(--glass-line); border-radius: 18px; background: #0b1030; }
+#victoryModal .end-climb-chart .journey { position: absolute; inset: 0; width: 100%; height: 100%; max-height: none; aspect-ratio: auto; object-fit: contain; border-radius: 0; image-rendering: pixelated; }
+#victoryModal .end-climb-chart .journey.is-tall { object-fit: fill; }
+#victoryModal .end-share { flex: none; min-height: 50px; }
+#victoryModal .end-next-line { display: flex; justify-content: center; gap: 12px; align-items: center; color: var(--muted); font-size: 13px; }
+#victoryModal .end-next-line span[hidden] { display: none; }
+#victoryModal .end-world { display: grid; gap: 6px; padding: 12px; border: 1px solid var(--glass-line); border-radius: 12px; }
+#victoryModal .end-percent { color: var(--text); font-size: 28px; }
+#victoryModal .end-world-text { font-size: 12px; }
+#victoryModal .end-link { display: flex; justify-content: space-between; align-items: center; min-height: 44px; padding: 0 12px; border: 0; border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--text); font: 14px var(--font-body); cursor: pointer; }
+#victoryModal .end-link b { color: var(--accent); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+#victoryModal .end-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); width: min(560px, 100%); justify-self: center; }
+#victoryModal .end-actions .btn { min-height: 46px; font-size: 10px; }
+#victoryModal .end-dots { display: none; }
+@media (min-width: 761px) {
+  #victoryModal .end-next-page { display: none; }
+}
+@media (max-width: 760px) {
+  #victoryModal .end-screen { gap: 8px; padding: calc(env(safe-area-inset-top, 0px) + 14px) 0 calc(env(safe-area-inset-bottom, 0px) + 12px); }
+  #victoryModal .end-grid { display: flex; gap: 0; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  #victoryModal .end-page { flex: 0 0 100%; gap: 8px; padding: 0 16px; scroll-snap-align: start; }
+  #victoryModal .end-head h2 { font-size: 12px; }
+  #victoryModal .end-score .score-display { font-size: 44px; }
+  #victoryModal .end-climb-chart { margin: 0 -16px; border: 0; border-radius: 0; }
+  #victoryModal .end-climb-chart .journey { max-height: none; }
+  #victoryModal .end-next-page { display: inline-block; padding: 4px 0; color: var(--accent); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+  #victoryModal .end-dots { display: flex; justify-content: center; gap: 6px; }
+  #victoryModal .end-actions { width: auto; padding: 0 12px; }
+}
+
+/* 1v1 after the match: a screen of its own in two pages, like the end of the day. */
+.duel-view[data-phase="done"] .duel-panel {
+  inset: 0; top: 0; right: 0; bottom: 0; left: 0; width: auto; max-width: none; max-height: none; transform: none;
+  display: grid; grid-template-rows: minmax(0, 1fr) auto auto; gap: 10px;
+  padding: calc(env(safe-area-inset-top, 0px) + 56px) 0 calc(env(safe-area-inset-bottom, 0px) + 14px);
+  border: 0; border-radius: 0; background: #070b17; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+.duel-pages { display: flex; min-height: 0; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.duel-pages::-webkit-scrollbar { display: none; }
+.duel-page { display: flex; flex: 0 0 100%; flex-direction: column; justify-content: center; gap: 14px; min-width: 0; padding: 0 16px; overflow-y: auto; scroll-snap-align: start; }
+.duel-page + .duel-page { justify-content: flex-start; }
+.duel-done-chip { align-self: center; padding: 5px 10px; border-radius: 999px; background: color-mix(in srgb, var(--duel) 16%, transparent); color: var(--duel); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.duel-podium { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 10px; text-align: center; }
+.duel-podium-side { display: grid; justify-items: center; gap: 6px; --me: var(--gold); }
+.duel-podium-side.is-them { --me: var(--duel); }
+.duel-podium-side.is-winner { transform: translateY(-14px); }
+.duel-crown { height: 18px; color: var(--gold); font: 16px var(--font-display); }
+.duel-ava.is-big { width: 76px; height: 76px; border-radius: 16px; }
+.duel-ava.is-big canvas { width: 66px; height: 66px; }
+.duel-podium .duel-player-name { color: var(--me); }
+.duel-podium-score { color: var(--me); font: 700 26px var(--font-mono); }
+.duel-vs { padding-bottom: 34px; color: var(--faint); font: 9px var(--font-display); }
+.duel-done-title { text-align: center; color: var(--gold); }
+.duel-round-bars { display: flex; justify-content: center; gap: 4px; }
+.duel-round-bars i { width: 28px; height: 8px; border-radius: 3px; background: var(--muted); }
+.duel-round-bars i.is-you { background: var(--gold); }
+.duel-round-bars i.is-them { background: var(--duel); }
+.duel-page .duel-fine { text-align: center; }
+.duel-page .duel-link { display: inline; padding: 0; color: var(--duel); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.duel-dots-pages { display: flex; justify-content: center; gap: 6px; }
+.duel-dots-pages i { width: 8px; height: 8px; border-radius: 2px; background: var(--line); }
+.duel-dots-pages i.is-on { background: var(--duel); }
+.duel-view[data-phase="done"] .duel-actions { padding: 0 12px; }
+@media (min-width: 761px) {
+  .duel-view[data-phase="done"] .duel-panel { padding: 64px 40px 28px; }
+  .duel-pages { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 36px; width: min(1100px, 100%); margin: 0 auto; overflow: hidden; }
+  .duel-page { padding: 0; }
+  .duel-page .duel-fine .duel-link,
+  .duel-dots-pages { display: none; }
+  .duel-view[data-phase="done"] .duel-actions { width: min(560px, 100%); margin: 0 auto; }
+}
+.duel-page .duel-row-what small { white-space: normal; }
+
+/* ---------- 1v1: the versus screen (19 November 2026, mockups/casual-standard/round-5.html, A) ----------
+   Over the globe between the lobby and round 1. A phone splits top (you, gold) and bottom
+   (them, purple) along a slash; a computer splits left and right. .is-in plays the entrance
+   once (the halves sweep in, the explorers slide in, VS slams down, the card rises); .is-out
+   slides the halves apart to show round 1 on the globe behind. */
+.duel-view .duel-close { z-index: 6; }
+.duel-versus { position: absolute; inset: 0; z-index: 5; overflow: hidden; --you: var(--gold); --them: var(--duel); }
+.duel-vs-half { position: absolute; left: 0; right: 0; }
+.duel-vs-half.is-you { top: 0; height: 44%; background: linear-gradient(160deg, #3a2a05, #110c02 72%); clip-path: polygon(0 0, 100% 0, 100% 72%, 0 100%); }
+.duel-vs-half.is-them { top: 28%; bottom: 0; background: linear-gradient(-20deg, #2a1a4a, #0c0716 72%); clip-path: polygon(0 14%, 100% 0, 100% 100%, 0 100%); }
+.duel-vs-slash { position: absolute; left: -10%; right: -10%; top: 35.5%; height: 4px; background: #fff; box-shadow: 0 0 18px #fff; transform: rotate(-8.5deg); }
+.duel-vs-fighter { position: absolute; display: flex; align-items: center; gap: 12px; }
+.duel-vs-fighter.is-you { top: calc(env(safe-area-inset-top, 0px) + 64px); left: 16px; --me: var(--you); }
+.duel-vs-fighter.is-them { top: 38%; right: 16px; flex-direction: row-reverse; text-align: right; --me: var(--them); }
+.duel-vs-ava canvas { display: block; width: 96px; height: 96px; image-rendering: pixelated; }
+.duel-vs-plate { display: grid; gap: 4px; }
+.duel-vs-plate strong { color: var(--me); font: 12px var(--font-display); letter-spacing: var(--ls-pixel); text-transform: uppercase; }
+.duel-vs-plate small { color: var(--text); font: 8px var(--font-display); letter-spacing: var(--ls-pixel); }
+.duel-vs-plate .duel-vs-ready { color: #5cd26a; }
+.duel-vs-big { position: absolute; top: 27%; right: 28px; transform: translateY(-50%); color: #fff; font: 44px var(--font-display); text-shadow: 3px 3px 0 #ff5a5a, -3px -3px 0 #45e3ff; }
+.duel-vs-card { position: absolute; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); left: 12px; display: grid; gap: 8px; padding: 12px; border: 1px solid var(--glass-line); border-radius: 16px; background: rgba(5, 7, 13, 0.93); }
+.duel-vs-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--glass-line-soft); }
+.duel-vs-row b { font: 700 14px var(--font-mono); }
+.duel-vs-row b.is-you { color: var(--you); text-align: left; }
+.duel-vs-row b.is-them { color: var(--them); text-align: right; }
+.duel-vs-row b.is-you.is-lead::after { content: " ◆"; font-size: 8px; vertical-align: 2px; }
+.duel-vs-row b.is-them.is-lead::before { content: "◆ "; font-size: 8px; vertical-align: 2px; }
+.duel-vs-row span { color: var(--text); font: 7px var(--font-display); letter-spacing: var(--ls-pixel); text-align: center; white-space: nowrap; }
+.duel-vs-bar { display: flex; height: 6px; overflow: hidden; border-radius: 3px; background: var(--line); }
+.duel-vs-bar i.is-you { background: var(--you); } .duel-vs-bar i.is-them { background: var(--them); }
+.duel-vs-pips { display: flex; justify-content: center; gap: 4px; }
+.duel-vs-pips i { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 4px; color: #04060d; font: 7px var(--font-display); }
+.duel-vs-pips i.is-you { background: var(--you); } .duel-vs-pips i.is-them { background: var(--them); } .duel-vs-pips i.is-draw { background: var(--muted); }
+.duel-vs-first { color: var(--text); font: 9px/1.6 var(--font-display); letter-spacing: var(--ls-pixel); text-align: center; }
+.duel-vs-next { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--them) 50%, transparent); border-radius: 12px; background: rgba(180, 140, 255, 0.08); font-size: 12px; }
+.duel-vs-next b { color: var(--them); font: 8px var(--font-display); letter-spacing: var(--ls-pixel); white-space: nowrap; }
+.duel-vs-clock { color: var(--text); font: 11px var(--font-body); text-align: center; }
+
+/* The entrance (once) and the exit. */
+.duel-versus.is-in .duel-vs-half.is-you { animation: vs-from-left 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+.duel-versus.is-in .duel-vs-half.is-them { animation: vs-from-right 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+.duel-versus.is-in .duel-vs-slash { animation: vs-slash 0.4s 0.35s ease-out both; }
+.duel-versus.is-in .duel-vs-fighter.is-you { animation: vs-from-left 0.55s 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+.duel-versus.is-in .duel-vs-fighter.is-them { animation: vs-from-right 0.55s 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+.duel-versus.is-in .duel-vs-big { animation: vs-slam 0.45s 0.75s cubic-bezier(0.3, 1.4, 0.5, 1) both; }
+.duel-versus.is-in .duel-vs-card { animation: vs-rise 0.45s 0.95s ease-out both; }
+.duel-versus.is-out { pointer-events: none; }
+.duel-versus.is-out .duel-vs-half.is-you,
+.duel-versus.is-out .duel-vs-fighter.is-you { animation: vs-to-left 0.65s cubic-bezier(0.6, 0, 0.8, 0.4) both; }
+.duel-versus.is-out .duel-vs-half.is-them,
+.duel-versus.is-out .duel-vs-fighter.is-them { animation: vs-to-right 0.65s cubic-bezier(0.6, 0, 0.8, 0.4) both; }
+.duel-versus.is-out .duel-vs-slash,
+.duel-versus.is-out .duel-vs-big,
+.duel-versus.is-out .duel-vs-card { animation: vs-fade 0.3s ease-in both; }
+@keyframes vs-from-left { from { transform: translateX(-110%); } }
+@keyframes vs-from-right { from { transform: translateX(110%); } }
+@keyframes vs-to-left { to { transform: translateX(-110%); } }
+@keyframes vs-to-right { to { transform: translateX(110%); } }
+@keyframes vs-slash { from { opacity: 0; transform: rotate(-8.5deg) scaleX(0); } }
+@keyframes vs-slam { 0% { opacity: 0; transform: translateY(-50%) scale(3); } 70% { opacity: 1; transform: translateY(-50%) scale(0.92); } 85% { transform: translateY(-50%) scale(1.04) rotate(-2deg); } }
+@keyframes vs-rise { from { opacity: 0; transform: translateY(40px); } }
+@keyframes vs-fade { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .duel-versus.is-in *, .duel-versus.is-out * { animation-duration: 0.01s !important; animation-delay: 0s !important; }
+}
+
+/* A computer: the split turns sideways, you on the left, them on the right. */
+@media (min-width: 761px) {
+  .duel-vs-half { top: 0; bottom: 0; width: 56%; height: auto; }
+  .duel-vs-half.is-you { left: 0; right: auto; height: auto; background: linear-gradient(110deg, #3a2a05, #110c02 72%); clip-path: polygon(0 0, 100% 0, 78% 100%, 0 100%); }
+  .duel-vs-half.is-them { top: 0; left: auto; right: 0; background: linear-gradient(-70deg, #2a1a4a, #0c0716 72%); clip-path: polygon(22% 0, 100% 0, 100% 100%, 0 100%); }
+  .duel-vs-slash { top: 0; bottom: 0; left: calc(50% - 3px); right: auto; width: 6px; height: auto; transform: skewX(-12deg); }
+  .duel-vs-fighter { top: 16%; flex-direction: column; align-items: flex-start; gap: 16px; }
+  .duel-vs-fighter.is-you { top: 16%; left: 6%; }
+  .duel-vs-fighter.is-them { top: 16%; right: 6%; flex-direction: column; align-items: flex-end; }
+  .duel-vs-ava canvas { width: 208px; height: 208px; }
+  .duel-vs-plate strong { font-size: 18px; }
+  .duel-vs-plate small { font-size: 9px; }
+  .duel-vs-big { top: 70px; right: auto; left: 50%; transform: translateX(-50%); font-size: 72px; }
+  .duel-vs-card { right: auto; bottom: auto; left: 50%; top: 52%; width: 440px; transform: translate(-50%, -50%); padding: 18px 20px; }
+  @keyframes vs-slash { from { opacity: 0; transform: skewX(-12deg) scaleY(0); } }
+  @keyframes vs-slam { 0% { opacity: 0; transform: translateX(-50%) scale(3); } 70% { opacity: 1; transform: translateX(-50%) scale(0.92); } 85% { transform: translateX(-50%) scale(1.04) rotate(-2deg); } }
+  @keyframes vs-rise { from { opacity: 0; transform: translate(-50%, calc(-50% + 40px)); } }
+}
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -5038,43 +5221,43 @@ h1, h2, h3 { font-weight: normal; }
        and the archive days still to play. -->
   <div id="victoryModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal victory-modal end-screen">
-      <header class="end-head">
-        <span class="modal-badge" id="perfectBadge">DAY COMPLETE</span>
-        <h2 id="modalTitle">DAY COMPLETE</h2>
-      </header>
-      <!-- Two pages: the result (score, top %, journey, share) and the rounds (with how
-           everyone scored). Side by side on a computer; swiped on a phone. -->
+      <!-- Two pages (18 November 2026, docs/design-standard-plan.md): the day's journey with
+           the total, the squares SHARE sends and SHARE itself; then the rounds, you vs the
+           world (sample numbers for now) and your stats. Side by side on a computer, swiped on
+           a phone. HOME and ARCHIVE stay at the bottom of both. -->
       <div class="end-grid" id="endPages">
         <section class="end-page end-main" aria-label="Your result" data-i18n-attr="aria-label:end.yourResult">
+          <header class="end-head">
+            <span class="modal-badge" id="perfectBadge">DAY COMPLETE</span>
+            <h2 id="modalTitle">DAY COMPLETE</h2>
+          </header>
           <div class="end-score">
             <strong class="score-display" id="modalScore">0</strong>
             <span id="modalSubtext"></span>
           </div>
-          <div class="end-world">
-            <span class="field-label" data-i18n="end.vsWorld">YOU VS THE WORLD TODAY</span>
-            <strong class="end-percent" id="endPercent"></strong>
-            <p class="end-world-text" id="endWorldText"></p>
-          </div>
+          <div class="end-squares" id="endSquares" aria-hidden="true"></div>
           <div class="end-climb-chart" id="endClimb"></div>
           <button class="btn btn-primary end-share" id="copyResultBtn" type="button">COPY RESULT</button>
-          <button class="end-next-page" id="endNextPage" type="button" data-i18n="end.roundsNext">ROUNDS ›</button>
+          <p class="end-next-line"><span id="endNextDay"></span><button class="end-next-page" id="endNextPage" type="button" data-i18n="end.roundsNext">ROUNDS ›</button></p>
         </section>
         <section class="end-page end-more" aria-label="Your rounds" data-i18n-attr="aria-label:end.yourRoundsLabel">
           <span class="field-label" data-i18n="end.yourRounds">YOUR ROUNDS</span>
           <ol class="round-breakdown end-rounds" id="modalBreakdown"></ol>
-          <span class="field-label" data-i18n="end.everyone">EVERYONE TODAY</span>
-          <div id="endDistribution"></div>
-          <p class="sample-note" data-i18n="end.sample">Sample numbers until the game has real players.</p>
+          <span class="field-label" data-i18n="end.vsWorldSample">YOU VS THE WORLD · SAMPLE</span>
+          <div class="end-world">
+            <strong class="end-percent" id="endPercent"></strong>
+            <div id="endDistribution"></div>
+            <p class="end-world-text" id="endWorldText"></p>
+            <p class="sample-note" data-i18n="end.sample">Sample numbers until the game has real players.</p>
+          </div>
+          <button class="end-link stats-open-button" id="endStatsButton" type="button"><span data-i18n="end.yourStats">Your stats</span><b data-i18n="end.statsLink">STATS ›</b></button>
         </section>
       </div>
       <div class="end-dots" id="endDots" aria-hidden="true"><i class="is-on"></i><i></i></div>
       <div class="end-actions">
         <button class="btn btn-secondary home-button" type="button" data-i18n="end.home">HOME</button>
-        <button class="btn btn-secondary archive-open-button" id="endArchiveButton" type="button" data-i18n="menu.archive">ARCHIVE</button>
-        <button class="btn btn-secondary stats-open-button" id="endStatsButton" type="button" data-i18n="menu.stats">STATS</button>
-        <button class="btn btn-secondary" id="reviewRoundsButton" type="button" data-i18n="end.review">REVIEW ROUNDS</button>
+        <button class="btn btn-secondary archive-open-button" id="endArchiveButton" type="button">ARCHIVE</button>
       </div>
-      <p class="end-archive-note" id="endArchiveTitle"></p>
     </div>
   </div>
 
@@ -6025,6 +6208,11 @@ const EN = {
   "howto.letsPlay": "LET'S PLAY",
 
   // End of the day
+  "end.vsWorldSample": "YOU VS THE WORLD · SAMPLE",
+  "end.yourStats": "Your stats",
+  "end.statsLink": "STATS ›",
+  "end.archiveCount": "ARCHIVE · {n}",
+  "end.nextDay": "Next day in {h}h {m}m",
   "end.yourResult": "Your result",
   "end.vsWorld": "YOU VS THE WORLD TODAY",
   "end.roundsNext": "ROUNDS ›",
@@ -6562,6 +6750,28 @@ const EN = {
   "duel.theyLeadBy": "{name} LEADS BY {n}",
   "duel.level": "LEVEL",
   "duel.roundByRound": "ROUND BY ROUND",
+  "duel.youWinBy": "You win by {n}",
+  "duel.theyWinBy": "{name} wins by {n}",
+  "duel.matchOver": "1V1 · MATCH OVER",
+  "duel.wonRounds": "You won {n} of {total} rounds",
+  "duel.roundsNext": "ROUNDS ›",
+  "duel.shareResult": "SHARE RESULT",
+  "duel.resultCopied": "Result copied",
+  "duel.vs.record": "{n} MATCHES · {pct}% WON",
+  "duel.vs.new": "NEW EXPLORER",
+  "duel.vs.streak": "STREAK {s}",
+  "duel.vs.w": "W",
+  "duel.vs.l": "L",
+  "duel.vs.d": "D",
+  "duel.vs.isReady": "READY ✓",
+  "duel.vs.h2h": "HEAD TO HEAD",
+  "duel.vs.firstMatch": "FIRST MATCH AGAINST EACH OTHER",
+  "duel.vs.avg": "AVERAGE MATCH",
+  "duel.vs.bestRound": "BEST ROUND",
+  "duel.vs.youPick": "YOU PICK ›",
+  "duel.vs.theyPick": "{name} PICKS",
+  "duel.vs.ready": "READY",
+  "duel.vs.startsIn": "Starts in {n} s",
   "duel.task.pin": "Drop your pin",
   "duel.task.guess": "Make your guess",
   "duel.task.route": "Find the shortest route",
@@ -7180,6 +7390,11 @@ const NL = {
   "howto.letsPlay": "SPELEN",
 
   // Einde van de dag
+  "end.vsWorldSample": "JIJ TEGEN DE WERELD · VOORBEELD",
+  "end.yourStats": "Jouw stats",
+  "end.statsLink": "STATS ›",
+  "end.archiveCount": "ARCHIEF · {n}",
+  "end.nextDay": "Volgende dag over {h} u {m} min",
   "end.yourResult": "Je uitslag",
   "end.vsWorld": "JIJ TEGEN DE WERELD VANDAAG",
   "end.roundsNext": "RONDES ›",
@@ -7747,6 +7962,28 @@ const NL = {
   "duel.theyLeadBy": "{name} STAAT {n} VOOR",
   "duel.level": "GELIJK",
   "duel.roundByRound": "PER RONDE",
+  "duel.youWinBy": "Je wint met {n} verschil",
+  "duel.theyWinBy": "{name} wint met {n} verschil",
+  "duel.matchOver": "1V1 · AFGELOPEN",
+  "duel.wonRounds": "Je won {n} van de {total} rondes",
+  "duel.roundsNext": "RONDES ›",
+  "duel.shareResult": "DEEL UITSLAG",
+  "duel.resultCopied": "Uitslag gekopieerd",
+  "duel.vs.record": "{n} MATCHES · {pct}% GEWONNEN",
+  "duel.vs.new": "NIEUWE ONTDEKKER",
+  "duel.vs.streak": "REEKS {s}",
+  "duel.vs.w": "W",
+  "duel.vs.l": "V",
+  "duel.vs.d": "G",
+  "duel.vs.isReady": "KLAAR ✓",
+  "duel.vs.h2h": "ONDERLING",
+  "duel.vs.firstMatch": "JULLIE EERSTE MATCH TEGEN ELKAAR",
+  "duel.vs.avg": "GEMIDDELDE MATCH",
+  "duel.vs.bestRound": "BESTE RONDE",
+  "duel.vs.youPick": "JIJ KIEST ›",
+  "duel.vs.theyPick": "{name} KIEST",
+  "duel.vs.ready": "KLAAR",
+  "duel.vs.startsIn": "Begint over {n} s",
   "duel.task.pin": "Zet je speld",
   "duel.task.guess": "Doe je gok",
   "duel.task.route": "Vind de kortste route",
@@ -31432,7 +31669,8 @@ const DUEL_TIMES = {
   intro: 20000, // the question card, until both press CONTINUE
   naming: 40000,
   paint: 45000,
-  pick: 10000 // choosing a category
+  pick: 10000, // choosing a category
+  versus: 15000 // the versus screen before round 1, until both press READY
 };
 const roundTime = style => style === "bid" ? DUEL_TIMES.naming : DUEL_TIMES[style];
 
@@ -31588,10 +31826,12 @@ function scorePaint(answers, painted) {
 // The match.
 // ---------------------------------------------------------------------------
 
-// Who picks the category of round `index` (0–4): A picks rounds 1 and 3, B rounds 2 and 4,
-// and whoever is behind picks round 5 (a tie is decided by `coin`, 0 or 1, from the server).
-function picker(index, totals = { a: 0, b: 0 }, coin = 0) {
-  if (index < 4) return index % 2 === 0 ? "a" : "b";
+// Who picks the category of round `index` (0–4): `first` (drawn at random when the match
+// starts, 19 November 2026) picks rounds 1 and 3, the other player rounds 2 and 4, and whoever
+// is behind picks round 5 (a tie is decided by `coin`, 0 or 1, from the server).
+function picker(index, totals = { a: 0, b: 0 }, coin = 0, first = "a") {
+  const second = first === "a" ? "b" : "a";
+  if (index < 4) return index % 2 === 0 ? first : second;
   if (totals.a !== totals.b) return totals.a < totals.b ? "a" : "b";
   return coin ? "b" : "a";
 }
@@ -31826,6 +32066,8 @@ function createDuel({ globe, onExit, onSignIn }) {
     forget();
   }
   function forget() {
+    versus?.node.remove();
+    versus = null;
     stopWatching();
     clearInterval(syncTimer);
     match = null;
@@ -31842,6 +32084,7 @@ function createDuel({ globe, onExit, onSignIn }) {
   function tick() {
     frame = requestAnimationFrame(tick);
     const s = state();
+    if (s?.phase === "versus") versusClock(s);
     const running = s && s.deadline && ["pick", "intro", "play", "bid", "name", "reveal"].includes(s.phase);
     top.classList.toggle("has-clock", Boolean(running));
     if (!running) return;
@@ -31975,7 +32218,7 @@ function createDuel({ globe, onExit, onSignIn }) {
   // sheet on a phone. Before and after a match (the panel in the middle) it stays centred.
   function frameGlobe() {
     if (!open) return;
-    const centred = ["start", "lobby", "done", "intro"].includes(view.dataset.phase) || !panel.childElementCount;
+    const centred = ["start", "lobby", "done", "intro", "versus"].includes(view.dataset.phase) || !panel.childElementCount;
     if (centred) { globe.setViewShift(0); globe.setViewShiftY(0); return; }
     if (matchMedia("(max-width: 760px)").matches) {
       const topBottom = top.hidden ? 0 : top.getBoundingClientRect().bottom;
@@ -32030,7 +32273,7 @@ function createDuel({ globe, onExit, onSignIn }) {
   }
   function renderTop() {
     const s = state();
-    top.hidden = !s || s.phase === "lobby" || s.phase === "done";
+    top.hidden = !s || ["lobby", "versus", "done"].includes(s.phase);
     if (top.hidden) return;
     // While Blind Paint is still lighting up, the scores wait too.
     const held = paintRevealing() ? s.rounds[s.round].result : null;
@@ -32051,10 +32294,12 @@ function createDuel({ globe, onExit, onSignIn }) {
     if (!open) return;
     const s = state();
     view.dataset.phase = s?.phase || "start";
+    if (s?.phase !== "versus") leaveVersus();
     if (!isConfigured || !getUser()) return renderSignedOut();
     if (!match) return renderStart();
     if (match.status === "abandoned" || s.phase === "done") return renderDone();
     if (s.phase === "lobby") return renderLobby();
+    if (s.phase === "versus") return renderVersus();
     // A new round or phase: start your own part afresh.
     const key = `${match.id}:${s.round}:${s.phase}`;
     if (key !== localKey) {
@@ -32359,6 +32604,89 @@ function createDuel({ globe, onExit, onSignIn }) {
     if (round.style === "guess" || round.style === "route") focusRound(round);
   }
 
+  // -------------------------------------------------------------------------
+  // The versus screen (19 November 2026, mockups/casual-standard/round-5.html, option A):
+  // once both players are in and before round 1. The two halves sweep in over the lobby,
+  // both explorers slide in, VS slams down, and the numbers between you come up (state.versus,
+  // from the referee's versusStats). It waits for both READYs (or its clock); then the halves
+  // slide apart and round 1's pick is on the globe behind them.
+  // -------------------------------------------------------------------------
+  let versus = null; // { node, matchId }
+  function renderVersus() {
+    const s = state();
+    panel.replaceChildren();
+    if (!versus || versus.matchId !== match.id) {
+      versus?.node.remove();
+      versus = { node: el("div", "duel-versus is-in"), matchId: match.id };
+      view.append(versus.node);
+      // The entrance plays once; later updates (the other player's READY) just redraw.
+      const node = versus.node;
+      setTimeout(() => node.classList.replace("is-in", "is-shown"), 1600);
+      sounds.playFlyTo?.();
+    }
+    const stats = s.versus || { a: { matches: 0 }, b: { matches: 0 }, h2h: { matches: 0, a: 0, b: 0, last: [] } };
+    const mine = stats[me()] || { matches: 0 };
+    const theirs = stats[them()] || { matches: 0 };
+    const plate = (who, record) => {
+      const box = el("div", `duel-vs-fighter ${who === me() ? "is-you" : "is-them"}`);
+      const ava = el("span", "duel-vs-ava");
+      ava.append(tentOf(who));
+      const text = el("div", "duel-vs-plate");
+      text.append(el("strong", "", who === me() ? t("duel.you") : nameOf(who)));
+      text.append(el("small", "", record.matches ? t("duel.vs.record", { n: num(record.matches), pct: Math.round(100 * record.wins / record.matches) }) : t("duel.vs.new")));
+      if (record.streak) text.append(el("small", "", t("duel.vs.streak", { s: `${record.streak.kind === "W" ? t("duel.vs.w") : record.streak.kind === "L" ? t("duel.vs.l") : t("duel.vs.d")}${record.streak.n}` })));
+      if (s.ready?.[who]) text.append(el("small", "duel-vs-ready", t("duel.vs.isReady")));
+      box.append(ava, text);
+      return box;
+    };
+    // A row: your value, its label, theirs; the better one marked.
+    const row = (label, left, right, { leftBetter = null } = {}) => {
+      const line = el("div", "duel-vs-row");
+      line.append(el("b", `is-you${leftBetter === true ? " is-lead" : ""}`, left), el("span", "", label), el("b", `is-them${leftBetter === false ? " is-lead" : ""}`, right));
+      return line;
+    };
+    const card = el("div", "duel-vs-card");
+    const h2h = stats.h2h || { matches: 0 };
+    if (h2h.matches) {
+      const myWins = h2h[me()] || 0;
+      const theirWins = h2h[them()] || 0;
+      card.append(row(t("duel.vs.h2h"), String(myWins), String(theirWins), { leftBetter: myWins === theirWins ? null : myWins > theirWins }));
+      const bar = el("div", "duel-vs-bar");
+      const share = myWins + theirWins ? myWins / (myWins + theirWins) : 0.5;
+      bar.append(Object.assign(el("i", "is-you"), { style: `width:${share * 100}%` }), Object.assign(el("i", "is-them"), { style: `width:${(1 - share) * 100}%` }));
+      const pips = el("div", "duel-vs-pips");
+      (h2h.last || []).forEach(who => pips.append(el("i", who === me() ? "is-you" : who === "draw" ? "is-draw" : "is-them", who === me() ? t("duel.vs.w") : who === "draw" ? t("duel.vs.d") : t("duel.vs.l"))));
+      card.append(bar, pips);
+    } else card.append(el("p", "duel-vs-first", t("duel.vs.firstMatch")));
+    if (mine.matches && theirs.matches) card.append(row(t("duel.vs.avg"), num(mine.avg), num(theirs.avg), { leftBetter: mine.avg === theirs.avg ? null : mine.avg > theirs.avg }));
+    if (mine.bestStyle || theirs.bestStyle) card.append(row(t("duel.vs.bestRound"), mine.bestStyle ? styleName(mine.bestStyle) : "–", theirs.bestStyle ? styleName(theirs.bestStyle) : "–"));
+    const first = el("div", "duel-vs-next");
+    first.append(el("span", "", `${t("duel.roundOf", { n: 1, total: DUEL_ROUNDS.length })} · ${styleName(DUEL_ROUNDS[0])}`), el("b", "", (s.firstPicker || "a") === me() ? t("duel.vs.youPick") : t("duel.vs.theyPick", { name: nameOf(s.firstPicker || "a") })));
+    const ready = s.ready?.[me()];
+    const go = button(ready ? t("duel.waitingNext", { name: nameOf(them()) }) : t("duel.vs.ready"), "duel-go", () => { sounds.playClick(); move({ type: "ready" }); });
+    go.disabled = Boolean(ready);
+    const clock = el("span", "duel-vs-clock");
+    card.append(first, go, clock);
+    versus.node.replaceChildren(
+      el("div", "duel-vs-half is-you"), el("div", "duel-vs-half is-them"), el("div", "duel-vs-slash"),
+      plate(me(), mine), plate(them(), theirs), el("div", "duel-vs-big", "VS"), card
+    );
+    versusClock(s);
+  }
+  function versusClock(s) {
+    const clock = versus?.node.querySelector(".duel-vs-clock");
+    if (!clock) return;
+    clock.textContent = t("duel.vs.startsIn", { n: Math.max(0, Math.ceil((s.deadline - serverNow()) / 1000)) });
+  }
+  // The match has moved on: the halves slide apart, and round 1 is behind them.
+  function leaveVersus() {
+    if (!versus || versus.node.classList.contains("is-out")) return;
+    const node = versus.node;
+    node.classList.remove("is-in");
+    node.classList.add("is-out");
+    setTimeout(() => node.remove(), 800);
+  }
+
   // How long you have: a pixel clock and the seconds (Bid It: a turn to bid, then naming).
   function timeChip(style) {
     const chip = el("span", "duel-time");
@@ -32614,8 +32942,10 @@ function createDuel({ globe, onExit, onSignIn }) {
     panel.replaceChildren(...parts);
   }
 
-  // After the match: who won, the final lanes, and now (only now) every round: the
-  // winner's points in their colour, the other's dimmed, and one line on why.
+  // After the match, a screen of its own in two pages (18 November 2026, the standard of the
+  // end of the day): first the finale, both tents with the winner raised, the margin, the
+  // lanes, a bar per round in the colour of whoever won it (only now), and SHARE; then every
+  // round with one line on what happened. HOME and NEW MATCH under both.
   function renderDone() {
     const s = state();
     globe.setClickable(false);
@@ -32624,12 +32954,36 @@ function createDuel({ globe, onExit, onSignIn }) {
     if (s.left) winner = OTHER[s.left];
     else if (s.totals.a !== s.totals.b) winner = s.totals.a > s.totals.b ? "a" : "b";
     else if (s.wins.a !== s.wins.b) winner = s.wins.a > s.wins.b ? "a" : "b";
+    const gap = Math.abs(s.totals[me()] - s.totals[them()]);
     const title = s.left ? (s.left === me() ? t("duel.youLeft") : t("duel.theyLeft", { name: nameOf(s.left) }))
-      : winner === me() ? t("duel.youWonMatch") : winner ? t("duel.theyWonMatch", { name: nameOf(winner) }) : t("duel.drawMatch");
-    const score = el("div", "duel-final");
-    score.append(el("strong", "is-you", num(s.totals[me()])), el("span", "", "–"), el("strong", "is-them", num(s.totals[them()])));
+      : winner === me() ? t("duel.youWinBy", { n: num(gap) }) : winner ? t("duel.theyWinBy", { name: nameOf(winner), n: num(gap) }) : t("duel.drawMatch");
+    const played = s.rounds.filter(round => round?.result);
+    const won = played.filter(round => round.result.winner === me()).length;
+
+    // Page 1: the finale.
+    const podium = el("div", "duel-podium");
+    const side = who => {
+      const box = el("div", `duel-podium-side ${who === me() ? "is-you" : "is-them"}${winner === who ? " is-winner" : ""}`);
+      const ava = el("span", "duel-ava is-big");
+      ava.append(tentOf(who));
+      box.append(el("span", "duel-crown", winner === who ? "♛" : ""), ava, el("span", "duel-player-name", who === me() ? t("duel.you") : nameOf(who)), el("strong", "duel-podium-score", num(s.totals[who])));
+      return box;
+    };
+    podium.append(side(me()), el("span", "duel-vs", "VS"), side(them()));
     const lanes = el("div", "duel-lanes is-final");
     lanes.append(...createLanes(s.totals));
+    const bars = el("div", "duel-round-bars");
+    played.forEach(round => bars.append(el("i", round.result.winner === me() ? "is-you" : round.result.winner ? "is-them" : "is-draw")));
+    const pages = el("div", "duel-pages");
+    const first = el("section", "duel-page");
+    const toRounds = button(t("duel.roundsNext"), "duel-link", () => pages.scrollTo({ left: pages.clientWidth, behavior: "smooth" }));
+    const note = el("p", "duel-fine");
+    note.append(t("duel.wonRounds", { n: won, total: played.length }), " · ", toRounds);
+    first.append(el("span", "duel-done-chip", t("duel.matchOver")), podium, el("h2", "duel-title duel-done-title", title), lanes, bars, note,
+      button(t("duel.shareResult"), "duel-go", shareResult));
+
+    // Page 2: every round.
+    const second = el("section", "duel-page");
     const table = el("div", "duel-table");
     const legend = el("div", "duel-row is-head");
     legend.append(el("span", "duel-kicker", t("duel.roundByRound")), el("span", "duel-kicker is-you", t("duel.you")), el("span", "duel-kicker is-them", nameOf(them())));
@@ -32639,15 +32993,36 @@ function createDuel({ globe, onExit, onSignIn }) {
       const r = round.result;
       const row = el("div", "duel-row");
       const what = el("span", "duel-row-what");
-      what.append(el("b", "", `${index + 1}`), el("span", "", styleName(round.style)), el("small", "", `${categoryName(round.category)} · ${detail(round, r[me()], me())}`));
+      what.append(el("b", "", `${index + 1}`), el("span", "", styleName(round.style)),
+        el("small", "", `${categoryName(round.category)} · ${t("duel.you")}: ${detail(round, r[me()], me())} · ${nameOf(them())}: ${detail(round, r[them()], them())}`));
       row.append(what,
         el("strong", `is-you${r.winner === me() ? " is-win" : ""}${r[me()].points < 0 ? " is-negative" : ""}`, num(r[me()].points)),
         el("strong", `is-them${r.winner === them() ? " is-win" : ""}${r[them()].points < 0 ? " is-negative" : ""}`, num(r[them()].points)));
       table.append(row);
     });
+    second.append(table);
+    pages.append(first, second);
+
+    const dots = el("div", "duel-dots-pages");
+    dots.append(el("i", "is-on"), el("i"));
+    pages.addEventListener("scroll", () => {
+      const onSecond = pages.scrollLeft > pages.clientWidth / 2;
+      dots.children[0].classList.toggle("is-on", !onSecond);
+      dots.children[1].classList.toggle("is-on", onSecond);
+    }, { passive: true });
     const actions = el("div", "duel-actions");
-    actions.append(button(t("duel.menu"), "duel-go is-small is-ghost", () => { forget(); hide(); }), button(t("duel.newMatch"), "duel-go is-small", () => { forget(); send("create"); }));
-    panel.replaceChildren(head(t("duel.final"), title), score, lanes, table, actions);
+    actions.append(button(t("duel.menu"), "duel-go is-small is-ghost", () => { forget(); hide(); }), button(t("duel.newMatch"), "duel-go is-small is-ghost", () => { forget(); send("create"); }));
+    panel.replaceChildren(pages, dots, actions);
+  }
+
+  // The match in a few lines to send a friend: the score, and a square per round in the
+  // colour of who won it (🟨 you, 🟪 them, ⬜ a draw).
+  async function shareResult() {
+    const s = state();
+    const squares = s.rounds.filter(round => round?.result).map(round => round.result.winner === me() ? "🟨" : round.result.winner ? "🟪" : "⬜").join("");
+    const text = [`Expedition 1v1 · ${num(s.totals[me()])}–${num(s.totals[them()])} vs ${nameOf(them())}`, squares].join("\n");
+    if (navigator.share && matchMedia("(hover: none)").matches) { navigator.share({ text }).catch(() => {}); return; }
+    try { await navigator.clipboard.writeText(text); showToastNotice(t("duel.resultCopied")); } catch { prompt(t("duel.shareResult"), text); }
   }
 
   // -------------------------------------------------------------------------
@@ -36414,8 +36789,14 @@ function showFinalModal() {
   const words = applyJourneyWords();
   setText("modalSubtext", t("end.subtext", { unit: words.unit, max: getMaxScore(activeMode).toLocaleString(locale()), perfect, total: plan.length }));
 
+  // The screen is shown first, so the journey can take its size from it: on a phone it
+  // stands up and fills page 1 (the band is the whole box), on a computer it's the wide scene.
+  document.getElementById("victoryModal").dataset.mode = activeMode;
+  document.getElementById("victoryModal").classList.remove("hidden");
+  document.getElementById("endPages").scrollLeft = 0;
+  const onPhone = window.matchMedia("(max-width: 760px)").matches;
   // The day's journey, round by round in each round's colour.
-  endClimb = journeyIn(endClimb, "endClimb");
+  endClimb = journeyIn(endClimb, "endClimb", { tall: onPhone ? { top: 0.05, bottom: 0.96 } : null });
   const stretches = getStretches(dayScore);
   // Played once, then it stays at the day's total.
   endClimb.draw(0, { stretches });
@@ -36437,11 +36818,22 @@ function showFinalModal() {
   setText("endWorldText", t("end.world", { better: Math.max(0, Math.round(100 - topPercent)), players: stats.players.toLocaleString(locale()), average: stats.averageScore.toLocaleString(locale()), unit: words.unit }));
   document.getElementById("endDistribution").replaceChildren(createDistributionChart({ stats, completed: true, score: dayScore.total }));
 
-  // More to play: the earlier days not finished yet.
+  // More to play: the earlier days not finished yet, on the ARCHIVE button.
   const unplayed = getAllPuzzleDays().filter(date => date <= today && date !== activeDate && (record => !record.completed && !record.noGame)(getDayRecord(date, activeMode))).length;
-  setText("endArchiveTitle", unplayed ? t("end.moreDays", { n: unplayed }) : t("end.allPlayed"));
-  // Phones: back to the first page (the result) every time.
-  document.getElementById("endPages").scrollLeft = 0;
+  setText("endArchiveButton", unplayed ? t("end.archiveCount", { n: unplayed }) : t("menu.archive"));
+  // The squares SHARE sends, one per round: green perfect, gold some points, red none.
+  document.getElementById("endSquares").replaceChildren(...dayScore.rounds.map((round, index) => Object.assign(document.createElement("span"), {
+    className: round.isPerfect ? "is-perfect" : round.score > 0 ? "is-partial" : "is-zero",
+    textContent: String(index + 1)
+  })));
+  // When the next day opens (today's game only; days change at midnight UTC, like `today`).
+  const nextDay = document.getElementById("endNextDay");
+  nextDay.hidden = activeDate !== today;
+  if (activeDate === today) {
+    const now = new Date();
+    const left = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1) - now.getTime();
+    nextDay.textContent = t("end.nextDay", { h: Math.floor(left / 3600000), m: Math.floor(left / 60000) % 60 });
+  }
 
   const breakdown = document.getElementById("modalBreakdown");
   breakdown.replaceChildren(...plan.map((round, index) => {
@@ -36466,8 +36858,6 @@ function showFinalModal() {
     item.appendChild(row);
     return item;
   }));
-  document.getElementById("victoryModal").dataset.mode = activeMode;
-  document.getElementById("victoryModal").classList.remove("hidden");
 }
 
 // Spoiler-free share text: the score and one square per round.
@@ -37503,11 +37893,6 @@ document.addEventListener("keydown", event => {
     hideRoundIntro();
   }
 }, true);
-document.getElementById("reviewRoundsButton").addEventListener("click", () => {
-  sounds.playClick();
-  { endSkip(); document.getElementById("victoryModal").classList.add("hidden"); }
-  goToRound(0);
-});
 
 // (The same switch as in Settings, and remembered: setSound.)
 document.getElementById("soundToggle").addEventListener("click", () => setSound(!sounds.enabled));
