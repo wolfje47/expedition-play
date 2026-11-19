@@ -4757,6 +4757,82 @@ h1, h2, h3 { font-weight: normal; }
   .daily-text strong { font-size: 10px; }
 }
 
+/* ---------- Party: 3 or 4 players (19 November 2026) ----------
+   The same screens as 1v1, for more players. Every player has their own colour (`--me`, set
+   by duel-view.js: you gold, the others purple, cyan and coral). The top bar keeps two lanes
+   (you and your rival: the number 1, or the number 2 if you lead) with everyone's place
+   under it. A round's result has a column per player (2×2 on a phone with four). */
+.duel-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.duel-cols.is-party[data-n="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.duel-cols.is-party .duel-points strong { font-size: 20px; }
+.duel-side { --me: var(--duel); }
+.duel-side[data-who="them"] .duel-kicker { color: var(--me); }
+.duel-side.is-winner { border-color: var(--me); }
+.duel-lane-place { color: var(--muted); font: 7px var(--font-display); letter-spacing: var(--ls-pixel); }
+.duel-lock.is-gone { border-color: var(--danger); color: var(--danger); }
+.duel-places { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.duel-place { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px 2px 3px; border: 1px solid color-mix(in srgb, var(--me) 45%, transparent); border-radius: 999px; color: var(--text); font: 11px var(--font-body); }
+.duel-place b { display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--me); color: #04060d; font: 700 10px var(--font-mono); }
+.duel-place.is-you { border-color: var(--me); }
+.duel-place.is-gone { opacity: 0.5; text-decoration: line-through; }
+
+/* The lobby: a seat per player, filling as friends come in. */
+.duel-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.duel-slot { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 8px 10px; border: 2px solid var(--me, var(--glass-line)); border-radius: 12px; background: rgba(255, 255, 255, 0.04); }
+.duel-slot .duel-player-name { overflow: hidden; color: var(--me); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); text-overflow: ellipsis; white-space: nowrap; }
+.duel-slot.is-empty { border-style: dashed; border-color: var(--glass-line); }
+.duel-slot.is-empty .duel-ava { border-style: dashed; border-color: var(--faint); }
+.duel-slot.is-empty .duel-player-name { color: var(--faint); }
+
+/* The versus screen: every explorer in a row (2×2 on a phone with four), the card under. */
+.duel-versus.is-party .duel-party-bg { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 20%, #241a3d, #07060d 70%); }
+.duel-party-title { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 22px); left: 0; right: 0; color: #fff; font: 18px var(--font-display); letter-spacing: var(--ls-pixel); text-align: center; text-shadow: 3px 3px 0 #ff5a5a, -3px -3px 0 #45e3ff; }
+.duel-party-grid { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 70px); left: 12px; right: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.duel-party-grid[data-n="3"] > :last-child { grid-column: 1 / -1; justify-self: center; width: calc(50% - 5px); }
+.duel-party-fighter { display: grid; justify-items: center; gap: 6px; padding: 10px 6px; border: 2px solid color-mix(in srgb, var(--me) 60%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--me) 10%, rgba(5, 7, 13, 0.8)); text-align: center; }
+.duel-party-fighter.is-you { border-color: var(--me); box-shadow: 0 0 18px color-mix(in srgb, var(--me) 35%, transparent); }
+.duel-party-fighter .duel-vs-ava canvas { width: 72px; height: 72px; }
+.duel-party-fighter .duel-vs-plate { justify-items: center; }
+.duel-versus.is-party.is-in .duel-party-title { animation: vs-slam 0.45s 0.1s cubic-bezier(0.3, 1.4, 0.5, 1) both; }
+.duel-versus.is-party.is-in .duel-party-fighter { animation: vs-rise 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+.duel-versus.is-party.is-in .duel-party-fighter:nth-child(2) { animation-delay: 0.15s; }
+.duel-versus.is-party.is-in .duel-party-fighter:nth-child(3) { animation-delay: 0.3s; }
+.duel-versus.is-party.is-in .duel-party-fighter:nth-child(4) { animation-delay: 0.45s; }
+.duel-versus.is-party.is-out .duel-party-bg,
+.duel-versus.is-party.is-out .duel-party-title,
+.duel-versus.is-party.is-out .duel-party-grid { animation: vs-fade 0.4s ease-in both; }
+@media (max-height: 700px) {
+  .duel-party-fighter .duel-vs-ava canvas { width: 48px; height: 48px; }
+}
+@media (min-width: 761px) {
+  .duel-party-title { top: 9vh; font-size: 24px; }
+  .duel-party-grid { top: 18vh; left: 50%; right: auto; width: min(900px, calc(100% - 48px)); grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: 16px; transform: translateX(-50%); }
+  .duel-party-grid[data-n="3"] { --n: 3; }
+  .duel-party-grid[data-n="3"] > :last-child { grid-column: auto; width: auto; }
+  .duel-party-fighter { padding: 18px 10px; }
+  .duel-party-fighter .duel-vs-ava canvas { width: 96px; height: 96px; }
+  .duel-versus.is-party .duel-vs-card { left: 50%; right: auto; width: min(520px, calc(100% - 48px)); transform: translateX(-50%); }
+}
+
+/* The end: everyone on the podium by place (the winner raised), and a column each per round. */
+.duel-podium.is-party { grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 6px; }
+.duel-podium.is-party[data-n="4"] { --n: 4; }
+.duel-podium.is-party .duel-podium-side { min-width: 0; }
+.duel-podium.is-party .duel-podium-side[data-place="1"] { transform: translateY(-14px); }
+.duel-podium.is-party .duel-podium-side[data-place="2"] { transform: translateY(-6px); }
+.duel-podium.is-party .duel-crown { font-size: 9px; letter-spacing: var(--ls-pixel); }
+.duel-podium.is-party .duel-podium-side.is-winner .duel-crown { font-size: 16px; }
+.duel-podium.is-party .duel-player-name { overflow: hidden; max-width: 100%; text-overflow: ellipsis; white-space: nowrap; }
+.duel-podium.is-party .duel-podium-score { font-size: 20px; }
+.duel-podium.is-party[data-n="4"] .duel-ava.is-big { width: 60px; height: 60px; }
+.duel-podium.is-party[data-n="4"] .duel-ava.is-big canvas { width: 52px; height: 52px; }
+.duel-table.is-party .duel-row { grid-template-columns: minmax(0, 1fr) repeat(var(--cols), 52px); }
+.duel-table.is-party .duel-row.is-head .duel-kicker:not(:first-child) { overflow: hidden; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
+.duel-table.is-party .duel-row strong.is-win { color: inherit; }
+/* VERSUS in the menu: DUEL 1V1, PARTY · 3 and PARTY · 4 side by side. */
+.hero-actions.is-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.hero-actions.is-three > * { min-width: 0; padding-left: 6px; padding-right: 6px; text-align: center; }
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -4783,7 +4859,7 @@ h1, h2, h3 { font-weight: normal; }
         </button>
       </div>
       <!-- The bottom: the card for the selected area over a dock of three (19 November 2026):
-           DAILY (both solo quizzes, against the world), VERSUS (live: Duel, and Party to come)
+           DAILY (both solo quizzes, against the world), VERSUS (live: Duel 1v1, Party of 3 or 4)
            and CREW (your friends). -->
       <div class="menu-bottom">
         <div class="menu-hero" id="menuHero">
@@ -4820,6 +4896,8 @@ h1, h2, h3 { font-weight: normal; }
             <div class="hero-actions">
               <button class="play-tile-go" id="heroGo" type="button">▶ PLAY</button>
               <button class="hero-side" id="heroSide" type="button"></button>
+              <!-- VERSUS only: PARTY · 4 (heroSide is PARTY · 3 there). -->
+              <button class="hero-side" id="heroSide2" type="button" hidden></button>
             </div>
           </div>
         </div>
@@ -5887,6 +5965,8 @@ const EN = {
   "menu.versusRibbon": "BETA",
   "menu.duelGoShort": "▶ DUEL 1V1",
   "menu.partySoon": "PARTY · 3–4 · SOON",
+  "menu.party3": "▶ PARTY · 3",
+  "menu.party4": "▶ PARTY · 4",
   "menu.guest": "Guest",
   "menu.noBadge": "NO BADGE YET",
   "menu.mainGame": "MAIN GAME",
@@ -7029,6 +7109,38 @@ const EN = {
   "duel.yourTurnFirst": "Your turn: bid first, or pass.",
   "duel.letThem": "LET {name} NAME THEM",
   "duel.pass": "PASS",
+  // Party: 3 or 4 players (19 November 2026)
+  "duel.party.matchOver": "PARTY · {n} · MATCH OVER",
+  "duel.party.signInTitle": "Sign in to play your friends",
+  "duel.party.signInText": "A Party is live: everyone plays the same questions at the same time. Everyone needs to be signed in.",
+  "duel.party.label": "PARTY · {n}",
+  "duel.party.startTitle": "A Party of {n}, live",
+  "duel.party.startText": ({ n }) => `Make a match and send the link to ${n - 1} friends, or type the code you were sent.`,
+  "duel.party.create": "▶ MAKE A PARTY OF {n}",
+  "duel.party.rules": "Five rounds, everyone against everyone, on the same questions and the same clock. Whoever is last picks the next category. The top bar races you against the number 1 (or the number 2 if you lead).",
+  "duel.party.shareText": "Join my Expedition Party of {n}!",
+  "duel.party.open": "Open seat",
+  "duel.party.waitingTitle": ({ n }) => n === 1 ? "Waiting for 1 more player" : `Waiting for ${n} more players`,
+  "duel.party.waitingText": "{have} of {n} in. Send the code or the link; the match starts when every seat is taken.",
+  "duel.party.startNow": "▶ START WITH {n}",
+  "duel.party.startAt": "With {n} in, you can start without waiting for the last seat.",
+  "duel.party.waitingOthers": "Waiting for the others…",
+  "duel.party.lockedWait": ({ n }) => n === 1 ? "Locked in. Waiting for 1 more player…" : `Locked in. Waiting for ${n} more players…`,
+  "duel.party.allLocked": "Everyone's locked in.",
+  "duel.party.behind": "{place} · {n} BEHIND {name}",
+  "duel.party.left": "LEFT",
+  "duel.party.out": "Out: {names}",
+  "duel.party.youreOut": "You passed: you're out of this auction.",
+  "duel.party.passOut": "PASS (YOU'RE OUT)",
+  "duel.party.bids": "Bids: {list}",
+  "duel.party.record": "{n} PARTIES · {w} WON",
+  "duel.party.avg": "AVG {n}",
+  "duel.party.howItWorks": "Everyone against everyone. Whoever is last picks the next category.",
+  "duel.party.youFinish": "You finish {place} of {n}",
+  "duel.place.1": "1ST",
+  "duel.place.2": "2ND",
+  "duel.place.3": "3RD",
+  "duel.place.4": "4TH",
   "duel.nameHint": "Type a country or click it on the globe. One wrong name ends your turn.",
   "duel.paintReveal": "Here come the countries…",
   "duel.paintedCountries": "countries painted"
@@ -7069,6 +7181,8 @@ const NL = {
   "menu.versusRibbon": "BETA",
   "menu.duelGoShort": "▶ DUEL 1V1",
   "menu.partySoon": "PARTY · 3–4 · BINNENKORT",
+  "menu.party3": "▶ PARTY · 3",
+  "menu.party4": "▶ PARTY · 4",
   "menu.guest": "Gast",
   "menu.noBadge": "NOG GEEN BADGE",
   "menu.mainGame": "HOOFDSPEL",
@@ -8264,6 +8378,38 @@ const NL = {
   "duel.yourTurnFirst": "Jouw beurt: bied als eerste, of pas.",
   "duel.letThem": "LAAT {name} ZE NOEMEN",
   "duel.pass": "PAS",
+  // Party: 3 of 4 spelers (19 november 2026)
+  "duel.party.matchOver": "PARTY · {n} · AFGELOPEN",
+  "duel.party.signInTitle": "Log in om tegen je vrienden te spelen",
+  "duel.party.signInText": "Een Party is live: iedereen speelt dezelfde vragen op hetzelfde moment. Iedereen moet ingelogd zijn.",
+  "duel.party.label": "PARTY · {n}",
+  "duel.party.startTitle": "Een Party van {n}, live",
+  "duel.party.startText": ({ n }) => `Maak een wedstrijd en stuur de link naar ${n - 1} vrienden, of typ de code die je kreeg.`,
+  "duel.party.create": "▶ MAAK EEN PARTY VAN {n}",
+  "duel.party.rules": "Vijf rondes, iedereen tegen iedereen, met dezelfde vragen en dezelfde klok. Wie laatste staat, kiest de volgende categorie. Bovenaan race je tegen de nummer 1 (of de nummer 2 als jij voorstaat).",
+  "duel.party.shareText": "Doe mee met mijn Expedition Party van {n}!",
+  "duel.party.open": "Vrije plek",
+  "duel.party.waitingTitle": ({ n }) => n === 1 ? "Wachten op nog 1 speler" : `Wachten op nog ${n} spelers`,
+  "duel.party.waitingText": "{have} van de {n} zijn er. Stuur de code of de link; de wedstrijd begint als alle plekken bezet zijn.",
+  "duel.party.startNow": "▶ BEGIN MET {n}",
+  "duel.party.startAt": "Met {n} spelers kun je beginnen zonder op de laatste plek te wachten.",
+  "duel.party.waitingOthers": "Wachten op de anderen…",
+  "duel.party.lockedWait": ({ n }) => n === 1 ? "Vastgezet. Wachten op nog 1 speler…" : `Vastgezet. Wachten op nog ${n} spelers…`,
+  "duel.party.allLocked": "Iedereen heeft vastgezet.",
+  "duel.party.behind": "{place} · {n} ACHTER {name}",
+  "duel.party.left": "WEG",
+  "duel.party.out": "Uit: {names}",
+  "duel.party.youreOut": "Je paste: je bent uit deze veiling.",
+  "duel.party.passOut": "PAS (DAN BEN JE UIT)",
+  "duel.party.bids": "Biedingen: {list}",
+  "duel.party.record": "{n} PARTIES · {w} GEWONNEN",
+  "duel.party.avg": "GEM. {n}",
+  "duel.party.howItWorks": "Iedereen tegen iedereen. Wie laatste staat, kiest de volgende categorie.",
+  "duel.party.youFinish": "Je eindigt {place} van {n}",
+  "duel.place.1": "1E",
+  "duel.place.2": "2E",
+  "duel.place.3": "3E",
+  "duel.place.4": "4E",
   "duel.nameHint": "Typ een land of klik het aan op de globe. Eén foute naam en je beurt is voorbij.",
   "duel.paintReveal": "Daar komen de landen…",
   "duel.paintedCountries": "landen gekleurd"
@@ -11591,7 +11737,7 @@ const getGroups = () => call("my_groups");
 const getGroupBoard = (groupId, from, to) => call("group_board", { group_ref: groupId, from_date: from, to_date: to });
 
 // ---------------------------------------------------------------------------
-// 1v1 (docs/1v1-plan.md): the Edge Function `duel` is the referee; a match's changes come
+// 1v1 and Party (docs/1v1-plan.md): the Edge Function `duel` is the referee; a match's changes come
 // in live through Realtime (supabase/duel.sql).
 // ---------------------------------------------------------------------------
 
@@ -11623,10 +11769,12 @@ async function watchDuel(id, onRow) {
 async function findOpenDuel() {
   const supabase = await getClient();
   if (!supabase || !user) return null;
-  const { data } = await supabase.from("duels").select("id, code, player_a, status, state, version")
-    .in("status", ["lobby", "playing"]).order("updated_at", { ascending: false }).limit(1);
-  const row = data?.[0];
-  return row ? { ...row, you: row.player_a === user.id ? "a" : "b" } : null;
+  const { data } = await supabase.from("duels").select("id, code, player_a, player_b, player_c, player_d, status, state, version")
+    .in("status", ["lobby", "playing"]).order("updated_at", { ascending: false }).limit(5);
+  // A Party you left goes on without you: not yours any more.
+  const seatOf = row => ["a", "b", "c", "d"].find(seat => row[`player_${seat}`] === user.id);
+  const row = (data || []).find(item => seatOf(item) && !item.state?.gone?.[seatOf(item)]);
+  return row ? { ...row, you: seatOf(row) } : null;
 }
 
 return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, getAccountUnits, saveUnits, saveBase, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, addToGroup, leaveGroup, getGroups, getGroupBoard, callDuel, watchDuel, findOpenDuel };
@@ -31862,7 +32010,7 @@ return { DUEL_CATEGORIES, CATEGORY_IDS, categoryOf, NO_GUESS };
 
 // ---- duel-rules.js
 __modules["duel-rules.js"] = (() => {
-// The rules of 1v1 (docs/1v1-plan.md), without DOM, network or imports, so the same file
+// The rules of 1v1 and Party (3 or 4 players; docs/1v1-plan.md), without DOM, network or imports, so the same file
 // runs in the browser (to explain a score) and in the Edge Function (to decide it):
 // tools/build-duel-bank.mjs copies it to supabase/functions/duel/. Change it here only.
 
@@ -32002,15 +32150,13 @@ function scoreRoute(graph, start, end, route) {
 // Bid It: both bid at the same time; the higher bid names (a tie goes to the faster bid).
 // ---------------------------------------------------------------------------
 
-// bids: { a: { bid, ms } | null, b: … } → "a", "b" or null (nobody bid).
+// bids: { a: { bid, ms } | null, b: …, c: … } → the seat with the highest bid (a tie goes
+// to the faster bid), or null (nobody bid).
 function bidWinner(bids) {
-  const a = bids.a?.bid >= BID_MIN ? bids.a : null;
-  const b = bids.b?.bid >= BID_MIN ? bids.b : null;
-  if (!a && !b) return null;
-  if (!b) return "a";
-  if (!a) return "b";
-  if (a.bid !== b.bid) return a.bid > b.bid ? "a" : "b";
-  return a.ms <= b.ms ? "a" : "b";
+  const valid = Object.entries(bids).filter(([, entry]) => entry?.bid >= BID_MIN);
+  if (!valid.length) return null;
+  valid.sort(([, x], [, y]) => y.bid - x.bid || x.ms - y.ms);
+  return valid[0][0];
 }
 
 // The bidder's points before speed: 100 × bid if they named them all, otherwise damage,
@@ -32048,10 +32194,69 @@ function picker(index, totals = { a: 0, b: 0 }, coin = 0, first = "a") {
 // Round winner: more points wins; equal points (above 0), the faster lock-in wins; else a
 // draw (null).
 function roundWinner(a, b) {
-  if (a.points !== b.points) return a.points > b.points ? "a" : "b";
-  if (a.points <= 0) return null; // nobody scored: speed doesn't win it
-  if (a.ms !== b.ms) return a.ms < b.ms ? "a" : "b";
-  return null;
+  return roundWinnerOf({ a, b });
+}
+// The same for any number of players: results is { seat: { points, ms } }.
+function roundWinnerOf(results) {
+  const entries = Object.entries(results);
+  const top = Math.max(...entries.map(([, entry]) => entry.points));
+  const best = entries.filter(([, entry]) => entry.points === top);
+  if (best.length === 1) return best[0][0];
+  if (top <= 0) return null; // nobody scored: speed doesn't win it
+  const fastest = Math.min(...best.map(([, entry]) => entry.ms));
+  const quick = best.filter(([, entry]) => entry.ms === fastest);
+  return quick.length === 1 ? quick[0][0] : null;
+}
+
+// ---------------------------------------------------------------------------
+// Party (19 November 2026): 3 or 4 players, everyone against everyone, on the same rounds.
+// Seats are "a", "b", "c", "d"; a match plays `state.seats` (1v1: a and b).
+// ---------------------------------------------------------------------------
+const SEATS = ["a", "b", "c", "d"];
+const PARTY_SIZES = [2, 3, 4];
+const PARTY_MIN_START = 3; // a Party of 4 can start once 3 are in
+const seatsOf = state => state?.seats || SEATS.slice(0, state?.size || 2);
+// Seats still playing (a player who leaves a Party is out; their score stays as it was).
+const activeSeats = state => seatsOf(state).filter(seat => !state?.gone?.[seat]);
+
+// The standings: more points first, then more rounds won; whoever left goes below everyone
+// still playing. Equal on both shares a place. → [{ seat, place, total }]
+function standings(state) {
+  const seats = seatsOf(state);
+  const key = seat => [state.gone?.[seat] ? 1 : 0, -(state.totals?.[seat] || 0), -(state.wins?.[seat] || 0)];
+  const order = [...seats].sort((x, y) => {
+    const kx = key(x), ky = key(y);
+    for (let i = 0; i < kx.length; i++) if (kx[i] !== ky[i]) return kx[i] - ky[i];
+    return seats.indexOf(x) - seats.indexOf(y);
+  });
+  const list = [];
+  order.forEach((seat, index) => {
+    const previous = list[index - 1];
+    const same = previous && key(previous.seat).join() === key(seat).join();
+    list.push({ seat, place: same ? previous.place : index + 1, total: state.totals?.[seat] || 0 });
+  });
+  return list;
+}
+// Who you race against at the top of the screen: the number 1, or the number 2 if you're
+// the number 1 (the first in the standings who isn't you).
+const rivalOf = (state, you) => standings(state).find(entry => entry.seat !== you)?.seat || null;
+
+// Who picks the category of round `index` in a Party: round 1 a random player (the coin,
+// `first`), then whoever is last. Several last (all on 0 after round 1, say): the one of them
+// who has picked the fewest times, and never the same player twice in a row if another can.
+function partyPicker(index, state, random, first) {
+  const active = activeSeats(state);
+  if (index === 0 && first && active.includes(first)) return first;
+  const low = Math.min(...active.map(seat => state.totals?.[seat] || 0));
+  let pool = active.filter(seat => (state.totals?.[seat] || 0) === low);
+  if (pool.length > 1) {
+    const picked = seat => (state.rounds || []).filter(round => round?.pickedBy === seat).length;
+    const fewest = Math.min(...pool.map(picked));
+    pool = pool.filter(seat => picked(seat) === fewest);
+  }
+  const previous = state.rounds?.[index - 1]?.pickedBy;
+  if (pool.length > 1 && pool.includes(previous)) pool = pool.filter(seat => seat !== previous);
+  return pool[Math.floor(random() * pool.length)];
 }
 
 // A small seeded random (mulberry32), so the server can pick offers reproducibly.
@@ -32076,13 +32281,14 @@ function offerCategories(all, used, random, count = DUEL_CATEGORY_OFFER) {
   return open.slice(0, count);
 }
 
-return { DUEL_ROUNDS, DUEL_TIMES, roundTime, DUEL_MAX_ROUND, DUEL_CATEGORY_OFFER, BID_MIN, BID_MAX, BID_POINTS, ROUTE_STEP_PENALTY, GRACE_MS, DUEL_MAX_SPEED_BONUS, speedMultiplier, withSpeed, PIN_RADII, kmBetween, scorePin, GUESS_COST_PER_COUNTRY, countriesBetween, scoreGuess, OVERSEAS_BORDERS, routeGraph, shortestRoute, canStep, scoreRoute, bidWinner, scoreBid, scorePaint, picker, roundWinner, seededRandom, offerCategories };
+return { DUEL_ROUNDS, DUEL_TIMES, roundTime, DUEL_MAX_ROUND, DUEL_CATEGORY_OFFER, BID_MIN, BID_MAX, BID_POINTS, ROUTE_STEP_PENALTY, GRACE_MS, DUEL_MAX_SPEED_BONUS, speedMultiplier, withSpeed, PIN_RADII, kmBetween, scorePin, GUESS_COST_PER_COUNTRY, countriesBetween, scoreGuess, OVERSEAS_BORDERS, routeGraph, shortestRoute, canStep, scoreRoute, bidWinner, scoreBid, scorePaint, picker, roundWinner, roundWinnerOf, SEATS, PARTY_SIZES, PARTY_MIN_START, seatsOf, activeSeats, standings, rivalOf, partyPicker, seededRandom, offerCategories };
 })();
 
 // ---- duel-view.js
 __modules["duel-view.js"] = (() => {
-// 1v1 in the browser (docs/1v1-plan.md): the screen (#duelView) over the globe, from the
-// lobby to the final score. The referee is the Edge Function `duel` (auth.js callDuel);
+// 1v1 and Party (3–4 players) in the browser (docs/1v1-plan.md): the screen (#duelView)
+// over the globe, from the lobby to the final score. In a Party the top bar races you
+// against the number 1 (or the number 2 if you're the number 1), with everyone's place under it. The referee is the Edge Function `duel` (auth.js callDuel);
 // every change to the match comes in live (watchDuel) and, as a fallback, every few seconds
 // (sync). This file only shows the match and sends moves: it never knows an answer before
 // the referee reveals it.
@@ -32091,7 +32297,7 @@ const { COUNTRIES, TERRITORIES } = __modules["countries.js"];
 const { BORDER_KM } = __modules["border-data.js"];
 const { formatValue, getStat } = __modules["extremes.js"];
 const { DUEL_CATEGORIES } = __modules["duel-categories.js"];
-const { BID_MAX, BID_MIN, BID_POINTS, DUEL_MAX_ROUND, DUEL_MAX_SPEED_BONUS, DUEL_ROUNDS, DUEL_TIMES, GRACE_MS, GUESS_COST_PER_COUNTRY, PIN_RADII, ROUTE_STEP_PENALTY, canStep, roundTime, routeGraph } = __modules["duel-rules.js"];
+const { BID_MAX, BID_MIN, BID_POINTS, DUEL_MAX_ROUND, DUEL_MAX_SPEED_BONUS, DUEL_ROUNDS, DUEL_TIMES, GRACE_MS, GUESS_COST_PER_COUNTRY, PIN_RADII, ROUTE_STEP_PENALTY, PARTY_MIN_START, activeSeats, canStep, rivalOf, roundTime, routeGraph, seatsOf, standings } = __modules["duel-rules.js"];
 const { createTentCanvas } = __modules["tents.js"];
 const { getTentLook } = __modules["base.js"];
 const { callDuel, findOpenDuel, getUser, isConfigured, watchDuel } = __modules["auth.js"];
@@ -32106,6 +32312,8 @@ const CODE_KEY = "daily-geography:duel-code:v1"; // an invite code waiting for y
 const COLORS = { you: "#ffd45c", them: "#c58cff", answer: "#5cd26a", wrong: "#ff6b7d", missed: "#ff9f43", neutral: "#45e3ff" };
 const hex = color => parseInt(color.slice(1), 16);
 const OTHER = { a: "b", b: "a" };
+// The other players' colours in a Party, in seat order (in a 1v1 the opponent is the first).
+const PARTY_COLORS = ["#c58cff", "#45e3ff", "#ff8a5c"];
 const SYNC_MS = 3000;
 
 const el = (tag, className, text) => {
@@ -32172,12 +32380,25 @@ function createDuel({ globe, onExit, onSignIn }) {
   let frame = 0;
   let readyFor = "";
   let entry = null; // the country box kept across renders: { key, node, onCountry, field }
+  let startSize = 2; // the match you'll make: 2 (1v1), 3 or 4 (Party), from the menu
 
   const serverNow = () => Date.now() + offset;
   const state = () => match?.state;
   const me = () => match?.you;
-  const them = () => OTHER[match?.you];
+  const seats = () => seatsOf(state());
+  const others = () => seats().filter(seat => seat !== me());
+  const isParty = () => seats().length > 2;
+  // Your rival: in a 1v1 the other player; in a Party the number 1, or the number 2 if you
+  // lead (`totals` lets the top bar hold back points still being revealed).
+  const them = (totals = state()?.totals) => (isParty() ? rivalOf({ ...state(), totals }, me()) : OTHER[me()]) || others()[0];
+  const colorOf = who => who === me() ? COLORS.you : PARTY_COLORS[others().indexOf(who)] || COLORS.them;
   const nameOf = who => state()?.players?.[who]?.name || t("duel.opponent");
+  const label = who => who === me() ? t("duel.you") : nameOf(who);
+  const modeLabel = size => (size || seats().length) > 2 ? t("duel.party.label", { n: size || seats().length }) : "1V1";
+  // Waiting on the others: by name in a 1v1, as "the others" in a Party.
+  const waitingLabel = () => isParty() ? t("duel.party.waitingOthers") : t("duel.waitingNext", { name: nameOf(them()) });
+  const placeOf = who => standings(state()).find(entry => entry.seat === who)?.place || 1;
+  const placeText = n => t(`duel.place.${Math.min(4, n)}`);
 
   // -------------------------------------------------------------------------
   // Talking to the referee
@@ -32230,7 +32451,8 @@ function createDuel({ globe, onExit, onSignIn }) {
   // -------------------------------------------------------------------------
   // Opening and closing
   // -------------------------------------------------------------------------
-  async function show() {
+  async function show({ size } = {}) {
+    if (size) startSize = size;
     open = true;
     document.getElementById("mainMenu").classList.add("hidden");
     view.classList.remove("hidden");
@@ -32478,13 +32700,16 @@ function createDuel({ globe, onExit, onSignIn }) {
   }
   const MATCH_MAX = DUEL_ROUNDS.length * DUEL_MAX_ROUND * (1 + DUEL_MAX_SPEED_BONUS);
   const ZERO_AT = 8; // % of the track before the zero line
-  function createLanes(totals, { locks = {} } = {}) {
-    return [me(), them()].map(who => {
+  function createLanes(totals, { locks = {}, who: list = [me(), them(totals)] } = {}) {
+    const lanes = list.map(who => {
       const lane = el("div", `duel-lane ${who === me() ? "is-you" : "is-them"}`);
+      lane.style.setProperty("--me", colorOf(who));
       const ava = el("span", "duel-ava");
       ava.append(tentOf(who));
-      const name = el("span", "duel-player-name", who === me() ? t("duel.you") : nameOf(who));
+      const name = el("span", "duel-player-name", label(who));
+      if (isParty() && who !== me()) name.append(el("span", "duel-lane-place", placeText(placeIn(totals, who))));
       if (locks[who]) name.append(el("span", "duel-lock", t("duel.locked")));
+      if (state()?.gone?.[who]) name.append(el("span", "duel-lock is-gone", t("duel.party.left")));
       const total = totals[who] || 0;
       const track = el("div", "duel-track");
       const at = total >= 0 ? ZERO_AT + (100 - ZERO_AT) * Math.min(1, total / MATCH_MAX) : ZERO_AT * Math.max(0, 1 + total / 1000);
@@ -32499,6 +32724,20 @@ function createDuel({ globe, onExit, onSignIn }) {
       lane.append(ava, body, el("strong", `duel-player-score${total < 0 ? " is-negative" : ""}`, num(total)));
       return lane;
     });
+    return lanes;
+  }
+  // A Party's place of a player on these totals.
+  const placeIn = (totals, who) => standings({ ...state(), totals }).find(entry => entry.seat === who)?.place || 1;
+  // Under the two lanes in a Party: everyone's place, in order (1 ANA · 2 YOU · 3 BEN).
+  function createPlaces(totals) {
+    const row = el("div", "duel-places");
+    standings({ ...state(), totals }).forEach(({ seat, place }) => {
+      const item = el("span", `duel-place${seat === me() ? " is-you" : ""}${state().gone?.[seat] ? " is-gone" : ""}`);
+      item.style.setProperty("--me", colorOf(seat));
+      item.append(el("b", "", String(place)), el("span", "", label(seat)));
+      row.append(item);
+    });
+    return row;
   }
   function renderTop() {
     const s = state();
@@ -32506,16 +32745,17 @@ function createDuel({ globe, onExit, onSignIn }) {
     if (top.hidden) return;
     // While Blind Paint is still lighting up, the scores wait too.
     const held = paintRevealing() ? s.rounds[s.round].result : null;
-    const totals = { [me()]: s.totals[me()] - (held?.[me()].points || 0), [them()]: s.totals[them()] - (held?.[them()].points || 0) };
-    const locks = {
-      [me()]: (s.phase === "play" && s.locked?.[me()]) || (s.phase === "intro" && s.ready?.[me()]),
-      [them()]: (s.phase === "play" && s.locked?.[them()]) || (s.phase === "intro" && s.ready?.[them()])
-    };
-    document.getElementById("duelLanes").replaceChildren(...createLanes(totals, { locks }));
+    const totals = Object.fromEntries(seats().map(who => [who, s.totals[who] - (held?.[who]?.points || 0)]));
+    const locks = Object.fromEntries(seats().map(who => [who, (s.phase === "play" && s.locked?.[who]) || (s.phase === "intro" && s.ready?.[who])]));
+    const rival = them(totals);
+    document.getElementById("duelLanes").replaceChildren(...createLanes(totals, { locks }), ...(isParty() ? [createPlaces(totals)] : []));
     document.getElementById("duelRoundLabel").textContent = t("duel.roundShort", { n: s.round + 1, total: DUEL_ROUNDS.length });
-    const gap = totals[me()] - totals[them()];
+    const gap = totals[me()] - totals[rival];
     const lead = document.getElementById("duelLead");
-    lead.textContent = gap > 0 ? t("duel.youLeadBy", { n: num(gap) }) : gap < 0 ? t("duel.theyLeadBy", { name: nameOf(them()), n: num(-gap) }) : t("duel.level");
+    const place = placeIn(totals, me());
+    lead.textContent = gap > 0 ? t("duel.youLeadBy", { n: num(gap) })
+      : gap < 0 ? (isParty() ? t("duel.party.behind", { place: placeText(place), n: num(-gap), name: nameOf(rival) }) : t("duel.theyLeadBy", { name: nameOf(rival), n: num(-gap) }))
+      : t("duel.level");
     lead.title = lead.textContent;
     lead.dataset.who = gap > 0 ? "you" : gap < 0 ? "them" : "";
   }
@@ -32582,7 +32822,7 @@ function createDuel({ globe, onExit, onSignIn }) {
 
   function renderSignedOut() {
     panel.replaceChildren(
-      head("1V1", t("duel.signInTitle"), t(isConfigured ? "duel.signInText" : "duel.notSetUp")),
+      head(modeLabel(startSize), t(startSize > 2 ? "duel.party.signInTitle" : "duel.signInTitle"), t(!isConfigured ? "duel.notSetUp" : startSize > 2 ? "duel.party.signInText" : "duel.signInText")),
       ...(isConfigured ? [button(t("duel.signIn"), "duel-go", onSignIn)] : [])
     );
   }
@@ -32597,12 +32837,13 @@ function createDuel({ globe, onExit, onSignIn }) {
     field.addEventListener("keydown", event => { if (event.key === "Enter") joinIt(); });
     const joinRow = el("div", "duel-join");
     joinRow.append(field, button(t("duel.join"), "duel-go is-small", joinIt));
+    const party = startSize > 2;
     panel.replaceChildren(
-      head("1V1", t("duel.startTitle"), t("duel.startText")),
-      button(t("duel.create"), "duel-go", () => send("create")),
+      head(modeLabel(startSize), party ? t("duel.party.startTitle", { n: startSize }) : t("duel.startTitle"), party ? t("duel.party.startText", { n: startSize }) : t("duel.startText")),
+      button(party ? t("duel.party.create", { n: startSize }) : t("duel.create"), "duel-go", () => send("create", { size: startSize })),
       el("span", "duel-or", t("duel.or")),
       joinRow,
-      el("p", "duel-fine", t("duel.rules"))
+      el("p", "duel-fine", party ? t("duel.party.rules") : t("duel.rules"))
     );
   }
 
@@ -32613,20 +32854,39 @@ function createDuel({ globe, onExit, onSignIn }) {
     return url.toString();
   }
   function renderLobby() {
+    const s = state();
     const link = inviteLink();
     const code = el("div", "duel-code", match.code);
     const actions = el("div", "duel-actions");
     actions.append(button(t("duel.copyLink"), "duel-go is-small", async () => {
       try { await navigator.clipboard.writeText(link); showToastNotice(t("duel.copied")); } catch { prompt(t("duel.copyLink"), link); }
     }));
-    if (navigator.share) actions.append(button(t("duel.share"), "duel-go is-small is-ghost", () => navigator.share({ title: "Expedition 1v1", text: t("duel.shareText"), url: link }).catch(() => {})));
-    panel.replaceChildren(
-      head("1V1", t("duel.waitingTitle"), t("duel.waitingText")),
-      code,
-      actions,
-      el("p", "duel-fine", t("duel.waitingNote")),
-      leaveLink()
-    );
+    if (navigator.share) actions.append(button(t("duel.share"), "duel-go is-small is-ghost", () => navigator.share({ title: `Expedition ${modeLabel()}`, text: isParty() ? t("duel.party.shareText", { n: seats().length }) : t("duel.shareText"), url: link }).catch(() => {})));
+    if (!isParty()) {
+      panel.replaceChildren(head("1V1", t("duel.waitingTitle"), t("duel.waitingText")), code, actions, el("p", "duel-fine", t("duel.waitingNote")), leaveLink());
+      return;
+    }
+    // A Party: the seats, filling as friends come in; the host can start a Party of 4 with 3.
+    const filled = seats().filter(seat => s.players[seat]);
+    const slots = el("div", "duel-slots");
+    seats().forEach(seat => {
+      const player = s.players[seat];
+      const slot = el("div", `duel-slot${player ? "" : " is-empty"}${seat === me() ? " is-you" : ""}`);
+      if (player) {
+        slot.style.setProperty("--me", colorOf(seat));
+        const ava = el("span", "duel-ava");
+        ava.append(tentOf(seat));
+        slot.append(ava, el("span", "duel-player-name", label(seat)));
+      } else slot.append(el("span", "duel-ava"), el("span", "duel-player-name", t("duel.party.open")));
+      slots.append(slot);
+    });
+    const missing = seats().length - filled.length;
+    const parts = [head(modeLabel(), t("duel.party.waitingTitle", { n: missing }), t("duel.party.waitingText", { have: filled.length, n: seats().length })), slots, code, actions];
+    if (me() === "a" && seats().length > PARTY_MIN_START && filled.length >= PARTY_MIN_START) {
+      parts.push(button(t("duel.party.startNow", { n: filled.length }), "duel-go", () => move({ type: "start" })));
+    } else if (me() === "a" && seats().length > PARTY_MIN_START) parts.push(el("p", "duel-fine", t("duel.party.startAt", { n: PARTY_MIN_START })));
+    parts.push(el("p", "duel-fine", t("duel.waitingNote")), leaveLink());
+    panel.replaceChildren(...parts);
   }
 
   function renderPick() {
@@ -32676,6 +32936,10 @@ function createDuel({ globe, onExit, onSignIn }) {
 
   function lockedNote() {
     const s = state();
+    if (isParty()) {
+      const waiting = activeSeats(s).filter(who => !s.locked[who]).length;
+      return el("p", "duel-wait", waiting ? t("duel.party.lockedWait", { n: waiting }) : t("duel.party.allLocked"));
+    }
     return el("p", "duel-wait", s.locked[them()] ? t("duel.bothLocked") : t("duel.lockedWait", { name: nameOf(them()) }));
   }
 
@@ -32794,7 +33058,15 @@ function createDuel({ globe, onExit, onSignIn }) {
     const standing = el("div", "duel-auction");
     standing.append(el("span", "duel-kicker", t("duel.highest")), el("strong", "duel-count", high ? String(high) : "–"),
       el("small", "duel-detail", leader ? (leader === me() ? t("duel.youLead") : t("duel.theyLead", { name: nameOf(leader) })) : t("duel.noBidYet")));
+    // A Party: who's out of the auction (they passed after a bid).
+    const out = (s.bid.out || []).filter(who => !s.gone?.[who]);
+    if (isParty() && out.length) standing.append(el("small", "duel-detail", t("duel.party.out", { names: out.map(label).join(", ") })));
     parts.push(standing);
+    if (isParty() && out.includes(me())) {
+      parts.push(el("p", "duel-wait", t("duel.party.youreOut")));
+      panel.replaceChildren(...parts);
+      return;
+    }
     if (!mine) {
       parts.push(el("p", "duel-wait", t("duel.theirTurn", { name: nameOf(turn) })));
       panel.replaceChildren(...parts);
@@ -32809,7 +33081,7 @@ function createDuel({ globe, onExit, onSignIn }) {
     }
     const go = button(local.bid ? t("duel.bidGo", { n: local.bid }) : t("duel.bidPick"), "duel-go", () => move({ type: "bid", bid: local.bid }));
     go.disabled = !local.bid;
-    const pass = button(leader ? t("duel.letThem", { name: nameOf(leader) }) : t("duel.pass"), "duel-go is-small is-ghost", () => move({ type: "pass" }));
+    const pass = button(leader ? (isParty() ? t("duel.party.passOut") : t("duel.letThem", { name: nameOf(leader) })) : t("duel.pass"), "duel-go is-small is-ghost", () => move({ type: "pass" }));
     parts.push(el("p", "duel-wait is-turn", leader ? t("duel.yourTurnRaise", { n: high }) : t("duel.yourTurnFirst")), el("p", "duel-hint", t("duel.bidHint")), grid, go, pass);
     panel.replaceChildren(...parts);
   }
@@ -32823,7 +33095,7 @@ function createDuel({ globe, onExit, onSignIn }) {
     picked.dataset.who = round.pickedBy === me() ? "you" : "them";
     picked.append(el("span", "duel-kicker", round.pickedBy === me() ? t("duel.youPicked") : t("duel.theyPicked", { name: nameOf(round.pickedBy) })), el("strong", "", categoryName(round.category)));
     const ready = s.ready[me()];
-    const go = button(ready ? t("duel.waitingNext", { name: nameOf(them()) }) : t("duel.continue"), "duel-go", () => move({ type: "ready" }));
+    const go = button(ready ? waitingLabel() : t("duel.continue"), "duel-go", () => move({ type: "ready" }));
     go.disabled = ready;
     panel.replaceChildren(
       head(roundKicker(), t(`duel.intro.${round.style}`)),
@@ -32849,13 +33121,14 @@ function createDuel({ globe, onExit, onSignIn }) {
     panel.replaceChildren();
     if (!versus || versus.matchId !== match.id) {
       versus?.node.remove();
-      versus = { node: el("div", "duel-versus is-in"), matchId: match.id };
+      versus = { node: el("div", `duel-versus is-in${isParty() ? " is-party" : ""}`), matchId: match.id };
       view.append(versus.node);
       // The entrance plays once; later updates (the other player's READY) just redraw.
       const node = versus.node;
       setTimeout(() => node.classList.replace("is-in", "is-shown"), 1600);
       sounds.playFlyTo?.();
     }
+    if (isParty()) { renderPartyVersus(s); return; }
     const stats = s.versus || { a: { matches: 0 }, b: { matches: 0 }, h2h: { matches: 0, a: 0, b: 0, last: [] } };
     const mine = stats[me()] || { matches: 0 };
     const theirs = stats[them()] || { matches: 0 };
@@ -32895,7 +33168,7 @@ function createDuel({ globe, onExit, onSignIn }) {
     const first = el("div", "duel-vs-next");
     first.append(el("span", "", `${t("duel.roundOf", { n: 1, total: DUEL_ROUNDS.length })} · ${styleName(DUEL_ROUNDS[0])}`), el("b", "", (s.firstPicker || "a") === me() ? t("duel.vs.youPick") : t("duel.vs.theyPick", { name: nameOf(s.firstPicker || "a") })));
     const ready = s.ready?.[me()];
-    const go = button(ready ? t("duel.waitingNext", { name: nameOf(them()) }) : t("duel.vs.ready"), "duel-go", () => { sounds.playClick(); move({ type: "ready" }); });
+    const go = button(ready ? waitingLabel() : t("duel.vs.ready"), "duel-go", () => { sounds.playClick(); move({ type: "ready" }); });
     go.disabled = Boolean(ready);
     const clock = el("span", "duel-vs-clock");
     card.append(first, go, clock);
@@ -32903,6 +33176,37 @@ function createDuel({ globe, onExit, onSignIn }) {
       el("div", "duel-vs-half is-you"), el("div", "duel-vs-half is-them"), el("div", "duel-vs-slash"),
       plate(me(), mine), plate(them(), theirs), el("div", "duel-vs-big", "VS"), card
     );
+    versusClock(s);
+  }
+  // A Party's versus screen: every explorer in a row (2×2 on a phone with four), each with
+  // their record in Parties of this size, then who picks round 1 and READY.
+  function renderPartyVersus(s) {
+    const stats = s.versus || {};
+    const grid = el("div", "duel-party-grid");
+    grid.dataset.n = String(seats().length);
+    seats().forEach(who => {
+      const record = stats[who] || { matches: 0 };
+      const box = el("div", `duel-party-fighter${who === me() ? " is-you" : ""}`);
+      box.style.setProperty("--me", colorOf(who));
+      const ava = el("span", "duel-vs-ava");
+      ava.append(tentOf(who));
+      const text = el("div", "duel-vs-plate");
+      text.append(el("strong", "", label(who)));
+      text.append(el("small", "", record.matches ? t("duel.party.record", { n: num(record.matches), w: num(record.wins) }) : t("duel.vs.new")));
+      if (record.matches) text.append(el("small", "", t("duel.party.avg", { n: num(record.avg) })));
+      if (s.ready?.[who]) text.append(el("small", "duel-vs-ready", t("duel.vs.isReady")));
+      box.append(ava, text);
+      grid.append(box);
+    });
+    const card = el("div", "duel-vs-card");
+    const first = el("div", "duel-vs-next");
+    const picker = s.firstPicker || "a";
+    first.append(el("span", "", `${t("duel.roundOf", { n: 1, total: DUEL_ROUNDS.length })} · ${styleName(DUEL_ROUNDS[0])}`), el("b", "", picker === me() ? t("duel.vs.youPick") : t("duel.vs.theyPick", { name: nameOf(picker) })));
+    const ready = s.ready?.[me()];
+    const go = button(ready ? waitingLabel() : t("duel.vs.ready"), "duel-go", () => { sounds.playClick(); move({ type: "ready" }); });
+    go.disabled = Boolean(ready);
+    card.append(el("p", "duel-vs-first", t("duel.party.howItWorks")), first, go, el("span", "duel-vs-clock"));
+    versus.node.replaceChildren(el("div", "duel-party-bg"), el("div", "duel-party-title", modeLabel()), grid, card);
     versusClock(s);
   }
   function versusClock(s) {
@@ -32987,7 +33291,9 @@ function createDuel({ globe, onExit, onSignIn }) {
     const parts = [
       head(roundKicker(), mine ? t("duel.nameYou", { n: bid }) : t("duel.nameThem", { name: nameOf(bidder), n: bid })),
       questionBlock(round),
-      el("p", "duel-bidline", t("duel.bidsWere", { you: bids[me()] ?? "–", them: bids[them()] ?? "–", name: nameOf(them()) })),
+      el("p", "duel-bidline", isParty()
+        ? t("duel.party.bids", { list: seats().map(who => `${label(who)} ${bids[who] ?? "–"}`).join(" · ") })
+        : t("duel.bidsWere", { you: bids[me()] ?? "–", them: bids[them()] ?? "–", name: nameOf(them()) })),
       el("div", "duel-count", `${named.length} / ${bid}`)
     ];
     const chips = el("div", "duel-chips");
@@ -33003,13 +33309,13 @@ function createDuel({ globe, onExit, onSignIn }) {
   // -------------------------------------------------------------------------
   // The reveal: both answers and the real one.
   // -------------------------------------------------------------------------
-  function pointsLine(entry) {
+  function pointsLine(entry = { points: 0 }) {
     const line = el("div", "duel-points");
     line.append(el("strong", "", num(entry.points)));
     if (entry.base > 0 && entry.points !== entry.base) line.append(el("small", "", t("duel.speed", { base: num(entry.base), x: (entry.points / entry.base).toFixed(2) })));
     return line;
   }
-  function detail(round, entry, who) {
+  function detail(round, entry = {}, who) {
     const text = detailText(round, entry, who);
     return entry?.timedOut ? `${text} · ${t("duel.timedOut")}` : text;
   }
@@ -33062,14 +33368,13 @@ function createDuel({ globe, onExit, onSignIn }) {
   function drawReveal(round) {
     const r = round.result;
     const you = r[me()];
-    const other = r[them()];
     globe.clearMarkers();
     globe.setGuessPath([]);
     if (round.style === "pin") {
       globe.setHighlights([]);
       globe.addMarker(r.answer.lat, r.answer.lon, COLORS.answer, t("duel.answer"), "✓");
       if (you.pin) globe.addMarker(you.pin.lat, you.pin.lon, COLORS.you, nameOf(me()), "1");
-      if (other.pin) globe.addMarker(other.pin.lat, other.pin.lon, COLORS.them, nameOf(them()), "2");
+      others().forEach((who, index) => { const pin = r[who]?.pin; if (pin) globe.addMarker(pin.lat, pin.lon, colorOf(who), nameOf(who), String(index + 2)); });
       if (you.pin) globe.setGuessPath([you.pin, { lat: r.answer.lat, lon: r.answer.lon }]);
       globe.rotateTo(r.answer.lat, r.answer.lon);
     } else if (round.style === "route") {
@@ -33092,7 +33397,7 @@ function createDuel({ globe, onExit, onSignIn }) {
   function paintFills(who) {
     const r = state().rounds[state().round].result;
     const answers = new Set(r.answer.countries);
-    const painted = r[who].countries || [];
+    const painted = r[who]?.countries || [];
     return [
       ...r.answer.countries.filter(iso => !painted.includes(iso)).map(iso => ({ country: COUNTRY.get(iso), color: hex(COLORS.missed), fill: true })),
       ...painted.map(iso => ({ country: COUNTRY.get(iso), color: hex(answers.has(iso) ? COLORS.answer : COLORS.wrong), fill: true }))
@@ -33102,8 +33407,8 @@ function createDuel({ globe, onExit, onSignIn }) {
     const r = round.result;
     const answers = new Set(r.answer.countries);
     const steps = [];
-    for (const who of [me(), them()]) {
-      const painted = r[who].countries || [];
+    for (const who of [me(), ...others()]) {
+      const painted = r[who]?.countries || [];
       painted.forEach((iso, index) => steps.push(() => {
         globe.setHighlights(painted.slice(0, index + 1).map(code => ({ country: COUNTRY.get(code), color: hex(answers.has(code) ? COLORS.answer : COLORS.wrong), fill: true })));
         if (answers.has(iso)) sounds.playGuess(); else sounds.playError();
@@ -33111,7 +33416,7 @@ function createDuel({ globe, onExit, onSignIn }) {
       steps.push(() => {});
     }
     steps.push(() => {
-      paintView = "you";
+      paintView = me();
       globe.setHighlights(paintFills(me()));
       const r = round.result;
       if (r.winner === me()) sounds.playGuess(); else if (r.winner) sounds.playError();
@@ -33144,40 +33449,51 @@ function createDuel({ globe, onExit, onSignIn }) {
       drawReveal(round);
       if (round.style !== "paint") { if (r.winner === me()) sounds.playGuess(); else if (r.winner) sounds.playError(); }
     }
+    // Everyone, best first in a Party (you first in a 1v1).
+    const order = isParty() ? [...seats()].sort((x, y) => (r[y]?.points || 0) - (r[x]?.points || 0)) : [me(), them()];
+    const cols = () => {
+      const box = el("div", `duel-cols${isParty() ? " is-party" : ""}`);
+      box.dataset.n = String(order.length);
+      return box;
+    };
+    const column = (who, className = "duel-side") => {
+      const node = el("div", className);
+      node.dataset.who = who === me() ? "you" : "them";
+      node.style.setProperty("--me", colorOf(who));
+      return node;
+    };
     // Blind Paint: first only how many each of you painted; the rest once the globe is done.
     if (round.style === "paint" && !paintView) {
-      const counts = el("div", "duel-versus");
-      for (const who of [me(), them()]) {
-        const column = el("div", "duel-side");
-        column.dataset.who = who === me() ? "you" : "them";
-        column.append(el("span", "duel-kicker", who === me() ? t("duel.you") : nameOf(who)), el("strong", "duel-count", String((r[who].countries || []).length)), el("small", "duel-detail", t("duel.paintedCountries")));
-        counts.append(column);
+      const counts = cols();
+      for (const who of order) {
+        const side = column(who);
+        side.append(el("span", "duel-kicker", label(who)), el("strong", "duel-count", String((r[who]?.countries || []).length)), el("small", "duel-detail", t("duel.paintedCountries")));
+        counts.append(side);
       }
       panel.replaceChildren(head(roundKicker(), t("duel.paintReveal")), counts);
       return;
     }
     const verdict = r.winner === me() ? t("duel.youWin") : r.winner ? t("duel.theyWin", { name: nameOf(r.winner) }) : t("duel.draw");
-    const columns = el("div", "duel-versus");
-    for (const who of [me(), them()]) {
-      const column = el("div", `duel-side${r.winner === who ? " is-winner" : ""}`);
-      column.dataset.who = who === me() ? "you" : "them";
-      column.append(el("span", "duel-kicker", who === me() ? t("duel.you") : nameOf(who)), pointsLine(r[who]), el("small", "duel-detail", detail(round, r[who], who)));
-      if (round.style === "paint") column.append(el("small", "duel-detail", t("duel.paintCount", { n: (r[who].countries || []).length })));
-      columns.append(column);
+    const columns = cols();
+    for (const who of order) {
+      const side = column(who, `duel-side${r.winner === who ? " is-winner" : ""}`);
+      side.append(el("span", "duel-kicker", label(who)), pointsLine(r[who]), el("small", "duel-detail", r[who]?.gone ? t("duel.party.left") : detail(round, r[who], who)));
+      if (round.style === "paint") side.append(el("small", "duel-detail", t("duel.paintCount", { n: (r[who]?.countries || []).length })));
+      columns.append(side);
     }
     const parts = [head(roundKicker(), verdict), columns];
     if (round.style === "paint" && paintView) {
       const toggle = el("div", "duel-toggle");
-      ["you", "them"].forEach(side => toggle.append(button(side === "you" ? t("duel.you") : nameOf(them()), paintView === side ? "is-on" : "", () => {
-        paintView = side;
-        globe.setHighlights(paintFills(side === "you" ? me() : them()));
+      [me(), ...others()].forEach(who => toggle.append(button(label(who), paintView === who ? "is-on" : "", () => {
+        paintView = who;
+        globe.setHighlights(paintFills(who));
         renderPanel();
       })));
       parts.push(toggle);
     }
     parts.push(answerBlock(round));
     const ready = s.ready[me()];
-    const next = button(ready ? t("duel.waitingNext", { name: nameOf(them()) }) : s.round >= DUEL_ROUNDS.length - 1 ? t("duel.seeFinal") : t("duel.next"), "duel-go", () => move({ type: "ready" }));
+    const next = button(ready ? waitingLabel() : s.round >= DUEL_ROUNDS.length - 1 ? t("duel.seeFinal") : t("duel.next"), "duel-go", () => move({ type: "ready" }));
     next.disabled = ready;
     parts.push(next);
     panel.replaceChildren(...parts);
@@ -33191,6 +33507,7 @@ function createDuel({ globe, onExit, onSignIn }) {
     const s = state();
     globe.setClickable(false);
     if (localKey !== `${match.id}:done`) { localKey = `${match.id}:done`; clearGlobe(); }
+    if (isParty()) { renderPartyDone(s); return; }
     let winner = null;
     if (s.left) winner = OTHER[s.left];
     else if (s.totals.a !== s.totals.b) winner = s.totals.a > s.totals.b ? "a" : "b";
@@ -33256,12 +33573,93 @@ function createDuel({ globe, onExit, onSignIn }) {
     panel.replaceChildren(pages, dots, actions);
   }
 
+  // A Party's end, in the same two pages: the podium (everyone by place, the winner raised
+  // highest), your place in words, everyone's lanes, a bar per round in the colour of who
+  // won it, SHARE; then every round with everyone's points.
+  function renderPartyDone(s) {
+    const list = standings(s);
+    const mine = list.find(entry => entry.seat === me());
+    const winner = list.filter(entry => entry.place === 1).length === 1 ? list[0].seat : null;
+    const second = list.find(entry => entry.seat !== me());
+    const title = winner === me() ? t("duel.youWinBy", { n: num(mine.total - (second?.total || 0)) })
+      : t("duel.party.youFinish", { place: placeText(mine.place).toLowerCase(), n: seats().length });
+    const played = s.rounds.filter(round => round?.result);
+    const won = played.filter(round => round.result.winner === me()).length;
+
+    const podium = el("div", "duel-podium is-party");
+    podium.dataset.n = String(list.length);
+    list.forEach(({ seat, place, total }) => {
+      const box = el("div", `duel-podium-side${seat === me() ? " is-you" : " is-them"}${winner === seat ? " is-winner" : ""}`);
+      box.style.setProperty("--me", colorOf(seat));
+      box.dataset.place = String(place);
+      const ava = el("span", "duel-ava is-big");
+      ava.append(tentOf(seat));
+      box.append(el("span", "duel-crown", winner === seat ? "♛" : placeText(place)), ava, el("span", "duel-player-name", label(seat)), el("strong", "duel-podium-score", num(total)));
+      if (s.gone?.[seat]) box.append(el("small", "duel-detail", t("duel.party.left")));
+      podium.append(box);
+    });
+    const lanes = el("div", "duel-lanes is-final");
+    lanes.append(...createLanes(s.totals, { who: list.map(entry => entry.seat) }));
+    const bars = el("div", "duel-round-bars");
+    played.forEach(round => {
+      const bar = el("i", round.result.winner === me() ? "is-you" : round.result.winner ? "is-them" : "is-draw");
+      if (round.result.winner) bar.style.background = colorOf(round.result.winner);
+      bars.append(bar);
+    });
+    const pages = el("div", "duel-pages");
+    const first = el("section", "duel-page");
+    const toRounds = button(t("duel.roundsNext"), "duel-link", () => pages.scrollTo({ left: pages.clientWidth, behavior: "smooth" }));
+    const note = el("p", "duel-fine");
+    note.append(t("duel.wonRounds", { n: won, total: played.length }), " · ", toRounds);
+    first.append(el("span", "duel-done-chip", t("duel.party.matchOver", { n: seats().length })), podium, el("h2", "duel-title duel-done-title", title), lanes, bars, note,
+      button(t("duel.shareResult"), "duel-go", shareResult));
+
+    const secondPage = el("section", "duel-page");
+    const table = el("div", "duel-table is-party");
+    table.style.setProperty("--cols", String(list.length));
+    const legend = el("div", "duel-row is-head");
+    legend.append(el("span", "duel-kicker", t("duel.roundByRound")));
+    list.forEach(({ seat }) => { const cell = el("span", "duel-kicker", label(seat)); cell.style.color = colorOf(seat); legend.append(cell); });
+    table.append(legend);
+    s.rounds.forEach((round, index) => {
+      if (!round?.result) return;
+      const r = round.result;
+      const row = el("div", "duel-row");
+      const what = el("span", "duel-row-what");
+      what.append(el("b", "", `${index + 1}`), el("span", "", styleName(round.style)), el("small", "", `${categoryName(round.category)} · ${t("duel.you")}: ${detail(round, r[me()], me())}`));
+      row.append(what);
+      list.forEach(({ seat }) => {
+        const points = r[seat]?.points || 0;
+        const cell = el("strong", `${r.winner === seat ? "is-win" : ""}${points < 0 ? " is-negative" : ""}`, num(points));
+        if (r.winner === seat) cell.style.color = colorOf(seat);
+        row.append(cell);
+      });
+      table.append(row);
+    });
+    secondPage.append(table);
+    pages.append(first, secondPage);
+    const dots = el("div", "duel-dots-pages");
+    dots.append(el("i", "is-on"), el("i"));
+    pages.addEventListener("scroll", () => {
+      const onSecond = pages.scrollLeft > pages.clientWidth / 2;
+      dots.children[0].classList.toggle("is-on", !onSecond);
+      dots.children[1].classList.toggle("is-on", onSecond);
+    }, { passive: true });
+    const size = seats().length;
+    const actions = el("div", "duel-actions");
+    actions.append(button(t("duel.menu"), "duel-go is-small is-ghost", () => { forget(); hide(); }), button(t("duel.newMatch"), "duel-go is-small is-ghost", () => { forget(); send("create", { size }); }));
+    panel.replaceChildren(pages, dots, actions);
+  }
+
   // The match in a few lines to send a friend: the score, and a square per round in the
-  // colour of who won it (🟨 you, 🟪 them, ⬜ a draw).
+  // colour of who won it (🟨 you, 🟪 someone else, ⬜ a draw). A Party: your place.
   async function shareResult() {
     const s = state();
     const squares = s.rounds.filter(round => round?.result).map(round => round.result.winner === me() ? "🟨" : round.result.winner ? "🟪" : "⬜").join("");
-    const text = [`Expedition 1v1 · ${num(s.totals[me()])}–${num(s.totals[them()])} vs ${nameOf(them())}`, squares].join("\n");
+    const line = isParty()
+      ? `Expedition Party · ${placeText(placeOf(me()))} / ${seats().length} · ${num(s.totals[me()])}`
+      : `Expedition 1v1 · ${num(s.totals[me()])}–${num(s.totals[them()])} vs ${nameOf(them())}`;
+    const text = [line, squares].join("\n");
     if (navigator.share && matchMedia("(hover: none)").matches) { navigator.share({ text }).catch(() => {}); return; }
     try { await navigator.clipboard.writeText(text); showToastNotice(t("duel.resultCopied")); } catch { prompt(t("duel.shareResult"), text); }
   }
@@ -33279,7 +33677,7 @@ function createDuel({ globe, onExit, onSignIn }) {
   const signedIn = () => { if (open) { render(); if (getUser()) show(); } };
 
   return {
-    open: show,
+    open: show, // { size }: 2 (1v1), 3 or 4 (Party), for a match you make
     openCode,
     signedIn,
     isOpen: () => open,
@@ -37773,14 +38171,18 @@ function renderHero() {
   // ARCHIVE next to it (not for Base Camp); on a past day, the way home.
   const side = document.getElementById("heroSide");
   side.hidden = camp;
-  // On VERSUS the second button is Party (3–4 players), still being built.
-  side.disabled = key === "duel";
+  // On VERSUS three buttons: DUEL 1V1 (heroGo), PARTY · 3 (heroSide) and PARTY · 4 (heroSide2).
+  const versus = key === "duel";
+  side.disabled = false;
+  document.getElementById("heroSide2").hidden = !versus;
+  document.getElementById("heroSide2").textContent = t("menu.party4");
+  card.querySelector(".hero-actions").classList.toggle("is-three", versus);
   // The dock shows which card is up.
   document.querySelectorAll("#menuDock [data-select]").forEach(item => {
     item.classList.toggle("is-active", item.dataset.select === key);
     item.setAttribute("aria-pressed", String(item.dataset.select === key));
   });
-  side.textContent = key === "duel" ? t("menu.partySoon") : date ? `⌂ ${t(getTent() ? "hero.myTent" : "hero.home")}` : `▤ ${t("menu.archive")}`;
+  side.textContent = key === "duel" ? t("menu.party3") : date ? `⌂ ${t(getTent() ? "hero.myTent" : "hero.home")}` : `▤ ${t("menu.archive")}`;
 }
 // The DAILY card (19 November 2026, mockups/menu option A): today's two solo games, both
 // against the world. Highs & Lows first and biggest (the main game), Casual under it, each
@@ -37848,15 +38250,19 @@ document.getElementById("heroGo").addEventListener("click", () => {
   sounds.playClick();
   if (hero.key === "camp") { selectMenuCountry(null); community.open(); return; }
   if (hero.key === "tent") { openMyTent(); return; }
-  if (hero.key === "duel") { duel.open(); return; }
+  if (hero.key === "duel") { duel.open({ size: 2 }); return; }
   mainMenu.showGame(hero.key, hero.date);
 });
 // ARCHIVE opens the archive of that game: every day on a calendar (13 November 2026, team
 // request; it used to step through past days on the card, a plane flying to each).
 document.getElementById("heroSide").addEventListener("click", () => {
-  if (hero.key === "duel") return;
   sounds.playClick();
+  if (hero.key === "duel") { duel.open({ size: 3 }); return; }
   archive.openArchive(null, hero.key);
+});
+document.getElementById("heroSide2").addEventListener("click", () => {
+  sounds.playClick();
+  duel.open({ size: 4 });
 });
 onLangChange(renderHero);
 
