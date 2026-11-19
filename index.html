@@ -4707,41 +4707,21 @@ h1, h2, h3 { font-weight: normal; }
 .dock-item.is-active .dock-sub { color: color-mix(in srgb, var(--tile) 70%, var(--text)); }
 #menuDailyButton .dock-art svg { width: 26px; height: 26px; }
 
-/* DAILY: both of today's games. */
+/* DAILY on the shared card: two buttons to pick the game (in the hero buttons' style), then
+   START under them. */
 .menu-hero [hidden] { display: none !important; }
-.daily-card {
-  display: grid; gap: 8px; padding: 12px; border: 1px solid color-mix(in srgb, #ff6b9d 45%, transparent); border-radius: 20px;
-  background: rgba(10, 15, 30, 0.86); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45), 0 0 40px color-mix(in srgb, #ff6b9d 12%, transparent);
-}
-.daily-head { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
-.daily-head span:first-child { color: #ff6b9d; }
-.daily-head span:last-child { font: 12px var(--font-mono); letter-spacing: 0; }
-.daily-game {
-  position: relative; display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px;
-  border: 1px solid color-mix(in srgb, var(--tile) 35%, transparent); border-radius: 14px;
-  background: color-mix(in srgb, var(--tile) 7%, rgba(255, 255, 255, 0.02)); cursor: pointer; transition: border-color 0.15s ease;
-}
-.daily-game.is-main { border-width: 2px; box-shadow: 0 0 22px color-mix(in srgb, var(--tile) 22%, transparent); }
-.daily-game:hover { border-color: var(--tile); }
-.daily-game .play-tile-ribbon { top: -9px; right: 12px; }
-.daily-art { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 11px; background: #0b1226; }
-.daily-art svg { width: 36px; height: 36px; }
-.daily-text { display: grid; gap: 4px; min-width: 0; }
-.daily-text strong { color: var(--text); font: 11px/1.3 var(--font-display); letter-spacing: var(--ls-pixel); }
-.daily-text em { overflow: hidden; color: var(--tile); font: 7px/1.3 var(--font-display); font-style: normal; letter-spacing: var(--ls-pixel); white-space: nowrap; text-overflow: ellipsis; }
-.daily-text small { color: var(--muted); font: 12px/1.3 var(--font-body); }
-.daily-text small:empty { display: none; }
-.daily-go {
-  padding: 11px 13px; border: 0; border-radius: 10px; background: var(--tile); color: #0a0f1e;
-  font: 10px var(--font-display); letter-spacing: var(--ls-pixel); white-space: nowrap; cursor: pointer;
-  box-shadow: 0 3px 0 color-mix(in srgb, var(--tile) 55%, #000); transition: transform 0.12s, filter 0.12s;
-}
-.daily-go:hover:not(:disabled), .daily-go:focus-visible { transform: translateY(-2px); filter: brightness(1.08); outline: none; }
-.daily-go:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
-.daily-game[data-state="done"] .daily-go { background: transparent; color: #5cf28a; box-shadow: inset 0 0 0 1px color-mix(in srgb, #5cf28a 60%, transparent); font: 700 13px var(--font-mono); }
-.daily-archive { padding: 4px; border: 0; background: none; color: var(--muted); font: 8px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
-.daily-archive:hover, .daily-archive:focus-visible { color: var(--text); outline: none; }
+.hero-pick { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.hero-pick button { display: grid; gap: 4px; min-width: 0; padding: 9px 10px; border: 2px solid color-mix(in srgb, var(--tile) 40%, transparent); border-radius: 10px; background: rgba(10, 15, 30, 0.6); color: var(--text); text-align: left; cursor: pointer; transition: border-color 0.12s, background 0.12s; }
+.hero-pick b { overflow: hidden; color: var(--text); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); white-space: nowrap; text-overflow: ellipsis; }
+.hero-pick small { overflow: hidden; color: var(--muted); font: 7px var(--font-display); letter-spacing: var(--ls-pixel); white-space: nowrap; text-overflow: ellipsis; }
+.hero-pick button:hover:not(:disabled), .hero-pick button:focus-visible { border-color: var(--tile); outline: none; }
+.hero-pick button.is-on { border-color: var(--tile); background: color-mix(in srgb, var(--tile) 18%, rgba(10, 15, 30, 0.6)); }
+.hero-pick button.is-on b { color: var(--tile); }
+.hero-pick button[data-state="done"] { --tile: #5cf28a !important; }
+.hero-pick button[data-state="done"] small { color: #5cf28a; }
+.hero-pick button[data-state="started"] small { color: var(--gold); }
+.hero-pick button:disabled { opacity: 0.45; cursor: default; }
+@media (max-width: 760px) { .hero-go-name { display: none; } }
 .hero-side:disabled { opacity: 0.55; cursor: default; }
 .hero-side:disabled:hover { border-color: color-mix(in srgb, var(--tile) 55%, transparent); background: rgba(10, 15, 30, 0.6); }
 
@@ -4750,11 +4730,6 @@ h1, h2, h3 { font-weight: normal; }
   .menu-profile-text b { max-width: 96px; }
   .main-menu .menu-dock { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .dock-label { font-size: 8px; }
-  .daily-card { padding: 10px; gap: 7px; }
-  .daily-game { grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; padding: 9px; }
-  .daily-art { width: 40px; height: 40px; }
-  .daily-art svg { width: 32px; height: 32px; }
-  .daily-text strong { font-size: 10px; }
 }
 
 /* ---------- Party: 3 or 4 players (19 November 2026) ----------
@@ -4863,23 +4838,9 @@ h1, h2, h3 { font-weight: normal; }
            and CREW (your friends). -->
       <div class="menu-bottom">
         <div class="menu-hero" id="menuHero">
-          <!-- DAILY: both of today's games on one card (engine.js renderDaily). -->
-          <div class="daily-card" id="dailyCard" aria-live="polite">
-            <div class="daily-head"><span id="dailyDay"></span><span id="dailyNext"></span></div>
-            <div class="daily-game is-main" data-mode="extremes" style="--tile: #ff6b9d">
-              <span class="play-tile-ribbon" data-i18n="menu.mainGame">MAIN GAME</span>
-              <span class="daily-art" data-art="extremes" aria-hidden="true"></span>
-              <span class="daily-text"><strong>HIGHS &amp; LOWS</strong><em data-i18n="menu.extremesTag">6 QUESTIONS · RANKED</em><small data-status></small></span>
-              <button class="daily-go" type="button" data-go></button>
-            </div>
-            <div class="daily-game" data-mode="casual" style="--tile: var(--gold)">
-              <span class="daily-art" data-art="casual" aria-hidden="true"></span>
-              <span class="daily-text"><strong data-i18n="mode.casual.short">CASUAL</strong><em data-i18n="menu.casualTag">5 ROUNDS · RANKED</em><small data-status></small></span>
-              <button class="daily-go" type="button" data-go></button>
-            </div>
-            <button class="daily-archive" id="dailyArchive" type="button"></button>
-          </div>
-          <!-- VERSUS and CREW: the card for what's selected (engine.js renderHero). -->
+          <!-- The card for what's selected (engine.js renderHero): DAILY, VERSUS or CREW, one design.
+               DAILY (19 November 2026, mockups/menu-daily option A): pick Highs & Lows or Casual
+               (#heroPick), then START plays it. -->
           <div class="play-tile is-main hero-card" id="heroCard" style="--tile: #ff6b9d" aria-live="polite">
             <span class="play-tile-ribbon" id="heroRibbon"></span>
             <span class="play-tile-art" id="heroArt" aria-hidden="true"></span>
@@ -4888,6 +4849,10 @@ h1, h2, h3 { font-weight: normal; }
               <span id="heroText"></span>
               <small id="heroStatus"></small>
             </span>
+            <div class="hero-pick" id="heroPick" role="tablist" hidden>
+              <button type="button" role="tab" data-pick="extremes" style="--tile: #ff6b9d"><b>HIGHS &amp; LOWS</b><small></small></button>
+              <button type="button" role="tab" data-pick="casual" style="--tile: #ffd45c"><b data-i18n="mode.casual.short">CASUAL</b><small></small></button>
+            </div>
             <div class="hero-days hidden" id="heroDays">
               <button class="hero-step" id="heroOlder" type="button" data-i18n-attr="aria-label:hero.older">‹</button>
               <span class="hero-day"><strong id="heroDayLabel"></strong><small id="heroDayName"></small></span>
@@ -5965,6 +5930,10 @@ const EN = {
   "menu.versusRibbon": "BETA",
   "menu.duelGoShort": "▶ DUEL 1V1",
   "menu.partySoon": "PARTY · 3–4 · SOON",
+  "menu.startGame": "▶ START {name}",
+  "menu.inProgress": "IN PROGRESS",
+  "menu.notPlayed": "NOT PLAYED",
+  "menu.noDayShort": "NO DAY TODAY",
   "menu.party3": "▶ PARTY · 3",
   "menu.party4": "▶ PARTY · 4",
   "menu.guest": "Guest",
@@ -7181,6 +7150,10 @@ const NL = {
   "menu.versusRibbon": "BETA",
   "menu.duelGoShort": "▶ DUEL 1V1",
   "menu.partySoon": "PARTY · 3–4 · BINNENKORT",
+  "menu.startGame": "▶ START {name}",
+  "menu.inProgress": "BEZIG",
+  "menu.notPlayed": "NOG NIET GESPEELD",
+  "menu.noDayShort": "VANDAAG GEEN DAG",
   "menu.party3": "▶ PARTY · 3",
   "menu.party4": "▶ PARTY · 4",
   "menu.guest": "Gast",
@@ -38104,7 +38077,7 @@ const HERO_INFO = {
   camp: { title: () => t("menu.community"), text: () => t("menu.communityNote"), color: "#45e3ff" },
   // 1v1 (duel-view.js): a live match against a friend; the button opens the match screen.
   duel: { title: () => t("menu.versus"), text: () => t("menu.versusText"), color: "#c58cff" },
-  // DAILY (19 November 2026): both solo games on one card of their own (renderDaily).
+  // DAILY: both solo games on this same card; you pick one (#heroPick), then START.
   daily: { title: () => t("menu.daily"), text: () => "", color: "#ff6b9d" },
   // My Tent: where your tent stands (the camera pans there); OPEN MY TENT opens the window.
   tent: { title: () => t("menu.account"), text: () => t("menu.tentText"), color: () => getTentColor() }
@@ -38125,16 +38098,14 @@ function dayState(key, dateKey) {
 function renderHero() {
   const card = document.getElementById("heroCard");
   if (!card) return;
-  const { key, date } = hero;
-  // DAILY has its own card with both games; VERSUS and CREW use this one.
-  const daily = key === "daily";
-  card.hidden = daily;
-  document.getElementById("dailyCard").hidden = !daily;
+  const { date } = hero;
+  // DAILY is the game it's looking at (menuFocus): Highs & Lows or Casual, picked above START.
+  const daily = hero.key === "daily";
+  const key = daily ? dailyGame() : hero.key;
   document.querySelectorAll("#menuDock [data-select]").forEach(item => {
-    item.classList.toggle("is-active", item.dataset.select === key);
-    item.setAttribute("aria-pressed", String(item.dataset.select === key));
+    item.classList.toggle("is-active", item.dataset.select === hero.key);
+    item.setAttribute("aria-pressed", String(item.dataset.select === hero.key));
   });
-  if (daily) { renderDaily(); return; }
   const info = HERO_INFO[key];
   const camp = key === "camp" || key === "tent"; // places, not games: no day, no archive
   const state = camp || key === "duel" ? "new" : dayState(key, date || today);
@@ -38142,7 +38113,9 @@ function renderHero() {
   card.dataset.state = state === "none" ? "new" : state;
   card.dataset.key = key;
   card.classList.toggle("is-archive", Boolean(date));
-  const ribbon = date ? t("common.day", { n: getPuzzleNumber(date) }).toUpperCase() : key === MAIN_MODE ? t("menu.mainGame") : key === "duel" ? t("menu.versusRibbon") : "";
+  const ribbon = date ? t("common.day", { n: getPuzzleNumber(date) }).toUpperCase()
+    : daily ? `${t("menu.today")} · ${t("common.day", { n: getPuzzleNumber(today) }).toUpperCase()}`
+    : key === "duel" ? t("menu.versusRibbon") : "";
   setText("heroRibbon", ribbon);
   document.getElementById("heroRibbon").hidden = !ribbon;
   document.getElementById("heroArt").replaceChildren(heroArtFor(key));
@@ -38150,11 +38123,24 @@ function renderHero() {
   setText("heroText", info.text());
   // Under it: how today stands (or, on a past day, whether you played it).
   let status = "";
-  if (key === "duel") status = "";
-  else if (key === "tent") status = tentWhere();
-  else if (!camp && !date) status = describeMode(key);
+  if (key === "tent") status = tentWhere();
+  else if (daily) status = [describeMode(key) || t(key === MAIN_MODE ? "menu.mainGame" : "menu.casualTag"), t("end.nextDay", nextDayIn())].join(" · ");
+  else if (!camp && key !== "duel" && !date) status = describeMode(key);
   else if (date) status = state === "none" ? t("hero.noGame") : state === "done" ? t("hero.played") : state === "started" ? t("hero.started") : t("hero.notPlayed");
   setText("heroStatus", status);
+  // DAILY: the two games to pick from, each with how today stands.
+  const pick = document.getElementById("heroPick");
+  pick.hidden = !daily;
+  if (daily) pick.querySelectorAll("[data-pick]").forEach(item => {
+    const mode = item.dataset.pick;
+    const modeNow = modeState(mode);
+    const record = modeNow === "done" ? getDayRecord(today, mode) : null;
+    item.classList.toggle("is-on", mode === key);
+    item.setAttribute("aria-selected", String(mode === key));
+    item.dataset.state = modeNow;
+    item.disabled = modeNow === "none";
+    item.querySelector("small").textContent = modeNow === "done" ? `✓ ${num(record.score ?? 0)}` : modeNow === "started" ? t("menu.inProgress") : modeNow === "none" ? t("menu.noDayShort") : mode === MAIN_MODE ? t("menu.mainGame") : t("menu.notPlayed");
+  });
   // The day stepper, on a past day.
   document.getElementById("heroDays").classList.toggle("hidden", !date);
   if (date) {
@@ -38165,62 +38151,43 @@ function renderHero() {
     document.getElementById("heroNewer").disabled = index <= 0;
   }
   const go = document.getElementById("heroGo");
-  go.textContent = key === "duel" ? t("menu.duelGoShort") : key === "tent" ? t("menu.tentGo") : camp ? t("menu.pinGoCamp") : t(state === "done" ? "menu.seeResults" : state === "started" ? "menu.continueGo" : "menu.playNow");
+  const record = daily && state === "done" ? getDayRecord(today, key) : null;
+  go.textContent = key === "duel" ? t("menu.duelGoShort") : key === "tent" ? t("menu.tentGo") : camp ? t("menu.pinGoCamp")
+    : daily ? (state === "done" ? `✓ ${num(record.score ?? 0)}` : state === "started" ? t("menu.continueGo") : t("menu.startGame", { name: info.title() }))
+    : t(state === "done" ? "menu.seeResults" : state === "started" ? "menu.continueGo" : "menu.playNow");
+  // DAILY's START names the game; a phone has the name in the title already (one line).
+  if (daily && state === "new") {
+    const [start, name] = t("menu.startGame", { name: "\u0000" }).split("\u0000");
+    go.replaceChildren(start.trimEnd(), Object.assign(document.createElement("span"), { className: "hero-go-name", textContent: ` ${info.title()}${name}` }));
+  }
+  go.title = daily && state === "done" ? t("menu.seeResults").replace(/^✓\s*/, "") : "";
   go.disabled = state === "none";
-  go.hidden = state === "none" && !date;
+  go.hidden = state === "none" && !date && !daily;
   // ARCHIVE next to it (not for Base Camp); on a past day, the way home.
   const side = document.getElementById("heroSide");
   side.hidden = camp;
+  side.disabled = false;
   // On VERSUS three buttons: DUEL 1V1 (heroGo), PARTY · 3 (heroSide) and PARTY · 4 (heroSide2).
   const versus = key === "duel";
-  side.disabled = false;
   document.getElementById("heroSide2").hidden = !versus;
   document.getElementById("heroSide2").textContent = t("menu.party4");
   card.querySelector(".hero-actions").classList.toggle("is-three", versus);
-  // The dock shows which card is up.
-  document.querySelectorAll("#menuDock [data-select]").forEach(item => {
-    item.classList.toggle("is-active", item.dataset.select === key);
-    item.setAttribute("aria-pressed", String(item.dataset.select === key));
-  });
-  side.textContent = key === "duel" ? t("menu.party3") : date ? `⌂ ${t(getTent() ? "hero.myTent" : "hero.home")}` : `▤ ${t("menu.archive")}`;
+  // DAILY's archive says how many earlier days of the main game are still open.
+  const unplayed = daily ? getAllPuzzleDays().filter(day => day < today && (record => !record.completed && !record.noGame)(getDayRecord(day, key))).length : 0;
+  side.textContent = versus ? t("menu.party3") : date ? `⌂ ${t(getTent() ? "hero.myTent" : "hero.home")}` : `▤ ${t("menu.archive")}`;
+  side.title = unplayed ? t("menu.archiveOpen", { n: unplayed }) : "";
 }
-// The DAILY card (19 November 2026, mockups/menu option A): today's two solo games, both
-// against the world. Highs & Lows first and biggest (the main game), Casual under it, each
-// with how today stands and its own button; under them the archive (with how many earlier
-// days are still open) and, at the top, when the next day opens (midnight UTC).
-function renderDaily() {
-  setText("dailyDay", `${t("menu.today")} · ${t("common.day", { n: getPuzzleNumber(today) }).toUpperCase()}`);
+// The game DAILY shows: the one you picked (or pointed at on the globe), else today's main game.
+const dailyGame = () => (menuFocus === "casual" || menuFocus === "extremes") && modeState(menuFocus) !== "none" ? menuFocus : featuredMode();
+const nextDayIn = () => {
   const now = new Date();
   const left = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1) - now.getTime();
-  setText("dailyNext", t("end.nextDay", { h: Math.floor(left / 3600000), m: Math.floor(left / 60000) % 60 }));
-  document.querySelectorAll("#dailyCard .daily-game").forEach(row => {
-    const mode = row.dataset.mode;
-    const state = modeState(mode);
-    row.dataset.state = state;
-    row.classList.toggle("is-focus", mode === menuFocus);
-    const record = state === "done" ? getDayRecord(today, mode) : null;
-    row.querySelector("[data-status]").textContent = state === "none" ? t("menu.noDay") : state === "started" ? describeMode(mode) : "";
-    const go = row.querySelector("[data-go]");
-    go.textContent = state === "done" ? `✓ ${num(record.score ?? 0)}` : t(state === "started" ? "menu.continueGo" : "menu.playNow");
-    go.disabled = state === "none";
-  });
-  const unplayed = getAllPuzzleDays().filter(date => date < today && (record => !record.completed && !record.noGame)(getDayRecord(date, MAIN_MODE))).length;
-  setText("dailyArchive", `▤ ${unplayed ? t("menu.archiveOpen", { n: unplayed }) : t("menu.archive")} ›`);
-}
-document.querySelectorAll("#dailyCard .daily-game").forEach(row => {
-  const mode = row.dataset.mode;
-  row.querySelector("[data-go]").addEventListener("click", () => { sounds.playClick(); mainMenu.showGame(mode); });
-  // A click on the row (not its button) turns the globe to that game's start.
-  row.addEventListener("click", event => {
-    if (event.target.closest("[data-go]")) return;
-    sounds.playClick();
-    selectHero(mode);
-  });
-});
-document.getElementById("dailyArchive").addEventListener("click", () => {
+  return { h: Math.floor(left / 3600000), m: Math.floor(left / 60000) % 60 };
+};
+document.querySelectorAll("#heroPick [data-pick]").forEach(item => item.addEventListener("click", () => {
   sounds.playClick();
-  archive.openArchive(null, menuFocus === "casual" ? "casual" : MAIN_MODE);
-});
+  selectHero(item.dataset.pick);
+}));
 
 // The place for the card on the globe now.
 function heroStop() {
@@ -38237,11 +38204,10 @@ function selectHero(key) {
   hero.key = key;
   hero.date = null;
   hero.days = null;
+  const focus = game || key;
+  if (key !== "duel") menuFocus = focus; // DAILY's card shows this game
   renderHero();
   if (key === "duel") return; // no place on the globe: the camera stays
-  const focus = game || key;
-  menuFocus = focus;
-  if (game) renderDaily();
   if (globe.mode !== "menu") return;
   const stop = stopOf(focus);
   globe.glideMenuTo(stop.lat, stop.lon, FLIGHT_MS, { distance: HERO_ZOOM });
@@ -38251,14 +38217,14 @@ document.getElementById("heroGo").addEventListener("click", () => {
   if (hero.key === "camp") { selectMenuCountry(null); community.open(); return; }
   if (hero.key === "tent") { openMyTent(); return; }
   if (hero.key === "duel") { duel.open({ size: 2 }); return; }
-  mainMenu.showGame(hero.key, hero.date);
+  mainMenu.showGame(hero.key === "daily" ? dailyGame() : hero.key, hero.date);
 });
 // ARCHIVE opens the archive of that game: every day on a calendar (13 November 2026, team
 // request; it used to step through past days on the card, a plane flying to each).
 document.getElementById("heroSide").addEventListener("click", () => {
   sounds.playClick();
   if (hero.key === "duel") { duel.open({ size: 3 }); return; }
-  archive.openArchive(null, hero.key);
+  archive.openArchive(null, hero.key === "daily" ? dailyGame() : hero.key);
 });
 document.getElementById("heroSide2").addEventListener("click", () => {
   sounds.playClick();
