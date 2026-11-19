@@ -5206,7 +5206,7 @@ h1, h2, h3 { font-weight: normal; }
           <article class="how-to-card">
             <header><b data-i18n="howto.x.3">CLOSE STILL COUNTS</b><span>3/4</span></header>
             <div class="how-to-card-art"><ol class="how-to-ladder" id="howToExampleLadder"></ol></div>
-            <p data-i18n-html="howto.x.3text">Spot on is 1,000 points.<small>The nearer your country's figure, the more you score.</small></p>
+            <p data-i18n-html="howto.x.3text">Spot on is 1,000 points, #2 950, #3 900.<small>Further down, the higher your rank and the nearer your country's figure, the more you score.</small></p>
           </article>
           <article class="how-to-card">
             <header><b data-i18n="howto.x.4">CLIMB THE WORLD</b><span>4/4</span></header>
@@ -6237,7 +6237,7 @@ const EN = {
   "howto.x.2": "ONE CLICK",
   "howto.x.2text": "Pick a country on the globe and lock it in.<small>One try per round.</small>",
   "howto.x.3": "CLOSE STILL COUNTS",
-  "howto.x.3text": "Spot on is 1,000 points.<small>The nearer your country's figure, the more you score.</small>",
+  "howto.x.3text": "Spot on is 1,000 points, #2 950, #3 900.<small>Further down, the higher your rank and the nearer your country's figure, the more you score.</small>",
   "howto.x.4": "CLIMB THE WORLD",
   "howto.x.top": "TOP 12%",
   "howto.x.4text": "See your rank against the world every day.<small>Play through the month to earn a badge, up to the top 1%.</small>",
@@ -7426,7 +7426,7 @@ const NL = {
   "howto.x.2": "EÉN KLIK",
   "howto.x.2text": "Kies een land op de globe en leg het vast.<small>Eén poging per ronde.</small>",
   "howto.x.3": "DICHTBIJ TELT OOK",
-  "howto.x.3text": "Raak is 1.000 punten.<small>Hoe dichter het cijfer van je land erbij zit, hoe meer je scoort.</small>",
+  "howto.x.3text": "Raak is 1.000 punten, #2 950, #3 900.<small>Verder naar beneden: hoe hoger je rang en hoe dichter het cijfer van je land erbij zit, hoe meer je scoort.</small>",
   "howto.x.4": "KLIM OP IN DE WERELD",
   "howto.x.top": "TOP 12%",
   "howto.x.4text": "Zie elke dag je plek tegenover de wereld.<small>Speel de maand door voor een badge, tot de top 1%.</small>",
@@ -26427,7 +26427,12 @@ const EXTREME_ROUNDS = 6;
 const EXTREME_MAX_ROUND = 1000;
 const EXTREME_MAX_DAY = EXTREME_ROUNDS * EXTREME_MAX_ROUND;
 const MODE_NAME = "Highs & Lows"; // working title
-const RANK_FLOOR = [[1, 1000], [2, 850], [3, 750], [5, 650], [10, 500], [20, 300], [40, 150]];
+// Points by rank band (19 November 2026, team decision): [up to rank, lowest, highest]. The
+// top three are fixed; below them how close your country's figure is (1 − % off) moves you
+// up within your band, never into the next. Before, the score was the best of closeness and
+// a floor per rank, which paid #3 only 750 on spread-out stats and up to 758 for the very
+// last country on tight ones (mothers' age).
+const RANK_BANDS = [[1, 1000, 1000], [2, 950, 950], [3, 900, 900], [5, 820, 880], [10, 650, 800], [20, 450, 640], [40, 200, 440], [Infinity, 0, 190]];
 
 // How each stat is named and asked, in plain words. Food figures are FAO food supply
 // (what reaches shops and kitchens), close enough to "eaten" for a game. Generated days
@@ -26751,8 +26756,9 @@ function getStandings(statId, find) {
   return result;
 }
 
-function rankFloor(rank) {
-  return RANK_FLOOR.find(([upTo]) => rank <= upTo)?.[1] || 0;
+function rankBand(rank) {
+  const [, low, high] = RANK_BANDS.find(([upTo]) => rank <= upTo);
+  return { low, high };
 }
 
 // The score of one pick: points, rank and how far off it was (offBy: 0.32 = 32% off; null
@@ -26762,9 +26768,11 @@ function scorePick(statId, find, iso) {
   const entry = standings.ranks[iso];
   if (!entry) return null;
   const offBy = standings.target === 0 ? null : entry.distance / Math.abs(standings.target);
-  const byValue = entry.distance === 0 ? EXTREME_MAX_ROUND : offBy === null ? 0 : Math.round(EXTREME_MAX_ROUND * Math.max(0, 1 - offBy));
-  const points = Math.max(byValue, rankFloor(entry.rank));
-  return { points, rank: entry.rank, tied: entry.tied, heat: entry.heat, value: entry.value, offBy, byValue, floor: rankFloor(entry.rank), perfect: entry.rank === 1 };
+  // Closeness 0–1: spot on is 1; at a target of 0 a percentage means nothing, so only the rank counts.
+  const closeness = entry.distance === 0 ? 1 : offBy === null ? 0 : Math.max(0, 1 - offBy);
+  const { low, high } = rankBand(entry.rank);
+  const points = Math.round(low + (high - low) * closeness);
+  return { points, rank: entry.rank, tied: entry.tied, heat: entry.heat, value: entry.value, offBy, closeness, band: { low, high }, perfect: entry.rank === 1 };
 }
 
 // Why a country can't be picked: no figure in the stat's source (since when, if known).
@@ -26799,7 +26807,7 @@ const FIND_LABELS = {
   get average() { return t("find.average"); }
 };
 
-return { EXTREME_ROUNDS, EXTREME_MAX_ROUND, EXTREME_MAX_DAY, MODE_NAME, getStat, STAT_IDS, askQuestion, getStandings, rankFloor, scorePick, missingReason, formatValue, FIND_LABELS };
+return { EXTREME_ROUNDS, EXTREME_MAX_ROUND, EXTREME_MAX_DAY, MODE_NAME, getStat, STAT_IDS, askQuestion, getStandings, rankBand, scorePick, missingReason, formatValue, FIND_LABELS };
 })();
 
 // ---- daily.js
