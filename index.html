@@ -32656,10 +32656,7 @@ function createDuel({ globe, onExit, onSignIn, onMatchStart = () => {}, notice =
     frame = requestAnimationFrame(tick);
     render();
     if (!match && isConfigured && getUser()) {
-      const found = await findOpenDuel();
-      if (found) take(found);
-      const code = store.get(CODE_KEY);
-      if (code && (!found || found.code !== code)) { store.set(CODE_KEY, null); await send("join", { code }); }
+      await restore();
       if (match) sync();
       render();
     }
@@ -32685,7 +32682,13 @@ function createDuel({ globe, onExit, onSignIn, onMatchStart = () => {}, notice =
   // A lobby stays on the menu; a match being played opens this screen.
   async function restore() {
     if (!isConfigured || !getUser()) return;
-    if (!match) { const found = await findOpenDuel(); if (found) take(found); }
+    // A lobby left behind (the page was closed or reloaded) is closed quietly: VERSUS opens on
+    // its tiles, not on an old lobby. A match being played comes back.
+    if (!match) {
+      const found = await findOpenDuel();
+      if (found?.state?.phase === "lobby") await callDuel("move", { id: found.id, move: { type: "leave" } }).catch(() => {});
+      else if (found) take(found);
+    }
     const code = store.get(CODE_KEY);
     if (code && (!match || match.code !== code)) {
       store.set(CODE_KEY, null);
