@@ -4619,6 +4619,61 @@ h1, h2, h3 { font-weight: normal; }
   @keyframes vs-rise { from { opacity: 0; transform: translate(-50%, calc(-50% + 40px)); } }
 }
 
+/* 1v1: the last 5 seconds (19 November 2026, team request). The clock bar flashes red,
+   twice a second, in hard 8-bit steps (no fade), with the seconds in white. Sound comes later. */
+.duel-top[data-clock="low"] .duel-clock { animation: duel-clock-flash 0.5s steps(1, end) infinite; }
+.duel-top[data-clock="low"] .duel-clock-text { color: #fff; text-shadow: 0 1px 0 #04060d; }
+@keyframes duel-clock-flash {
+  0% { background: rgba(255, 107, 125, 0.35); box-shadow: 0 0 0 2px var(--danger), 0 0 16px color-mix(in srgb, var(--danger) 70%, transparent); }
+  50% { background: rgba(255, 255, 255, 0.08); box-shadow: none; }
+}
+.duel-top[data-clock="low"] .duel-clock-fill { animation: duel-fill-flash 0.5s steps(1, end) infinite; }
+@keyframes duel-fill-flash { 0% { background: #ff8a95; } 50% { background: var(--danger); } }
+@media (prefers-reduced-motion: reduce) {
+  .duel-top[data-clock="low"] .duel-clock,
+  .duel-top[data-clock="low"] .duel-clock-fill { animation: none; box-shadow: 0 0 0 2px var(--danger); }
+}
+
+/* ---------- 1v1 top bar, round 2 (19 November 2026, team request: "looks horrible") ----------
+   No way back to the menu during a match (the ✕ shows only before and after one). The bar
+   runs the full width: ROUND 2/5 · the time with the pixel clock · the lead on one line, the
+   two lanes, and the clock as a 4 px line along the bottom edge. Tents fill their frames. */
+.duel-view:is([data-phase="pick"], [data-phase="intro"], [data-phase="play"], [data-phase="bid"], [data-phase="name"], [data-phase="reveal"], [data-phase="versus"]) .duel-close { display: none; }
+#duelTop.duel-top { gap: 8px; padding: 10px 14px 0; overflow: hidden; }
+#duelTop .duel-top-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+#duelTop .duel-round { color: var(--text); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+#duelTop .duel-lead { justify-self: end; overflow: hidden; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+#duelTop .duel-clock-time { display: inline-flex; align-items: center; gap: 6px; color: var(--duel); visibility: hidden; }
+#duelTop.has-clock .duel-clock-time { visibility: visible; }
+#duelTop .duel-clock-time .pxclock { width: 14px; height: 14px; }
+#duelTop .duel-clock-text { position: static; color: inherit; font: 700 15px/1 var(--font-mono); }
+#duelTop .duel-lane { grid-template-columns: 26px minmax(0, 1fr) auto; gap: 10px; }
+#duelTop .duel-ava { width: 26px; height: 26px; border-width: 2px; border-radius: 7px; }
+#duelTop .duel-ava canvas { width: 24px; height: 24px; }
+#duelTop .duel-lane-body { gap: 3px; }
+#duelTop .duel-player-name { font-size: 8px; }
+#duelTop .duel-track { height: 6px; }
+#duelTop .duel-fill { top: 0; height: 6px; }
+#duelTop .duel-pos { width: 8px; height: 8px; }
+#duelTop .duel-lane .duel-player-score { font-size: 15px; }
+#duelTop .duel-clock { position: relative; height: 4px; min-width: 0; margin: 2px -14px 0; border-radius: 0; background: rgba(255, 255, 255, 0.06); }
+#duelTop .duel-clock-fill { border-radius: 0; }
+/* The last 5 seconds: the line, the time and the frame flash red together. */
+#duelTop[data-clock="low"] .duel-clock { animation: none; box-shadow: none; }
+#duelTop[data-clock="low"] .duel-clock-time { animation: duel-time-flash 0.5s steps(1, end) infinite; }
+#duelTop[data-clock="low"] { animation: duel-frame-flash 0.5s steps(1, end) infinite; }
+@keyframes duel-time-flash { 0% { color: #fff; } 50% { color: var(--danger); } }
+@keyframes duel-frame-flash { 0% { border-color: var(--danger); box-shadow: var(--glass-shadow), 0 0 18px color-mix(in srgb, var(--danger) 55%, transparent); } 50% { border-color: var(--glass-line); } }
+#duelTop[data-clock="ready"] .duel-clock-time { color: var(--muted); }
+#duelTop[data-clock="ready"] .duel-clock-text { font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+@media (prefers-reduced-motion: reduce) {
+  #duelTop[data-clock="low"], #duelTop[data-clock="low"] .duel-clock-time { animation: none; border-color: var(--danger); color: var(--danger); }
+}
+@media (max-width: 760px) {
+  #duelTop.duel-top { top: calc(8px + env(safe-area-inset-top)); left: 8px; right: 8px; width: auto; padding: 8px 12px 0; border-radius: 14px; }
+  #duelTop .duel-clock { margin: 2px -12px 0; }
+}
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -5448,12 +5503,15 @@ h1, h2, h3 { font-weight: normal; }
     <!-- Two lanes, you above your opponent, on one scale (0 to 6,500): only the totals matter
          during a match (who won which round is on the result screen). renderTop in duel-view.js. -->
     <header class="duel-top" id="duelTop" hidden>
+      <!-- The round, the time left (with the pixel clock) and the lead on one line; the two
+           lanes; and the clock as a thin line along the bottom edge (19 November 2026). -->
       <div class="duel-top-row">
         <span class="duel-round" id="duelRoundLabel"></span>
+        <span class="duel-clock-time"><i class="pxclock" aria-hidden="true"></i><span class="duel-clock-text" id="duelClockText"></span></span>
         <span class="duel-lead" id="duelLead"></span>
       </div>
       <div class="duel-lanes" id="duelLanes"></div>
-      <div class="duel-clock"><span class="duel-clock-fill" id="duelClockFill"></span><span class="duel-clock-text" id="duelClockText"></span></div>
+      <div class="duel-clock"><span class="duel-clock-fill" id="duelClockFill"></span></div>
     </header>
     <aside class="duel-panel" id="duelPanel" aria-live="polite"></aside>
     <div class="duel-toast hidden" id="duelToast" role="status" aria-live="polite"></div>
@@ -6717,7 +6775,7 @@ const EN = {
   "duel.how.pin": "Drop a pin on a place. The closer, the more points.",
   "duel.how.guess": "Guess a country's number. Points drop for every country that lies between your guess and the real value.",
   "duel.how.route": "Travel from one country to another through countries that border each other. The shortest route scores 1,000.",
-  "duel.how.bid": "Take turns bidding how many answers you can name; each raise gives the other player a fresh clock. The highest bidder names them: all of them scores 100 per name, too few loses 100 per name missed.",
+  "duel.how.bid": "Take turns bidding how many answers you can name; each raise gives the other player a fresh clock. The highest bidder names them: all of them scores 100 per name, too few loses 100 per name missed. One wrong name ends your turn.",
   "duel.how.paint": "Paint every country that fits. Nothing shows right or wrong until you both lock in.",
   "duel.intro.pin": "Pin it on the globe. Closer is more points.",
   "duel.intro.guess": "Guess the number. Closer is more points.",
@@ -6772,6 +6830,13 @@ const EN = {
   "duel.vs.theyPick": "{name} PICKS",
   "duel.vs.ready": "READY",
   "duel.vs.startsIn": "Starts in {n} s",
+  "duel.lastCounts": "If time runs out, your last answer counts (without the speed bonus).",
+  "duel.timedOut": "time ran out, last answer",
+  "duel.roundShort": "ROUND {n}/{total}",
+  "duel.pts.wrongName": "A wrong name",
+  "duel.pts.turnOver": "ends your turn",
+  "duel.wrongEnds": "{name} isn't on the list. Your turn is over.",
+  "duel.wrongWas": "wrong: {name}",
   "duel.task.pin": "Drop your pin",
   "duel.task.guess": "Make your guess",
   "duel.task.route": "Find the shortest route",
@@ -6851,7 +6916,7 @@ const EN = {
   "duel.yourTurnFirst": "Your turn: bid first, or pass.",
   "duel.letThem": "LET {name} NAME THEM",
   "duel.pass": "PASS",
-  "duel.nameHint": "Type a country or click it on the globe.",
+  "duel.nameHint": "Type a country or click it on the globe. One wrong name ends your turn.",
   "duel.paintReveal": "Here come the countries…",
   "duel.paintedCountries": "countries painted"
 };
@@ -7929,7 +7994,7 @@ const NL = {
   "duel.how.pin": "Zet een speld op een plek. Hoe dichterbij, hoe meer punten.",
   "duel.how.guess": "Raad het getal van een land. Je verliest punten voor elk land dat tussen je gok en de echte waarde ligt.",
   "duel.how.route": "Reis van het ene land naar het andere via landen die aan elkaar grenzen. De kortste route is 1.000 punten.",
-  "duel.how.bid": "Bied om de beurt hoeveel antwoorden je kunt noemen; elk hoger bod geeft de ander een nieuwe klok. Het hoogste bod noemt ze: allemaal goed is 100 per naam, te weinig kost 100 per gemiste naam.",
+  "duel.how.bid": "Bied om de beurt hoeveel antwoorden je kunt noemen; elk hoger bod geeft de ander een nieuwe klok. Het hoogste bod noemt ze: allemaal goed is 100 per naam, te weinig kost 100 per gemiste naam. Eén foute naam en je beurt is voorbij.",
   "duel.how.paint": "Kleur elk land dat past. Goed of fout zie je pas als jullie allebei vastzetten.",
   "duel.intro.pin": "Prik een speld op de globe. Hoe dichterbij, hoe meer punten.",
   "duel.intro.guess": "Raad het getal. Hoe dichterbij, hoe meer punten.",
@@ -7984,6 +8049,13 @@ const NL = {
   "duel.vs.theyPick": "{name} KIEST",
   "duel.vs.ready": "KLAAR",
   "duel.vs.startsIn": "Begint over {n} s",
+  "duel.lastCounts": "Loopt de tijd af, dan telt je laatste antwoord (zonder snelheidsbonus).",
+  "duel.timedOut": "tijd op, laatste antwoord",
+  "duel.roundShort": "RONDE {n}/{total}",
+  "duel.pts.wrongName": "Een foute naam",
+  "duel.pts.turnOver": "beurt voorbij",
+  "duel.wrongEnds": "{name} staat niet op de lijst. Je beurt is voorbij.",
+  "duel.wrongWas": "fout: {name}",
   "duel.task.pin": "Zet je speld",
   "duel.task.guess": "Doe je gok",
   "duel.task.route": "Vind de kortste route",
@@ -8063,7 +8135,7 @@ const NL = {
   "duel.yourTurnFirst": "Jouw beurt: bied als eerste, of pas.",
   "duel.letThem": "LAAT {name} ZE NOEMEN",
   "duel.pass": "PAS",
-  "duel.nameHint": "Typ een land of klik het aan op de globe.",
+  "duel.nameHint": "Typ een land of klik het aan op de globe. Eén foute naam en je beurt is voorbij.",
   "duel.paintReveal": "Daar komen de landen…",
   "duel.paintedCountries": "landen gekleurd"
 };
@@ -32131,6 +32203,7 @@ function createDuel({ globe, onExit, onSignIn }) {
     const style = s.rounds[s.round].style;
     if (style === "pin") {
       local.pin = { lat, lon };
+      sendDraft();
       sounds.playClick();
       drawPlay();
       renderPanel();
@@ -32180,6 +32253,7 @@ function createDuel({ globe, onExit, onSignIn }) {
       return;
     }
     local.route = [...(local.route || []), country.iso];
+    sendDraft();
     sounds.playClick();
     drawPlay();
     renderPanel();
@@ -32190,19 +32264,37 @@ function createDuel({ globe, onExit, onSignIn }) {
     if (painted.has(country.iso)) painted.delete(country.iso);
     else painted.add(country.iso);
     local.painted = [...painted];
+    sendDraft();
     sounds.playClick();
     drawPlay();
     renderPanel();
   }
-  async function lockIn() {
+  // Your answer as it stands (the pin, the slider, the route, what you painted).
+  function currentAnswer() {
     const s = state();
     const style = s.rounds[s.round].style;
-    const answer = style === "pin" ? local.pin
+    return style === "pin" ? local.pin
       : style === "guess" ? { value: local.value }
       : style === "route" ? { route: local.route || [] }
       : { countries: local.painted || [] };
-    if (style === "pin" && !answer) return;
+  }
+  async function lockIn() {
+    const answer = currentAnswer();
+    if (!answer) return;
+    clearTimeout(draftTimer);
     await move({ type: "answer", answer });
+  }
+  // While you play, your answer goes to the referee as a draft (at most every 0.4 s): if the
+  // clock runs out before you lock in, your last answer counts, without the speed bonus.
+  let draftTimer = 0;
+  function sendDraft() {
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(() => {
+      const s = state();
+      if (s?.phase !== "play" || s.locked?.[me()] || serverNow() < s.opensAt) return;
+      const answer = currentAnswer();
+      if (answer) move({ type: "draft", answer });
+    }, 400);
   }
 
   // -------------------------------------------------------------------------
@@ -32283,10 +32375,11 @@ function createDuel({ globe, onExit, onSignIn }) {
       [them()]: (s.phase === "play" && s.locked?.[them()]) || (s.phase === "intro" && s.ready?.[them()])
     };
     document.getElementById("duelLanes").replaceChildren(...createLanes(totals, { locks }));
-    document.getElementById("duelRoundLabel").textContent = t("duel.roundOf", { n: s.round + 1, total: DUEL_ROUNDS.length });
+    document.getElementById("duelRoundLabel").textContent = t("duel.roundShort", { n: s.round + 1, total: DUEL_ROUNDS.length });
     const gap = totals[me()] - totals[them()];
     const lead = document.getElementById("duelLead");
     lead.textContent = gap > 0 ? t("duel.youLeadBy", { n: num(gap) }) : gap < 0 ? t("duel.theyLeadBy", { name: nameOf(them()), n: num(-gap) }) : t("duel.level");
+    lead.title = lead.textContent;
     lead.dataset.who = gap > 0 ? "you" : gap < 0 ? "them" : "";
   }
 
@@ -32487,6 +32580,7 @@ function createDuel({ globe, onExit, onSignIn }) {
       slider.addEventListener("input", () => {
         local.value = sliderValue(round.question, Number(slider.value));
         shown.textContent = formatValue(stat, local.value);
+        sendDraft();
       });
       slider.disabled = !ready;
       go.disabled = !ready;
@@ -32497,7 +32591,7 @@ function createDuel({ globe, onExit, onSignIn }) {
       chips.append(chip(startCountry, "is-start"));
       (local.route || []).forEach(iso => chips.append(chip(COUNTRY.get(iso))));
       const entry = countryEntry(country => addToRoute(country), t("duel.nextCountry", { name: countryName(COUNTRY.get(routeEnd())) }), !ready);
-      const undo = button(t("duel.undo"), "duel-link", () => { local.route = (local.route || []).slice(0, -1); drawPlay(); renderPanel(); });
+      const undo = button(t("duel.undo"), "duel-link", () => { local.route = (local.route || []).slice(0, -1); sendDraft(); drawPlay(); renderPanel(); });
       undo.disabled = !(local.route || []).length;
       parts.push(el("p", "duel-hint", t("duel.routeHint")), chips, entry, undo);
     } else if (round.style === "paint") {
@@ -32506,6 +32600,7 @@ function createDuel({ globe, onExit, onSignIn }) {
       go.disabled = !ready;
       parts.push(el("p", "duel-hint", t("duel.paintHint", { n: (local.painted || []).length })), chips, go);
     }
+    parts.push(el("p", "duel-fine", t("duel.lastCounts")));
     panel.replaceChildren(...parts);
   }
 
@@ -32712,7 +32807,7 @@ function createDuel({ globe, onExit, onSignIn }) {
     } else if (round.style === "route") {
       rows = [[t("duel.pts.shortest"), pts(DUEL_MAX_ROUND), "plus"], [t("duel.pts.extraHop"), pts(-ROUTE_STEP_PENALTY), "minus"], [t("duel.pts.notThere"), "0", ""]];
     } else if (round.style === "bid") {
-      rows = [[t("duel.pts.nameAll"), t("duel.pts.each", { n: pts(BID_POINTS) }), "plus"], [t("duel.pts.missOne"), t("duel.pts.each", { n: pts(-BID_POINTS) }), "minus"], [t("duel.pts.outbid"), "0", ""]];
+      rows = [[t("duel.pts.nameAll"), t("duel.pts.each", { n: pts(BID_POINTS) }), "plus"], [t("duel.pts.missOne"), t("duel.pts.each", { n: pts(-BID_POINTS) }), "minus"], [t("duel.pts.wrongName"), t("duel.pts.turnOver"), "minus"], [t("duel.pts.outbid"), "0", ""]];
     } else if (round.style === "paint") {
       rows = [[t("duel.pts.rightOne"), t("duel.pts.share"), "plus"], [t("duel.pts.wrongOne"), t("duel.pts.sameOff"), "minus"], [t("duel.pts.neverBelow"), "0", ""]];
     }
@@ -32741,7 +32836,7 @@ function createDuel({ globe, onExit, onSignIn }) {
     if (serverNow() < state().opensAt) return;
     const outcome = await move({ type: "name", iso: country.iso });
     if (outcome?.right) sounds.playGuess();
-    if (outcome?.wrong) { sounds.playError(); showToastNotice(t("duel.notOnList", { name: countryName(country) }), { problem: true }); }
+    if (outcome?.wrong) { sounds.playError(); showToastNotice(t("duel.wrongEnds", { name: countryName(country) }), { problem: true }); }
     if (outcome?.already) showToastNotice(t("duel.already"), { problem: true });
   }
 
@@ -32778,6 +32873,10 @@ function createDuel({ globe, onExit, onSignIn }) {
     return line;
   }
   function detail(round, entry, who) {
+    const text = detailText(round, entry, who);
+    return entry?.timedOut ? `${text} · ${t("duel.timedOut")}` : text;
+  }
+  function detailText(round, entry, who) {
     const r = round.result;
     switch (round.style) {
       case "pin": { if (!entry.pin) return t("duel.noAnswer"); const away = distance(entry.km); return t("duel.km", { km: num(Math.round(away.value)), unit: away.unit }); }
@@ -32788,7 +32887,12 @@ function createDuel({ globe, onExit, onSignIn }) {
         const right = entry.countries.filter(iso => r.answer.countries.includes(iso)).length;
         return t("duel.painted", { right, wrong: entry.countries.length - right });
       }
-      case "bid": return r && state().bid?.bidder === who ? t("duel.bidResult", { named: entry.named, bid: entry.bid }) : t("duel.didntBid");
+      case "bid": {
+        if (!(r && state().bid?.bidder === who)) return t("duel.didntBid");
+        const named = t("duel.bidResult", { named: entry.named, bid: entry.bid });
+        const wrong = entry.wrong && COUNTRY.get(entry.wrong);
+        return wrong ? `${named} · ${t("duel.wrongWas", { name: countryName(wrong) })}` : named;
+      }
       default: return "";
     }
   }
