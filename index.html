@@ -4892,8 +4892,75 @@ h1, h2, h3 { font-weight: normal; }
 .hero-actions.is-three > button b { color: var(--text); font: 11px var(--font-display); letter-spacing: var(--ls-pixel); }
 .hero-actions.is-three > button small { color: var(--muted); font: 7px var(--font-display); letter-spacing: var(--ls-pixel); }
 .mode-pips { display: flex; align-items: flex-end; gap: 3px; }
-.mode-head { width: 21px; height: 24px; image-rendering: pixelated; }
+.mode-head { width: 22px; height: 20px; image-rendering: pixelated; }
 .hero-join { order: 1; }
+@media (max-width: 760px) { .mode-pips { gap: 1px; } .mode-head { width: 18px; height: 16px; } }
+
+/* ---------- Create your camp (19 November 2026, tent-creator.js, mockups/tent-creator) ----------
+   Over everything (My tent, the lobby): the preview of your camp on the left, a ‹ choice ›
+   row per part on the right; on a phone one column with the preview stuck on top. */
+.tent-creator { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: radial-gradient(120% 80% at 30% 10%, rgba(23, 35, 71, 0.97), rgba(5, 7, 13, 0.98) 70%); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); color: var(--text); }
+.tent-creator.hidden { display: none; }
+.creator { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 560px); justify-content: center; gap: 24px; padding: 32px 20px 40px; }
+.creator-head { grid-column: 1 / -1; display: grid; gap: 6px; }
+.creator-head h2 { margin: 0; font: 18px var(--font-display); letter-spacing: var(--ls-pixel); }
+.creator-head p { margin: 0; color: var(--muted); font: 14px var(--font-body); }
+.creator-kicker { color: var(--gold); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.creator-stage, .creator-panel { display: grid; align-content: start; gap: 14px; padding: 16px; border: 1px solid var(--glass-line); border-radius: 20px; background: rgba(10, 15, 30, 0.82); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45); }
+.creator-scene { position: relative; height: 340px; border-radius: 14px; background: linear-gradient(#24346b, #3d5aa8 80%, #e8ecf6 80%, #c9d2e6); overflow: hidden; }
+.creator-scene::before { content: ""; position: absolute; left: 12%; top: 18%; width: 14px; height: 14px; background: #ffd45c; box-shadow: 0 0 20px #ffd45c; }
+.creator-scene canvas { position: absolute; left: 50%; bottom: 48px; width: 320px; height: 320px; transform: translateX(-50%); image-rendering: pixelated; }
+.creator-stage-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.creator-count { color: var(--muted); font: 12px var(--font-body); }
+.creator-dice { padding: 10px 12px; border: 2px solid var(--gold); border-radius: 10px; background: color-mix(in srgb, var(--gold) 14%, transparent); color: var(--gold); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
+.creator-where { display: grid; gap: 8px; }
+.creator-where-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.creator-where figure { display: grid; justify-items: center; gap: 6px; margin: 0; padding: 10px 6px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); }
+.creator-where figcaption { color: var(--muted); font: 7px var(--font-display); letter-spacing: var(--ls-pixel); }
+.creator-where canvas { image-rendering: pixelated; }
+.where-pin { display: grid; place-items: center; width: 40px; height: 40px; border: 2px solid var(--gold); border-radius: 50% 50% 50% 4px; background: #0b1226; transform: rotate(-45deg); }
+.where-pin canvas { width: 26px; height: 26px; transform: rotate(45deg); }
+.where-seat { display: grid; place-items: center; width: 60px; height: 52px; border: 2px solid var(--gold); border-radius: 10px; background: color-mix(in srgb, var(--gold) 10%, rgba(10, 15, 30, 0.6)); }
+.where-seat canvas { width: 44px; height: 44px; }
+.where-lane { display: grid; place-items: center; width: 34px; height: 34px; border: 2px solid var(--gold); border-radius: 9px; background: rgba(0, 0, 0, 0.35); }
+.where-lane canvas { width: 28px; height: 28px; }
+.creator-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.creator-tabs button { padding: 12px; border: 2px solid var(--glass-line); border-radius: 12px; background: rgba(10, 15, 30, 0.6); color: var(--muted); font: 10px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
+.creator-tabs button.is-on { border-color: var(--gold); background: color-mix(in srgb, var(--gold) 14%, rgba(10, 15, 30, 0.6)); color: var(--gold); }
+.creator-options { display: grid; gap: 6px; }
+/* A part per row: its name, ‹ the choice ›, and where it is in the list. */
+.creator-row { display: grid; grid-template-columns: 96px 36px minmax(0, 1fr) 36px 40px; align-items: center; gap: 6px; }
+.creator-label { color: var(--muted); font: 8px var(--font-display); letter-spacing: var(--ls-pixel); }
+.creator-step { height: 40px; border: 2px solid var(--glass-line); border-radius: 10px; background: rgba(10, 15, 30, 0.6); color: var(--text); font: 14px var(--font-display); cursor: pointer; }
+.creator-step:hover, .creator-step:focus-visible { border-color: var(--gold); color: var(--gold); outline: none; }
+.creator-step:active { transform: translateY(1px); }
+.creator-value { display: flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 8px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); overflow: hidden; }
+.creator-value b { overflow: hidden; color: var(--text); font: 8px var(--font-display); letter-spacing: var(--ls-pixel); text-overflow: ellipsis; white-space: nowrap; }
+.creator-value canvas { width: 32px; height: 32px; image-rendering: pixelated; }
+.creator-value canvas.is-explorer { width: 18px; height: 33px; }
+.creator-swatch { width: 56px; height: 24px; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 6px; background: var(--swatch); box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.25); }
+.creator-pos { color: var(--faint); font: 12px var(--font-mono); text-align: right; }
+.creator-note { margin: 0; color: var(--muted); font: 12px/1.45 var(--font-body); }
+.creator-actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.creator-save { padding: 13px; border: 0; border-radius: 10px; background: var(--gold); color: #0a0f1e; font: 11px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; box-shadow: 0 4px 0 #a07a1c; }
+.creator-cancel { padding: 13px 14px; border: 2px solid var(--glass-line); border-radius: 10px; background: none; color: var(--text); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
+@media (max-width: 760px) {
+  .creator { grid-template-columns: minmax(0, 1fr); gap: 12px; padding: calc(env(safe-area-inset-top, 0px) + 16px) 12px calc(env(safe-area-inset-bottom, 0px) + 16px); }
+  .creator-head p { display: none; }
+  .creator-scene { height: 240px; }
+  .creator-scene canvas { bottom: 34px; width: 224px; height: 224px; }
+  .creator-where { display: none; }
+  .creator-stage { position: sticky; top: 0; z-index: 2; padding: 10px; gap: 8px; }
+  .creator-panel { padding: 12px; }
+  .creator-row { grid-template-columns: 78px 34px minmax(0, 1fr) 34px 32px; gap: 5px; }
+}
+
+/* My tent: your camp and the button to the creator. */
+.camp-preview { display: flex; align-items: center; gap: 14px; margin-top: 10px; padding: 10px 12px; border: 1px solid var(--glass-line); border-radius: 14px; background: linear-gradient(#24346b, #3d5aa8 72%, #e8ecf6 72%); }
+.camp-preview-art { width: 72px; height: 72px; image-rendering: pixelated; }
+.camp-create { flex: 1; padding: 12px; border: 0; border-radius: 10px; background: var(--gold); color: #0a0f1e; font: 10px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; box-shadow: 0 3px 0 #a07a1c; }
+.camp-create:hover, .camp-create:focus-visible { filter: brightness(1.08); outline: none; }
+.base-line .camp-preview { grid-column: 1 / -1; flex-basis: 100%; width: 100%; box-sizing: border-box; }
 
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -6090,6 +6157,54 @@ const EN = {
   "versus.duel": "DUEL",
   "versus.party": "PARTY",
   "versus.players": "{n} PLAYERS",
+  // Create your camp (tent-creator.js)
+  "creator.open": "✎ CREATE YOUR CAMP",
+  "creator.kicker": "MY TENT",
+  "creator.title": "CREATE YOUR CAMP",
+  "creator.text": "Your tent and your explorer, the way everyone sees them: on the globe, in Crew and in every match.",
+  "creator.dice": "🎲 SURPRISE ME",
+  "creator.count": "One of {n} camps",
+  "creator.tab.tent": "⛺ TENT",
+  "creator.tab.explorer": "🧭 EXPLORER",
+  "creator.save": "✓ SAVE MY CAMP",
+  "creator.cancel": "CANCEL",
+  "creator.note": "Everything is free to pick for now. Tents and explorers you earn by playing can come later, as extra choices here.",
+  "creator.prev": "Previous {part}",
+  "creator.next": "Next {part}",
+  "creator.nobody": "Nobody",
+  "creator.yours": "Your explorer",
+  "creator.p.explorer": "Explorer",
+  "creator.p.style": "Style",
+  "creator.p.color": "Colour",
+  "creator.p.accent": "Second colour",
+  "creator.p.pattern": "Pattern",
+  "creator.p.flag": "Flag",
+  "creator.p.skin": "Skin",
+  "creator.p.hair": "Hair",
+  "creator.p.hairColor": "Hair colour",
+  "creator.p.hat": "Hat",
+  "creator.p.hatColor": "Hat colour",
+  "creator.p.jacket": "Jacket",
+  "creator.p.legs": "Trousers",
+  "creator.v.aframe": "A-frame",
+  "creator.v.dome": "Dome",
+  "creator.v.popup": "Pop-up",
+  "creator.v.summit": "Summit",
+  "creator.v.plain": "Plain",
+  "creator.v.stripe": "Stripe",
+  "creator.v.patch": "Patch",
+  "creator.v.none": "None",
+  "creator.v.pennant": "Pennant",
+  "creator.v.banner": "Banner",
+  "creator.v.short": "Short",
+  "creator.v.long": "Long",
+  "creator.v.bun": "Bun",
+  "creator.v.spiky": "Spiky",
+  "creator.v.bald": "Bald",
+  "creator.v.beanie": "Beanie",
+  "creator.v.bobble": "Bobble",
+  "creator.v.cap": "Cap",
+  "creator.v.bareLegs": "Bare legs",
   "menu.party3": "▶ PARTY · 3",
   "menu.party4": "▶ PARTY · 4",
   "menu.guest": "Guest",
@@ -7349,6 +7464,54 @@ const NL = {
   "versus.duel": "DUEL",
   "versus.party": "PARTY",
   "versus.players": "{n} SPELERS",
+  // Maak je kamp (tent-creator.js)
+  "creator.open": "✎ MAAK JE KAMP",
+  "creator.kicker": "MIJN TENT",
+  "creator.title": "MAAK JE KAMP",
+  "creator.text": "Je tent en je ontdekker, zoals iedereen ze ziet: op de globe, in Crew en in elke match.",
+  "creator.dice": "🎲 VERRAS ME",
+  "creator.count": "Een van {n} kampen",
+  "creator.tab.tent": "⛺ TENT",
+  "creator.tab.explorer": "🧭 ONTDEKKER",
+  "creator.save": "✓ BEWAAR MIJN KAMP",
+  "creator.cancel": "ANNULEER",
+  "creator.note": "Alles is voorlopig vrij te kiezen. Tenten en ontdekkers die je verdient door te spelen, kunnen later als extra keuzes komen.",
+  "creator.prev": "Vorige {part}",
+  "creator.next": "Volgende {part}",
+  "creator.nobody": "Niemand",
+  "creator.yours": "Jouw ontdekker",
+  "creator.p.explorer": "Ontdekker",
+  "creator.p.style": "Stijl",
+  "creator.p.color": "Kleur",
+  "creator.p.accent": "Tweede kleur",
+  "creator.p.pattern": "Patroon",
+  "creator.p.flag": "Vlag",
+  "creator.p.skin": "Huid",
+  "creator.p.hair": "Haar",
+  "creator.p.hairColor": "Haarkleur",
+  "creator.p.hat": "Muts",
+  "creator.p.hatColor": "Mutskleur",
+  "creator.p.jacket": "Jas",
+  "creator.p.legs": "Broek",
+  "creator.v.aframe": "Driehoek",
+  "creator.v.dome": "Koepel",
+  "creator.v.popup": "Pop-up",
+  "creator.v.summit": "Topper",
+  "creator.v.plain": "Effen",
+  "creator.v.stripe": "Streep",
+  "creator.v.patch": "Lap",
+  "creator.v.none": "Geen",
+  "creator.v.pennant": "Wimpel",
+  "creator.v.banner": "Vaandel",
+  "creator.v.short": "Kort",
+  "creator.v.long": "Lang",
+  "creator.v.bun": "Knot",
+  "creator.v.spiky": "Stekels",
+  "creator.v.bald": "Kaal",
+  "creator.v.beanie": "Muts",
+  "creator.v.bobble": "Pompon",
+  "creator.v.cap": "Pet",
+  "creator.v.bareLegs": "Blote benen",
   "menu.party3": "▶ PARTY · 3",
   "menu.party4": "▶ PARTY · 4",
   "menu.guest": "Gast",
@@ -11832,7 +11995,7 @@ async function saveTentColor(tentColor) {
 async function saveTentLook(tentLook) {
   const supabase = await getClient();
   const stored = user?.user_metadata?.tentLook;
-  if (!supabase || !user || (stored && stored.style === tentLook.style && stored.avatar === tentLook.avatar)) return;
+  if (!supabase || !user || (stored && JSON.stringify(stored) === JSON.stringify(tentLook))) return;
   const { data, error } = await supabase.auth.updateUser({ data: { tentLook } });
   if (error) console.warn("Couldn't save your tent to your account.", error);
   else if (data?.user) user = data.user;
@@ -30766,6 +30929,55 @@ function initializePlayerStats({ getDays, getDayRecord, openArchive }) {
 return { createDistributionChart, initializeHistoryScreens, computePlayerStats };
 })();
 
+// ---- look-parts.js
+__modules["look-parts.js"] = (() => {
+// Every part of a camp (your tent and your explorer) that can be picked, and how a look is
+// checked. No DOM and no imports: the game uses it (tents.js, base.js, tent-creator.js) and so
+// does the Edge Function `duel` (a copy, made by tools/build-duel-bank.mjs), which reads your
+// look from your account and shows it to the other players. Change it here only.
+const TENT_STYLE_IDS = ["aframe", "dome", "popup", "summit"];
+const AVATAR_IDS = ["none", "boy", "girl", "custom"];
+const LOOK_PARTS = {
+  tent: {
+    style: TENT_STYLE_IDS,
+    color: ["#ff9f43", "#ff5a5a", "#ff6b9d", "#b48cff", "#5b8cff", "#45e3ff", "#36d6b0", "#a8f060", "#ffd45c", "#f4f1e8", "#8a5a32", "#2b313b"],
+    accent: ["#ffd45c", "#f4f1e8", "#ff5a5a", "#45e3ff", "#36d6b0", "#b48cff", "#0b1020"],
+    pattern: ["plain", "stripe", "patch"],
+    flag: ["none", "pennant", "banner"]
+  },
+  explorer: {
+    skin: ["#f6d5b8", "#f2c29b", "#d9a273", "#b97a4f", "#8d5a3b", "#5e3a24"],
+    hair: ["short", "long", "bun", "spiky", "bald"],
+    hairColor: ["#2a1a10", "#5c3a1f", "#8a5a32", "#d9a441", "#c4502a", "#e8ecf6", "#5b8cff"],
+    hat: ["none", "beanie", "bobble", "cap"],
+    hatColor: ["#ff5a5a", "#ffd45c", "#36d6b0", "#5b8cff", "#ff6b9d", "#f4f1e8"],
+    jacket: ["#2bb3a3", "#ff6b9d", "#ff9f43", "#5b8cff", "#ffd45c", "#b48cff", "#ff5a5a", "#2b313b"],
+    legs: ["#5c3a1f", "#2b313b", "#1f3f8a", "#7a8a3a", "skin"]
+  }
+};
+const pick = (list, value, fallback = list[0]) => (list.includes(value) ? value : fallback);
+// A look with only known parts (anything else falls back to the first choice). The colour
+// of the tent is kept apart (it's also your pin's colour): cleanColor.
+function cleanLook(value = {}) {
+  const parts = LOOK_PARTS.tent;
+  const look = {
+    style: pick(parts.style, value?.style),
+    avatar: pick(AVATAR_IDS, value?.avatar, "none"),
+    accent: pick(parts.accent, value?.accent),
+    pattern: pick(parts.pattern, value?.pattern),
+    flag: pick(parts.flag, value?.flag)
+  };
+  if (look.avatar === "custom") {
+    look.explorer = {};
+    for (const [part, list] of Object.entries(LOOK_PARTS.explorer)) look.explorer[part] = pick(list, value?.explorer?.[part]);
+  }
+  return look;
+}
+const cleanColor = (value, fallback = LOOK_PARTS.tent.color[0]) => pick(LOOK_PARTS.tent.color, value, fallback);
+
+return { TENT_STYLE_IDS, AVATAR_IDS, LOOK_PARTS, cleanLook, cleanColor };
+})();
+
 // ---- tents.js
 __modules["tents.js"] = (() => {
 // Your tent: your own marker on the globe, distinct from Base Camp (the shared camp with its
@@ -30785,17 +30997,19 @@ const { createBadge } = __modules["badges.js"];
 const { RANK_TIERS, getMonthBadge } = __modules["community.js"];
 const { isPreseasonMonth } = __modules["daily.js"];
 const { t } = __modules["i18n.js"];
+const { AVATAR_IDS, LOOK_PARTS } = __modules["look-parts.js"];
 
 const TENT_KEY = "daily-geography:tent-level:v1";
 
-// The styles, in the order they unlock (level = the rank that unlocks it).
+// The styles. Since the creator (19 November 2026) every style is free: level 0. Tents and
+// explorers earned by playing can come back later as extra choices.
 const TENT_STYLES = [
   { id: "aframe", level: 0 },
-  { id: "dome", level: 1 },
-  { id: "popup", level: 3 },
-  { id: "summit", level: 5 }
+  { id: "dome", level: 0 },
+  { id: "popup", level: 0 },
+  { id: "summit", level: 0 }
 ];
-const AVATARS = ["none", "boy", "girl"];
+const AVATARS = AVATAR_IDS;
 const isStyleUnlocked = (style, level) => (TENT_STYLES.find(item => item.id === style)?.level ?? 99) <= level;
 // The style to draw: your choice if you've unlocked it, else the A-frame.
 const styleFor = (style, level) => (isStyleUnlocked(style, level) ? style : "aframe");
@@ -30817,21 +31031,158 @@ const PALETTE = {
   Y: "#ffd45c", y: "#c99a2e", P: "#ff6b9d", p: "#c2456f", T: "#2bb3a3", t: "#1c7a70",
   B: "#8a5a32", b: "#5c3a1f", F: "#f2c29b", f: "#c98f6a"
 };
-const STYLE_ROWS = {
-  // A classic ridge tent seen from the front, its pole sticking out on top.
-  aframe: [".....K.....", ".....K.....", "....KCK....", "...KCCcK...", "..KCCKccK..", ".KCCKnKccK.", "KCCKnnnKccK", "KKKKKKKKKKK"],
-  // A round dome with a little window.
-  dome: ["...KKKKK...", "..KCCCCcK..", ".KCCWCCccK.", ".KCCCCCccK.", "KCCCKKKcccK", "KCCKnnnKccK", "KCCKnnnKccK", "KKKKKKKKKKK"],
-  // A pop-up: low and boxy, with a bright band.
-  popup: ["..KKKKKKK..", ".KCCCCCCcK.", "KCYYYYYYYcK", "KCCCKKKCccK", "KCCKnnnKccK", "KCCKnnnKccK", "KKKKKKKKKKK"],
-  // A high-altitude summit shelter: snow on its peak and a gold pennant.
-  summit: [".....KYYY..", ".....KYY...", ".....K.....", "....KSK....", "...KSSsK...", "..KCCSccK..", ".KCCKnKccK.", "KCCKnnnKccK", "KKKKKKKKKKK"]
-};
-const AVATAR_ROWS = {
-  boy: [".KKK.", "KBBBK", "KFFFK", ".KFK.", "KTTTK", "KtttK", "KbKbK", "KK.KK"],
-  girl: [".KKK.", "KbbbK", "KFFFK", "KbFbK", "KPPPK", "KpppK", "KFKFK", "KK.KK"]
-};
 
+// ---------- Create your own (19 November 2026) ----------
+// Every part of the tent and the explorer can be picked (tent-creator.js; mockups/tent-
+// creator), so every player has their own setup. Each part is optional: a look without
+// them draws as before (the boy and girl are presets of the explorer below).
+// The boy and girl of before, as explorers.
+const EXPLORER_PRESETS = {
+  boy: { skin: "#f2c29b", hair: "short", hairColor: "#8a5a32", hat: "none", jacket: "#2bb3a3", jacketShade: "#1c7a70", legs: "#5c3a1f" },
+  girl: { skin: "#f2c29b", hair: "long", hairColor: "#5c3a1f", hat: "none", jacket: "#ff6b9d", jacketShade: "#c2456f", legs: "skin" }
+};
+// The explorer in a look: { … } for avatar "custom" (or a preset), null for nobody.
+function explorerOf(look = {}) {
+  if (look.avatar === "custom") return { ...EXPLORER_PRESETS.boy, jacketShade: null, ...(look.explorer || {}) };
+  return EXPLORER_PRESETS[look.avatar] || null;
+}
+// How many different setups there are (for the creator: "one of …").
+function setupCount() {
+  const count = parts => Object.values(parts).reduce((total, list) => total * list.length, 1);
+  return count(LOOK_PARTS.tent) * (1 + count(LOOK_PARTS.explorer));
+}
+// A random setup (the creator's dice).
+function randomLook(random = Math.random) {
+  const pick = list => list[Math.floor(random() * list.length)];
+  const look = { avatar: "custom", explorer: {} };
+  for (const [part, list] of Object.entries(LOOK_PARTS.tent)) look[part] = pick(list);
+  for (const [part, list] of Object.entries(LOOK_PARTS.explorer)) look.explorer[part] = pick(list);
+  return look;
+}
+
+// ---------- The art, on a 32×32 grid (19 November 2026: twice the detail of before) ----------
+// The tent is 21 pixels wide, drawn by code (so its edges are clean): K outline, C fabric and
+// c its shaded side, A/a the second colour, n the doorway, S/s snow, Y gold. The explorer is
+// 11×20 (explorerRows).
+const GRID = 32;
+const TENT_W = 21;
+function grid(width, height) { return Array.from({ length: height }, () => Array(width).fill(".")); }
+function tentShape(style) {
+  const cx = 10;
+  if (style === "dome") {
+    const h = 16, g = grid(TENT_W, h);
+    for (let y = 0; y < h; y++) {
+      const dy = (h - 0.5 - y) / h;
+      const half = Math.round(10 * Math.sqrt(Math.max(0, 1 - dy * dy)) + (y === h - 1 ? 0 : 0));
+      for (let x = cx - half; x <= cx + half; x++) g[y][x] = x === cx - half || x === cx + half || y === 0 || y === h - 1 ? "K" : x > cx + 3 ? "c" : "C";
+    }
+    for (let y = 1; y < h - 1; y++) for (let x = 0; x < TENT_W; x++) if (g[y][x] !== "." && g[y][x] !== "K" && (g[y - 1][x] === "." )) g[y][x] = "K";
+    // Seams over the top, a window, an arched door.
+    for (let y = 2; y < h - 1; y++) { if (g[y][cx - 4] !== "K" && g[y][cx - 4] !== ".") g[y][cx - 4] = "c"; if (g[y][cx + 4] !== "K" && g[y][cx + 4] !== ".") g[y][cx + 4] = "K"; }
+    [[5, 5], [5, 6], [6, 5], [6, 6]].forEach(([y, x]) => { g[y][x] = "W"; });
+    for (let y = h - 6; y < h - 1; y++) for (let x = cx - 2; x <= cx + 2; x++) g[y][x] = y === h - 6 && (x === cx - 2 || x === cx + 2) ? g[y][x] : "n";
+    g[h - 6][cx - 1] = g[h - 6][cx] = g[h - 6][cx + 1] = "K";
+    return g;
+  }
+  if (style === "popup") {
+    const h = 14, g = grid(TENT_W, h);
+    for (let y = 0; y < h; y++) {
+      const inset = y === 0 ? 3 : y === 1 ? 1 : 0;
+      for (let x = inset; x < TENT_W - inset; x++) g[y][x] = x === inset || x === TENT_W - 1 - inset || y === 0 || y === h - 1 ? "K" : x > TENT_W - 6 ? "c" : "C";
+    }
+    for (let x = 1; x < TENT_W - 1; x++) { g[3][x] = "Y"; g[4][x] = x > TENT_W - 6 ? "y" : "Y"; }
+    for (let y = h - 7; y < h - 1; y++) for (let x = cx - 2; x <= cx + 2; x++) g[y][x] = x === cx - 2 || x === cx + 2 ? "K" : "n";
+    for (let x = cx - 2; x <= cx + 2; x++) g[h - 8][x] = "K";
+    for (let y = h - 6; y < h - 3; y++) for (let x = 3; x < 6; x++) g[y][x] = y === h - 6 || x === 3 ? "K" : "W";
+    return g;
+  }
+  // The A-frame and the summit shelter: a triangle with a seam down the middle and a door.
+  const summit = style === "summit";
+  const h = summit ? 20 : 17, g = grid(TENT_W, h);
+  for (let y = 0; y < h; y++) {
+    const half = Math.round(y * 10 / (h - 1));
+    for (let x = cx - half; x <= cx + half; x++) {
+      const edge = x === cx - half || x === cx + half || y === h - 1;
+      g[y][x] = edge ? "K" : x === cx ? "K" : summit && y < 8 ? (x < cx ? "S" : "s") : x < cx ? "C" : "c";
+    }
+  }
+  // The door: open flaps from the seam down.
+  const top = h - (summit ? 7 : 6);
+  for (let y = top; y < h - 1; y++) {
+    const d = Math.floor((y - top) / 2) + 1;
+    for (let x = cx - d; x <= cx + d; x++) g[y][x] = "n";
+    g[y][cx - d - 1] = g[y][cx - d - 1] === "K" ? "K" : "W";
+  }
+  return g;
+}
+// The tent's rows with its pattern and flag (stripe: a band of the second colour across the
+// fabric; patch: a square of it on the left; pennant / banner on a pole above the top).
+function tentRows(look) {
+  const g = tentShape(look.style);
+  const fabric = (y, x) => g[y]?.[x] === "C" || g[y]?.[x] === "c";
+  const h = g.length;
+  if (look.pattern === "stripe") {
+    const at = h - Math.round(h * 0.55);
+    [at, at + 1].forEach(y => g[y].forEach((key, x) => { if (fabric(y, x)) g[y][x] = key === "C" ? "A" : "a"; }));
+  } else if (look.pattern === "patch") {
+    const y0 = h - 6, x0 = look.style === "popup" ? 3 : look.style === "dome" ? 3 : 6;
+    for (let y = y0; y < y0 + 3; y++) for (let x = x0; x < x0 + 3; x++) if (fabric(y, x)) g[y][x] = (x === x0 || y === y0) ? "a" : "A";
+  }
+  // A rim of light just inside the left outline (the sunny side).
+  g.forEach(row => { const at = row.findIndex(key => key === "C"); if (at > 0 && row[at - 1] === "K") row[at] = "e"; });
+  let rows = g.map(row => row.join(""));
+  if (look.flag === "pennant" || look.flag === "banner") {
+    const firstK = rows[0].indexOf("K");
+    const pole = Math.min(Math.round((firstK + rows[0].lastIndexOf("K")) / 2), TENT_W - 5);
+    const line = cells => { const row = Array(TENT_W).fill("."); cells.forEach(([x, key]) => { row[x] = key; }); return row.join(""); };
+    const flag = look.flag === "pennant"
+      ? [line([[pole, "K"], [pole + 1, "A"], [pole + 2, "A"], [pole + 3, "A"], [pole + 4, "a"]]), line([[pole, "K"], [pole + 1, "A"], [pole + 2, "a"]]), line([[pole, "K"]]), line([[pole, "K"]])]
+      : [line([[pole, "K"], [pole + 1, "A"], [pole + 2, "A"], [pole + 3, "A"], [pole + 4, "A"]]), line([[pole, "K"], [pole + 1, "A"], [pole + 2, "W"], [pole + 3, "A"], [pole + 4, "A"]]), line([[pole, "K"], [pole + 1, "a"], [pole + 2, "a"], [pole + 3, "a"], [pole + 4, "a"]]), line([[pole, "K"]])];
+    rows = [...flag, ...rows];
+  } else if (look.style === "aframe" || look.style === "summit") {
+    // The ridge pole sticking out on top.
+    rows = [".".repeat(10) + "K" + ".".repeat(10), ...rows];
+  }
+  return rows;
+}
+// The explorer's 11×20 pixels: 5 rows of hair or hat, a face (eyes with whites, a nose, a
+// mouth), a jacket with a zip, arms and hands, a belt with a buckle, trousers and boots.
+function explorerRows(person) {
+  const tops = {
+    short: ["...KKKKK...", "..KHHHHHK..", ".KHHhHHHHK.", ".KHhHHHhHK.", ".KHHFFFHHK."],
+    long: ["...KKKKK...", "..KHHHHHK..", ".KHHhHHHHK.", "KHHhHHHhHHK", "KHHHFFFHHHK"],
+    bun: ["....KHK....", "...KHhHK...", "..KKHHHKK..", ".KHHhHHHHK.", ".KHHFFFHHK."],
+    spiky: [".K.K.K.K...", "KHKHKHKHK..", ".KHHHHHHHK.", ".KHhHHhHHK.", ".KHHFFFHHK."],
+    bald: ["...KKKKK...", "..KFFFFFK..", ".KFWFFFFFK.", ".KFFFFFFFK.", ".KFFFFFFFK."]
+  };
+  const hats = {
+    beanie: ["...KKKKK...", "..KAAAAAK..", ".KAaAaAaAK.", ".KAaAaAaAK.", ".KaaaaaaaK."],
+    bobble: ["....KAK....", "...KAAAK...", "..KAAAAAK..", ".KAAAAAAAK.", ".KaaaaaaaK."],
+    cap: ["...KKKKK...", "..KAAAAAK..", ".KAAAAAAAK.", ".KAAAAAAAAK", ".KHaaaaaaaK"]
+  };
+  const long = person.hair === "long";
+  const head = hats[person.hat] ? [...hats[person.hat]] : [...(tops[person.hair] || tops.short)];
+  let face = [".KFFFFFFFK.", ".KFWKFWKFK.", ".KFFFfFFFK.", ".KfFFFFFfK.", "..KFFMFFK.."];
+  // Long hair falls past the face and over the shoulders.
+  if (long) face = face.map((row, i) => i < 4 ? "KH" + row.slice(2, 9) + "HK" : "KHK" + row.slice(3, 8) + "KHK");
+  const body = [
+    long ? "KHKJJjJJKHK" : "..KJJjJJK..",
+    ".KJJJjJJJK.",
+    "KJJKJjJKJJK",
+    "KjJKJjJKJjK",
+    "KFFKJjJKFFK",
+    "..KDDYDDK.."
+  ];
+  const legs = ["..KLLKLLK..", "..KLlKLlK..", "..KLlKLlK..", ".KBBBKBBBK."];
+  return [...head, ...face, ...body, ...legs];
+}
+
+// A colour a third of the way to white, for the rim of light.
+function light(hex) {
+  const value = parseInt(hex.slice(1), 16);
+  const part = shift => Math.round(((value >> shift) & 255) * 0.65 + 255 * 0.35);
+  return `rgb(${part(16)}, ${part(8)}, ${part(0)})`;
+}
 // A colour a third of the way to black, for the fabric's shade.
 function shade(hex) {
   const value = parseInt(hex.slice(1), 16);
@@ -30846,26 +31197,66 @@ function paint(ctx, rows, left, top, scale, colors) {
     ctx.fillRect(left + x * scale, top + y * scale, scale, scale);
   }));
 }
-// Your tent's look on a 16×16 grid (left, top: its corner; scale: pixels per cell): the
-// tent standing on the bottom, the explorer beside it on the right.
-function drawTentLook(ctx, { style = "aframe", avatar = "none", color = "#ff9f43" } = {}, left = 0, top = 0, scale = 1) {
-  const tent = STYLE_ROWS[style] || STYLE_ROWS.aframe;
-  const person = AVATAR_ROWS[avatar];
-  const colors = { ...PALETTE, C: color, c: shade(color) };
-  const bottom = 13; // the ground's row
-  const tentLeft = person ? 0 : 2;
-  paint(ctx, tent, left + tentLeft * scale, top + (bottom - tent.length + 1) * scale, scale, colors);
-  if (person) paint(ctx, person, left + 11 * scale, top + (bottom - person.length + 1) * scale, scale, colors);
+// Your tent's look on the 32×32 grid (left, top: its corner; cell: pixels per grid cell): the
+// tent standing on the ground, the explorer beside it on the right.
+const explorerColors = person => {
+  const legs = person.legs === "skin" ? person.skin : person.legs;
+  return {
+    K: PALETTE.K, W: PALETTE.W, F: person.skin, f: shade(person.skin), H: person.hairColor, h: shade(person.hairColor),
+    A: person.hatColor || "#ff5a5a", a: shade(person.hatColor || "#ff5a5a"), J: person.jacket, j: person.jacketShade || shade(person.jacket),
+    L: legs, l: shade(legs), B: "#3a2414", M: "#8a3a2a", D: "#2a1a10", Y: "#ffd45c"
+  };
+};
+function drawTentLook(ctx, look = {}, left = 0, top = 0, cell = 1) {
+  const { color = "#ff9f43", accent = "#ffd45c" } = look;
+  const tent = tentRows(look);
+  const person = explorerOf(look);
+  const colors = { ...PALETTE, C: color, c: shade(color), e: light(color), A: accent, a: shade(accent) };
+  const bottom = 29; // the ground's row
+  const tentLeft = person ? 0 : 5;
+  // A soft shadow on the ground under the camp.
+  ctx.fillStyle = "rgba(4, 6, 13, 0.28)";
+  ctx.fillRect(left + (tentLeft + 1) * cell, top + (bottom + 1) * cell, (person ? 30 : 19) * cell, cell);
+  paint(ctx, tent, left + tentLeft * cell, top + (bottom - tent.length + 1) * cell, cell, colors);
+  if (!person) return;
+  const rows = explorerRows(person);
+  paint(ctx, rows, left + 21 * cell, top + (bottom - rows.length + 1) * cell, cell, explorerColors(person));
+}
+// The explorer on their own (the creator's choices), at a whole-pixel scale.
+function createExplorerCanvas(look, scale = 4, className = "explorer-icon") {
+  const person = explorerOf(look);
+  const canvas = Object.assign(document.createElement("canvas"), { width: 11 * scale, height: 20 * scale, className });
+  if (person) paint(canvas.getContext("2d"), explorerRows(person), 0, 0, scale, explorerColors(person));
+  return canvas;
+}
+// Just the explorer's head (hair or hat and face: the top 10 rows), e.g. the VERSUS tiles.
+function createExplorerHead(explorer, scale = 2, className = "explorer-head") {
+  const person = { ...EXPLORER_PRESETS.boy, jacketShade: null, ...explorer };
+  const canvas = Object.assign(document.createElement("canvas"), { width: 11 * scale, height: 10 * scale, className });
+  paint(canvas.getContext("2d"), explorerRows(person).slice(0, 10), 0, 0, scale, explorerColors(person));
+  return canvas;
 }
 // A canvas with the look at a whole-pixel scale (crisp at any size).
 // centred: the drawn pixels in the middle of the square (the grid keeps the tent on the
 // ground and room for an explorer, so without one it would sit low and to the side).
+// `scale` is as before (a 16-pixel tent at 1); the art is drawn on the 32 grid at
+// ceil(scale / 2) pixels per cell, and a scale-1 icon (the globe pins, which use the canvas's
+// own size) is that drawing halved, still 16 pixels.
 function createTentCanvas(look, scale = 3, className = "tent-icon", { centred = false } = {}) {
+  if (scale === 1) {
+    const full = createTentCanvas(look, 2, className, { centred });
+    const small = Object.assign(document.createElement("canvas"), { width: 16, height: 16, className });
+    const sctx = small.getContext("2d");
+    sctx.imageSmoothingEnabled = true;
+    sctx.drawImage(full, 0, 0, 16, 16);
+    return small;
+  }
+  const cell = Math.ceil(scale / 2);
   const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = 16 * scale;
+  canvas.width = canvas.height = GRID * cell;
   canvas.className = className;
   const ctx = canvas.getContext("2d");
-  drawTentLook(ctx, look, 0, 0, scale);
+  drawTentLook(ctx, look, 0, 0, cell);
   if (!centred) return canvas;
   const size = canvas.width;
   const { data } = ctx.getImageData(0, 0, size, size);
@@ -30951,7 +31342,7 @@ function celebrateTent(unlocked, { look = {}, hasBase = true, onPitch = null } =
   });
 }
 
-return { TENT_STYLES, AVATARS, isStyleUnlocked, styleFor, tentLevel, drawTentLook, createTentCanvas, tentToCelebrate, markTentCelebrated, celebrateTent };
+return { TENT_STYLES, AVATARS, isStyleUnlocked, styleFor, tentLevel, EXPLORER_PRESETS, explorerOf, setupCount, randomLook, drawTentLook, createExplorerCanvas, createExplorerHead, createTentCanvas, tentToCelebrate, markTentCelebrated, celebrateTent };
 })();
 
 // ---- capital-data.js
@@ -30994,7 +31385,8 @@ __modules["base.js"] = (() => {
 // signed in, in the account (user metadata "base"; the account wins when you sign in).
 const { sounds } = __modules["audio.js"];
 const { getUser, saveBase, saveLanguage, saveTent, saveTentColor, saveTentLook } = __modules["auth.js"];
-const { AVATARS, TENT_STYLES, createTentCanvas, isStyleUnlocked, styleFor } = __modules["tents.js"];
+const { createTentCanvas } = __modules["tents.js"];
+const { LOOK_PARTS, cleanColor, cleanLook } = __modules["look-parts.js"];
 const { CAPITALS } = __modules["capital-data.js"];
 const { CITIES } = __modules["place-data.js"];
 const { createAtlasSprite } = __modules["atlas.js"];
@@ -31002,9 +31394,6 @@ const { COUNTRIES } = __modules["countries.js"];
 const { getCountry } = __modules["daily.js"];
 const { LANGUAGES, countryName, getLang, onLangChange, setLang, t } = __modules["i18n.js"];
 const { createCountryInput, createFlagImage } = __modules["ui.js"];
-const { RANK_TIERS } = __modules["community.js"];
-// The rank names by level (1 Tourist … 6 Mr. Worldwide).
-const RANK_NAMES = () => [null, ...RANK_TIERS.slice().reverse().map(tier => tier.name)];
 
 const BASE_KEY = "daily-geography:base:v1";
 // The tent's spot in that country: a real city (place-data.js), the capital by default.
@@ -31014,26 +31403,22 @@ const listeners = new Set();
 // picked under My account. Kept in this browser and, signed in, in the account (user
 // metadata "tentColor"; the account wins when you sign in).
 const COLOR_KEY = "daily-geography:tent-color:v1";
-const TENT_COLORS = ["#ff9f43", "#ff5a5a", "#b48cff", "#5b8cff", "#36d6b0", "#a8f060", "#f4f1e8"];
+const TENT_COLORS = LOOK_PARTS.tent.color;
 let tentColor = (() => { try { return localStorage.getItem(COLOR_KEY); } catch { return null; } })();
 if (!TENT_COLORS.includes(tentColor)) tentColor = TENT_COLORS[0];
 const getTentColor = () => tentColor;
-// Your tent's style and the explorer beside it (tents.js), picked under My Tent. A style
-// you haven't unlocked yet (a new browser before your days have loaded) draws as an A-frame.
+// Your camp: the tent's style, second colour, pattern and flag, and your explorer (tents.js,
+// made in the creator, tent-creator.js; the parts in look-parts.js). Every part is free.
 const LOOK_KEY = "daily-geography:tent-look:v1";
-const cleanLook = value => ({
-  style: TENT_STYLES.some(item => item.id === value?.style) ? value.style : "aframe",
-  avatar: AVATARS.includes(value?.avatar) ? value.avatar : "none"
-});
 let tentLook = cleanLook((() => { try { return JSON.parse(localStorage.getItem(LOOK_KEY) || "null"); } catch { return null; } })());
 // The explorer rank that unlocks styles, from engine.js (it knows your days).
 let levelSource = () => 0;
 const setTentLevelSource = source => { levelSource = source; };
-// Everything to draw your tent: { style, avatar, color }.
-const getTentLook = () => ({ style: styleFor(tentLook.style, levelSource()), avatar: tentLook.avatar, color: tentColor });
+// Everything to draw your camp: { style, avatar, color, accent, pattern, flag, explorer? }.
+const getTentLook = () => ({ ...structuredClone(tentLook), color: tentColor });
 function setTentLook(patch, { save = true } = {}) {
   const next = cleanLook({ ...tentLook, ...patch });
-  if (next.style === tentLook.style && next.avatar === tentLook.avatar) return;
+  if (JSON.stringify(next) === JSON.stringify(tentLook)) return;
   tentLook = next;
   try { localStorage.setItem(LOOK_KEY, JSON.stringify(tentLook)); } catch { /* storage off */ }
   if (save && getUser()) saveTentLook(tentLook);
@@ -31291,54 +31676,16 @@ function createBaseLine({ onChange = null } = {}) {
       onChange?.();
     });
     line.append(where, change);
-    // The pin's colour: a row of pixel swatches (only with a tent to colour).
-    if (base) {
-      const colors = document.createElement("div");
-      colors.className = "tent-colors";
-      colors.setAttribute("role", "radiogroup");
-      colors.setAttribute("aria-label", t("base.color"));
-      colors.appendChild(Object.assign(document.createElement("span"), { className: "field-label", textContent: t("base.color") }));
-      TENT_COLORS.forEach((color, index) => {
-        const swatch = Object.assign(document.createElement("button"), { type: "button", className: "tent-swatch" });
-        swatch.style.setProperty("--swatch", color);
-        swatch.setAttribute("role", "radio");
-        swatch.setAttribute("aria-checked", String(color === tentColor));
-        swatch.setAttribute("aria-label", t("base.colorN", { n: index + 1 }));
-        swatch.addEventListener("click", () => { sounds.playClick(); setTentColor(color); });
-        colors.appendChild(swatch);
-      });
-      line.appendChild(colors);
-      line.append(lookPicker("style"), lookPicker("avatar"));
+    // Your camp as it is, and the creator (tent-creator.js, opened by engine.js) to change it.
+    {
+      const camp = document.createElement("div");
+      camp.className = "camp-preview";
+      camp.append(createTentCanvas(getTentLook(), 4, "camp-preview-art", { centred: true }));
+      const edit = Object.assign(document.createElement("button"), { type: "button", className: "camp-create", textContent: t("creator.open") });
+      edit.addEventListener("click", () => { sounds.playClick(); document.dispatchEvent(new Event("open-tent-creator")); });
+      camp.append(edit);
+      line.appendChild(camp);
     }
-  };
-  // A row of choices drawn as your tent: the styles (locked ones say which badge opens
-  // them), or the explorers.
-  const lookPicker = kind => {
-    const row = document.createElement("div");
-    row.className = "tent-colors tent-looks";
-    row.setAttribute("role", "radiogroup");
-    row.setAttribute("aria-label", t(`base.${kind}`));
-    row.appendChild(Object.assign(document.createElement("span"), { className: "field-label", textContent: t(`base.${kind}`) }));
-    const level = levelSource();
-    const options = kind === "style" ? TENT_STYLES.map(item => item.id) : AVATARS;
-    const current = kind === "style" ? styleFor(tentLook.style, level) : tentLook.avatar;
-    options.forEach(id => {
-      const locked = kind === "style" && !isStyleUnlocked(id, level);
-      const look = { ...getTentLook(), [kind]: id };
-      const choice = Object.assign(document.createElement("button"), { type: "button", className: "tent-look" });
-      choice.appendChild(createTentCanvas(look, 2, "tent-look-icon"));
-      const name = t(kind === "style" ? `tent.style.${id}` : `tent.avatar.${id}`);
-      const lockedBy = locked ? TENT_STYLES.find(item => item.id === id).level : 0;
-      const note = locked ? t("base.lockedBy", { badge: RANK_NAMES()[lockedBy] }) : "";
-      choice.title = locked ? `${name} · ${note}` : name;
-      choice.setAttribute("role", "radio");
-      choice.setAttribute("aria-checked", String(id === current));
-      choice.setAttribute("aria-label", choice.title);
-      if (locked) { choice.disabled = true; choice.classList.add("is-locked"); }
-      choice.addEventListener("click", () => { sounds.playClick(); setTentLook({ [kind]: id }); });
-      row.appendChild(choice);
-    });
-    return row;
   };
   render();
   listeners.add(render);
@@ -33917,6 +34264,147 @@ function createDuel({ globe, onExit, onSignIn, onMatchStart = () => {}, notice =
 return { createDuel };
 })();
 
+// ---- tent-creator.js
+__modules["tent-creator.js"] = (() => {
+// Create your camp (19 November 2026, mockups/tent-creator): your tent and your explorer,
+// part by part. Every part is a row with ‹ the choice ›, colours too, so it stays small. The
+// preview is your camp as everyone sees it; SAVE MY CAMP keeps it (base.js, and the account),
+// CANCEL leaves it as it was. Opened from My tent and the Versus lobby (engine.js).
+const { sounds } = __modules["audio.js"];
+const { createExplorerCanvas, createTentCanvas, drawTentLook, randomLook, setupCount } = __modules["tents.js"];
+const { LOOK_PARTS } = __modules["look-parts.js"];
+const { getTentLook, setTentColor, setTentLook } = __modules["base.js"];
+const { num, t } = __modules["i18n.js"];
+
+const el = (tag, className, text) => Object.assign(document.createElement(tag), { className: className || "", textContent: text ?? "" });
+const isColor = value => typeof value === "string" && value.startsWith("#");
+const word = value => t(`creator.v.${value}`);
+
+function createTentCreator() {
+  let look = null; // the camp being made
+  let tab = "tent";
+  let onClose = null;
+  const overlay = el("div", "tent-creator hidden");
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  document.body.append(overlay);
+
+  function open({ then = null } = {}) {
+    look = structuredClone(getTentLook());
+    // The explorer as parts, so every row has a value (the boy and girl of before too).
+    if (look.avatar === "boy" || look.avatar === "girl") look = { ...look, avatar: "custom", explorer: presetOf(look.avatar) };
+    if (!look.explorer) look.explorer = presetOf("boy");
+    onClose = then;
+    tab = "tent";
+    overlay.classList.remove("hidden");
+    render();
+  }
+  function close() {
+    overlay.classList.add("hidden");
+    onClose?.();
+  }
+  function save() {
+    sounds.playClick();
+    const { color, ...rest } = look;
+    if (rest.avatar !== "custom") delete rest.explorer;
+    setTentColor(color);
+    setTentLook(rest);
+    close();
+  }
+  const presetOf = avatar => avatar === "girl"
+    ? { skin: "#f2c29b", hair: "long", hairColor: "#5c3a1f", hat: "none", hatColor: "#ff5a5a", jacket: "#ff6b9d", legs: "skin" }
+    : { skin: "#f2c29b", hair: "short", hairColor: "#8a5a32", hat: "none", hatColor: "#ff5a5a", jacket: "#2bb3a3", legs: "#5c3a1f" };
+
+  // A choice as a small picture of what it changes.
+  function preview(part, value, scope) {
+    const sample = structuredClone(look);
+    if (scope === "tent") sample[part] = value;
+    else sample.explorer = { ...sample.explorer, [part]: value, ...(part === "hair" || part === "hairColor" ? { hat: "none" } : {}) };
+    return scope === "explorer" ? createExplorerCanvas(sample, 2, "is-explorer") : createTentCanvas(sample, 2, "", { centred: true });
+  }
+  // One row per part: ‹ the current choice › and where it is in the list.
+  function picker(label, list, current, onPick, show) {
+    const row = el("div", "creator-row");
+    const index = Math.max(0, list.indexOf(current));
+    const step = by => { sounds.playClick(); onPick(list[(index + by + list.length) % list.length]); };
+    const prev = el("button", "creator-step", "‹");
+    const next = el("button", "creator-step", "›");
+    prev.type = next.type = "button";
+    prev.setAttribute("aria-label", t("creator.prev", { part: label }));
+    next.setAttribute("aria-label", t("creator.next", { part: label }));
+    prev.addEventListener("click", () => step(-1));
+    next.addEventListener("click", () => step(1));
+    const value = el("span", "creator-value");
+    value.append(...show(current));
+    row.append(el("span", "creator-label", label), prev, value, next, el("span", "creator-pos", `${index + 1}/${list.length}`));
+    return row;
+  }
+  function options() {
+    const box = el("div", "creator-options");
+    const show = (part, scope) => value => {
+      if (isColor(value)) return [Object.assign(el("i", "creator-swatch"), { style: `--swatch: ${value}` })];
+      if (value === "skin") return [el("b", "", word("bareLegs"))];
+      return [preview(part, value, scope), el("b", "", word(value))];
+    };
+    if (tab === "explorer") {
+      box.append(picker(t("creator.p.explorer"), ["custom", "none"], look.avatar === "none" ? "none" : "custom", value => { look.avatar = value; render(); }, value => [el("b", "", t(value === "none" ? "creator.nobody" : "creator.yours"))]));
+      if (look.avatar === "none") return box;
+    }
+    for (const [part, list] of Object.entries(LOOK_PARTS[tab])) {
+      if (part === "hatColor" && look.explorer.hat === "none") continue;
+      if (part === "accent" && look.pattern === "plain" && look.flag === "none") continue;
+      const current = tab === "tent" ? look[part] : look.explorer[part];
+      box.append(picker(t(`creator.p.${part}`), list, current, value => {
+        if (tab === "tent") look[part] = value; else look.explorer = { ...look.explorer, [part]: value };
+        render();
+      }, show(part, tab)));
+    }
+    return box;
+  }
+  function render() {
+    const big = Object.assign(document.createElement("canvas"), { width: 160, height: 160 });
+    drawTentLook(big.getContext("2d"), look, 0, 0, 5);
+    const scene = el("div", "creator-scene");
+    scene.append(big);
+    const dice = el("button", "creator-dice", t("creator.dice"));
+    dice.type = "button";
+    dice.addEventListener("click", () => { sounds.playClick(); look = randomLook(); render(); });
+    const foot = el("div", "creator-stage-foot");
+    foot.append(el("span", "creator-count", t("creator.count", { n: num(setupCount()) })), dice);
+    const stage = el("section", "creator-stage");
+    stage.append(scene, foot);
+    const tabs = el("div", "creator-tabs");
+    tabs.setAttribute("role", "tablist");
+    ["tent", "explorer"].forEach(id => {
+      const button = el("button", tab === id ? "is-on" : "", t(`creator.tab.${id}`));
+      button.type = "button";
+      button.setAttribute("role", "tab");
+      button.setAttribute("aria-selected", String(tab === id));
+      button.addEventListener("click", () => { sounds.playClick(); tab = id; render(); });
+      tabs.append(button);
+    });
+    const saveButton = el("button", "creator-save", t("creator.save"));
+    const cancel = el("button", "creator-cancel", t("creator.cancel"));
+    saveButton.type = cancel.type = "button";
+    saveButton.addEventListener("click", save);
+    cancel.addEventListener("click", () => { sounds.playClick(); close(); });
+    const actions = el("div", "creator-actions");
+    actions.append(saveButton, cancel);
+    const panel = el("section", "creator-panel");
+    panel.append(tabs, options(), el("p", "creator-note", t("creator.note")), actions);
+    const head = el("header", "creator-head");
+    head.append(el("span", "creator-kicker", t("creator.kicker")), el("h2", "", t("creator.title")), el("p", "", t("creator.text")));
+    const box = el("div", "creator");
+    box.append(head, stage, panel);
+    overlay.replaceChildren(box);
+  }
+  addEventListener("keydown", event => { if (event.key === "Escape" && !overlay.classList.contains("hidden")) close(); });
+  return { open, close, isOpen: () => !overlay.classList.contains("hidden") };
+}
+
+return { createTentCreator };
+})();
+
 // ---- world-map.js
 __modules["world-map.js"] = (() => {
 // A detailed flat world map (19 November 2026, mockups/casual-standard/round-8.html): the real
@@ -35214,7 +35702,8 @@ const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getTopPercent 
 const { initializeCommunity } = __modules["social.js"];
 const { createDuel } = __modules["duel-view.js"];
 const { createBaseLine, defaultBaseIso, getBase, getTent, getTentColor, getTentLook, onBaseChange, pickBase, setBase, setTentLevelSource, syncBase, tentLonLat } = __modules["base.js"];
-const { celebrateTent, createTentCanvas, tentLevel, tentToCelebrate } = __modules["tents.js"];
+const { celebrateTent, createExplorerHead, createTentCanvas, tentLevel, tentToCelebrate } = __modules["tents.js"];
+const { createTentCreator } = __modules["tent-creator.js"];
 const { createWorldMap } = __modules["world-map.js"];
 const { FLIGHT_MS, createTravelLayer, distance: distanceOnGlobe, drawSprite, getDayPlace, makeTrack, placeOf, spriteCanvas, startAmbient } = __modules["travel.js"];
 const { fillTransitCard, liveTitle } = __modules["transit-card.js"];
@@ -38485,7 +38974,7 @@ function renderLobby(card) {
     item.append(createTentCanvas(look, 3, "lobby-tent", { centred: true }), Object.assign(document.createElement("b"), { textContent: mine ? t("duel.you") : player.name }));
     if (mine) {
       const edit = Object.assign(document.createElement("button"), { type: "button", className: "lobby-tent-edit", textContent: t("lobby.editTent") });
-      edit.addEventListener("click", () => { sounds.playClick(); openMyTent(); });
+      edit.addEventListener("click", () => { sounds.playClick(); tentCreator.open(); });
       item.append(edit);
     } else item.append(Object.assign(document.createElement("small"), { textContent: t("lobby.joined") }));
     return item;
@@ -38636,23 +39125,14 @@ document.getElementById("versusStatsToggle").addEventListener("click", () => {
   document.getElementById("versusStatsToggle").setAttribute("aria-expanded", String(panel.classList.contains("is-open")));
 });
 const VERSUS_PIPS = ["#ffd45c", "#c58cff", "#45e3ff", "#ff8a5c"]; // you, then the others
-// A player's head in the explorers' pixel style: a bobble hat in the player's colour.
-const HEAD_ROWS = ["...C...", ".KCCCK.", "KCCCCCK", "KcccccK", "KFFFFFK", "KFKFKFK", "KFFFFFK", ".KKKKK."];
-const HEAD_SKIN = ["#f2c29b", "#c98f6a", "#e8b48a", "#8d5a3b"];
-function playerHead(color, index) {
-  const scale = 3;
-  const canvas = Object.assign(document.createElement("canvas"), { width: 7 * scale, height: HEAD_ROWS.length * scale, className: "mode-head" });
-  const ctx = canvas.getContext("2d");
-  const value = parseInt(color.slice(1), 16);
-  const dark = `rgb(${[16, 8, 0].map(shift => Math.round(((value >> shift) & 255) * 0.62)).join(",")})`;
-  const colors = { K: "#0b1020", C: color, c: dark, F: HEAD_SKIN[index % HEAD_SKIN.length] };
-  HEAD_ROWS.forEach((row, y) => [...row].forEach((key, x) => {
-    if (!colors[key]) return;
-    ctx.fillStyle = colors[key];
-    ctx.fillRect(x * scale, y * scale, scale, scale);
-  }));
-  return canvas;
-}
+// The players as explorer heads (tents.js, the creator's art), each in a hat of their colour.
+const VERSUS_HEADS = [
+  { skin: "#f2c29b", hair: "short", hairColor: "#5c3a1f", hat: "beanie" },
+  { skin: "#8d5a3b", hair: "long", hairColor: "#2a1a10", hat: "bobble" },
+  { skin: "#d9a273", hair: "short", hairColor: "#c4502a", hat: "cap" },
+  { skin: "#f6d5b8", hair: "long", hairColor: "#d9a441", hat: "beanie" }
+];
+const playerHead = (color, index) => createExplorerHead({ ...VERSUS_HEADS[index % VERSUS_HEADS.length], hatColor: color }, 2, "mode-head");
 function versusModeTile(button, n) {
   const pips = Object.assign(document.createElement("span"), { className: "mode-pips" });
   for (let i = 0; i < n; i++) pips.append(playerHead(VERSUS_PIPS[i], i));
@@ -39787,12 +40267,16 @@ duel = createDuel({
   // for the match.
   onMatchStart: () => {
     ["accountModal", "archiveModal", "statsModal", "howToPlayModal", "langModal"].forEach(id => document.getElementById(id)?.classList.add("hidden"));
+    if (tentCreator.isOpen()) tentCreator.close();
     closeSettings();
     if (!document.getElementById("communityModal")?.classList.contains("hidden")) community?.close();
     selectHero("daily");
   },
   notice: (message, options) => showToastNotice(message, options)
 });
+// Create your camp (tent-creator.js): from My tent (base.js asks with an event) and the lobby.
+const tentCreator = createTentCreator();
+document.addEventListener("open-tent-creator", () => tentCreator.open());
 // The lobby lives on the VERSUS card: every change redraws it (and the pill, the dot).
 duel.onChange(match => {
   if (match?.state?.phase === "lobby" && duelLobbyShown !== match.id) { duelLobbyShown = match.id; selectHero("duel"); }
