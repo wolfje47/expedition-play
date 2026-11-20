@@ -4447,11 +4447,22 @@ h1, h2, h3 { font-weight: normal; }
   #victoryModal .end-page { flex: 0 0 100%; gap: 8px; padding: 0 16px; scroll-snap-align: start; }
   #victoryModal .end-head h2 { font-size: 12px; }
   #victoryModal .end-score .score-display { font-size: 44px; }
-  #victoryModal .end-climb-chart { margin: 0 -16px; border: 0; border-radius: 0; }
   #victoryModal .end-climb-chart .journey { max-height: none; }
   #victoryModal .end-next-page { display: inline-block; padding: 4px 0; color: var(--accent); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
   #victoryModal .end-dots { display: flex; justify-content: center; gap: 6px; }
-  #victoryModal .end-actions { width: auto; padding: 0 12px; }
+  /* One rhythm (20 November 2026, request from the team: the spacing looked odd): every
+     block on the same 16 px gutter, the journey as a framed card like the rest instead of
+     bleeding to the edges, HOME and ARCHIVE as wide as SHARE, the words under the score in
+     the reading font, and the bottom only as deep as the home bar needs. */
+  #victoryModal .end-screen { gap: 10px; padding-bottom: max(12px, env(safe-area-inset-bottom, 0px)); }
+  #victoryModal .end-page { gap: 12px; }
+  #victoryModal .end-head { gap: 8px; }
+  #victoryModal .end-score { display: grid; gap: 2px; }
+  #victoryModal .end-score .score-display { line-height: 1; }
+  #victoryModal .end-score span { font: 500 13px/1.3 var(--font-body); }
+  #victoryModal .end-climb-chart { margin: 2px 0; border: 1px solid var(--glass-line); border-radius: 14px; }
+  #victoryModal .end-next-line { margin: -4px 0 0; }
+  #victoryModal .end-actions { width: auto; justify-self: stretch; padding: 0 16px; gap: 10px; }
 }
 
 /* 1v1 after the match: a screen of its own in two pages, like the end of the day. */
@@ -18884,758 +18895,1263 @@ const SCENES = { balloon, climb, mine, train, dive, sled };
 return { LABEL, LABEL_AHEAD, SHADOW, eachMark, eachTrail, planned, label, paletteOf, darker, lighter, glow, drawAtlas, flag, CLOUD, CLOUD_COLORS, PINE, PINE_COLORS, GREEN_PINE, ENVELOPE, BASKET, BAG, BIRD, PLANE, STAR, drawStar, SNOWMOBILE, HUT, HUT_COLORS, BOULDER, BOULDER_COLORS, YETI, YETI_COLORS, TENT, TENT_COLORS, SIGN, MINERALS, MINE_ORDER, PACK, BONE, GEODE, LOCO, WHEELS, LOCO_COLORS, drawCarriage, SPHERE, SPHERE_COLORS, SHIP, SEA, CREATURES, SEA_PIG, BRITTLE_STAR, SLED, HUSKY, HUSKY_COLORS, BEAR, NARWHAL, STATION, SCENES };
 })();
 
-// ---- journey-scenes-tall.js
-__modules["journey-scenes-tall.js"] = (() => {
-// The score journeys standing up, for the full-screen score card on a phone (13 November
-// 2026, team request: the journey is the main way to see your score, and on a phone it
-// stands). The same six journeys as journey-scenes.js, with the same sprites, colours and
-// details, laid out for a tall canvas: TALL_W art pixels wide and as tall as the screen
-// is (journeys.js works out `h`). The whole route runs between `top` and `bottom` (the
-// space between the points bar and the card at the bottom, measured by engine.js), so
-// every 1,000 mark and the goal are always in view; above and below is scenery.
-const { ATLAS, atlasRows, clamp, lerp, makeRoute, mix, ramp, random } = __modules["journey-pixels.js"];
-const { BAG, BASKET, BEAR, BIRD, BONE, BOULDER, BOULDER_COLORS, BRITTLE_STAR, CLOUD, CLOUD_COLORS, CREATURES, ENVELOPE, GEODE, GREEN_PINE, HUSKY, HUSKY_COLORS, HUT, HUT_COLORS, LOCO, LOCO_COLORS, MINERALS, MINE_ORDER, NARWHAL, PACK, PINE, PINE_COLORS, PLANE, SEA, SEA_PIG, SHADOW, SHIP, SIGN, SLED, SNOWMOBILE, SPHERE, SPHERE_COLORS, STATION, TENT, TENT_COLORS, WHEELS, YETI, YETI_COLORS, darker, drawAtlas, drawCarriage, drawStar, eachMark, eachTrail, flag, glow, label, lighter, paletteOf, planned } = __modules["journey-scenes.js"];
+// ---- journey-hd.js
+__modules["journey-hd.js"] = (() => {
+// The standing journeys in detail (20 November 2026, team request: more detail, like the
+// tent and explorer creator; chosen from mockups/journey-detail). Tools for the detailed standing journeys: the painter from
+// journey-pixels.js plus shapes filled in whole pixels (polygons, ellipses), sprites made
+// by code with an automatic 1-pixel outline, the full 16×24 Atlas from atlas.js, and the
+// shared journey parts (scale plates, the route in round colours, the faint way ahead).
+const { painter, mix, textWidth } = __modules["journey-pixels.js"];
+const { ATLAS_COLORS } = __modules["atlas.js"];
+const INK = "#0b1020";
+const darker = (c, a = 0.35) => mix(c, "#000000", a);
+const lighter = (c, a = 0.4) => mix(c, "#ffffff", a);
 
-// 120 art pixels across (80 until 15 November 2026: on a phone each pixel was almost 5
-// points, too coarse to see what things were). The scenes were laid out for 80, so every
-// position across goes through X(); sprites keep their own pixels and so come out smaller
-// and sharper.
-const TALL_W = 120;
-const W = TALL_W;
-const K = W / 80;
-const X = v => Math.round(v * K);
+// The painter with filled shapes. Every shape is filled row by row in whole pixels, so
+// nothing is blurred by the canvas's own anti-aliasing.
+function P(ctx) {
+  const p = painter(ctx);
+  p.poly = (pts, color) => {
+    const ys = pts.map(q => q[1]);
+    const y0 = Math.floor(Math.min(...ys));
+    const y1 = Math.ceil(Math.max(...ys));
+    ctx.fillStyle = color;
+    for (let y = y0; y <= y1; y += 1) {
+      const yc = y + 0.5;
+      const xs = [];
+      for (let i = 0; i < pts.length; i += 1) {
+        const a = pts[i];
+        const b = pts[(i + 1) % pts.length];
+        if ((a[1] <= yc && b[1] > yc) || (b[1] <= yc && a[1] > yc)) xs.push(a[0] + (yc - a[1]) / (b[1] - a[1]) * (b[0] - a[0]));
+      }
+      xs.sort((m, n) => m - n);
+      for (let k = 0; k + 1 < xs.length; k += 2) {
+        const l = Math.round(xs[k]);
+        const r = Math.round(xs[k + 1]);
+        if (r > l) ctx.fillRect(l, y, r - l, 1);
+      }
+    }
+  };
+  p.ell = (cx, cy, rx, ry, color) => {
+    ctx.fillStyle = color;
+    for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y += 1) {
+      const t = (y + 0.5 - cy) / ry;
+      if (Math.abs(t) > 1) continue;
+      const half = rx * Math.sqrt(1 - t * t);
+      const l = Math.round(cx - half);
+      const r = Math.round(cx + half);
+      if (r > l) ctx.fillRect(l, y, r - l, 1);
+    }
+  };
+  // A checkerboard of one colour over a box (8-bit shading).
+  p.dither = (x, y, w, h, color, phase = 0) => {
+    ctx.fillStyle = color;
+    for (let row = 0; row < h; row += 1) for (let col = (row + phase) % 2; col < w; col += 2) ctx.fillRect(x + col, y + row, 1, 1);
+  };
+  return p;
+}
+
+// A sprite drawn by code, once, with a 1-pixel outline all round. Drawn at (x, y) = its
+// top-left (without the outline).
+const made = new Map();
+function sprite(key, w, h, draw, outline = INK) {
+  if (made.has(key)) return made.get(key);
+  const canvas = document.createElement("canvas");
+  canvas.width = w + 2;
+  canvas.height = h + 2;
+  const ctx = canvas.getContext("2d");
+  ctx.translate(1, 1);
+  draw(P(ctx));
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  if (outline) {
+    const data = ctx.getImageData(0, 0, w + 2, h + 2).data;
+    const solid = (x, y) => x >= 0 && y >= 0 && x < w + 2 && y < h + 2 && data[(y * (w + 2) + x) * 4 + 3] > 0;
+    ctx.fillStyle = outline;
+    for (let y = 0; y < h + 2; y += 1) for (let x = 0; x < w + 2; x += 1) {
+      if (!solid(x, y) && (solid(x - 1, y) || solid(x + 1, y) || solid(x, y - 1) || solid(x, y + 1))) ctx.fillRect(x, y, 1, 1);
+    }
+  }
+  const flipped = document.createElement("canvas");
+  flipped.width = canvas.width;
+  flipped.height = canvas.height;
+  const f = flipped.getContext("2d");
+  f.scale(-1, 1);
+  f.drawImage(canvas, -canvas.width, 0);
+  const item = { canvas, flipped, w, h };
+  made.set(key, item);
+  return item;
+}
+function blit(p, item, x, y, { flip = false, alpha = 1 } = {}) {
+  if (alpha !== 1) p.ctx.globalAlpha = alpha;
+  p.ctx.drawImage(flip ? item.flipped : item.canvas, Math.round(x) - 1, Math.round(y) - 1);
+  if (alpha !== 1) p.ctx.globalAlpha = 1;
+}
+// Centred on x, standing on y (its bottom row).
+const blitAt = (p, item, x, y, options) => blit(p, item, x - Math.floor(item.w / 2), y - item.h + 1, options);
 
 // ---------------------------------------------------------------------------
-// 1. Balloon: straight up from the meadow and the village, through the clouds, to the
-// star at the top. A scale line across the sky every 1,000; sandbags land in the meadow.
+// Atlas, full size (the Base Camp sprite, atlas.js): 24 wide with room for his arms
 // ---------------------------------------------------------------------------
-function balloon(summit, { h: H, top: T, bottom: B }) {
-  // The basket's bottom follows the route; the envelope is 28 px above it.
-  const route = makeRoute([[X(30), B], [X(48), T + 30]]);
-  const groundTop = B + 6;
+const BODY = [
+  ".......YY.......", "......YYYY......", ".....KKKKKK.....", "...KKRRRRRRKK...", "..KRRrRRRRrRRK..", "..KRRRRRRRRRRK..",
+  ".KYYYYYYYYYYYYK.", ".KGGGgKKKKgGGGK.", ".KRSWWSSSSWWSRK.", ".KRSESSSSSSESRK.", ".KRSSSSssSSSSRK.", ".KRRSWWWWWWSRRK.",
+  "..KRWWWWWWWWRK..", "..KKWWwwwwWWKK..", ".KYYYYYYYYYYYYK.", "KTTTyYTTTTTTTTTK", "KTpTYYTTTTTTpTTK", "KTpTTYTTKTTTpTTK",
+  "KSpTTTTTKTTTpTSK", ".KKTTTTTKTTTTKK.", "..KggKKKKKKggK..", "..KggK....KggK..", ".KPPPK....KPPPK.", ".KKKKK....KKKKK."
+];
+const arm = (rows, x0, y0) => rows.flatMap((row, y) => [...row].map((k, x) => (k === "." ? null : [x0 + x, y0 + y, k])).filter(Boolean));
+const RIGHT_UP = [...arm([".KK.", "KSSK", "KSSK", "KTTK", ".KTK", ".KTK", "KTTK", "KTK."], 19, 8), [18, 18, "T"], [19, 15, "T"]];
+const LEFT_UP = [...arm([".KK.", "KSSK", "KSSK", "KTTK", "KTK.", "KTK.", "KTTK", ".KTK"], 1, 8), [5, 18, "T"], [4, 15, "T"]];
+function atlasGrid(pose, blink) {
+  const grid = Array.from({ length: 24 }, () => Array(24).fill("."));
+  BODY.forEach((row, y) => [...row].forEach((k, x) => { grid[y][x + 4] = k; }));
+  if (pose === "wave" || pose === "cheer") RIGHT_UP.forEach(([x, y, k]) => { grid[y][x] = k; });
+  if (pose === "cheer") LEFT_UP.forEach(([x, y, k]) => { grid[y][x] = k; });
+  if (blink) grid[9] = grid[9].map(k => (k === "E" ? "S" : k));
+  return grid;
+}
+function atlasSprite(pose, blink, rows) {
+  return sprite(`atlas:${pose}:${blink}:${rows}`, 24, rows, p => {
+    atlasGrid(pose, blink).slice(0, rows).forEach((row, y) => row.forEach((k, x) => { if (k !== ".") p.px(x, y, ATLAS_COLORS[k]); }));
+  }, null);
+}
+// Atlas centred on x with his feet on `bottom` (or, `upper`, his waist: in a basket, a cab,
+// a porthole). 24 wide; the body itself is the middle 16.
+// Where Atlas's hat was last drawn (for his sparkles and his "?", journeys.js).
+let head = { x: 100, y: 100 };
+const atlasHead = () => head;
+function atlas(p, x, bottom, { pose = "idle", now = 0, upper = false, flip = false } = {}) {
+  const rows = upper ? 17 : 24;
+  const blink = now % 3.4 < 0.14;
+  const wave = pose === "wave" && Math.floor(now * 3) % 2 ? "idle" : pose;
+  avoid(x - 10, bottom - rows - 1, x + 10, bottom + 2);
+  head = { x, y: bottom - rows + 1 };
+  blit(p, atlasSprite(wave, blink, rows), x - 12, bottom - rows + 1, { flip });
+}
+
+// ---------------------------------------------------------------------------
+// The journey's shared parts
+// ---------------------------------------------------------------------------
+
+function eachMark(s, fn) {
+  for (let v = 1000; v < s.summit; v += 1000) fn(v / s.summit, `${v / 1000}K`, v <= s.value + 0.5);
+}
+// The route travelled, `width` pixels wide, in its round's colour with a darker edge.
+function trail(p, s, { width = 2, offset = 0 } = {}) {
+  s.stretches.forEach(part => {
+    if (s.f <= part.a) return;
+    s.route.samples(part.a, Math.min(part.b, s.f)).forEach(q => {
+      p.rect(q.x - Math.floor(width / 2), q.y + offset, width, width, part.color);
+      p.px(q.x - Math.floor(width / 2), q.y + offset + width, darker(part.color, 0.45));
+    });
+  });
+}
+function planned(p, s, color, gap = 4) {
+  s.route.all ||= s.route.samples(0, 1);
+  s.route.all.forEach((q, i) => { if (i % gap === 0) p.rect(q.x, q.y, 1, 1, color); });
+}
+// The scale plates (20 November 2026, team: the 1K, 2K, 3K had to be clearer, and Atlas
+// hid the number when he stood on it). A 5×7 font, about twice the size of the 3×5 one;
+// plates are queued while the scene draws and drawn last, on top of everything, each moved
+// aside when Atlas, his vehicle or another plate is in the way.
+const BIG = {
+  0: [".###.", "#...#", "#..##", "#.#.#", "##..#", "#...#", ".###."],
+  1: ["..#..", ".##..", "..#..", "..#..", "..#..", "..#..", ".###."],
+  2: [".###.", "#...#", "....#", "...#.", "..#..", ".#...", "#####"],
+  3: ["####.", "....#", "....#", ".###.", "....#", "....#", "####."],
+  4: ["...#.", "..##.", ".#.#.", "#..#.", "#####", "...#.", "...#."],
+  5: ["#####", "#....", "####.", "....#", "....#", "#...#", ".###."],
+  6: [".###.", "#....", "#....", "####.", "#...#", "#...#", ".###."],
+  7: ["#####", "....#", "...#.", "..#..", ".#...", ".#...", ".#..."],
+  8: [".###.", "#...#", "#...#", ".###.", "#...#", "#...#", ".###."],
+  9: [".###.", "#...#", "#...#", ".####", "....#", "....#", ".###."],
+  K: ["#...#", "#..#.", "#.#..", "##...", "#.#..", "#..#.", "#...#"],
+  M: ["#...#", "##.##", "#.#.#", "#.#.#", "#...#", "#...#", "#...#"],
+  " ": [".....", ".....", ".....", ".....", ".....", ".....", "....."]
+};
+const bigWidth = text => text.length * 6 - 1;
+function bigText(p, text, x, y, color, shadow = null) {
+  const paint = (dx, dy, fill) => [...String(text).toUpperCase()].forEach((char, i) => (BIG[char] || BIG[" "]).forEach((row, ry) => [...row].forEach((bit, rx) => {
+    if (bit === "#") p.rect(x + i * 6 + rx + dx, y + ry + dy, 1, 1, fill);
+  })));
+  if (shadow) paint(1, 1, shadow);
+  paint(0, 0, color);
+}
+let queue = [];
+let blockers = [];
+function beginFrame() { queue = []; blockers = []; }
+// Something a plate must not cover (Atlas adds himself; scenes add their vehicles).
+function avoid(l, t, r, b) { blockers.push({ l, t, r, b }); }
+function plate(p, text, x, y, reached, { align = "left", color = null } = {}) {
+  queue.push({ text: String(text), x, y, reached, align, color });
+}
+const hits = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
+function flushPlates(p, { L = 0, R = 200, H = 400 } = {}) {
+  const placed = [];
+  queue.forEach(item => {
+    const w = bigWidth(item.text) + 6;
+    const h = 11;
+    const x0 = Math.round(item.align === "center" ? item.x - w / 2 : item.align === "right" ? item.x - w : item.x - 2);
+    const y0 = Math.round(item.y - 3);
+    const box = (l, t) => ({ l, t, r: l + w, b: t + h });
+    const tries = [box(x0, y0)];
+    blockers.forEach(b => { tries.push(box(b.l - w - 2, y0), box(b.r + 2, y0), box(x0, b.t - h - 2), box(x0, b.b + 2)); });
+    const inside = c => c.l >= L + 1 && c.r <= R - 1 && c.t >= 1 && c.b <= H - 1;
+    const free = c => inside(c) && !blockers.some(b => hits(c, b)) && !placed.some(o => hits(c, o));
+    const spot = tries.find(free) || tries.find(c => inside(c) && !blockers.some(b => hits(c, b))) || tries[0];
+    placed.push(spot);
+    const rim = item.reached ? (item.color || "#ffd45c") : "#3a4570";
+    p.rect(spot.l, spot.t, w, h, "#070b17");
+    p.rect(spot.l + 1, spot.t + 1, w - 2, h - 2, item.reached ? "#1b2342" : "#121830");
+    p.rect(spot.l + 1, spot.t + 1, w - 2, 1, rim);
+    bigText(p, item.text, spot.l + 3, spot.t + 3, item.reached ? "#ffffff" : "#aab4d4");
+  });
+  queue = [];
+}
+// Where each round ended: a small marker in the round's colour.
+function stopMarks(p, s, draw) {
+  s.stops.forEach(stop => draw(s.route.at(stop.f), stop.color));
+}
+// A 5-point star, 9 across, for goals.
+function bigStar(p, x, y, color, now = 0, lit = false) {
+  const item = sprite(`star:${color}`, 11, 11, q => {
+    q.poly([[5.5, 0], [7, 4], [11, 4.2], [8, 6.8], [9.3, 11], [5.5, 8.5], [1.7, 11], [3, 6.8], [0, 4.2], [4, 4]], color);
+    q.poly([[5.5, 1.5], [6.4, 4.4], [5.5, 6.5], [4.6, 4.4]], lighter(color, 0.6));
+  });
+  blit(p, item, x - 5, y - 5);
+  if (lit && now % 1 < 0.5) {
+    [[-8, -2], [8, 1], [-2, -8], [3, 8]].forEach(([dx, dy], i) => p.px(x + dx, y + dy + ((now * 2 + i) % 2 < 1 ? 0 : 1), "#ffffff"));
+  }
+}
+
+return { INK, darker, lighter, P, sprite, blit, blitAt, atlasHead, atlas, eachMark, trail, planned, bigText, beginFrame, avoid, plate, flushPlates, stopMarks, bigStar };
+})();
+
+// ---- journey-scenes-hd.js
+__modules["journey-scenes-hd.js"] = (() => {
+// The six score journeys standing up, in detail (20 November 2026, team request; chosen
+// from mockups/journey-detail). At least 200 art pixels across (it was 120), the full 16×24 Atlas (the game has an 11×14
+// miniature), and every vehicle, animal and building drawn by code with shading and an
+// outline, like the tent creator. A scene: make(summit, { h }) → { route, bg(p), frame(p, s) }.
+const { clamp, lerp, makeRoute, mix, ramp, random } = __modules["journey-pixels.js"];
+const { INK, P, atlas, atlasHead, avoid, bigText, bigStar, blit, blitAt, darker, eachMark, lighter, planned, plate, sprite, stopMarks, trail } = __modules["journey-hd.js"];
+
+const HD_W = 200;
+const W = HD_W;
+
+// ---------------------------------------------------------------------------
+// Shared scenery
+// ---------------------------------------------------------------------------
+function pine(size, { leaf = "#1d6b3a", light = "#2fa35a", snow = null } = {}) {
+  const w = size * 2 + 1;
+  const h = Math.round(size * 2.6) + 3;
+  return sprite(`pine:${size}:${leaf}:${snow}`, w, h, p => {
+    const tiers = 3;
+    for (let i = 0; i < tiers; i += 1) {
+      const top = Math.round(i * size * 0.7);
+      const half = size * (0.55 + i * 0.22);
+      const bottom = top + Math.round(size * 1.15);
+      p.poly([[size + 0.5, top], [size + 0.5 + half, bottom], [size + 0.5 - half, bottom]], leaf);
+      p.poly([[size + 0.5, top], [size + 0.5, bottom], [size + 0.5 - half, bottom]], light);
+      if (snow) p.poly([[size + 0.5, top], [size + 0.5 + half * 0.45, top + size * 0.5], [size + 0.5 - half * 0.45, top + size * 0.5]], snow);
+    }
+    p.rect(size - 1, h - 3, 3, 3, "#5c3a1f");
+    p.px(size - 1, h - 3, "#7a4f2c");
+  });
+}
+function cloud(w, key = "") {
+  const h = Math.round(w * 0.42);
+  return sprite(`cloud:${w}:${key}`, w, h, p => {
+    const rnd = random(w * 7 + key.length);
+    p.ell(w / 2, h * 0.68, w / 2, h * 0.32, "#c9d6ef");
+    for (let i = 0; i < 4; i += 1) {
+      const cx = w * (0.22 + i * 0.19);
+      const r = h * (0.32 + rnd() * 0.2);
+      p.ell(cx, h * 0.62 - r * 0.6, r * 1.1, r, "#f4f7ff");
+    }
+    p.ell(w / 2, h * 0.8, w * 0.46, h * 0.16, "#c9d6ef");
+    p.ell(w * 0.35, h * 0.3, w * 0.08, h * 0.08, "#ffffff");
+  }, "rgba(120,140,190,0.55)");
+}
+// A little round marker where a round ended.
+function pin(p, q, color) {
+  p.rect(q.x - 2, q.y - 2, 5, 5, INK);
+  p.rect(q.x - 1, q.y - 1, 3, 3, color);
+  p.px(q.x - 1, q.y - 1, lighter(color, 0.6));
+}
+function smoke(p, x, y, now, { n = 5, color = "#c9d6ef", rise = 10, drift = 3 } = {}) {
+  for (let i = 0; i < n; i += 1) {
+    const t = (now * 0.45 + i / n) % 1;
+    const r = 1 + t * 2.5;
+    p.ctx.globalAlpha = 0.75 * (1 - t);
+    p.ell(x + Math.sin(t * 5 + i) * 1.2 + t * drift, y - t * rise * 2, r, r, color);
+  }
+  p.ctx.globalAlpha = 1;
+}
+function stars(p, list, now, T) {
+  list.forEach(([x, y, b], i) => {
+    const tw = (now * 1.2 + i * 0.37) % 4 < 0.2;
+    p.px(x, y, tw ? "#ffd45c" : b > 0.7 ? "#ffffff" : "#9fb3e8");
+    if (b > 0.93 && y < T) { p.px(x - 1, y, "rgba(255,255,255,0.35)"); p.px(x + 1, y, "rgba(255,255,255,0.35)"); p.px(x, y - 1, "rgba(255,255,255,0.35)"); p.px(x, y + 1, "rgba(255,255,255,0.35)"); }
+  });
+}
+// A reaction after a round (journeys.js react) wins; otherwise cheer at the goal, now and
+// then a wave while standing.
+const poseOf = s => (s.pose === "wave" || s.pose === "cheer" ? s.pose : s.goal ? "cheer" : s.moving ? "idle" : s.now % 6 < 1.4 ? "wave" : "idle");
+
+// ---------------------------------------------------------------------------
+// 1. Balloon: up from a village at sunrise, through the clouds, to the star
+// ---------------------------------------------------------------------------
+const ENVELOPE = sprite("envelope", 34, 40, p => {
+  const stripes = ["#e0484f", "#ffd45c", "#e0484f", "#f4f1e8", "#e0484f", "#ffd45c", "#e0484f"];
+  for (let y = 0; y < 40; y += 1) {
+    const t = y / 39;
+    const half = t < 0.62 ? 17 * Math.sqrt(1 - Math.pow((0.62 - t) / 0.62, 2)) : lerp(17, 5, (t - 0.62) / 0.38);
+    for (let x = Math.round(17 - half); x < Math.round(17 + half); x += 1) {
+      const u = clamp((x - (17 - half)) / (half * 2 || 1), 0, 0.999);
+      const band = Math.min(stripes.length - 1, Math.floor(u * stripes.length));
+      let c = stripes[band];
+      if (u < 0.18) c = lighter(c, 0.25);
+      if (u > 0.72) c = darker(c, 0.22);
+      if (u > 0.88) c = darker(c, 0.4);
+      p.px(x, y, c);
+    }
+  }
+  p.ell(10, 9, 3, 4, "rgba(255,255,255,0.45)");
+  p.rect(9, 7, 2, 2, "#ffffff");
+  p.rect(12, 34, 10, 2, "#8a5a32");
+  p.rect(12, 34, 10, 1, "#a8743f");
+});
+const BASKET = sprite("basket", 20, 9, p => {
+  p.rect(0, 0, 20, 2, "#a8743f");
+  p.rect(0, 2, 20, 7, "#8a5a32");
+  for (let y = 2; y < 9; y += 2) for (let x = (y / 2) % 2; x < 20; x += 3) p.rect(x, y, 2, 1, "#b8864d");
+  p.rect(0, 8, 20, 1, "#5c3a1f");
+});
+const HOUSE = (roof, w = 13) => sprite(`house:${roof}:${w}`, w, 13, p => {
+  p.poly([[-0.5, 6], [w / 2, 0], [w + 0.5, 6]], roof);
+  p.poly([[w / 2, 0], [w + 0.5, 6], [w / 2, 6]], darker(roof, 0.25));
+  p.rect(w - 4, 0, 2, 4, "#7a5560");
+  p.rect(1, 6, w - 2, 7, "#f4f1e8");
+  p.rect(w - 4, 6, 3, 7, "#d8d2c2");
+  p.rect(Math.floor(w / 2) - 1, 9, 3, 4, "#8a5a32");
+  p.rect(2, 8, 2, 2, "#ffd45c");
+  p.rect(w - 4, 8, 2, 2, "#ffd45c");
+});
+const BAG = color => sprite(`bag:${color}`, 4, 5, p => {
+  p.rect(1, 0, 2, 1, color);
+  p.rect(0, 1, 4, 4, "#c9a66b");
+  p.rect(3, 1, 1, 4, "#9a7a46");
+});
+const BIRD = [sprite("bird0", 7, 3, p => { p.px(0, 0, "#1a2238"); p.px(1, 1, "#1a2238"); p.px(2, 1, "#1a2238"); p.px(3, 2, "#1a2238"); p.px(4, 1, "#1a2238"); p.px(5, 1, "#1a2238"); p.px(6, 0, "#1a2238"); }, null),
+  sprite("bird1", 7, 3, p => { p.rect(0, 1, 7, 1, "#1a2238"); p.px(3, 2, "#1a2238"); }, null)];
+
+function balloon(summit, { h: H, w: CW = HD_W }) {
+  const ox = Math.max(0, Math.round((CW - HD_W) / 2));
+  const L = -ox;
+  const R = HD_W + ox;
+  const ground = H - 44;
+  const T = 30;
+  const route = makeRoute([[64, ground - 2], [92, T + 42]]);
   const rnd = random(11);
-  const stars = Array.from({ length: 50 }, () => [Math.floor(rnd() * W), Math.floor(rnd() * (T + 30))]);
-  const groundY = x => groundTop + Math.round(Math.sin(x * 0.12) * 1.5);
-  const falling = [];
-  const landed = new Map();
+  const starList = Array.from({ length: 70 }, () => [Math.floor(L + rnd() * (R - L)), Math.floor(rnd() * H * 0.45), rnd()]);
+  const hill = x => ground + Math.round(Math.sin(x * 0.05) * 2 + Math.sin(x * 0.13) * 1);
+  const clouds = [[20, 0.82, 36, 2.2], [130, 0.66, 44, 1.4], [40, 0.46, 30, 2.8], [150, 0.3, 38, 1.1], [80, 0.16, 26, 1.7]];
   return {
+    ox,
     route,
-    goal: { x: X(64), y: T + 6 },
-    background(p) {
-      p.bands(0, 0, W, groundTop + 2, t => ramp([[0, "#151b44"], [0.3, "#263a7a"], [0.6, "#4b7cc8"], [0.84, "#9cc4ec"], [0.94, "#f2c09a"], [1, "#ffd29a"]], t));
-      stars.forEach(([x, y]) => p.px(x, y, y < T ? "#ffffff" : "#9fb3e8"));
-      p.disc(X(66), groundTop - 1, 6, "#ff8a3d");
-      p.disc(X(66), groundTop - 1, 4, "#ffd45c");
-      for (let x = 0; x < W; x += 1) {
-        const far = groundTop - 8 + Math.round(Math.sin(x * 0.18) * 2 + Math.sin(x * 0.06) * 2);
-        p.rect(x, far, 1, H - far, "#3d5d8c");
+    bg(p) {
+      p.bands(L, 0, R - L, ground + 4, t => ramp([[0, "#10163a"], [0.28, "#22336e"], [0.55, "#4470b8"], [0.78, "#8fbbe6"], [0.9, "#f0c3a0"], [1, "#ffcf8f"]], t));
+      starList.forEach(([x, y, b]) => p.px(x, y, b > 0.6 ? "#ffffff" : "#8fa3d8"));
+      // The sun with soft rings.
+      [[16, "rgba(255,200,120,0.18)"], [12, "rgba(255,190,110,0.3)"], [9, "#ff9a4d"], [7, "#ffc25c"], [5, "#ffe08a"]].forEach(([r, c]) => p.ell(150, ground - 6, r, r, c));
+      // Far mountains, lit from the sun on the right.
+      for (let x = L; x < R; x += 1) {
+        const y = ground - 26 + Math.round(Math.sin(x * 0.045) * 8 + Math.sin(x * 0.11 + 1) * 4);
+        // Lit where the slope faces the sun (on the right): the derivative, not pixel steps.
+        const slope = 0.36 * Math.cos(x * 0.045) + 0.44 * Math.cos(x * 0.11 + 1);
+        p.rect(x, y, 1, H - y, slope > 0.05 ? "#5d79ad" : "#46628f");
+        if (y < ground - 31) p.rect(x, y, 1, ground - 31 - y + 1, "#e9eefb");
       }
-      for (let x = 0; x < W; x += 1) {
-        const top = groundY(x);
-        p.rect(x, top, 1, H - top, "#2a8a4c");
-        p.px(x, top, "#5cc46a");
-        const near = groundTop + 9 + Math.round(Math.sin(x * 0.2 + 1) * 1.2);
-        p.rect(x, near, 1, H - near, "#1d6b3a");
+      for (let x = L; x < R; x += 1) {
+        const y = ground - 12 + Math.round(Math.sin(x * 0.07 + 2) * 4);
+        p.rect(x, y, 1, H - y, "#3a5a6e");
       }
-      // The village, with lit windows, and pines.
-      [[X(46), "#e0484f"], [X(54), "#2a6fd0"], [X(63), "#ffd45c"], [X(72), "#c58cff"]].forEach(([x, roof]) => {
-        const base = groundY(x) + 2;
-        p.rect(x, base - 4, 5, 4, "#f4f1e8");
-        p.rect(x - 1, base - 5, 7, 1, roof);
-        p.rect(x, base - 6, 5, 1, roof);
-        p.rect(x + 1, base - 7, 3, 1, roof);
-        p.px(x + 1, base - 3, "#ffd45c");
-        p.px(x + 3, base - 3, "#ffd45c");
-      });
-      [3, X(10), X(38)].forEach(x => p.sprite(PINE, GREEN_PINE, x, groundY(x) - 6));
+      // Meadows in two layers, with tufts and a path.
+      for (let x = L; x < R; x += 1) {
+        const y = hill(x);
+        p.rect(x, y, 1, H - y, "#3c9a52");
+        p.px(x, y, "#7fd47a");
+        p.px(x, y + 1, "#5cc46a");
+        const near = ground + 18 + Math.round(Math.sin(x * 0.09 + 1) * 2);
+        p.rect(x, near, 1, H - near, "#2a7d40");
+        p.px(x, near, "#4fb05e");
+      }
+      const tr = random(5);
+      for (let i = 0; i < 160; i += 1) { const x = Math.floor(L + tr() * (R - L)); const y = ground + 3 + Math.floor(tr() * (H - ground - 3)); p.px(x, y, tr() < 0.5 ? "#4fb05e" : "#226a35"); }
+      for (let y = ground + 2; y < H; y += 1) { const x = Math.round(64 + (y - ground) * 0.9 + Math.sin(y * 0.3) * 2); p.rect(x - 1, y, 4, 1, "#c9a66b"); p.px(x + 2, y, "#a8864d"); }
+      // A fence, the village and pines.
+      for (let x = 2; x < 44; x += 5) { p.rect(x, ground + 17, 2, 7, "#8a5a32"); p.px(x, ground + 17, "#c99a62"); }
+      p.rect(2, ground + 18, 42, 1, "#c99a62");
+      p.rect(2, ground + 21, 42, 1, "#a8743f");
+      [[110, "#e0484f", 13], [126, "#2a6fd0", 11], [140, "#ffd45c", 13], [156, "#c58cff", 11], [172, "#ff8a3d", 13]].forEach(([x, roof, w], i) => blit(p, HOUSE(roof, w), x, hill(x) - 12 + (i % 2) * 6));
+      blit(p, pine(5), 6, hill(6) - 15);
+      blit(p, pine(6), 18, hill(18) - 18);
+      blit(p, pine(4), 32, hill(32) - 12);
+      blit(p, pine(5), 186, hill(186) - 15);
       // The launch field and a windsock.
-      const field = X(30) - 8; // the launch field under the basket, the windsock left of it
-      p.rect(field, B + 1, 17, 1, "#8a5a32");
-      p.rect(field - 4, B - 7, 1, 8, "#c9ced9");
-      p.rect(field - 3, B - 7, 3, 1, "#ff8a3d");
-      p.rect(field - 3, B - 6, 2, 1, "#f4f1e8");
+      p.rect(48, ground + 1, 32, 2, "#8a5a32");
+      p.rect(48, ground + 1, 32, 1, "#a8743f");
+      p.rect(44, ground - 12, 1, 14, "#c9ced9");
+      [["#ff8a3d", 0], ["#f4f1e8", 1], ["#ff8a3d", 2], ["#f4f1e8", 3]].forEach(([c, i]) => p.rect(45 + i * 2, ground - 12 + Math.floor(i / 2), 2, 3 - Math.floor(i / 2), c));
     },
     frame(p, s) {
-      stars.slice(0, 8).forEach(([x, y], index) => { if ((s.now * 1.3 + index * 0.71) % 3 < 0.25) p.px(x, y, "#ffd45c"); });
-      // A plane high up, birds and drifting clouds.
-      const planeX = ((s.now * 9) % (W + 100)) - 50;
-      const planeY = Math.max(3, T - 4);
-      for (let x = planeX - 24; x < planeX; x += 2) p.px(x, planeY + 1, `rgba(255,255,255,${0.1 + (x - planeX + 24) / 24 * 0.35})`);
-      p.sprite(PLANE, { K: "#0b1020", W: "#f4f1e8" }, planeX, planeY);
-      const birdY = Math.round(lerp(B, T, 0.3));
-      [[X(20), birdY], [X(20) + 7, birdY + 3], [X(20) + 14, birdY - 1]].forEach(([x0, y], index) => {
-        const x = ((x0 - s.now * 4) % (W + 20) + W + 20) % (W + 20) - 10;
-        p.sprite(BIRD[(Math.floor(s.now * 4) + index) % 2], { K: "#1a2238" }, x, y);
+      stars(p, starList.slice(0, 14), s.now, T);
+      // A plane with its contrail, birds and clouds.
+      const px = L + ((s.now * 10) % (R - L + 120)) - 60;
+      for (let x = px - 40; x < px; x += 1) if ((x | 0) % 2 === 0) p.px(x, 13, `rgba(255,255,255,${0.08 + (x - px + 40) / 40 * 0.4})`);
+      p.rect(px, 12, 9, 2, "#f4f1e8"); p.rect(px + 2, 10, 2, 2, "#c9d6ef"); p.rect(px + 3, 14, 3, 1, "#c9d6ef"); p.px(px + 8, 12, "#45e3ff");
+      [[0, 0], [9, 3], [17, -1]].forEach(([dx, dy], i) => {
+        const x = L + ((150 + dx - s.now * 5) % (R - L + 30) + R - L + 30) % (R - L + 30) - 15;
+        blit(p, BIRD[(Math.floor(s.now * 4) + i) % 2], x, Math.round(lerp(ground, T, 0.34)) + dy);
       });
-      [[X(6), 0.82, 2.2], [X(50), 0.62, 1.5], [X(20), 0.4, 2.8], [X(58), 0.18, 1.1]].forEach(([x0, at, speed]) => {
-        const x = ((x0 + s.now * speed) % (W + 30)) - 15;
-        p.sprite(CLOUD, CLOUD_COLORS, x, Math.round(lerp(B, T, at)), { alpha: 0.85 });
+      clouds.forEach(([x0, at, w, speed]) => {
+        const x = L + ((x0 + s.now * speed) % (R - L + w * 2)) - w;
+        blit(p, cloud(w), x, Math.round(lerp(ground, T, at)), { alpha: 0.92 });
       });
-
-      // The scale: a line across the sky every 1,000, labelled on the left.
+      // The scale: a dotted line across the sky every 1,000.
       eachMark(s, (f, text, reached) => {
         const y = Math.round(s.route.at(f).y);
-        for (let x = 0; x < W; x += 3) p.px(x, y, "rgba(255,255,255,0.18)");
-        label(p, s, text, 2, y - 6, reached);
+        for (let x = L; x < R; x += 3) p.px(x, y, reached ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.14)");
+        plate(p, text, 4, y - 4, reached);
       });
-      label(p, s, `${s.summit / 1000}K`, X(64) + 6, T + 3, s.goal);
-      drawStar(p, s.goal ? "#ffd45c" : "#8f9bbd", X(64), T + 6);
-
-      planned(p, s, "rgba(255,255,255,0.4)", 3);
-      eachTrail(s, (point, color) => {
-        p.px(point.x, point.y, color);
-        p.px(point.x + 1, point.y, darker(color, 0.25));
-      });
-
-      // Sandbags in the meadow, one for every round that has ended.
-      const bags = new Map(landed);
-      s.stops.forEach(stop => bags.set(stop.value, stop.color));
-      falling.forEach(item => bags.delete(item.value));
-      let slot = 0;
-      bags.forEach((color, value) => {
-        const x = X(30) - 6 + (slot++ * 4) % 18;
-        p.sprite(BAG, paletteOf("bag", color, tie => ({ c: tie, s: "#c9a66b", t: "#9a7a46" })), x - 1, groundY(x) - 1);
-      });
-      for (let index = falling.length - 1; index >= 0; index -= 1) {
-        const item = falling[index];
-        const age = s.now - item.born;
-        const ground = groundY(item.x) - 1;
-        const y = Math.min(ground, item.y + 60 * age * age);
-        if (y >= ground) {
-          landed.set(item.value, item.color);
-          falling.splice(index, 1);
-        }
-        p.sprite(BAG, paletteOf("bag", item.color, tie => ({ c: tie, s: "#c9a66b", t: "#9a7a46" })), item.x - 1, y);
-      }
-
-      // The balloon: envelope, burner, Atlas in the basket.
+      // The goal: a star level with the top of the route, beside the balloon.
+      const goalY = Math.round(s.route.at(1).y);
+      for (let x = L; x < R; x += 3) p.px(x, goalY, s.goal ? "rgba(255,212,92,0.5)" : "rgba(255,255,255,0.14)");
+      bigStar(p, 140, goalY - 8, s.goal ? "#ffd45c" : "#8f9bbd", s.now, s.goal);
+      plate(p, `${s.summit / 1000}K`, 150, goalY - 11, s.goal, { color: "#ffd45c" });
+      planned(p, s, "rgba(255,255,255,0.45)", 4);
+      trail(p, s, { width: 2 });
+      // Sandbags in the meadow, one for each round.
+      s.stops.forEach((stop, i) => blit(p, BAG(stop.color), 52 + i * 5, ground - 3 + (i % 2)));
+      // The balloon: the envelope, ropes, the burner and Atlas in the basket.
       const at = s.route.at(s.f);
-      const x = Math.round(at.x + Math.sin(s.now * 1.3) * 0.8);
+      const x = Math.round(at.x + Math.sin(s.now * 1.3) * 1);
       const y = Math.round(at.y);
-      p.line(x - 5, y - 21, x - 5, y - 4, "#5c3a1f");
-      p.line(x + 5, y - 21, x + 5, y - 4, "#5c3a1f");
-      drawAtlas(p, s, x, y - 3, { upper: true });
-      p.sprite(BASKET, ATLAS, x - 5, y - 3);
-      p.rect(x - 1, y - 15, 3, 1, "#8f9bbd");
-      if (s.moving || s.now % 2.6 < 0.4) {
-        const tall = Math.floor(s.now * 14) % 2;
-        p.rect(x, y - 17 - tall, 1, 2 + tall, "#ffd45c");
-        p.px(x - 1 + tall * 2, y - 16, "#ff8a3d");
+      blit(p, ENVELOPE, x - 17, y - 58);
+      avoid(x - 18, y - 59, x + 18, y + 2);
+      [-9, -4, 4, 9].forEach(dx => p.line(x + Math.sign(dx) * 5, y - 22, x + dx, y - 8, "#5c3a1f"));
+      atlas(p, x, y - 7, { upper: true, now: s.now, pose: poseOf(s) });
+      blit(p, BASKET, x - 10, y - 8);
+      if (s.moving || s.now % 2.6 < 0.5) {
+        const f = Math.floor(s.now * 14) % 2;
+        p.rect(x - 1, y - 27 - f, 3, 4 + f, "#ff8a3d");
+        p.rect(x, y - 26 - f, 1, 3, "#ffe08a");
       }
-      p.sprite(ENVELOPE, ATLAS, x - 6, y - 28);
-    },
-    head(s) {
-      const at = s.route.at(s.f);
-      return { x: Math.round(at.x), y: Math.round(at.y) - 13 };
-    },
-    react(s, { points, color }) {
-      if (points <= 0) return;
-      const at = s.route.at(s.f);
-      falling.push({ x: clamp(Math.round(at.x) + 6, X(30) - 8, X(30) + 14), y: Math.round(at.y) - 2, born: s.now, color, value: s.value });
     }
   };
 }
 
 // ---------------------------------------------------------------------------
-// 2. Climb: on the snowmobile up the switchbacks of one tall peak, from Base Camp past the
-// pines, the hut, the yeti's boulder and the avalanche sign, to the flag on the summit.
+// 2. Climb: by snowmobile up hairpin bends to a summit at dawn
 // ---------------------------------------------------------------------------
-function climb(summit, { h: H, top: T, bottom: B }) {
-  const L = B - T;
-  const peak = { x: X(46), y: T + 8 }; // room above for Atlas on the summit
-  const route = makeRoute([[X(8), B], [X(64), B - L * 0.17], [X(12), B - L * 0.37], [X(62), B - L * 0.56], [X(18), B - L * 0.74], [X(54), B - L * 0.9], [peak.x - 1, T + 14]]);
-  const slope = Math.max(1.2 / K, (B - 2 - peak.y) / (42 * K));
-  const top = x => Math.round(peak.y + Math.abs(x - peak.x) * slope) + (x % 7 === 3 ? 1 : 0);
-  const rnd = random(7);
-  const stars = Array.from({ length: 45 }, () => [Math.floor(rnd() * W), Math.floor(rnd() * (T + 30))]);
-  const yetiAt = route.at(0.62);
-  const yeti = { x: clamp(Math.round(yetiAt.x) - 14, 4, X(60)), y: Math.round(yetiAt.y) + 2 };
-  const hut = route.at(0.34);
-  return {
-    route,
-    goal: { x: peak.x, y: T + 10 },
-    background(p) {
-      p.bands(0, 0, W, H, t => ramp([[0, "#0b1030"], [0.55, "#1d2a5e"], [1, "#33478a"]], t));
-      stars.forEach(([x, y]) => p.px(x, y, y < T ? "#ffffff" : "#8fa3d8"));
-      p.disc(X(70), Math.max(6, T - 2), 3, "#f4f1e8");
-      // Far ridges low down.
-      for (let x = 0; x < W; x += 1) {
-        const ridge = Math.round(lerp(B, T, 0.55)) + Math.round(Math.abs(((x * 0.9) % 24) - 12) * 0.9 + Math.sin(x * 0.2) * 1.5);
-        p.rect(x, ridge, 1, H - ridge, "#26336a");
-        p.px(x, ridge, "#8fa3d8");
-      }
-      // The mountain: the lit face on the left, the shadow face on the right.
-      for (let x = 0; x < W; x += 1) {
-        const y0 = top(x);
-        for (let y = Math.max(0, y0); y < H; y += 1) {
-          const lit = x <= peak.x;
-          const depth = y - y0;
-          let color = lit ? (depth < 2 ? "#ffffff" : (x + y) % 2 && depth > 14 ? "#c3d0ea" : "#dfe7f7") : (depth < 1 ? "#b9c7e6" : (x + y) % 2 ? "#7f93c4" : "#8a9dcc");
-          if (rnd() < 0.025 && depth > 3) color = lit ? "#9aa9cc" : "#5a6a9a";
-          p.px(x, y, color);
-        }
-      }
-      for (let y = B + 4; y < H; y += 1) p.rect(0, y, W, 1, y % 2 ? "#e9eefb" : "#dfe7f7");
-      // Base Camp at the start, pines at the first bend, the hut, rocks and the sign.
-      p.sprite(TENT, TENT_COLORS, 1, B - 5);
-      flag(p, 13, B - 1, "#ff6b9d", 7);
-      const bend = route.at(0.12);
-      [[0, 0], [5, -2], [10, 1]].forEach(([dx, dy]) => p.sprite(PINE, PINE_COLORS, Math.round(bend.x) - 6 + dx, Math.round(bend.y) - 10 + dy));
-      p.sprite(HUT, HUT_COLORS, Math.round(hut.x) - 4, Math.round(hut.y) - 12);
-      const cliff = route.at(0.8);
-      p.sprite(BOULDER, BOULDER_COLORS, Math.round(cliff.x) + 4, Math.round(cliff.y) - 6);
-      p.rect(peak.x + 9, T + 20, 1, 6, "#5c3a1f");
-      p.sprite(SIGN, { K: "#0b1020", Y: "#ffd45c" }, peak.x + 7, T + 16);
-    },
-    frame(p, s) {
-      // Smoke from the hut's chimney.
-      for (let index = 0; index < 4; index += 1) {
-        const age = (s.now * 0.6 + index / 4) % 1;
-        p.px(Math.round(hut.x) + 4 + Math.round(Math.sin(age * 6 + index) + age * 4), Math.round(hut.y) - 13 - Math.round(age * 10), `rgba(230,236,250,${0.6 * (1 - age)})`);
-      }
-      // The yeti, peeking out from behind his boulder; he waves when Atlas comes by.
-      const at = s.route.at(s.f);
-      const near = Math.hypot(at.x - yeti.x, at.y - yeti.y) < 22;
-      const peek = near ? 5 : (s.now % 6 < 1.4 ? 3 : 0);
-      if (peek) {
-        p.sprite(YETI, YETI_COLORS, yeti.x, yeti.y - 4 - peek);
-        if (near && Math.floor(s.now * 4) % 2) { p.px(yeti.x + 7, yeti.y - 7 - peek, "#f4f1e8"); p.px(yeti.x + 7, yeti.y - 8 - peek, "#f4f1e8"); }
-      }
-      p.sprite(BOULDER, BOULDER_COLORS, yeti.x - 2, yeti.y - 4);
+const SNOWMOBILE = sprite("snowmobile", 28, 12, p => {
+  p.poly([[2, 3], [20, 3], [27, 7], [27, 9], [2, 9]], "#e0484f");
+  p.poly([[2, 3], [20, 3], [23, 5], [2, 5]], "#ff6b6b");
+  p.rect(2, 7, 25, 2, "#9c2b35");
+  p.poly([[18, 0], [22, 0], [25, 4], [21, 4]], "#45e3ff");
+  p.px(19, 1, "#c9f5ff");
+  p.rect(26, 6, 2, 2, "#ffe08a");
+  p.rect(1, 9, 18, 3, "#2a3550");
+  for (let x = 2; x < 18; x += 3) p.rect(x, 10, 2, 1, "#4a5778");
+  p.rect(18, 11, 10, 1, "#c9ced9");
+  p.px(27, 10, "#c9ced9");
+});
+const HUT = sprite("hut", 24, 20, p => {
+  p.poly([[-1, 9], [12, 0], [25, 9]], "#f4f7ff");
+  p.poly([[12, 0], [25, 9], [12, 9]], "#c9d6ef");
+  p.rect(1, 9, 22, 11, "#8a5a32");
+  for (let y = 10; y < 20; y += 2) p.rect(1, y, 22, 1, "#7a4f2c");
+  p.rect(16, 9, 7, 11, "#6b4425");
+  p.rect(4, 12, 4, 4, "#ffd45c"); p.rect(5, 12, 1, 4, "#c99a2e"); p.rect(4, 13, 4, 1, "#c99a2e");
+  p.rect(11, 13, 4, 7, "#3a2414");
+  p.rect(17, 2, 3, 6, "#5c4a4a");
+});
+const YETI = sprite("yeti", 16, 22, p => {
+  p.ell(8, 13, 7, 8, "#f4f1e8");
+  p.ell(8, 6, 5, 5, "#f4f1e8");
+  p.ell(9.5, 13, 4, 7, "#d8e0ef");
+  p.rect(5, 4, 6, 4, "#7f93c4");
+  p.rect(6, 5, 1, 1, INK); p.rect(9, 5, 1, 1, INK);
+  p.rect(7, 7, 2, 1, "#4a5778");
+  p.rect(3, 19, 4, 3, "#f4f1e8"); p.rect(9, 19, 4, 3, "#f4f1e8");
+});
+const YETI_ARM = [sprite("yarm0", 5, 8, p => { p.rect(1, 0, 3, 8, "#f4f1e8"); p.rect(1, 0, 3, 2, "#7f93c4"); }), sprite("yarm1", 7, 6, p => { p.poly([[0, 6], [3, 6], [7, 0], [4, 0]], "#f4f1e8"); p.rect(4, 0, 3, 2, "#7f93c4"); })];
+const BOULDER = w => sprite(`boulder:${w}`, w, Math.round(w * 0.6), p => {
+  const h = Math.round(w * 0.6);
+  p.ell(w / 2, h * 0.6, w / 2, h * 0.5, "#6a7a9a");
+  p.ell(w * 0.4, h * 0.5, w * 0.3, h * 0.32, "#8494b4");
+  p.ell(w * 0.6, h * 0.82, w * 0.38, h * 0.18, "#4a5778");
+  p.ell(w * 0.45, h * 0.22, w * 0.34, h * 0.2, "#f4f7ff");
+});
+const SIGN = sprite("avalanche", 13, 16, p => {
+  p.rect(6, 10, 1, 6, "#8f9bbd");
+  p.poly([[6.5, 0], [13, 11], [0, 11]], "#ffd45c");
+  p.poly([[6.5, 2.5], [11, 10], [2, 10]], "#ff8a3d");
+  p.rect(6, 4, 1, 3, INK); p.px(6, 8, INK);
+});
+const TENT = color => sprite(`tent:${color}`, 16, 10, p => {
+  p.poly([[0, 10], [8, 0], [16, 10]], color);
+  p.poly([[8, 0], [16, 10], [8, 10]], darker(color, 0.3));
+  p.poly([[8, 4], [10.5, 10], [5.5, 10]], INK);
+  p.px(8, 0, "#f4f1e8");
+});
+const FLAG = (color, f) => sprite(`flag:${color}:${f}`, 12, 16, p => {
+  p.rect(0, 0, 1, 16, "#c9ced9");
+  const wave = f ? [0, 1, 1, 0, 0, 1, 1, 0, 0, 1] : [1, 0, 0, 1, 1, 0, 0, 1, 1, 0];
+  for (let x = 1; x < 11; x += 1) { p.rect(x, 1 + wave[x - 1], 1, 6, color); p.px(x, 1 + wave[x - 1], lighter(color, 0.35)); p.px(x, 6 + wave[x - 1], darker(color, 0.3)); }
+}, null);
 
-      planned(p, s, "#5a6fa8", 2);
-      eachTrail(s, (point, color) => {
-        p.px(point.x, point.y, color);
-        p.px(point.x, point.y + 1, darker(color, 0.3));
-      });
-      // Marker posts every 1,000, and a flag where each round ended.
-      eachMark(s, (f, text, reached) => {
-        const point = s.route.at(f);
-        p.rect(point.x, point.y - 3, 1, 3, "#5c3a1f");
-        p.px(point.x, point.y - 3, reached ? "#ffd45c" : "#c9ced9");
-        label(p, s, text, point.x < W / 2 ? point.x + 2 : point.x - 10, point.y - 9, reached);
-      });
-      s.stops.forEach(stop => {
-        const point = s.route.at(stop.f);
-        flag(p, Math.round(point.x), Math.round(point.y), stop.color, 6, s.now);
-      });
-      flag(p, peak.x, T + 13, s.goal ? "#ffd45c" : "#ff6b9d", 7, s.now);
-      label(p, s, `${s.summit / 1000}K`, peak.x + 5, T + 4, s.goal);
-
-      // Atlas on his snowmobile, facing the way he goes, snow spraying behind him.
-      const flip = at.dx < -0.01;
-      const x = Math.round(at.x);
-      const y = Math.round(at.y);
-      if (s.moving) {
-        for (let index = 0; index < 5; index += 1) {
-          const back = (flip ? 1 : -1) * (7 + Math.random() * 6);
-          p.px(x + back, y - Math.random() * 4, "#ffffff");
-        }
-      }
-      drawAtlas(p, s, x + (flip ? 1 : -1), y - 4, { upper: true, flip });
-      p.sprite(SNOWMOBILE, ATLAS, x - 6, y - 7, { flip });
-    },
-    head(s) {
-      const at = s.route.at(s.f);
-      return { x: Math.round(at.x), y: Math.round(at.y) - 14 };
-    }
-  };
-}
-
-// ---------------------------------------------------------------------------
-// 3. Mine: down the shaft under the headframe, then the tunnel winds down through one
-// layer of rock for every 1,000, coal first and diamonds at the bottom.
-// ---------------------------------------------------------------------------
-function mine(summit, { h: H, top: T, bottom: B }) {
-  const L = B - T;
-  const shaft = X(18);
-  const route = makeRoute([[shaft, T], [shaft, T + 8], [X(64), T + L * 0.36], [X(14), T + L * 0.7], [X(58), B - 2]]);
-  const levels = Math.max(1, Math.round(summit / 1000));
-  const order = MINE_ORDER[levels] || Array.from({ length: levels }, (_, index) => MINE_ORDER[9][Math.round(index * 8 / Math.max(1, levels - 1))]);
-  const tops = Array.from({ length: levels + 1 }, (_, index) => index === 0 ? T + 1 : index === levels ? H : Math.round(route.at(index / levels).y));
-  const rnd = random(5);
-  const gems = [];
-  const chunks = [];
-  let lastSwing = 0;
-  const layerAt = f => Math.min(levels - 1, Math.floor(f * levels + 1e-9));
-  const grass = T - 1;
-  return {
-    route,
-    goal: { x: X(64), y: B - 2 },
-    background(p) {
-      p.bands(0, 0, W, grass - 1, t => ramp([[0, "#3f6fc8"], [0.6, "#7fc0ff"], [1, "#bfe3ff"]], t));
-      p.rect(0, grass - 2, W, 2, "#2fb35e");
-      p.rect(0, grass, W, 1, "#1d7a40");
-      // The headframe over the shaft, and a cart of ore.
-      p.line(shaft - 7, grass, shaft - 2, grass - 8, "#8a5a32");
-      p.line(shaft + 7, grass, shaft + 2, grass - 8, "#8a5a32");
-      p.rect(shaft - 3, grass - 8, 7, 1, "#5c3a1f");
-      p.disc(shaft, grass - 8, 1, "#c9ced9");
-      p.rect(shaft + 14, grass - 4, 7, 3, "#6a7a9a");
-      p.rect(shaft + 15, grass - 5, 5, 1, "#ffd45c");
-      p.px(shaft + 15, grass - 1, "#0b1020");
-      p.px(shaft + 19, grass - 1, "#0b1020");
-      for (let level = 0; level < levels; level += 1) {
-        const y0 = tops[level];
-        const y1 = tops[level + 1];
-        const base = ramp([[0, "#7a5636"], [0.35, "#5e4a44"], [0.7, "#3e3550"], [1, "#272038"]], level / Math.max(1, levels - 1));
-        for (let y = y0; y < y1; y += 1) {
-          for (let x = 0; x < W; x += 1) {
-            const r = rnd();
-            p.px(x, y, r < 0.1 ? darker(base, 0.2) : r > 0.94 ? lighter(base, 0.12) : base);
-          }
-        }
-        if (level > 0) for (let x = 0; x < W; x += 1) p.px(x, y0 + Math.round(Math.sin(x * 0.3 + level) * 0.8), darker(base, 0.45));
-        const mineral = MINERALS[order[level]];
-        const count = mineral.gem ? 5 : 8;
-        for (let index = 0; index < count; index += 1) {
-          const x = 3 + Math.floor(rnd() * (W - 8));
-          const y = y0 + 2 + Math.floor(rnd() * Math.max(1, Math.min(y1, B + 12) - y0 - 4));
-          if (mineral.gem) {
-            p.px(x, y - 1, mineral.shine);
-            p.rect(x - 1, y, 3, 1, mineral.ore);
-            p.px(x, y + 1, darker(mineral.ore, 0.3));
-            gems.push([x, y - 1, mineral.shine]);
-          } else {
-            p.rect(x, y, 2, 2, mineral.ore);
-            p.px(x + 2, y + 1, mineral.ore);
-            p.px(x, y, mineral.shine);
-          }
-        }
-      }
-      for (let index = 0; index < 10; index += 1) {
-        const x = Math.floor(rnd() * W);
-        p.line(x, grass + 1, x + Math.round(rnd() * 4 - 2), grass + 3 + Math.floor(rnd() * 3), "#3a2414");
-      }
-      p.sprite(BONE, { W: "#e8dcc0" }, X(48), Math.round(lerp(tops[0], tops[1], 0.6)));
-    },
-    frame(p, s) {
-      gems.forEach(([x, y, color], index) => { if ((s.now * 0.9 + index * 0.37) % 2.4 < 0.18) { p.px(x, y - 1, color); p.px(x - 1, y - 1, "#ffffff"); p.px(x + 1, y - 1, "#ffffff"); } });
-      s.route.samples(0, s.f).forEach(point => p.rect(point.x - 2, point.y - 6, 5, 7, "#160f0c"));
-      s.route.samples(s.f, 1).forEach((point, index) => { if (index % 3 === 0) p.px(point.x, point.y - 3, "rgba(255,255,255,0.22)"); });
-      eachTrail(s, (point, color) => p.px(point.x, point.y, color));
-      eachMark(s, (f, text, reached) => {
-        const point = s.route.at(f);
-        if (reached) {
-          p.rect(point.x - 3, point.y - 6, 1, 7, "#8a5a32");
-          p.rect(point.x + 3, point.y - 6, 1, 7, "#8a5a32");
-          p.rect(point.x - 3, point.y - 7, 7, 1, "#a8743a");
-        }
-      });
-      for (let level = 1; level < levels; level += 1) label(p, s, `${level}K`, 2, tops[level] + 2, level * 1000 <= s.value + 0.5);
-      label(p, s, `${s.summit / 1000}K`, X(66), B - 12, s.goal);
-      s.stops.forEach(stop => {
-        const point = s.route.at(stop.f);
-        const x = Math.round(point.x);
-        const y = Math.round(point.y) - 5;
-        glow(p, x, y + 1, 6, stop.color, 0.45);
-        p.px(x, y - 1, SHADOW);
-        p.rect(x, y, 1, 2, stop.color);
-      });
-      p.sprite(GEODE, { K: "#0b1020", D: "#bff4ff", d: "#ffffff" }, X(64) - 3, B - 5);
-      if (s.goal) glow(p, X(64), B - 2, 8, "#bff4ff", 0.5);
-
-      const at = s.route.at(s.f);
-      const flip = at.dx < -0.01;
-      const x = Math.round(at.x);
-      const y = Math.round(at.y);
-      const dir = flip ? -1 : 1;
-      const swinging = s.moving && s.f > 0.01;
-      const strike = swinging && Math.floor(s.now * 6) % 2 === 1;
-      const mineral = MINERALS[order[layerAt(s.f)]];
-      if (swinging && strike && s.now - lastSwing > 0.25) {
-        lastSwing = s.now;
-        chunks.push({ born: s.now, color: mineral.ore, shine: mineral.shine });
-      }
-      p.sprite(PACK, { K: "#0b1020", P: "#8a5a32", p: "#5c3a1f", Y: "#ffd45c" }, x - 9 * dir - (flip ? 4 : 0), y - 10);
-      const found = s.f > 0 ? Math.min(levels, layerAt(s.f) + 1) : 0;
-      for (let index = 0; index < found; index += 1) {
-        const item = MINERALS[order[index]];
-        const px = x - 8 * dir + (index % 3) * dir;
-        p.px(px, y - 10 - Math.floor(index / 3), item.ore);
-        if (index === found - 1) p.px(px, y - 11 - Math.floor(index / 3), item.shine);
-      }
-      drawAtlas(p, s, x, y, { flip });
-      if (strike) {
-        p.line(x + 4 * dir, y - 5, x + 9 * dir, y - 4, "#8a5a32");
-        p.rect(x + 9 * dir, y - 6, 1, 4, "#c9ced9");
-        if (Math.random() < 0.6) p.px(x + (10 + Math.round(Math.random() * 2)) * dir, y - 5 + Math.round(Math.random() * 2), "#ffd45c");
-      } else if (swinging) {
-        p.line(x + 4 * dir, y - 5, x + 6 * dir, y - 12, "#8a5a32");
-        p.rect(x + (flip ? -8 : 4), y - 13, 5, 1, "#c9ced9");
-      } else {
-        p.line(x + 4 * dir, y - 4, x + 7 * dir, y - 10, "#8a5a32");
-        p.rect(x + (flip ? -9 : 6), y - 11, 4, 1, "#c9ced9");
-      }
-      for (let index = chunks.length - 1; index >= 0; index -= 1) {
-        const item = chunks[index];
-        const t = (s.now - item.born) / 0.45;
-        if (t >= 1) { chunks.splice(index, 1); continue; }
-        const cx = lerp(x + 10 * dir, x - 7 * dir, t);
-        const cy = lerp(y - 4, y - 11, t) - Math.sin(t * Math.PI) * 7;
-        p.px(cx, cy, item.color);
-        p.px(cx + 1, cy, item.shine);
-      }
-    },
-    head(s) {
-      const at = s.route.at(s.f);
-      return { x: Math.round(at.x), y: Math.round(at.y) - 13 };
-    }
-  };
-}
-
-// ---------------------------------------------------------------------------
-// 4. Train: a mountain railway that zigzags up the screen in rows, the steam engine with
-// Atlas in the cab, a carriage for every round (with its load), and the station on top.
-// ---------------------------------------------------------------------------
-const ROWS = 4;
-function train(summit, { h: H, top: T, bottom: B }) {
-  const low = B - 12; // the posts and labels hang under the bottom row
-  const gap = (low - T - 22) / (ROWS - 1); // the top row leaves room for the engine and the station
-  const rowY = index => Math.round(low - index * gap);
-  const ends = [3, W - 3];
-  const points = [];
-  for (let row = 0; row < ROWS; row += 1) {
-    const y = rowY(row);
-    const [a, b] = row % 2 ? [ends[1], ends[0]] : ends;
-    points.push([a, y], [row === ROWS - 1 ? X(60) : b, y]);
+function climb(summit, { h: H, w: CW = HD_W }) {
+  const ox = Math.max(0, Math.round((CW - HD_W) / 2));
+  const L = -ox;
+  const R = HD_W + ox;
+  const T = 34;
+  const B = H - 22;
+  const n = 8;
+  const pts = [[30, B]];
+  for (let i = 1; i <= n; i += 1) {
+    const y = lerp(B, T + 8, i / n);
+    const half = lerp(66, 16, i / n);
+    pts.push([i % 2 ? 100 + half : 100 - half, y]);
   }
-  const route = makeRoute(points);
-  const rnd = random(3);
-  const puffs = [];
-  let lastPuff = 0;
-  const topY = rowY(ROWS - 1);
-  // Which row a point on the route is on, and whether it runs to the left there.
-  const rowOf = y => clamp(Math.round((low - y) / gap), 0, ROWS - 1);
-  const st = X(64) - 64; // the station, drawn for 80 across, moved to the end of the line
+  pts.push([100, T]);
+  const route = makeRoute(pts);
+  const rnd = random(21);
+  const starList = Array.from({ length: 50 }, () => [Math.floor(L + rnd() * (R - L)), Math.floor(rnd() * 50), rnd()]);
+  const ridge = y => lerp(4, 96, clamp((y - T + 6) / (B - T + 26), 0, 1));
   return {
+    ox,
     route,
-    goal: { x: 70 + st, y: topY - 16 },
-    background(p) {
-      p.bands(0, 0, W, topY - 8, t => ramp([[0, "#3f86d8"], [0.6, "#8fc6f5"], [1, "#d8efff"]], t));
-      p.disc(X(14), Math.max(7, T - 6), 4, "#ffd45c");
-      p.disc(X(14), Math.max(7, T - 6), 2, "#fff2b0");
-      for (let x = 0; x < W; x += 1) {
-        const peak = topY - 22 + Math.round(Math.abs(((x * 1.3) % 34) - 17) * 0.7 + Math.sin(x * 0.17) * 2);
-        p.rect(x, peak, 1, H - peak, "#7f9fcf");
-        if (peak < topY - 19) p.px(x, peak, "#f4f7ff");
+    bg(p) {
+      p.bands(L, 0, R - L, H, t => ramp([[0, "#1a1d4a"], [0.25, "#3b3f8a"], [0.45, "#a46aa8"], [0.62, "#f29b8c"], [1, "#ffd7a3"]], t));
+      starList.forEach(([x, y, b]) => p.px(x, y, b > 0.5 ? "#ffffff" : "#b8b0e0"));
+      // Far peaks.
+      p.poly([[-10, H * 0.55], [36, T + 40], [70, H * 0.5], [110, T + 30], [150, H * 0.5], [176, T + 46], [210, H * 0.58], [210, H], [-10, H]], "#6e6aa8");
+      p.poly([[36, T + 40], [42, T + 50], [30, T + 50]], "#e9eefb");
+      p.poly([[176, T + 46], [182, T + 56], [170, T + 55]], "#e9eefb");
+      // The mountain: snow, rock bands and a shadowed right flank.
+      p.poly([[100, T - 6], [100 + ridge(H) + 20, H], [100 - ridge(H) - 20, H]], "#dfe7f7");
+      p.poly([[100, T - 6], [100 + ridge(H) + 20, H], [100, H]], "#b4c2e0");
+      const r2 = random(3);
+      // Rock outcrops poking through the snow: a lit and a shaded face, snow on top.
+      for (let i = 0; i < 30; i += 1) {
+        const y = Math.round(lerp(T + 10, H - 10, r2()));
+        const spread = ridge(y) + 10;
+        const x = Math.round(100 + (r2() * 2 - 1) * spread);
+        const w = 5 + Math.floor(r2() * 8);
+        const h = 3 + Math.floor(r2() * 4);
+        const shade = x > 100 ? 0.25 : 0;
+        p.poly([[x - w / 2, y + h], [x - 1, y], [x + 1, y], [x + w / 2, y + h]], darker("#6a7a9a", shade));
+        p.poly([[x + 1, y], [x + w / 2, y + h], [x + 1, y + h]], darker("#4a5778", shade));
+        p.poly([[x - 2, y + 2], [x - 1, y], [x + 1, y], [x + 3, y + 2]], x > 100 ? "#c9d6ef" : "#ffffff");
       }
-      for (let x = 0; x < W; x += 1) {
-        const hill = topY - 10 + Math.round(Math.sin(x * 0.12 + 0.5) * 3 + Math.sin(x * 0.3));
-        p.rect(x, hill, 1, H - hill, "#5fbf6a");
-      }
-      p.rect(0, topY + 6, W, H - topY - 6, "#3f9a4c");
-      for (let index = 0; index < 22; index += 1) {
-        const x = Math.floor(rnd() * W);
-        const y = topY + 8 + Math.floor(rnd() * (H - topY - 10));
-        p.rect(x, y - 2, 2, 3, "#2f8a4a");
-      }
-      for (let index = 0; index < 50; index += 1) p.px(Math.floor(rnd() * W), topY + 6 + Math.floor(rnd() * (H - topY - 6)), ["#ffd45c", "#ff6b9d", "#f4f1e8"][index % 3]);
-      // The track on every row, and the bends that join them.
-      for (let row = 0; row < ROWS; row += 1) {
-        const y = rowY(row);
-        const [a, b] = [ends[0], row === ROWS - 1 ? X(64) : ends[1]];
-        p.rect(a - 2, y + 1, b - a + 5, 3, "#8a7a66");
-        for (let x = a; x <= b; x += 3) p.rect(x, y + 1, 2, 1, "#5c3a1f");
-        p.rect(a - 1, y, b - a + 3, 1, "#c9ced9");
-        if (row < ROWS - 1) {
-          const side = row % 2 ? ends[0] - 2 : ends[1] + 1;
-          const next = rowY(row + 1);
-          p.rect(side, next, 2, y - next + 2, "#8a7a66");
-          p.rect(side + (row % 2 ? 0 : 1), next, 1, y - next + 1, "#c9ced9");
-        }
-      }
-      // The station at the end of the line.
-      const sy = topY - 16;
-      p.rect(62 + st, topY - 4, W - 62 - st, 4, "#c9b08a");
-      p.rect(62 + st, topY - 5, W - 62 - st, 1, "#f4f1e8");
-      p.rect(64 + st, sy + 4, 14, 11, "#f4f1e8");
-      p.rect(62 + st, sy + 2, 18, 2, "#ff6b9d");
-      p.rect(64 + st, sy, 14, 2, "#ff6b9d");
-      p.rect(66 + st, sy - 2, 10, 2, "#ff6b9d");
-      p.rect(66 + st, sy + 7, 3, 4, "#2a6fd0");
-      p.rect(73 + st, sy + 7, 3, 4, "#2a6fd0");
-      p.rect(69 + st, sy + 10, 4, 5, "#8a5a32");
-      p.disc(71 + st, sy + 4, 1, "#ffd45c");
+      for (let y = T; y < H; y += 1) { p.px(100 + Math.round(Math.sin(y * 0.3)), y, "#9aaad0"); }
+      // The road: packed snow, edged.
+      route.samples(0, 1).forEach(q => { p.rect(q.x - 3, q.y - 1, 7, 4, "#c9d6ef"); });
+      route.samples(0, 1).forEach(q => { p.rect(q.x - 2, q.y, 5, 2, "#f4f7ff"); });
+      // Pines on the lower slopes, rocks, the hut and base camp.
+      [[14, B - 14, 5], [26, B - 30, 4], [172, B - 18, 6], [186, B - 40, 5], [160, B - 44, 4], [8, B - 52, 4]].forEach(([x, y, sz]) => blit(p, pine(sz, { snow: "#f4f7ff", leaf: "#1d5b4a", light: "#2a7a5e" }), x, y));
+      blit(p, HUT, 150, lerp(B, T, 0.3) - 26);
+      blit(p, SIGN, 150, lerp(B, T, 0.62) - 18);
+      blit(p, TENT("#45e3ff"), 2, B + 4);
+      blit(p, TENT("#ffd45c"), 16, B + 6);
+      p.rect(L, H - 6, R - L, 6, "#e9eefb");
     },
     frame(p, s) {
-      // Kilometre posts under the track, and the rest of the line faintly.
+      stars(p, starList.slice(0, 10), s.now, T);
+      smoke(p, 169, lerp(B, T, 0.3) - 26, s.now, { color: "#e9eefb" });
+      // The yeti peeks out from behind the boulder and waves as Atlas passes.
+      // Outside the third bend on the left, clear of the road.
+      const yetiY = Math.round(lerp(B, T + 8, 3 / 8)) - 6;
+      const near = Math.abs(s.route.at(s.f).y - yetiY) < 26;
+      blit(p, YETI, 22, yetiY - 14);
+      blit(p, YETI_ARM[near && Math.floor(s.now * 4) % 2 ? 1 : 0], 36, yetiY - 10);
+      blit(p, BOULDER(18), 26, yetiY - 6);
       eachMark(s, (f, text, reached) => {
-        const point = s.route.at(f);
-        const x = Math.round(point.x);
-        const y = rowY(rowOf(point.y));
-        p.rect(x, y + 4, 1, 3, reached ? "#ffd45c" : "#f4f1e8");
-        label(p, s, text, clamp(x, 6, W - 7), y + 8, reached, { align: "center" });
+        const q = s.route.at(f);
+        p.rect(q.x, q.y - 6, 1, 6, "#4a5778");
+        p.rect(q.x - 1, q.y - 7, 3, 2, reached ? "#ffd45c" : "#8f9bbd");
+        plate(p, text, q.x > 100 ? q.x + 4 : q.x - 4, q.y - 12, reached, { align: q.x > 100 ? "left" : "right" });
       });
-      label(p, s, `${s.summit / 1000}K`, 3, topY - 9, s.goal); // left of the top row (the engine ends on the right)
-      flag(p, 71 + st, topY - 18, s.goal ? "#ffd45c" : "#ff6b9d", 5, s.now);
-      s.route.samples(s.f, 1).forEach((point, index) => { if (index % 3 === 0) p.px(point.x, point.y - 1, "rgba(255,255,255,0.45)"); });
-
-      // The carriages: each round covers its stretch of the line, row by row.
-      const shake = s.now % 2.6 < 0.16;
-      s.stretches.forEach((part, index) => {
-        if (part.b <= part.a || s.f <= part.a) return;
-        const pieces = s.route.samples(part.a, Math.min(part.b, s.f));
-        const byRow = new Map();
-        pieces.forEach(point => {
-          const row = rowOf(point.y);
-          if (Math.abs(point.y - rowY(row)) > 0.5) return; // on a bend
-          const span = byRow.get(row) || [Infinity, -Infinity];
-          byRow.set(row, [Math.min(span[0], point.x), Math.max(span[1], point.x)]);
-        });
-        byRow.forEach(([a, b], row) => drawCarriage(p, s, index, Math.round(a) + 1, Math.round(b) - 1, part.color, shake && index % 6 === 3, rowY(row)));
-      });
-
-      // The engine, Atlas in the cab, and its smoke; it faces the way the row runs.
+      blit(p, FLAG(s.goal ? "#ffd45c" : "#8f9bbd", Math.floor(s.now * 3) % 2), 100, T - 22);
+      plate(p, `${s.summit / 1000}K`, 114, T - 18, s.goal, { color: "#ffd45c" });
+      if (s.goal) bigStar(p, 106, T - 26, "#ffd45c", s.now, true);
+      planned(p, s, "rgba(74,87,140,0.6)", 4);
+      trail(p, s, { width: 2, offset: 1 });
+      stopMarks(p, s, (q, c) => pin(p, q, c));
       const at = s.route.at(s.f);
-      const flip = at.dx < -0.01;
-      const row = rowOf(at.y);
-      const onBend = Math.abs(at.y - rowY(row)) > 0.5;
-      const x = Math.round(at.x) - (flip ? 21 : 0);
-      const bottom = Math.round(onBend ? at.y : rowY(row)) - 1;
-      if (s.now - lastPuff > (s.moving ? 0.18 : 0.9)) {
-        lastPuff = s.now;
-        puffs.push({ x: flip ? x + 5 : x + 16, y: bottom - 12, born: s.now, dir: flip ? 1 : -1 });
-      }
-      for (let index = puffs.length - 1; index >= 0; index -= 1) {
-        const item = puffs[index];
-        const age = s.now - item.born;
-        if (age > 1.6) { puffs.splice(index, 1); continue; }
-        const radius = Math.min(3, Math.floor(age * 2.5));
-        p.disc(item.x + item.dir * age * (s.moving ? 14 : 4), item.y - age * 8, radius, `rgba(244,247,255,${0.75 * (1 - age / 1.6)})`);
-      }
-      drawAtlas(p, s, flip ? x + 18 : x + 3, bottom - 6, { upper: true, flip });
-      p.sprite(LOCO, LOCO_COLORS, x, bottom - 12, { flip });
-      p.sprite(WHEELS[s.moving ? Math.floor(s.now * 10) % 2 : 0], LOCO_COLORS, x - 1, bottom - 2, { flip });
-    },
-    head(s) {
-      const at = s.route.at(s.f);
-      const flip = at.dx < -0.01;
-      const x = Math.round(at.x) - (flip ? 21 : 0);
-      return { x: flip ? x + 18 : x + 3, y: Math.round(rowY(rowOf(at.y))) - 18 };
+      const flip = at.dx < 0;
+      const x = Math.round(at.x);
+      const y = Math.round(at.y) + 2;
+      const bump = s.moving && Math.floor(s.now * 10) % 2 ? 1 : 0;
+      atlas(p, x + (flip ? 3 : -3), y - 8 - bump, { upper: true, now: s.now, pose: poseOf(s), flip });
+      blit(p, SNOWMOBILE, x - 14, y - 11 - bump, { flip });
+      avoid(x - 16, y - 30, x + 16, y + 2);
+      if (s.moving) [0, 1, 2].forEach(i => p.px(x + (flip ? 16 + i * 2 : -16 - i * 2), y - 1 - (i % 2), "rgba(255,255,255,0.8)"));
     }
   };
 }
 
 // ---------------------------------------------------------------------------
-// 5. Dive: from the ship down the cable in the bathysphere, past the animals of each depth
-// (the same real depths as journey-scenes.js), to the seabed.
+// 3. Mine: down through the layers, one per 1,000, to the diamonds
 // ---------------------------------------------------------------------------
-function dive(summit, { h: H, top: T, bottom: B }) {
-  const sphereX = X(38);
-  const d = sphereX - 38; // the ship and its crane, drawn for 80 across, moved with the sphere
-  const y0 = T + 6;
-  const span = B - 8 - y0; // the seabed (and its label) just above the card
-  const surface = T - 2;
-  const depthY = depth => y0 + depth / summit * span;
-  const route = makeRoute([[sphereX, y0], [sphereX, y0 + span]]);
-  const plain = Math.min(6000, summit);
-  const plainY = Math.round(depthY(plain)) + 5;
-  const floorY = Math.round(depthY(summit)) + 5;
-  const trench = summit > 6000;
-  const rnd = random(9);
-  const bubbles = [];
-  const colorAtDepth = depth => ramp([[0, "#3fc4f0"], [200, "#1d86c4"], [1000, "#0d3c78"], [2000, "#0a2650"], [4000, "#06132e"], [6000, "#040a1e"], [9000, "#02040f"]].map(([d, c]) => [d / 9000, c]), depth / 9000);
-  const seabedTop = x => trench && (x < X(26) || x > X(50)) ? plainY : floorY;
-  // The animals of the wide scene, spread over the narrower width.
-  const creatureX = x0 => Math.round(4 + (x0 / 176) * (W - 12));
+const LAYERS = [
+  { name: "COAL", rock: "#3a3a44", dark: "#26262e", light: "#55556a", gem: ["#0b0b10", "#2c2c38", "#6a6a80"] },
+  { name: "IRON", rock: "#6a4a42", dark: "#4f3530", light: "#8a6458", gem: ["#b8582e", "#e08a4e", "#ffc08a"] },
+  { name: "GOLD", rock: "#5a5040", dark: "#433b2e", light: "#7a6c52", gem: ["#c99a2e", "#ffd45c", "#fff3b0"] },
+  { name: "EMERALD", rock: "#3e4a4a", dark: "#2c3636", light: "#566666", gem: ["#1a8a4c", "#5cf28a", "#c8ffd8"] },
+  { name: "RUBY", rock: "#4a3442", dark: "#352430", light: "#664a5c", gem: ["#9c1b35", "#e0484f", "#ffb0b8"] },
+  { name: "DIAMOND", rock: "#26304a", dark: "#1a2236", light: "#3a4668", gem: ["#7fd8ff", "#e9f8ff", "#ffffff"] },
+  { name: "DIAMOND", rock: "#1e2640", dark: "#141a2e", light: "#323c5e", gem: ["#7fd8ff", "#e9f8ff", "#ffffff"] },
+  { name: "DIAMOND", rock: "#181e36", dark: "#101428", light: "#2a3354", gem: ["#7fd8ff", "#e9f8ff", "#ffffff"] }
+];
+const LANTERN = sprite("lantern", 5, 7, p => { p.rect(1, 0, 3, 1, "#2a3550"); p.rect(0, 1, 5, 5, "#ffd45c"); p.rect(1, 2, 3, 3, "#fff3b0"); p.rect(0, 6, 5, 1, "#2a3550"); });
+const HEADFRAME = sprite("headframe", 30, 30, p => {
+  p.poly([[2, 30], [13, 4], [17, 4], [28, 30], [24, 30], [15, 9], [6, 30]], "#8a5a32");
+  p.rect(9, 16, 12, 2, "#8a5a32"); p.rect(7, 23, 16, 2, "#8a5a32");
+  p.ell(15, 5, 6, 5, "#2a3550"); p.ell(15, 5, 4, 3, "#4a5778"); p.rect(14, 4, 3, 3, "#c9ced9");
+});
+const CART = sprite("cart", 14, 9, p => { p.poly([[0, 0], [14, 0], [12, 6], [2, 6]], "#6a7a9a"); p.rect(0, 0, 14, 2, "#8494b4"); p.rect(2, 1, 10, 2, "#26262e"); p.ell(4, 7, 2, 2, "#2a3550"); p.ell(10, 7, 2, 2, "#2a3550"); });
+const PICK = [sprite("pick0", 10, 10, p => { p.line(2, 9, 7, 2, "#8a5a32"); p.line(3, 9, 8, 2, "#a8743f"); p.poly([[3, 0], [10, 3], [9, 4], [4, 2]], "#c9ced9"); }),
+  sprite("pick1", 10, 10, p => { p.line(1, 8, 9, 5, "#8a5a32"); p.line(1, 9, 9, 6, "#a8743f"); p.poly([[7, 0], [10, 8], [9, 9], [7, 3]], "#c9ced9"); })];
+
+function mine(summit, { h: H, w: CW = HD_W }) {
+  const ox = Math.max(0, Math.round((CW - HD_W) / 2));
+  const L = -ox;
+  const R = HD_W + ox;
+  const layers = summit / 1000;
+  const top = 46;
+  const lh = (H - top - 8) / layers;
+  const pts = [[44, top - 2], [44, top + lh * 0.72]];
+  for (let i = 0; i < layers; i += 1) {
+    const y = top + lh * (i + 0.72);
+    const next = top + lh * (i + 1.72);
+    const x = i % 2 ? 44 : 156;
+    pts.push([x, i === layers - 1 ? y : lerp(y, next, 0.15)]);
+    if (i < layers - 1) pts.push([x, next]);
+  }
+  const route = makeRoute(pts);
+  const layerAt = y => clamp(Math.floor((y - top) / lh), 0, layers - 1);
+  const rnd = random(31);
+  const gems = [];
+  const tunnelH = Math.min(28, Math.max(26, Math.round(lh - 10))); // Atlas is 24 tall
+  // Gems in the rock at the sides, and a few in the tunnel's back wall (what he hacks).
+  for (let i = 0; i < layers; i += 1) for (let k = 0; k < 6; k += 1) {
+    const x = k < 3 ? L + 4 + Math.floor(rnd() * (28 - L)) : 168 + Math.floor(rnd() * (R - 172));
+    gems.push([x, top + lh * i + 4 + Math.floor(rnd() * (lh - 8)), i, rnd()]);
+  }
+  const wallGems = [];
+  for (let i = 0; i < layers; i += 1) for (let k = 0; k < 3; k += 1) wallGems.push([60 + Math.floor(rnd() * 80), Math.round(top + lh * (i + 0.72)) - 6 - Math.floor(rnd() * (tunnelH - 12)), i, rnd()]);
   return {
+    ox,
     route,
-    goal: { x: sphereX, y: floorY - 1 },
-    background(p) {
-      p.bands(0, 0, W, surface, t => ramp([[0, "#4f6fb8"], [0.7, "#f2a87a"], [1, "#ffd29a"]], t));
-      for (let y = surface; y < H; y += 1) {
-        const depth = Math.max(0, (y - y0) / span * summit);
-        const here = colorAtDepth(depth);
-        const next = colorAtDepth(depth + summit / span);
-        for (let x = 0; x < W; x += 1) p.px(x, y, (x + y) % 2 && here !== next ? next : here);
-      }
-      [[X(48), 0.18], [X(62), 0.12], [X(72), 0.16]].forEach(([x, alpha]) => { for (let y = surface + 1; y < surface + 12; y += 1) p.rect(x + (y - surface - 1) - 8, y, 3, 1, `rgba(220,250,255,${alpha * (1 - (y - surface - 1) / 11)})`); });
-      for (let x = 0; x < W; x += 1) {
-        const top = seabedTop(x) + (x % 9 === 0 ? -1 : 0);
-        p.rect(x, top, 1, H - top, x % 2 ? "#2e2a22" : "#3a3428");
-        p.px(x, top, "#4a4434");
-        if (rnd() < 0.16) p.px(x, top + 1 + Math.floor(rnd() * 2), "#141210");
-      }
-      if (trench) {
-        for (let y = plainY; y < floorY; y += 1) {
-          p.px(X(26) - 1 - Math.floor((y - plainY) / 6), y, "#3a3428");
-          p.px(X(50) + 1 + Math.floor((y - plainY) / 6), y, "#3a3428");
+    bg(p) {
+      p.bands(L, 0, R - L, top, t => ramp([[0, "#2a3a7a"], [1, "#9cc4ec"]], t));
+      p.ell(170, 12, 6, 6, "#ffe08a");
+      blit(p, cloud(30, "m"), 100, 8);
+      p.rect(L, top - 4, R - L, 4, "#3c9a52"); p.rect(L, top - 4, R - L, 1, "#7fd47a");
+      for (let i = 0; i < layers; i += 1) {
+        const LY = LAYERS[Math.min(i, LAYERS.length - 1)];
+        const y0 = Math.round(top + lh * i);
+        const y1 = Math.round(top + lh * (i + 1));
+        p.rect(L, y0, R - L, y1 - y0, LY.rock);
+        const r = random(100 + i);
+        for (let k = 0; k < 70; k += 1) {
+          const x = L + r() * (R - L);
+          const y = y0 + r() * (y1 - y0);
+          const w = 2 + r() * 5;
+          p.ell(x, y, w, w * 0.6, LY.dark);
+          p.ell(x - 0.5, y - 0.5, w * 0.6, w * 0.35, LY.light);
         }
+        p.rect(L, y0, R - L, 1, LY.dark);
+        // A wavy seam between layers.
+        for (let x = L; x < R; x += 1) p.px(x, y0 + Math.round(Math.sin(x * 0.2 + i) * 1.2), LY.light);
       }
-      p.sprite(SHIP, { K: "#0b1020", R: "#e0484f", W: "#f4f1e8" }, 16 + d, surface - 8);
-      p.line(30 + d, surface - 7, sphereX, surface - 10, "#ffd45c");
-      p.line(35 + d, surface - 1, sphereX, surface - 10, "#ffd45c");
+      gems.forEach(([x, y, i]) => {
+        const LY = LAYERS[Math.min(i, LAYERS.length - 1)];
+        if (!LY.gem) return;
+        p.poly([[x, y - 3], [x + 3, y], [x, y + 3], [x - 3, y]], LY.gem[0]);
+        p.poly([[x, y - 3], [x + 3, y], [x, y]], LY.gem[1]);
+        p.px(x - 1, y - 1, LY.gem[2]);
+      });
+      // The tunnel, dug along the route: a cut-away in the layer's own rock, darker, so
+      // the layers still read; a dark rim, a floor, and a timber frame now and then.
+      const samples = route.samples(0, 1);
+      const layerOf = q => LAYERS[Math.min(layerAt(q.y - tunnelH / 2), LAYERS.length - 1)];
+      samples.forEach(q => p.rect(q.x - 5, q.y - tunnelH + 1, 11, tunnelH, "#0e0a08"));
+      samples.forEach(q => p.rect(q.x - 4, q.y - tunnelH + 2, 9, tunnelH - 2, darker(layerOf(q).rock, 0.55)));
+      samples.forEach((q, i) => { if (i % 5 === 0) p.rect(q.x, q.y - tunnelH + 5 + (i * 7) % (tunnelH - 9), 2, 1, darker(layerOf(q).light, 0.5)); });
+      samples.forEach(q => { p.rect(q.x - 4, q.y + 1, 9, 1, "#3a2414"); p.rect(q.x - 4, q.y - tunnelH + 2, 9, 1, "rgba(0,0,0,0.5)"); });
+      wallGems.forEach(([x, y, i]) => {
+        const LY = LAYERS[Math.min(i, LAYERS.length - 1)];
+        p.poly([[x, y - 3], [x + 3, y], [x, y + 3], [x - 3, y]], LY.gem[0]);
+        p.poly([[x, y - 3], [x + 3, y], [x, y]], LY.gem[1]);
+        p.px(x - 1, y - 1, LY.gem[2]);
+      });
+      let lastBeam = -99;
+      samples.forEach((q, i) => {
+        if (q.y < top + 8 || Math.abs(q.dy) > 0.5 || i - lastBeam < 46) return;
+        lastBeam = i;
+        p.rect(q.x - 6, q.y - tunnelH + 2, 2, tunnelH - 1, "#8a5a32");
+        p.rect(q.x + 5, q.y - tunnelH + 2, 2, tunnelH - 1, "#6b4425");
+        p.rect(q.x - 7, q.y - tunnelH + 1, 15, 2, "#a8743f");
+        p.px(q.x - 6, q.y - tunnelH + 2, "#c99a62");
+      });
+      blit(p, HEADFRAME, 29, top - 32);
+      blit(p, CART, 72, top - 13);
+      p.rect(64, top - 4, 30, 1, "#4a5778");
     },
     frame(p, s) {
-      for (let x = 0; x < W; x += 1) if ((x + Math.floor(s.now * 6)) % 7 === 0) p.px(x, surface, "#ffffff");
-      const leap = (s.now % 7) / 1.2;
-      if (leap < 1) {
-        const lx = X(54) + leap * 14;
-        const ly = surface - Math.sin(leap * Math.PI) * 6;
-        p.sprite([".BBBB.", "BBBBBK", ".b..b."], SEA, lx, ly - 1);
-      }
-      const at = s.route.at(s.f);
-      const sy = Math.round(at.y);
-      CREATURES.forEach(([name, depth, x0, rows, sway, lights = []]) => {
-        if (depth > summit) return;
-        const x = Math.round(creatureX(x0) + Math.sin(s.now * 0.5 + x0) * Math.min(sway, 5));
-        const y = Math.round(depthY(depth)) - Math.floor(rows.length / 2);
-        const flip = Math.cos(s.now * 0.5 + x0) < 0;
-        const dark = depth > 800 ? clamp(1 - (Math.hypot(x - sphereX, y - sy) - 12) / 18, 0.2, 1) : 1;
-        p.sprite(rows, SEA, x, y, { flip, alpha: dark });
-        lights.forEach(([dx, dy]) => {
-          const lx = flip ? x + rows[0].length - 1 - dx : x + dx;
-          if ((s.now * 1.5 + x0) % 2 > 0.3) { p.px(lx, y + dy, SEA.L); glow(p, lx, y + dy, 3, SEA.L, 0.4); }
-        });
-      });
-      if (plain <= summit) {
-        [[X(50), 0], [X(60), 1]].forEach(([x0, index]) => {
-          const x = Math.round(x0 + Math.sin(s.now * 0.3 + index * 2) * 3);
-          const dark = clamp(1 - (Math.hypot(x - sphereX, plainY - sy) - 12) / 18, 0.25, 1);
-          p.sprite(SEA_PIG, SEA, x, plainY - 3, { alpha: dark });
-        });
-        p.sprite(BRITTLE_STAR, SEA, X(70), plainY - 4, { alpha: clamp(1 - (Math.hypot(X(70) - sphereX, plainY - sy) - 12) / 18, 0.25, 1) });
-      }
+      [...gems, ...wallGems].forEach(([x, y, i, b]) => { if (LAYERS[Math.min(i, LAYERS.length - 1)].gem && (s.now * 0.8 + b * 7) % 3 < 0.15) { p.px(x, y - 4, "#ffffff"); p.px(x + 4, y, "#ffffff"); } });
       eachMark(s, (f, text, reached) => {
-        const y = Math.round(depthY(f * summit));
-        p.rect(0, y, 3, 1, reached ? "#ffd45c" : "rgba(255,255,255,0.4)");
-        label(p, s, text, 4, y - 2, reached);
+        const y = Math.round(top + lh * Math.round(f * layers));
+        plate(p, text, R - 4, y + 2, reached, { align: "right" });
       });
-      label(p, s, `${s.summit / 1000}K`, 4, floorY - 3, s.goal);
-      for (let y = sy + 6; y < floorY - 1; y += 3) p.px(sphereX, y, "rgba(255,255,255,0.28)");
-      p.rect(sphereX, surface - 10, 1, y0 - surface + 10, "#c9ced9");
-      eachTrail(s, (point, color) => p.px(point.x, point.y - 5, color));
-      s.stops.forEach(stop => {
-        const y = Math.round(s.route.at(stop.f).y) - 5;
-        if ((s.now * 2 + stop.f * 7) % 2 > 0.4) glow(p, sphereX, y, 4, stop.color, 0.6);
-        p.rect(sphereX - 1, y, 3, 1, stop.color);
+      plate(p, `${s.summit / 1000}K`, R - 4, H - 14, s.goal, { align: "right", color: "#7fd8ff" });
+      planned(p, s, "rgba(255,212,92,0.35)", 4);
+      trail(p, s, { width: 2, offset: 1 });
+      // A lantern where each round ended, swinging a little.
+      stopMarks(p, s, (q, c) => {
+        blit(p, LANTERN, q.x - 2, q.y - tunnelH + 4);
+        p.px(q.x, q.y - tunnelH + 3, c);
+        p.ctx.globalAlpha = 0.18 + 0.05 * Math.sin(s.now * 3);
+        p.ell(q.x, q.y - tunnelH + 8, 9, 7, "#ffd45c");
+        p.ctx.globalAlpha = 1;
       });
-      p.rect(sphereX + 7, floorY - 4, 1, 4, "#c9ced9");
-      p.px(sphereX + 7, floorY - 5, s.goal ? "#ffd45c" : "#5a6a8a");
-      if (s.goal) glow(p, sphereX + 7, floorY - 5, 5, "#ffd45c", 0.6);
-      if (s.f > 0.03) glow(p, sphereX, sy + 6, 20, "#bff4ff", 0.22 + 0.08 * Math.min(1, s.f * 4));
-      if (s.moving && Math.random() < 0.5) bubbles.push({ x: sphereX + (Math.random() < 0.5 ? -4 : 4), y: sy - 2, born: s.now });
-      for (let index = bubbles.length - 1; index >= 0; index -= 1) {
-        const item = bubbles[index];
-        const age = s.now - item.born;
-        const y = item.y - age * 14;
-        if (age > 1.2 || y < surface + 1) { bubbles.splice(index, 1); continue; }
-        p.px(item.x + Math.round(Math.sin(age * 9)), y, "rgba(220,250,255,0.7)");
-      }
-      p.sprite(SPHERE, SPHERE_COLORS, sphereX - 4, sy - 4);
-      p.px(sphereX, sy + 5, "#ffd45c");
-    },
-    head(s) {
-      return { x: sphereX, y: Math.round(s.route.at(s.f).y) - 5 };
+      if (s.goal) bigStar(p, route.points.at(-1)[0], route.points.at(-1)[1] - tunnelH / 2, "#e9f8ff", s.now, true);
+      const at = s.route.at(s.f);
+      const flip = at.dx < -0.1;
+      const x = Math.round(at.x);
+      const y = Math.round(at.y);
+      p.ctx.globalAlpha = 0.16;
+      p.ell(x, y - 12, 18, 13, "#ffd45c");
+      p.ctx.globalAlpha = 1;
+      atlas(p, x, y, { now: s.now, pose: poseOf(s), flip });
+      const swing = !s.goal && Math.floor(s.now * 3) % 2;
+      blit(p, PICK[swing ? 1 : 0], x + (flip ? -16 : 6), y - 16, { flip });
+      avoid(x - 18, y - 25, x + 18, y + 2);
+      if (s.moving && swing) [[-1, 0], [1, -1], [0, -2]].forEach(([dx, dy]) => p.px(x + (flip ? -17 : 17) + dx, y - 6 + dy, LAYERS[Math.min(layerAt(y), LAYERS.length - 1)].light));
     }
   };
 }
 
 // ---------------------------------------------------------------------------
-// 6. Sled: from the bottom of the screen across the sea ice to the North Pole on the
-// horizon, past the research station, the polar bear and the open lead. Every round
-// lights its own curtain of the aurora, across its share of the sky.
+// 4. Train: a steam train climbs four rows of track to the station
 // ---------------------------------------------------------------------------
-function sled(summit, { h: H, top: T, bottom: B }) {
-  const L = B - T;
-  const horizon = T + 12;
-  const route = makeRoute([[X(24), B], [X(52), B - L * 0.24], [X(20), B - L * 0.5], [X(50), B - L * 0.76], [X(40), T + 18]]);
-  const leadY = Math.round(B - L * 0.36);
-  const rnd = random(4);
-  const stars = Array.from({ length: 66 }, () => [Math.floor(rnd() * W), Math.floor(rnd() * horizon)]);
-  const snow = Array.from({ length: 33 }, () => [rnd() * W, rnd() * H, 0.5 + rnd()]);
-  const hop = y => (Math.abs(y - leadY) < 4 ? -Math.round(Math.cos((y - leadY) / 4 * Math.PI / 2) * 3) : 0);
-  const pole = { x: X(40), y: T + 18 };
+const LOCO = sprite("loco", 34, 22, p => {
+  p.rect(0, 2, 12, 14, "#1c7a70");
+  p.rect(0, 2, 12, 2, "#2bb3a3");
+  p.ctx.clearRect(2, 4, 9, 8);
+  p.rect(-1, 0, 14, 2, "#2a3550");
+  p.rect(12, 7, 18, 9, "#2bb3a3");
+  p.rect(12, 7, 18, 2, "#5ce0cf");
+  p.rect(12, 14, 18, 2, "#1c7a70");
+  [16, 22].forEach(x => p.rect(x, 7, 1, 9, "#ffd45c"));
+  p.rect(25, 1, 4, 6, "#2a3550"); p.rect(24, 0, 6, 2, "#4a5778");
+  p.rect(18, 4, 3, 3, "#ffd45c");
+  p.rect(30, 9, 3, 3, "#fff3b0");
+  p.poly([[29, 16], [34, 16], [34, 20], [31, 20]], "#e0484f");
+  p.rect(0, 16, 30, 2, "#2a3550");
+});
+const WHEELS = [0, 1].map(f => sprite(`wheels:${f}`, 30, 6, p => {
+  [[4, 2.5], [14, 3], [24, 3]].forEach(([x, r]) => { p.ell(x, 3, r + 0.5, r + 0.5, "#4a5778"); p.ell(x, 3, r - 1, r - 1, "#c9ced9"); p.px(x, 3, INK); });
+  p.rect(4, f ? 2 : 4, 21, 1, "#e0484f");
+}, INK));
+const CARRIAGE = (color, cargo) => sprite(`car:${color}:${cargo}`, 26, 18, p => {
+  p.rect(0, 2, 26, 12, color);
+  p.rect(0, 2, 26, 2, lighter(color, 0.35));
+  p.rect(0, 12, 26, 2, darker(color, 0.3));
+  p.rect(-1, 0, 28, 2, darker(color, 0.5));
+  if (cargo === "windows") [3, 10, 17].forEach(x => { p.rect(x, 5, 5, 5, "#8fd8ff"); p.rect(x, 5, 5, 1, "#c9f5ff"); });
+  if (cargo === "logs") { p.rect(1, -2, 24, 4, "#8a5a32"); [3, 8, 13, 18, 23].forEach(x => p.ell(x, 0, 2, 2, "#c99a62")); }
+  if (cargo === "rex") { p.rect(3, 4, 20, 8, "#2a3550"); p.text("REX", 8, 6, "#5cf28a"); }
+  if (cargo === "globe") { p.ell(13, 0, 6, 6, "#2a6fd0"); p.ell(11, -1, 3, 3, "#3c9a52"); p.ell(16, 2, 2, 2, "#3c9a52"); }
+  if (cargo === "sand") { p.ell(13, 2, 12, 4, "#ffd29a"); p.ell(13, 1, 8, 3, "#ffe0b0"); }
+  if (cargo === "animals") { p.rect(3, 5, 6, 6, "#8fd8ff"); p.rect(11, 5, 6, 6, "#8fd8ff"); p.rect(19, 5, 4, 6, "#8fd8ff"); p.rect(4, 6, 3, 4, "#ffd45c"); p.rect(5, 5, 1, 1, "#8a5a32"); p.rect(12, 7, 4, 3, "#8494b4"); p.rect(20, 7, 2, 3, "#e0484f"); }
+  p.rect(0, 14, 26, 2, "#2a3550");
+  p.ell(5, 16, 2.5, 2.5, "#4a5778"); p.ell(21, 16, 2.5, 2.5, "#4a5778");
+});
+const CARGO = ["animals", "sand", "windows", "rex", "logs", "globe"];
+const STATION = sprite("station", 60, 34, p => {
+  p.poly([[-2, 12], [8, 2], [52, 2], [62, 12]], "#9c2b35");
+  p.poly([[8, 2], [52, 2], [55, 5], [5, 5]], "#e0484f");
+  p.rect(2, 12, 56, 20, "#e9dcc2");
+  p.rect(2, 12, 56, 2, "#c9b89a");
+  [6, 18, 38, 48].forEach(x => { p.rect(x, 17, 6, 8, "#2a6fd0"); p.rect(x, 17, 6, 1, "#8fd8ff"); p.rect(x + 2, 17, 1, 8, "#e9dcc2"); });
+  p.rect(27, 16, 6, 16, "#5c3a1f");
+  p.ell(30, 6, 5, 5, "#f4f1e8"); p.ell(30, 6, 4, 4, "#ffffff"); p.rect(30, 3, 1, 3, INK); p.rect(30, 6, 3, 1, INK);
+  p.rect(0, 31, 60, 3, "#8494b4"); p.rect(0, 31, 60, 1, "#c9ced9");
+});
+const WINDMILL = sprite("windmill", 26, 34, p => {
+  p.poly([[9, 34], [11, 12], [15, 12], [17, 34]], "#e9dcc2");
+  p.poly([[13, 12], [15, 12], [17, 34], [13, 34]], "#c9b89a");
+  p.poly([[9, 13], [13, 7], [17, 13]], "#9c2b35");
+  p.rect(12, 26, 3, 8, "#5c3a1f");
+  [[13, 10, 13, 0], [13, 10, 25, 10], [13, 10, 13, 20], [13, 10, 1, 10]].forEach(([a, b, c, d]) => { p.line(a, b, c, d, "#8a5a32"); });
+  p.rect(12, 1, 3, 7, "#f4f1e8"); p.rect(18, 9, 7, 3, "#f4f1e8"); p.rect(12, 13, 3, 7, "#f4f1e8"); p.rect(2, 9, 7, 3, "#f4f1e8");
+  p.rect(12, 9, 3, 3, "#5c3a1f");
+});
+const FARM = sprite("farm", 30, 22, p => {
+  p.poly([[0, 10], [9, 2], [18, 10]], "#e0484f"); p.poly([[9, 2], [18, 10], [9, 10]], "#9c2b35");
+  p.rect(1, 10, 16, 12, "#f4f1e8"); p.rect(11, 10, 6, 12, "#d8d2c2");
+  p.rect(7, 15, 4, 7, "#8a5a32"); p.rect(3, 12, 3, 3, "#ffd45c"); p.rect(13, 12, 3, 3, "#ffd45c");
+  p.rect(20, 6, 8, 16, "#c9ced9"); p.ell(24, 6, 4, 3, "#8494b4"); p.rect(20, 10, 8, 1, "#8494b4"); p.rect(20, 15, 8, 1, "#8494b4");
+});
+const COW = sprite("cow", 12, 8, p => { p.rect(2, 1, 8, 5, "#f4f1e8"); p.rect(4, 2, 3, 2, INK); p.rect(9, 0, 3, 4, "#f4f1e8"); p.px(11, 2, INK); p.rect(2, 6, 1, 2, "#f4f1e8"); p.rect(8, 6, 1, 2, "#f4f1e8"); p.rect(10, 3, 2, 1, "#ff9ab0"); });
+
+function train(summit, { h: H, w: CW = HD_W }) {
+  const ox = Math.max(0, Math.round((CW - HD_W) / 2));
+  const L = -ox;
+  const R = HD_W + ox;
+  const top = 54;
+  const rows = 4;
+  const bottom = H - 16;
+  const gap = (bottom - top) / (rows - 1 + 0.4);
+  const pts = [];
+  for (let i = 0; i < rows; i += 1) {
+    const y = Math.round(bottom - i * gap);
+    const [a, b] = i % 2 ? [176, 24] : [24, 176];
+    if (i === 0) pts.push([4, y]);
+    else pts.push([a, y]);
+    pts.push([b, y]);
+    if (i < rows - 1) pts.push([b + (i % 2 ? -14 : 14), y - gap / 2]);
+  }
+  pts[pts.length - 1] = [100, pts[pts.length - 1][1]];
+  const route = makeRoute(pts);
+  const rnd = random(41);
   return {
+    ox,
     route,
-    goal: { x: pole.x, y: pole.y - 8 },
-    background(p) {
-      p.bands(0, 0, W, horizon + 2, t => ramp([[0, "#050818"], [0.6, "#0d1640"], [1, "#1d2c63"]], t));
-      stars.forEach(([x, y]) => p.px(x, y, y < horizon / 2 ? "#ffffff" : "#7f8fc8"));
-      p.disc(10, 8, 3, "#f4f1e8");
-      p.disc(12, 7, 2, "#050818");
-      for (let x = 0; x < W; x += 1) {
-        const ridge = horizon + Math.round(Math.abs(((x * 1.7) % 18) - 9) * 0.4 + Math.sin(x * 0.3));
-        p.rect(x, ridge, 1, H - ridge, "#a9c1de");
-        p.px(x, ridge, "#f4f7ff");
+    bg(p) {
+      p.bands(L, 0, R - L, top, t => ramp([[0, "#3a6fc0"], [1, "#a8d4f0"]], t));
+      blit(p, cloud(34, "t"), 20, 8); blit(p, cloud(24, "t2"), 150, 18);
+      p.rect(L, top - 18, R - L, H, "#5cb85c");
+      for (let x = L; x < R; x += 1) { const y = top - 22 + Math.round(Math.sin(x * 0.06) * 3); p.rect(x, y, 1, 6, "#4fa85a"); p.px(x, y, "#7fd47a"); }
+      // Fields between the rows of track: crops in stripes.
+      for (let i = 0; i < rows - 1; i += 1) {
+        const y0 = Math.round(bottom - i * gap - gap + 8);
+        const fy = y0 + 2;
+        const tint = ["#d8b84a", "#8ac85a", "#c99a62"][i % 3];
+        p.rect(40, fy, 120, gap - 18, tint);
+        for (let y = fy; y < fy + gap - 18; y += 3) p.rect(40, y, 120, 1, darker(tint, 0.15));
       }
-      p.bands(0, horizon + 5, W, H - horizon - 5, t => ramp([[0, "#c9d9ee"], [1, "#e9f1fb"]], t));
-      // Faint lines in the ice, closer together towards the horizon.
-      for (let y = horizon + 8; y < H; y += Math.max(3, Math.round((y - horizon) / 6))) p.rect(0, y, W, 1, "rgba(80,110,160,0.12)");
-      // The open lead across the ice.
-      for (let x = 0; x < W; x += 1) {
-        const y = leadY + Math.round(Math.sin(x * 0.15) * 1.5);
-        p.rect(x, y - 2, 1, 4, (x % 3) ? "#0b2a4a" : "#123a62");
-        p.px(x, y - 3, "#f4f7ff");
+      // A river under the lowest row, with a bridge.
+      const ry = bottom + 6;
+      p.rect(L, ry, R - L, H - ry, "#2a6fd0");
+      for (let x = L; x < R; x += 5) p.rect(x, ry + 2 + (x % 3), 3, 1, "#8fd8ff");
+      for (let x = 70; x < 130; x += 10) { p.rect(x, bottom + 2, 3, H - bottom, "#8494b4"); p.px(x, bottom + 2, "#c9ced9"); }
+      // Trees and cows.
+      for (let k = 0; k < 16; k += 1) {
+        const x = Math.floor(L + rnd() * (R - L));
+        const i = Math.floor(rnd() * (rows - 1));
+        const y = bottom - i * gap - 10;
+        if (x > 36 && x < 164) continue;
+        blit(p, pine(4 + Math.floor(rnd() * 2)), x - 4, y - 12);
       }
-      p.sprite(STATION, { O: "#ff8a3d", Y: "#ffd45c", K: "#0b1020" }, X(62), Math.round(B - L * 0.62));
-      for (let y = pole.y - 8; y < pole.y + 1; y += 1) p.px(pole.x, y, Math.floor(y / 2) % 2 ? "#e0484f" : "#f4f1e8");
-      p.rect(pole.x - 3, pole.y + 1, 7, 1, "#8f9bbd");
+      // Hedges along the fields, flowers, a windmill and a farmhouse.
+      for (let i = 0; i < rows - 1; i += 1) {
+        const y0 = Math.round(bottom - i * gap - gap + 8);
+        for (let x = 40; x < 160; x += 4) { p.ell(x + 2, y0 + 1, 2.5, 2, "#2a7d40"); p.px(x + 1, y0, "#4fb05e"); }
+      }
+      const fr = random(9);
+      for (let k = 0; k < 60; k += 1) { const x = Math.floor(L + fr() * (R - L)); const y = top + Math.floor(fr() * (bottom - top)); if (x < 38 || x > 162) p.px(x, y, ["#ffd45c", "#f4f1e8", "#ff9ab0"][k % 3]); }
+      blit(p, WINDMILL, 150, top - 36);
+      blit(p, FARM, 4, top + 10);
+      blit(p, COW, 60, bottom - gap * 0.5 + 2); blit(p, COW, 120, bottom - gap * 1.5 + 4, { flip: true });
+      // The track: sleepers and two rails.
+      route.samples(0, 1).forEach((q, i) => { if (i % 3 === 0) p.rect(q.x - 1, q.y + 1, 3, 2, "#6b4425"); });
+      route.samples(0, 1).forEach(q => { p.px(q.x, q.y, "#c9ced9"); p.px(q.x, q.y + 3, "#8494b4"); });
+      blit(p, STATION, 70, top - 46);
     },
     frame(p, s) {
-      // The aurora: one curtain per round, across its share of the sky.
-      s.stretches.forEach((part, index) => {
-        if (part.b <= part.a || s.f <= part.a) return;
-        const a = Math.round(part.a * W);
-        const b = Math.round(Math.min(part.b, s.f) * W);
-        const base = Math.max(2, horizon - 26) + (index % 3) * 4;
-        for (let x = a; x <= b; x += 1) {
-          const wave = Math.sin(x * 0.3 + s.now * 1.1 + index * 1.7) * 3 + Math.sin(x * 0.1 - s.now * 0.4) * 2;
-          const shimmer = 0.55 + 0.45 * Math.sin(s.now * 2.3 + x * 0.4 + index);
-          const top = Math.round(base + wave);
-          const height = 13 + Math.round(Math.sin(x * 0.3 + index) * 3);
-          for (let y = 0; y < height; y += 1) {
-            const alpha = (1 - y / height) ** 0.7 * 0.85 * shimmer;
-            if (alpha > 0.05) p.rect(x, top + y, 1, 1, `${part.color}${Math.round(alpha * 255).toString(16).padStart(2, "0")}`);
+      eachMark(s, (f, text, reached) => {
+        const q = s.route.at(f);
+        p.rect(q.x, q.y - 9, 1, 9, "#f4f1e8");
+        p.rect(q.x - 2, q.y - 12, 5, 4, reached ? "#ffd45c" : "#8f9bbd");
+        plate(p, text, q.x, q.y - 20, reached, { align: "center" });
+      });
+      plate(p, `${s.summit / 1000}K`, 140, top - 40, s.goal, { color: "#ffd45c" });
+      if (s.goal) bigStar(p, 100, top - 52, "#ffd45c", s.now, true);
+      planned(p, s, "rgba(255,255,255,0.35)", 6);
+      trail(p, s, { width: 2, offset: 1 });
+      // The train: a carriage for every round so far, behind the locomotive.
+      const at = s.route.at(s.f);
+      const done = s.stretches.filter(part => part.a < s.f);
+      const spacing = 28 / s.route.total;
+      done.slice().reverse().forEach((part, i) => {
+        const q = s.route.at(Math.max(0, s.f - spacing * (i + 1) - 4 / s.route.total));
+        const index = s.stretches.indexOf(part);
+        blit(p, CARRIAGE(part.color, CARGO[index % CARGO.length]), q.x - 13, q.y - 17);
+        avoid(q.x - 14, q.y - 20, q.x + 14, q.y + 2);
+      });
+      const flip = at.dx < 0;
+      const x = Math.round(at.x);
+      const y = Math.round(at.y);
+      const bob = s.moving && Math.floor(s.now * 8) % 2 ? 1 : 0;
+      smoke(p, x + (flip ? -10 : 10), y - 24 - bob, s.now, { n: 6, color: "#e9eefb", rise: 12, drift: flip ? 6 : -6 });
+      // Atlas in the cab, seen through its window (the window is left open in the sprite).
+      const win = flip ? x - 17 + 23 : x - 17 + 2;
+      p.rect(win, y - 17 - bob, 9, 8, "#8fd8ff");
+      p.ctx.save();
+      p.ctx.beginPath(); p.ctx.rect(win, y - 17 - bob, 9, 8); p.ctx.clip();
+      atlas(p, win + 4, y - 3 - bob, { upper: true, now: s.now, pose: "idle", flip });
+      p.ctx.restore();
+      blit(p, LOCO, x - 17, y - 21 - bob, { flip });
+      avoid(x - 19, y - 30, x + 19, y + 2);
+      blit(p, WHEELS[s.moving ? Math.floor(s.now * 8) % 2 : 0], x - 15, y - 4, { flip });
+    }
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 5. Dive: a bathysphere on a cable from a ship, down past the sea life of each depth
+// ---------------------------------------------------------------------------
+const SHIP = sprite("ship", 56, 26, p => {
+  p.poly([[0, 14], [56, 14], [50, 26], [6, 26]], "#e0484f");
+  p.rect(2, 14, 52, 3, "#f4f1e8");
+  p.poly([[6, 22], [50, 22], [50, 26], [6, 26]], "#9c2b35");
+  p.rect(8, 6, 18, 8, "#f4f1e8"); p.rect(8, 6, 18, 2, "#c9d6ef");
+  [10, 15, 20].forEach(x => p.rect(x, 9, 3, 2, "#2a6fd0"));
+  p.rect(14, 0, 4, 6, "#ff8a3d"); p.rect(14, 0, 4, 1, INK);
+  p.rect(38, 2, 2, 12, "#ffd45c"); p.line(40, 2, 50, 8, "#ffd45c"); p.line(40, 3, 50, 9, "#c99a2e");
+});
+const SPHERE = sprite("sphere", 28, 28, p => {
+  p.ell(14, 14, 14, 14, "#6f86a8");
+  p.ell(12, 12, 12, 12, "#8fa3c0");
+  p.ell(9, 8, 5, 4, "#c9d6ef");
+  p.ell(14, 15, 8, 8, "#2a3550");
+  p.ell(14, 15, 7, 7, "#9ad8ff");
+  for (let a = 0; a < 12; a += 1) p.px(14 + Math.round(Math.cos(a / 12 * Math.PI * 2) * 11), 14 + Math.round(Math.sin(a / 12 * Math.PI * 2) * 11), "#c9d6ef");
+  p.rect(12, 0, 4, 2, "#4a5778");
+});
+const FISH = (body, belly, w = 9) => sprite(`fish:${body}:${w}`, w, Math.ceil(w * 0.6), p => {
+  const h = Math.ceil(w * 0.6);
+  p.ell(w * 0.42, h / 2, w * 0.42, h * 0.42, body);
+  p.ell(w * 0.42, h * 0.65, w * 0.32, h * 0.2, belly);
+  p.poly([[w * 0.78, h / 2], [w, 0], [w, h]], body);
+  p.px(Math.round(w * 0.2), Math.floor(h * 0.4), INK);
+});
+const TURTLE = sprite("turtle", 22, 14, p => {
+  p.ell(11, 7, 8, 5, "#2a8a4c"); p.ell(10, 6, 6, 3.5, "#5cc46a");
+  [[7, 5], [11, 4], [14, 6], [9, 8]].forEach(([x, y]) => p.rect(x, y, 2, 2, "#1d6b3a"));
+  p.ell(2, 7, 2.5, 2, "#a8d48a"); p.px(1, 6, INK);
+  p.poly([[6, 10], [3, 14], [8, 12]], "#a8d48a"); p.poly([[15, 10], [19, 13], [17, 10]], "#a8d48a");
+  p.poly([[6, 3], [2, 1], [8, 4]], "#a8d48a");
+});
+const JELLY = f => sprite(`jelly:${f}`, 12, 18, p => {
+  p.ell(6, 4, 6, 4, "#ff9ad8"); p.rect(0, 4, 12, 1, "#c56aa8"); p.ell(4, 2, 2, 1.5, "#ffd0ee");
+  [1, 4, 7, 10].forEach((x, i) => { for (let y = 5; y < 18; y += 1) p.px(x + Math.round(Math.sin(y * 0.6 + i + f * 2)), y, "rgba(255,154,216,0.8)"); });
+}, null);
+const WHALE = sprite("whale", 60, 22, p => {
+  p.ell(26, 11, 25, 9, "#3a5a8c"); p.ell(26, 14, 22, 5, "#c9d6ef");
+  for (let x = 8; x < 40; x += 3) p.rect(x, 15, 2, 1, "#8fa3c0");
+  p.poly([[48, 10], [60, 3], [56, 11], [60, 19]], "#3a5a8c");
+  p.poly([[20, 16], [14, 22], [26, 17]], "#2c4670");
+  p.px(9, 9, INK); p.rect(4, 12, 6, 1, "#2c4670");
+});
+const SQUID = f => sprite(`squid:${f}`, 30, 14, p => {
+  p.poly([[0, 7], [8, 2], [16, 3], [16, 11], [8, 12]], "#e0484f");
+  p.poly([[0, 7], [4, 1], [5, 13]], "#ff6b6b");
+  p.ell(13, 7, 2, 2, "#ffd45c"); p.px(13, 7, INK);
+  for (let k = 0; k < 4; k += 1) for (let x = 16; x < 30; x += 1) p.px(x, 4 + k * 2 + Math.round(Math.sin(x * 0.5 + k + f * 2)), "#c03a45");
+});
+const ANGLER = sprite("angler", 22, 16, p => {
+  p.ell(11, 9, 9, 7, "#2a2f4a"); p.ell(10, 11, 7, 4, "#3a4060");
+  p.poly([[19, 9], [22, 4], [22, 14]], "#2a2f4a");
+  for (let x = 3; x < 14; x += 2) p.px(x, 12, "#e9eefb");
+  p.px(7, 6, "#9ad8ff");
+  p.line(9, 2, 4, -2, "#4a5778");
+}, null);
+const SEA_PIG = sprite("seapig", 12, 7, p => { p.ell(6, 4, 6, 3, "#ffb0c8"); p.ell(6, 3, 5, 2, "#ffd0e0"); [2, 5, 8, 11].forEach(x => p.rect(x, 6, 1, 1, "#ffb0c8")); p.rect(3, 0, 1, 2, "#ffb0c8"); p.rect(7, 0, 1, 2, "#ffb0c8"); p.px(1, 3, INK); });
+
+function dive(summit, { h: H, w: CW = HD_W }) {
+  const ox = Math.max(0, Math.round((CW - HD_W) / 2));
+  const L = -ox;
+  const R = HD_W + ox;
+  const sea = 34;
+  const floor = H - 14;
+  const route = makeRoute([[120, sea + 30], [120, floor - 16]]);
+  const depthAt = f => Math.round(f * summit);
+  const rnd = random(51);
+  const bubbles = Array.from({ length: 24 }, () => [L + rnd() * (R - L), rnd()]);
+  const yOf = f => lerp(sea + 30, floor - 16, f);
+  return {
+    ox,
+    route,
+    bg(p) {
+      p.bands(L, 0, R - L, sea, t => ramp([[0, "#3a6fc0"], [1, "#bfe3ff"]], t));
+      p.bands(L, sea, R - L, H - sea, t => ramp([[0, "#2bb3c8"], [0.12, "#1a7aa8"], [0.3, "#114a80"], [0.55, "#0b2a54"], [0.8, "#071636"], [1, "#040b20"]], t));
+      // Sun rays near the top.
+      for (let k = 0; k < 6; k += 1) {
+        p.ctx.globalAlpha = 0.08;
+        p.poly([[20 + k * 32, sea], [34 + k * 32, sea], [10 + k * 32 + 40, sea + 90], [k * 32 + 30, sea + 90]], "#e9f8ff");
+      }
+      p.ctx.globalAlpha = 1;
+      // The seabed: rocks, coral and the trench.
+      for (let x = L; x < R; x += 1) {
+        const y = floor + Math.round(Math.sin(x * 0.08) * 2 + Math.sin(x * 0.3) * 1);
+        p.rect(x, y, 1, H - y, "#2a2438");
+        p.px(x, y, "#4a3e5e");
+      }
+      [[30, "#e0484f"], [48, "#ff8a3d"], [170, "#c58cff"]].forEach(([x, c]) => {
+        for (let k = 0; k < 5; k += 1) p.rect(x + k * 2 - 4, floor - 6 + (k % 2) * 2, 1, 6 - (k % 2) * 2, c);
+        p.rect(x - 4, floor - 1, 9, 1, darker(c, 0.3));
+      });
+    },
+    frame(p, s) {
+      // Waves and the ship, rocking.
+      for (let x = L; x < R; x += 1) {
+        const y = sea + Math.round(Math.sin(x * 0.15 + s.now * 2) * 1.2);
+        p.rect(x, y - 1, 1, 2, "#8fd8ff");
+        if ((x + Math.floor(s.now * 6)) % 9 === 0) p.px(x, y - 2, "#ffffff");
+      }
+      const tilt = Math.round(Math.sin(s.now * 1.4));
+      blit(p, SHIP, 80, sea - 22 + tilt);
+      // Creatures at the depths they live (the game's list, journey-scenes.js CREATURES).
+      const swim = (speed, off) => L + ((s.now * speed + off) % (R - L + 60)) - 30;
+      const lamp = q => Math.hypot(q[0] - s.route.at(s.f).x, q[1] - s.route.at(s.f).y) < 34;
+      const school = FISH("#ffd45c", "#fff3b0", 8);
+      for (let k = 0; k < 7; k += 1) blit(p, school, swim(14, k * 9) , yOf(0.05) + (k % 3) * 5 + Math.round(Math.sin(s.now * 2 + k)));
+      blit(p, TURTLE, R + L - swim(6, 40), yOf(0.16), { flip: true });
+      blit(p, FISH("#ff8a3d", "#ffd0a0", 11), swim(9, 120), yOf(0.24));
+      blit(p, JELLY(Math.floor(s.now * 2) % 2), 34, yOf(0.32) + Math.round(Math.sin(s.now) * 3));
+      blit(p, WHALE, R + L - swim(4, 10) - 30, yOf(0.42), { flip: true });
+      const deep = (item, x, y, glow) => {
+        const visible = glow || lamp([x, y]);
+        p.ctx.globalAlpha = visible ? 1 : 0.18;
+        blit(p, item, x, y);
+        p.ctx.globalAlpha = 1;
+      };
+      deep(SQUID(Math.floor(s.now * 3) % 2), 20, yOf(0.58), false);
+      // The anglerfish's lure glows by itself.
+      deep(ANGLER, 150, yOf(0.74), false);
+      p.ctx.globalAlpha = 0.25 + 0.2 * Math.sin(s.now * 4);
+      p.ell(154, yOf(0.74) - 2, 4, 4, "#9ad8ff");
+      p.ctx.globalAlpha = 1;
+      p.rect(153, yOf(0.74) - 3, 2, 2, "#e9f8ff");
+      deep(SEA_PIG, 60, floor - 7, false);
+      bubbles.forEach(([x, t0]) => { const t = (t0 + s.now * 0.08) % 1; const y = lerp(floor, sea + 4, t); p.px(x + Math.sin(t * 20) * 1.5, y, "rgba(200,240,255,0.5)"); });
+      // The depth scale on the left.
+      eachMark(s, (f, text, reached) => {
+        const y = Math.round(yOf(f));
+        for (let x = 0; x < 14; x += 1) p.px(x, y, "rgba(255,255,255,0.3)");
+        plate(p, text, 4, y - 10, reached);
+      });
+      plate(p, `${s.summit / 1000}K`, 4, floor - 14, s.goal, { color: "#9ad8ff" });
+      // The cable, the light and the bathysphere.
+      const at = s.route.at(s.f);
+      const x = Math.round(at.x);
+      const y = Math.round(at.y);
+      p.line(x, sea - 6 + tilt, x, y - 26, "#c9ced9");
+      planned(p, s, "rgba(255,255,255,0.18)", 5);
+      // The cable takes the rounds' colours, from the surface down to the sphere.
+      s.stretches.forEach(part => {
+        if (s.f <= part.a) return;
+        const y0 = Math.round(yOf(part.a)) - 12;
+        const y1 = Math.min(Math.round(yOf(Math.min(part.b, s.f))) - 12, y - 27);
+        if (y1 > y0) { p.rect(x - 1, y0, 3, y1 - y0, part.color); p.rect(x + 1, y0, 1, y1 - y0, darker(part.color, 0.35)); }
+      });
+      stopMarks(p, s, (q, c) => { if (q.y - 12 < y - 26) pin(p, { x: q.x, y: q.y - 12 }, c); });
+      if (y > sea + 80) {
+        p.ctx.globalAlpha = 0.14;
+        p.poly([[x - 4, y], [x + 4, y], [x + 22, y + 40], [x - 22, y + 40]], "#e9f8ff");
+        p.ctx.globalAlpha = 1;
+      }
+      blit(p, SPHERE, x - 14, y - 27);
+      avoid(x - 15, y - 28, x + 15, y + 2);
+      // Atlas through the porthole.
+      p.ctx.save();
+      p.ctx.beginPath(); p.ctx.arc(x, y - 12, 6.5, 0, Math.PI * 2); p.ctx.clip();
+      p.rect(x - 7, y - 19, 14, 14, "#9ad8ff");
+      atlas(p, x, y - 4, { upper: true, now: s.now, pose: "idle" });
+      p.ctx.restore();
+      bigText(p, `${depthAt(s.f)} M`, x + 18, y - 17, "#e9f8ff", INK);
+      avoid(x + 16, y - 19, x + 20 + `${depthAt(s.f)} M`.length * 6, y - 8);
+      if (s.goal) bigStar(p, x + 30, floor - 8, "#9ad8ff", s.now, true);
+    }
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 6. Sled: by dog sled over the ice to the North Pole, under the rounds' aurora
+// ---------------------------------------------------------------------------
+const HUSKY = f => sprite(`husky:${f}`, 16, 11, p => {
+  p.ell(7, 5, 6, 3, "#4a5778"); p.ell(7, 6.5, 5, 2, "#f4f7ff");
+  p.ell(13, 3, 3, 2.6, "#4a5778"); p.rect(13, 3, 3, 2, "#f4f7ff"); p.px(15, 3, INK); p.px(13, 2, "#9ad8ff");
+  p.poly([[11, 1], [12, -2], [13, 1]], "#4a5778"); p.poly([[13, 1], [14, -2], [15, 1]], "#3a4560");
+  p.poly([[1, 4], [-1, 0], [2, 3]], "#4a5778");
+  const legs = f ? [[3, 1], [5, -1], [9, 1], [11, -1]] : [[3, -1], [5, 1], [9, -1], [11, 1]];
+  legs.forEach(([x, d]) => p.rect(x + d, 8, 1, 3, "#3a4560"));
+  p.rect(4, 4, 6, 1, "#e0484f");
+});
+const SLED = sprite("sled", 24, 10, p => {
+  p.rect(2, 2, 18, 4, "#8a5a32"); p.rect(2, 2, 18, 1, "#a8743f");
+  for (let x = 4; x < 20; x += 4) p.rect(x, 2, 1, 4, "#5c3a1f");
+  p.rect(0, 0, 2, 7, "#5c3a1f");
+  p.rect(0, 8, 22, 1, "#c9ced9"); p.poly([[21, 8], [24, 5], [24, 6], [22, 9]], "#c9ced9");
+  p.rect(5, 6, 1, 2, "#5c3a1f"); p.rect(16, 6, 1, 2, "#5c3a1f");
+});
+const BEAR = f => sprite(`bear:${f}`, 30, 16, p => {
+  p.ell(14, 8, 11, 6, "#f4f1e8"); p.ell(14, 11, 10, 3, "#d8d2c2");
+  p.ell(25, 6, 4.5, 3.5, "#f4f1e8"); p.rect(28, 6, 2, 2, "#d8d2c2"); p.px(29, 6, INK); p.px(26, 5, INK);
+  p.ell(23, 3, 1.2, 1.2, "#d8d2c2");
+  const legs = f ? [5, 10, 17, 21] : [6, 9, 18, 20];
+  legs.forEach(x => p.rect(x, 12, 3, 4, "#e9e3d4"));
+});
+const NARWHAL = sprite("narwhal", 24, 10, p => {
+  p.ell(10, 6, 9, 4, "#7f93c4"); p.ell(10, 5, 7, 2.5, "#9fb3e8");
+  for (let x = 4; x < 16; x += 3) p.px(x, 5, "#4a5778");
+  p.line(19, 4, 24, 0, "#f4f1e8"); p.px(17, 5, INK);
+  p.poly([[1, 6], [-1, 2], [3, 5]], "#7f93c4");
+});
+const STATION_HUT = sprite("polar-station", 40, 24, p => {
+  p.ell(12, 16, 11, 9, "#e9eefb"); p.ell(10, 13, 7, 5, "#ffffff");
+  p.rect(1, 16, 22, 8, "#e9eefb");
+  p.rect(24, 12, 16, 12, "#ff8a3d"); p.rect(24, 12, 16, 2, "#ffb07a");
+  [27, 34].forEach(x => p.rect(x, 16, 3, 3, "#ffd45c"));
+  p.rect(10, 18, 4, 6, "#4a5778");
+  p.rect(36, 0, 1, 12, "#c9ced9"); p.rect(33, 3, 7, 1, "#c9ced9");
+});
+const POLE = sprite("pole", 6, 34, p => { for (let y = 0; y < 34; y += 1) p.rect(1, y, 4, 1, Math.floor(y / 4) % 2 ? "#e0484f" : "#f4f1e8"); p.ell(3, 0, 3, 2, "#ffd45c"); }, INK);
+
+function sled(summit, { h: H, w: CW = HD_W }) {
+  const ox = Math.max(0, Math.round((CW - HD_W) / 2));
+  const L = -ox;
+  const R = HD_W + ox;
+  // The whole ice, edge to edge: a high horizon and bends that reach the sides.
+  const horizon = Math.round(H * 0.2);
+  const B = H - 12;
+  const n = 6;
+  const reach = 100 + ox - 22;
+  const pts = [[100 - reach, B]];
+  for (let i = 1; i <= n; i += 1) {
+    const t = i / n;
+    const y = lerp(B, horizon + 12, Math.pow(t, 0.85));
+    pts.push([i === n ? 100 : 100 + (i % 2 ? 1 : -1) * lerp(reach, 26, t), y]);
+  }
+  const route = makeRoute(pts);
+  const rnd = random(61);
+  const starList = Array.from({ length: 90 }, () => [Math.floor(L + rnd() * (R - L)), Math.floor(rnd() * horizon), rnd()]);
+  const lead = Math.round(lerp(B, horizon, 0.5));
+  return {
+    ox,
+    route,
+    bg(p) {
+      p.bands(L, 0, R - L, horizon + 2, t => ramp([[0, "#070b22"], [0.6, "#121a44"], [1, "#24305e"]], t));
+      starList.forEach(([x, y, b]) => p.px(x, y, b > 0.6 ? "#ffffff" : "#7f8fc4"));
+      p.ell(30, 18, 7, 7, "#f4f1e8"); p.ell(33, 16, 6, 6, "#070b22");
+      // Distant ice cliffs on the horizon.
+      for (let x = L; x < R; x += 1) { const y = horizon - 3 + Math.round(Math.abs(Math.sin(x * 0.21)) * 3); p.rect(x, y, 1, 6, x % 7 < 3 ? "#9fb3e8" : "#bfd0f4"); }
+      // The ice, lighter towards you, with sastrugi, cracks and pressure ridges.
+      p.bands(L, horizon + 2, R - L, H - horizon, t => ramp([[0, "#8fa3d0"], [0.4, "#c9d6ef"], [1, "#eef3fd"]], t));
+      for (let k = 0; k < 120; k += 1) {
+        const y = horizon + 4 + Math.pow(rnd(), 0.7) * (H - horizon);
+        const x = L + rnd() * (R - L);
+        const len = 2 + (y - horizon) / 18;
+        p.rect(x, y, len, 1, "rgba(120,140,190,0.35)");
+      }
+      [[30, 0.25, 26], [160, 0.7, 30], [20, 0.82, 22]].forEach(([x, f, w]) => {
+        const y = lerp(B, horizon, f);
+        for (let k = 0; k < w; k += 4) {
+          const hgt = 5 + ((k * 7) % 6);
+          p.poly([[x + k - 1, y], [x + k + 2, y - hgt], [x + k + 4, y - hgt + 2], [x + k + 7, y]], "#f4f7ff");
+          p.poly([[x + k + 2, y - hgt], [x + k + 4, y - hgt + 2], [x + k + 7, y], [x + k + 3, y]], "#a8b8dc");
+          p.rect(x + k - 1, y, 8, 1, "#8fa3d0");
+        }
+      });
+      // An open lead of water across the ice.
+      for (let x = L; x < R; x += 1) { const y = lead + Math.round(Math.sin(x * 0.08) * 2); p.rect(x, y, 1, 4, "#0b2a54"); p.px(x, y, "#5a7ab0"); p.px(x, y + 4, "#ffffff"); }
+      blit(p, STATION_HUT, 150, lerp(B, horizon, 0.3) - 24);
+    },
+    frame(p, s) {
+      // The aurora: a curtain in each finished round's colour, swaying.
+      const curtains = s.stretches.filter(part => part.a < s.f);
+      curtains.forEach((part, i) => {
+        const x0 = L + 10 + i * (R - L - 20) / 6;
+        for (let x = 0; x < (R - L - 20) / 6 + 14; x += 1) {
+          const xx = Math.round(x0 + x - 7);
+          const top = 6 + Math.round(Math.sin(xx * 0.12 + s.now * 0.8 + i) * 5 + i % 2 * 6);
+          const len = 18 + Math.round(Math.sin(xx * 0.3 + s.now) * 6);
+          for (let y = 0; y < len; y += 1) {
+            if ((xx + y) % 2 && y > len * 0.5) continue;
+            p.ctx.globalAlpha = 0.55 * (1 - y / len);
+            p.px(xx, top + y, y < 3 ? lighter(part.color, 0.5) : part.color);
           }
         }
+        p.ctx.globalAlpha = 1;
       });
-      const stationY = Math.round(B - L * 0.62);
-      if (s.now % 1.6 < 0.5) { p.px(X(62) + 6, stationY, "#ff3a3a"); glow(p, X(62) + 6, stationY, 3, "#ff3a3a", 0.5); }
-      snow.forEach(([x0, y0, speed]) => p.px(((x0 - s.now * 10 * speed) % W + W) % W, (y0 + s.now * 3 * speed) % H, "rgba(255,255,255,0.7)"));
-      const surfacing = s.now % 6.5;
-      if (surfacing < 2) p.sprite(NARWHAL, SEA, 8, leadY - 1 - Math.round(Math.sin(surfacing / 2 * Math.PI) * 3));
-      const bearX = Math.round(X(14) + Math.sin(s.now * 0.25) * X(6));
-      p.sprite(BEAR, { W: "#f4ecd8", K: "#0b1020" }, bearX, Math.round(B - L * 0.86), { flip: Math.cos(s.now * 0.25) < 0 });
-
-      // Stakes every 1,000 beside the route, and the goal.
+      stars(p, starList.slice(0, 12), s.now, horizon);
+      // The station's light, the bear and the narwhal.
+      if (s.now % 1.2 < 0.6) p.px(186, lerp(B, horizon, 0.3) - 24, "#e0484f");
+      const bx = ((s.now * 3) % 80) + 10;
+      blit(p, BEAR(Math.floor(s.now * 3) % 2), bx, lerp(B, horizon, 0.62) - 14);
+      const up = (s.now % 5) / 5;
+      if (up < 0.4) blit(p, NARWHAL, 140, lead - 6 + Math.round(Math.abs(Math.sin(up / 0.4 * Math.PI)) * -5), { alpha: 1 });
+      blit(p, POLE, 97, horizon - 22);
+      blit(p, FLAG(s.goal ? "#ffd45c" : "#8f9bbd", Math.floor(s.now * 3) % 2), 101, horizon - 22);
+      plate(p, `${s.summit / 1000}K`, 115, horizon - 10, s.goal, { color: "#ffd45c" });
+      if (s.goal) bigStar(p, 100, horizon - 30, "#ffd45c", s.now, true);
+      planned(p, s, "rgba(74,87,140,0.5)", 4);
+      // Runner tracks in the round colours.
+      s.stretches.forEach(part => {
+        if (s.f <= part.a) return;
+        s.route.samples(part.a, Math.min(part.b, s.f)).forEach(q => { p.px(q.x - 2, q.y, part.color); p.px(q.x + 2, q.y, part.color); });
+      });
+      stopMarks(p, s, (q, c) => pin(p, q, c));
       eachMark(s, (f, text, reached) => {
-        const point = s.route.at(f);
-        const x = Math.round(point.x) + (point.x < W / 2 ? -6 : 6);
-        p.rect(x, Math.round(point.y) - 3, 1, 3, reached ? "#ffd45c" : "#4a5778");
-        label(p, s, text, x, Math.round(point.y) + 1, reached, { align: "center" });
+        const q = s.route.at(f);
+        p.rect(q.x, q.y - 8, 1, 8, "#4a5778");
+        p.rect(q.x + 1, q.y - 8, 4, 3, reached ? "#ffd45c" : "#8f9bbd");
+        plate(p, text, q.x > 100 ? q.x + 7 : q.x - 4, q.y - 8, reached, { align: q.x > 100 ? "left" : "right" });
       });
-      label(p, s, `${s.summit / 1000}K`, pole.x + 4, pole.y - 9, s.goal);
-      p.disc(pole.x, pole.y - 9, 1, s.goal ? "#ffd45c" : "#c9ced9");
-      s.route.samples(s.f, 1).forEach((point, index) => { if (index % 3 === 0) p.px(point.x, point.y + 1, "rgba(74,87,120,0.6)"); });
-      eachTrail(s, (point, color) => { if (Math.abs(point.y - leadY) > 2) p.px(point.x, point.y + 1, color); });
-
-      // The team: three huskies ahead on the route, the sled and Atlas behind them.
       const at = s.route.at(s.f);
-      const flip = at.dx < -0.01;
+      const flip = at.dx < 0;
       const x = Math.round(at.x);
-      const y = Math.round(at.y) + hop(at.y);
-      const dogs = [0.02, 0.04, 0.06].map(ahead => s.route.at(Math.min(1, s.f + ahead)));
-      const last = dogs[2];
-      p.line(x + (flip ? -1 : 9), y - 3, Math.round(last.x) + 3, Math.round(last.y) - 3 + hop(last.y), "#8a5a32");
-      dogs.forEach((dog, index) => {
-        const frame = s.moving ? (Math.floor(s.now * 10) + index) % 2 : 0;
-        p.sprite(HUSKY[frame], HUSKY_COLORS, Math.round(dog.x) - 4, Math.round(dog.y) - 4 + hop(dog.y), { flip: dog.dx < -0.01 });
+      const y = Math.round(at.y);
+      const step = s.moving ? Math.floor(s.now * 8) % 2 : 0;
+      const dir = flip ? -1 : 1;
+      // Three huskies ahead on the route itself, so the team follows the bends.
+      const dogs = [16, 31, 46].map(d => s.route.at(Math.min(1, s.f + d / s.route.total)));
+      let prev = { x: x + dir * 10, y: y - 5 };
+      dogs.forEach((q, k) => {
+        p.line(prev.x, prev.y, q.x, q.y - 5, "#5c3a1f");
+        prev = { x: q.x, y: q.y - 5 };
       });
-      drawAtlas(p, s, x + (flip ? 5 : 4), y - 3, { upper: true, flip });
-      p.sprite(SLED, ATLAS, x, y - 4, { flip });
-    },
-    head(s) {
-      const at = s.route.at(s.f);
-      return { x: Math.round(at.x) + 4, y: Math.round(at.y) + hop(at.y) - 13 };
+      dogs.slice().reverse().forEach((q, k) => blit(p, HUSKY((step + k) % 2), q.x - 8, q.y - 10, { flip: q.dx < 0 }));
+      dogs.forEach(q => avoid(q.x - 9, q.y - 13, q.x + 9, q.y + 2));
+      atlas(p, x - dir * 2, y - 5, { upper: true, now: s.now, pose: poseOf(s), flip });
+      blit(p, SLED, x - 12, y - 9, { flip });
+      avoid(x - 14, y - 24, x + 14, y + 2);
     }
   };
 }
 
-const TALL_SCENES = { balloon, climb, mine, train, dive, sled };
+// Every scene also says where Atlas's head is (sparkles, the "?") and where its goal is.
+const withParts = make => (summit, size) => {
+  const scene = make(summit, size);
+  const end = scene.route.at(1);
+  return { ...scene, head: () => atlasHead(), goal: scene.goal || { x: Math.round(end.x), y: Math.round(end.y) - 16 } };
+};
+const HD_SCENES = Object.fromEntries(Object.entries({ balloon, climb, mine, train, dive, sled }).map(([key, make]) => [key, withParts(make)]));
+// The art size for a box of w × h points: one art pixel as large as fits 200 across and
+// 240 down, so a scene is never smaller than that; a wider box shows more at the sides.
+function hdSize(w, h) {
+  const px = Math.min(w / HD_W, h / 240) || 1;
+  return { W: Math.round(w / px), H: Math.round(h / px) };
+}
 
-return { TALL_W, TALL_SCENES };
+return { HD_W, HD_SCENES, hdSize };
 })();
 
 // ---- journeys.js
@@ -19643,7 +20159,8 @@ __modules["journeys.js"] = (() => {
 const { t } = __modules["i18n.js"];
 const { H: WIDE_H, W: WIDE_W, painter } = __modules["journey-pixels.js"];
 const { SCENES } = __modules["journey-scenes.js"];
-const { TALL_SCENES, TALL_W } = __modules["journey-scenes-tall.js"];
+const { HD_SCENES, hdSize } = __modules["journey-scenes-hd.js"];
+const { P: hdPainter, beginFrame, flushPlates } = __modules["journey-hd.js"];
 // The day's score as a journey with Atlas: every point takes him one unit further, and a
 // full day reaches the goal. Each day has its own journey (getJourney in daily.js), in the
 // same 8-bit pixel style as Atlas and the menu's planes and ships:
@@ -19699,17 +20216,20 @@ const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce
 // Below this width the scale labels are left out (the score tile).
 const SMALL_WIDTH = 240;
 
-// `tall` ({ top, bottom }, fractions of the height): the standing journey for the
-// full-screen score card on a phone (journey-scenes-tall.js), as tall as the container is
-// (TALL_W art pixels wide), with the whole route between `top` and `bottom`.
+// `tall`: the standing journey on a phone (the score card and the end screen), in detail
+// (journey-scenes-hd.js, 20 November 2026): the scene fills the container, at least 200
+// art pixels across and 240 down (hdSize). The `top`/`bottom` band of the older standing
+// journeys (journey-scenes-tall.js, no longer used) is ignored: the paged score card gives
+// the journey its own box.
 function createJourney(type, container, { summit = 6000, tall = null } = {}) {
-  const W = tall ? TALL_W : WIDE_W;
   const box = container.getBoundingClientRect();
-  const H = tall ? Math.max(180, Math.min(400, Math.round(W * (box.height || 2) / (box.width || 1)))) : WIDE_H;
-  const make = (tall ? TALL_SCENES : SCENES)[type] || (tall ? TALL_SCENES : SCENES).climb;
-  const scene = tall
-    ? make(summit, { h: H, top: Math.round(H * tall.top), bottom: Math.round(H * tall.bottom) })
-    : make(summit);
+  const size = tall ? hdSize(box.width || 360, box.height || 480) : null;
+  const W = tall ? size.W : WIDE_W;
+  const H = tall ? size.H : WIDE_H;
+  const make = (tall ? HD_SCENES : SCENES)[type] || (tall ? HD_SCENES : SCENES).climb;
+  const scene = tall ? make(summit, { w: W, h: H }) : make(summit);
+  // The detailed scenes lay out on 200 pixels and are shifted to the middle of a wider box.
+  const ox = scene.ox || 0;
   const route = scene.route;
 
   const canvas = document.createElement("canvas");
@@ -19723,11 +20243,14 @@ function createJourney(type, container, { summit = 6000, tall = null } = {}) {
   art.width = W;
   art.height = H;
   const artCtx = art.getContext("2d");
-  const p = painter(artCtx);
+  const p = tall ? hdPainter(artCtx) : painter(artCtx);
   const background = document.createElement("canvas");
   background.width = W;
   background.height = H;
-  scene.background(painter(background.getContext("2d")));
+  const backCtx = background.getContext("2d");
+  backCtx.translate(ox, 0);
+  if (tall) scene.bg(hdPainter(backCtx));
+  else scene.background(painter(backCtx));
   container.replaceChildren(canvas);
 
   const state = {
@@ -19776,10 +20299,15 @@ function createJourney(type, container, { summit = 6000, tall = null } = {}) {
     state.pose = mood ? mood.pose : "idle";
     state.thinking = mood?.pose === "think";
     state.goal = state.value >= summit - 0.5;
+    artCtx.setTransform(1, 0, 0, 1, 0, 0);
     artCtx.clearRect(0, 0, W, H);
     artCtx.drawImage(background, 0, 0);
+    artCtx.translate(ox, 0);
     state.labelBoxes = [];
+    if (tall) beginFrame();
     scene.frame(p, state);
+    // The scale plates go on top of everything, clear of Atlas (journey-hd.js).
+    if (tall) flushPlates(p, { L: -ox, R: W - ox, H });
     // Atlas thinking after a round without points.
     if (state.thinking) {
       const head = scene.head(state);
@@ -35549,6 +36077,7 @@ function fillRoundIntro(index) {
   setText("roundIntroCount", t("intro.roundOf", { n: index + 1, total: plan.length }));
   setText("roundIntroName", label);
   setText("roundIntroTask", task);
+  document.getElementById("roundIntroTask").hidden = !task;
   setText("roundIntroGivenLabel", givenLabel || "");
   setText("roundIntroGivenText", given || "");
   document.getElementById("roundIntroGiven").hidden = !given;
@@ -35560,7 +36089,8 @@ function getIntroWords(round, index) {
   const label = ROUND_INFO[round.type].name.toUpperCase();
   const task = ROUND_INFO[round.type].task;
   const given = (givenLabel, text) => ({ label, task, givenLabel: t(givenLabel), given: text });
-  if (round.type === "extreme") return { label: t(`intro.find.${round.find}`), task: ROUND_INFO.extreme.task, givenLabel: t("intro.given.question"), given: round.question };
+  // Highs & Lows: FIND THE HIGHEST and the question say it all, no task line.
+  if (round.type === "extreme") return { label: t(`intro.find.${round.find}`), task: "", givenLabel: t("intro.given.question"), given: round.question };
   const clue = index === introIndex && introClue ? getFirstClue(index) : null;
   if (clue) return given("intro.given.clue", clue.text);
   switch (round.type) {
