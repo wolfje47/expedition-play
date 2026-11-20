@@ -38729,6 +38729,7 @@ startAmbient(menuTravel, {
     });
     const pins = [
       { kind: "camp", lonLat: BASE_CAMP_LONLAT },
+      { kind: "duel", lonLat: VERSUS_LONLAT },
       { kind: "casual", lonLat: startLonLat("casual"), country: todayPlace("casual") },
       { kind: "extremes", lonLat: startLonLat("extremes"), country: todayPlace("extremes") }
     ];
@@ -38738,7 +38739,7 @@ startAmbient(menuTravel, {
       if (!spot.visible) return;
       const box = drawMenuPin(layer.ctx, spot.x, spot.y, SIGN_ICONS[pin.kind], PIN_COLORS[pin.kind], pin.kind === menuFocus || pin.kind === hero.key);
       // Done today: a green tick on the pin's corner.
-      if (pin.kind !== "camp" && cachedModeState(pin.kind) === "done") drawPinTick(layer.ctx, box.right - 6, box.top + 2);
+      if (pin.kind !== "camp" && pin.kind !== "duel" && cachedModeState(pin.kind) === "done") drawPinTick(layer.ctx, box.right - 6, box.top + 2);
       menuMarks.push({ x: spot.x, y: spot.y, kind: pin.kind, country: pin.country, box });
     });
     layer.placeLabels();
@@ -38750,6 +38751,9 @@ startAmbient(menuTravel, {
 // ---------------------------------------------------------------------------
 
 const BASE_CAMP_LONLAT = [86.85, 28.0];
+// VERSUS has its own place too (20 November 2026, team request): the Colosseum in Rome, an
+// arena for live matches. Its pin is the purple VS logo.
+const VERSUS_LONLAT = [12.4922, 41.8902];
 const menuMarks = [];
 // Where each game starts today (getDayPlace per game), worked out once a day.
 const todayPlaces = {};
@@ -38786,9 +38790,10 @@ function artIcon(rows, colors) {
 const SIGN_ICONS = {
   extremes: artIcon(PLAY_ART.extremes, PLAY_ART_COLORS),
   casual: artIcon(PLAY_ART.casual, PLAY_ART_COLORS),
-  camp: spriteCanvas("tent")
+  camp: spriteCanvas("tent"),
+  duel: artIcon(PLAY_ART.duel, PLAY_ART_COLORS)
 };
-const PIN_COLORS = { extremes: "#ff6b9d", casual: "#ffd45c", camp: "#45e3ff" };
+const PIN_COLORS = { extremes: "#ff6b9d", casual: "#ffd45c", camp: "#45e3ff", duel: "#c58cff" };
 // A pin: a framed pixel badge with the logo, on a short stem down to its spot. Returns the
 // box a click counts in.
 function drawMenuPin(ctx, x, y, icon, color, big) {
@@ -38844,6 +38849,7 @@ const featuredMode = () => (hasExtremeDay(today) ? "extremes" : "casual");
 let menuFocus = "extremes";
 function stopOf(key) {
   if (key === "camp") return { lat: BASE_CAMP_LONLAT[1], lon: BASE_CAMP_LONLAT[0] };
+  if (key === "duel") return { lat: VERSUS_LONLAT[1], lon: VERSUS_LONLAT[0] };
   // My Tent: your tent, or without one where you'd start (the capital of today's country).
   if (key === "tent") { const [lon, lat] = homeOrigin().lonLat; return { lat, lon }; }
   const [lon, lat] = startLonLat(key);
@@ -38851,7 +38857,7 @@ function stopOf(key) {
 }
 const MENU_FOCUS_MS = 800; // a glide to a place on the menu
 function focusMenuStop(key) {
-  if (key === menuFocus || key === "duel") return; // 1v1 has no place on the globe (yet)
+  if (key === menuFocus) return;
   menuFocus = key;
   if (globe.mode !== "menu") return;
   const stop = stopOf(key);
@@ -39227,7 +39233,6 @@ function selectHero(key) {
   const focus = game || key;
   if (key !== "duel") menuFocus = focus; // DAILY's card shows this game
   renderHero();
-  if (key === "duel") return; // no place on the globe: the camera stays
   if (globe.mode !== "menu") return;
   const stop = stopOf(focus);
   globe.glideMenuTo(stop.lat, stop.lon, FLIGHT_MS, { distance: HERO_ZOOM });
