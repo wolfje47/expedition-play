@@ -7002,9 +7002,17 @@ const EN = {
   "live.train.commuter": "Commuter train",
   "live.train.passenger": "Passenger train",
   "live.train.metro": "Metro train",
+  "live.train.rail": "Train",
   "live.timetable": "Timetable",
   "live.fromTimetable": "from the timetable",
   "live.sourceTimetable": "Not live: where the timetable puts it now, between its two stations. {credit}.",
+  "live.sourceFrequency": "Not live: the timetable gives a train every few minutes, not times; this is where the latest one to leave would be now. {credit}.",
+  "live.staleTimetable": "This is the latest timetable published ({date}); today's trains may differ.",
+  "live.sourceRoute": "Not live, and no timetable is published here: a train on this real route, placed where one could be now (its usual speed and frequency estimated). {credit}.",
+  "live.sourceLine": "Not live, and no timetable or train service is published here: a train on this real railway line, placed where one could be now (its speed and frequency estimated). {credit}.",
+  "live.estimatedSpeed": "estimated",
+  "live.every": "Every",
+  "live.everyMinutes": "{n} min",
   "live.inCountry": "in {country}",
   "live.noOrigin": "Not given",
   "live.trainNoFrom": "the feed doesn't say",
@@ -7022,6 +7030,7 @@ const EN = {
   "live.source.gr": "Live from the railway.gov.gr tracker (via jbb.ghsq.de), last fix {time}.",
   "live.projected": "Projected",
   "live.sourcePlaneProjected": "Not live: out of receiver range since {time}. Moved on from its last fix along its route at its last speed. Route: Virtual Radar Server.",
+  "live.sourceShipCourse": "Not live: out of AIS range since {time}. Its destination couldn't be read, so it's moved on along its last course at its last speed, over open water only, for at most six hours.",
   "live.sourceShipProjected": "Not live: out of AIS range since {time}. Moved on from its last fix along the usual sea lanes towards its destination, at its last speed. Sea lanes: Eurostat; ports: UN/LOCODE.",
   "live.portFound": "Read as {port}",
   "live.sourcePlaneOpensky": "Live from the OpenSky Network, last fix {time}. Route: Virtual Radar Server, checked against the plane's position.",
@@ -8339,9 +8348,17 @@ const NL = {
   "live.train.commuter": "Forensentrein",
   "live.train.passenger": "Passagierstrein",
   "live.train.metro": "Metro",
+  "live.train.rail": "Trein",
   "live.timetable": "Dienstregeling",
   "live.fromTimetable": "volgens de dienstregeling",
   "live.sourceTimetable": "Niet live: waar de dienstregeling hem nu zet, tussen zijn twee stations. {credit}.",
+  "live.sourceFrequency": "Niet live: de dienstregeling geeft een trein om de paar minuten, geen tijden; hier zou de laatst vertrokken trein nu zijn. {credit}.",
+  "live.staleTimetable": "Dit is de laatst gepubliceerde dienstregeling ({date}); de treinen van vandaag kunnen afwijken.",
+  "live.sourceRoute": "Niet live, en hier is geen dienstregeling gepubliceerd: een trein op deze echte route, geplaatst waar er nu een zou kunnen rijden (snelheid en frequentie geschat). {credit}.",
+  "live.sourceLine": "Niet live, en hier is geen dienstregeling of treindienst gepubliceerd: een trein op deze echte spoorlijn, geplaatst waar er nu een zou kunnen rijden (snelheid en frequentie geschat). {credit}.",
+  "live.estimatedSpeed": "geschat",
+  "live.every": "Elke",
+  "live.everyMinutes": "{n} min",
   "live.inCountry": "in {country}",
   "live.noOrigin": "Niet opgegeven",
   "live.trainNoFrom": "de bron zegt het niet",
@@ -8359,6 +8376,7 @@ const NL = {
   "live.source.gr": "Live van de tracker van railway.gov.gr (via jbb.ghsq.de), laatste positie {time}.",
   "live.projected": "Geschat",
   "live.sourcePlaneProjected": "Niet live: sinds {time} buiten bereik van de ontvangers. Vanaf zijn laatste positie verder langs zijn route, op zijn laatste snelheid. Route: Virtual Radar Server.",
+  "live.sourceShipCourse": "Niet live: sinds {time} buiten bereik van AIS. Zijn bestemming was niet te lezen, dus vaart hij verder op zijn laatste koers en snelheid, alleen over open water en hoogstens zes uur.",
   "live.sourceShipProjected": "Niet live: sinds {time} buiten bereik van AIS. Vanaf zijn laatste positie verder langs de gebruikelijke vaarroutes naar zijn bestemming, op zijn laatste snelheid. Vaarroutes: Eurostat; havens: UN/LOCODE.",
   "live.portFound": "Gelezen als {port}",
   "live.sourcePlaneOpensky": "Live van het OpenSky Network, laatste positie {time}. Route: Virtual Radar Server, gecontroleerd met de positie van het vliegtuig.",
@@ -35763,7 +35781,7 @@ function liveTitle(vehicle) {
   }
   if (vehicle.kind === "train") {
     const route = data.from && data.to ? `${tr(data.from)} → ${tr(data.to)}` : data.to ? `→ ${tr(data.to)}` : data.name || data.number || "";
-    const hint = [data.operator, data.name, data.timetable ? t("live.timetable") : null].filter(Boolean).join(" · ");
+    const hint = [data.operator, data.name, data.timetable ? t("live.timetable") : data.estimated ? t("live.projected") : null].filter(Boolean).join(" · ");
     return { title: `${t(`live.train.${data.category}`)} · ${route}`, hint: hint || null, iso: data.iso || null };
   }
   const kind = shipKind(data.shipType);
@@ -35814,8 +35832,9 @@ function fillTransitCard(card, vehicle, { countryOf }, onClose) {
     title.append(element("small", "", [data.airline?.name || data.airline?.icao, data.callsign].filter(Boolean).join(" · ")));
   } else if (vehicle.kind === "train") {
     // "FREIGHT TRAIN", and its operator with its line or number ("VR · T 3775").
-    // A train placed by its timetable says so: "PASSENGER TRAIN · TIMETABLE".
-    title.append(element("strong", "", [t(`live.train.${data.category}`), data.timetable ? t("live.timetable") : null].filter(Boolean).join(" · ").toUpperCase()));
+    // A train placed by its timetable says so ("PASSENGER TRAIN · TIMETABLE"), and a projected
+    // one on a route without a timetable too ("PASSENGER TRAIN · PROJECTED").
+    title.append(element("strong", "", [t(`live.train.${data.category}`), data.timetable ? t("live.timetable") : data.estimated ? t("live.projected") : null].filter(Boolean).join(" · ").toUpperCase()));
     title.append(element("small", "", [data.operator, data.name, data.number !== data.name ? data.number : null].filter(Boolean).join(" · ")));
   } else {
     const kind = shipKind(data.shipType);
@@ -35891,7 +35910,8 @@ function fillTransitCard(card, vehicle, { countryOf }, onClose) {
     fact(t("live.speed"), speedText(data.kmh), t("live.overGround"));
     if (data.reg) fact(t("live.reg"), data.reg);
   } else if (vehicle.kind === "train") {
-    fact(t("live.speed"), Number.isFinite(data.kmh) ? speedText(data.kmh) : t("live.stillOrUnknown"), data.timetable ? t("live.fromTimetable") : data.kmhFromFixes ? t("live.computed") : null);
+    fact(t("live.speed"), Number.isFinite(data.kmh) ? speedText(data.kmh) : t("live.stillOrUnknown"), data.timetable ? t("live.fromTimetable") : data.estimated ? t("live.estimatedSpeed") : data.kmhFromFixes ? t("live.computed") : null);
+    if (data.every) fact(t("live.every"), t("live.everyMinutes", { n: num(data.every) }));
     if (data.number && data.name && data.number !== data.name) fact(t("live.trainNumber"), data.number);
   } else {
     fact(t("live.speed"), `${num(data.knots)} kn`, speedText(data.kmh));
@@ -35904,9 +35924,12 @@ function fillTransitCard(card, vehicle, { countryOf }, onClose) {
   card.appendChild(now);
 
   // Where it comes from, and how fresh the fix is.
-  const sourceKey = data.projected ? (plane ? "live.sourcePlaneProjected" : "live.sourceShipProjected")
+  const sourceKey = data.projected ? (plane ? "live.sourcePlaneProjected" : data.projected.byCourse ? "live.sourceShipCourse" : "live.sourceShipProjected")
     : plane ? (data.source === "opensky" ? "live.sourcePlaneOpensky" : data.to ? "live.sourcePlane" : "live.sourcePlaneNoRoute") : vehicle.kind === "train" ? `live.source.${data.source}` : "live.sourceShip";
-  card.appendChild(element("p", "transit-fleet-note", data.timetable ? t("live.sourceTimetable", { credit: data.credit || "" }) : t(sourceKey, { time: clock(data.projected ? data.projected.at : data.at) })));
+  const note = data.estimated ? t(data.onLine ? "live.sourceLine" : "live.sourceRoute", { credit: data.credit || "" })
+    : data.timetable ? t(data.every ? "live.sourceFrequency" : "live.sourceTimetable", { credit: data.credit || "" }) + (data.stale ? ` ${t("live.staleTimetable", { date: data.stale })}` : "")
+    : t(sourceKey, { time: clock(data.projected ? data.projected.at : data.at) });
+  card.appendChild(element("p", "transit-fleet-note", note));
   return card;
 }
 
@@ -35920,7 +35943,8 @@ __modules["live-traffic.js"] = (() => {
 // Function `live-traffic` (supabase/functions/live-traffic: adsb.lol for planes, AIS via
 // aisstream.io for ships, the open train feeds and published timetables for trains), which
 // refreshes every few minutes for everyone. Some are estimates and say so on their card:
-// trains placed by their timetable (timetable: true), and planes and ships out of receiver
+// trains placed by their timetable (timetable: true) or projected on a real route
+// (estimated: true), and planes and ships out of receiver
 // range moved on from their last fix along their route (projected). Between those
 // fixes each vehicle moves on along its reported course at its reported speed (dead
 // reckoning), for at most MAX_RECKON_S; a new fix eases in over BLEND_S instead of jumping.
@@ -35965,8 +35989,9 @@ function createVehicle(kind, data) {
       let km = Number.isFinite(vehicle.heading) && Number.isFinite(fix.kmh) ? fix.kmh * seconds / 3600 : 0;
       if (kind === "plane" && fix.to) km = Math.min(km, distance([fix.lon, fix.lat], [fix.to.lon, fix.to.lat]) * EARTH_KM);
       // A ship stops where its course would take it ashore (stopKm, worked out by the
-      // function against the land map), a timetable train at its next station.
-      vehicle.stopped = (kind === "ship" || fix.timetable === true) && Number.isFinite(fix.stopKm) && km >= fix.stopKm;
+      // function against the land map), a timetable train at its next station, a projected
+      // train at the next bend of its track.
+      vehicle.stopped = (kind === "ship" || fix.timetable === true || fix.estimated === true) && Number.isFinite(fix.stopKm) && km >= fix.stopKm;
       if (vehicle.stopped) km = fix.stopKm;
       const here = km ? moveFrom([fix.lon, fix.lat], km, vehicle.heading) : [fix.lon, fix.lat];
       if (!vehicle.blend) return here;
