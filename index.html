@@ -35758,6 +35758,86 @@ const ARABIC = {
   "۲": "2", "۳": "3", "۴": "4", "۵": "5", "۶": "6", "۷": "7", "۸": "8", "۹": "9"
 };
 
+// Well-known cities in Arabic and Persian script, with their conventional English spelling
+// (22 November 2026, the team's request: "Thran" for Tehran isn't a name anyone knows). They're
+// replaced before the letters are spelled out, matched on the original script (which holds
+// more than the rough transliteration). Keys are compared after normalize() (letter variants
+// of Arabic and Persian made the same, vowel marks off), so one spelling per city is enough.
+const CITIES_AR = {
+  // Iran
+  "تهران": "Tehran", "مشهد": "Mashhad", "اصفهان": "Isfahan", "شیراز": "Shiraz", "تبریز": "Tabriz",
+  "قم": "Qom", "اهواز": "Ahvaz", "کرمانشاه": "Kermanshah", "کرمان": "Kerman", "یزد": "Yazd",
+  "زاهدان": "Zahedan", "بندرعباس": "Bandar Abbas", "بندر عباس": "Bandar Abbas", "رشت": "Rasht",
+  "گرگان": "Gorgan", "ساری": "Sari", "اراک": "Arak", "همدان": "Hamadan", "قزوین": "Qazvin",
+  "سمنان": "Semnan", "زنجان": "Zanjan", "کاشان": "Kashan", "اردبیل": "Ardabil", "ارومیه": "Urmia",
+  "بوشهر": "Bushehr", "خرمشهر": "Khorramshahr", "آبادان": "Abadan", "سرخس": "Sarakhs", "جلفا": "Jolfa",
+  "چابهار": "Chabahar", "بافق": "Bafq", "بیرجند": "Birjand", "سبزوار": "Sabzevar", "نیشابور": "Neyshabur",
+  "کرج": "Karaj", "گرمسار": "Garmsar", "فیروزکوه": "Firuzkuh", "مراغه": "Maragheh", "میانه": "Mianeh",
+  "اندیمشک": "Andimeshk", "دزفول": "Dezful", "خرمشهر": "Khorramshahr", "بندر امام خمینی": "Bandar Imam Khomeini",
+  // Iraq
+  "بغداد": "Baghdad", "البصرة": "Basra", "بصرة": "Basra", "الموصل": "Mosul", "كربلاء": "Karbala",
+  "كربلا": "Karbala", "النجف": "Najaf", "سامراء": "Samarra", "اربيل": "Erbil", "كركوك": "Kirkuk",
+  "الفلوجة": "Fallujah", "الرمادي": "Ramadi", "المسيب": "Al-Musayyib", "الحلة": "Hillah",
+  // Syria, Lebanon, Jordan
+  "دمشق": "Damascus", "حلب": "Aleppo", "حمص": "Homs", "حماة": "Hama", "اللاذقية": "Latakia",
+  "طرطوس": "Tartus", "دير الزور": "Deir ez-Zor", "الرقة": "Raqqa", "درعا": "Daraa", "بيروت": "Beirut",
+  "طرابلس": "Tripoli", "عمّان": "Amman", "العقبة": "Aqaba", "معان": "Ma'an", "الزرقاء": "Zarqa",
+  // Arabian Peninsula
+  "الرياض": "Riyadh", "جدة": "Jeddah", "مكة": "Mecca", "مكة المكرمة": "Mecca", "المدينة المنورة": "Medina",
+  "الدمام": "Dammam", "الهفوف": "Hofuf", "حائل": "Ha'il", "القريات": "Qurayyat", "الجوف": "Al Jawf",
+  "تبوك": "Tabuk", "بريدة": "Buraydah", "القصيم": "Qassim", "الطائف": "Taif", "ابوظبي": "Abu Dhabi",
+  "ابو ظبي": "Abu Dhabi", "دبي": "Dubai", "الشارقة": "Sharjah", "الفجيرة": "Fujairah", "العين": "Al Ain",
+  "رأس الخيمة": "Ras Al Khaimah", "الرويس": "Ruwais", "مسقط": "Muscat", "صلالة": "Salalah",
+  "الدوحة": "Doha", "الكويت": "Kuwait City", "المنامة": "Manama", "صنعاء": "Sanaa", "عدن": "Aden",
+  // Egypt and Sudan
+  "القاهرة": "Cairo", "الاسكندرية": "Alexandria", "اسوان": "Aswan", "الاقصر": "Luxor",
+  "بورسعيد": "Port Said", "بور سعيد": "Port Said", "السويس": "Suez", "الاسماعيلية": "Ismailia",
+  "طنطا": "Tanta", "المنصورة": "Mansoura", "الزقازيق": "Zagazig", "اسيوط": "Asyut", "سوهاج": "Sohag",
+  "المنيا": "Minya", "بني سويف": "Beni Suef", "دمياط": "Damietta", "مرسى مطروح": "Marsa Matruh",
+  "الجيزة": "Giza", "قنا": "Qena", "الفيوم": "Faiyum", "العريش": "Arish", "بئر العبد": "Bir al-Abd",
+  "الخرطوم": "Khartoum", "بورتسودان": "Port Sudan", "بور سودان": "Port Sudan", "عطبرة": "Atbara",
+  "كسلا": "Kassala", "الابيض": "El Obeid", "نيالا": "Nyala", "وادي حلفا": "Wadi Halfa",
+  // Maghreb
+  "الجزائر": "Algiers", "الجزاير": "Algiers", "وهران": "Oran", "قسنطينة": "Constantine", "عنابة": "Annaba",
+  "بشار": "Béchar", "سطيف": "Sétif", "بجاية": "Béjaïa", "تلمسان": "Tlemcen", "البليدة": "Blida",
+  "بسكرة": "Biskra", "تبسة": "Tébessa", "سيدي بلعباس": "Sidi Bel Abbès", "مغنية": "Maghnia",
+  "الغزوات": "Ghazaouet", "باتنة": "Batna", "تيزي وزو": "Tizi Ouzou", "ورقلة": "Ouargla", "سكيكدة": "Skikda",
+  "الشلف": "Chlef", "مستغانم": "Mostaganem", "تيارت": "Tiaret", "سيدي عمار": "Sidi Amar",
+  "تونس": "Tunis", "صفاقس": "Sfax", "سوسة": "Sousse", "قابس": "Gabès", "بنزرت": "Bizerte",
+  "قفصة": "Gafsa", "توزر": "Tozeur", "المهدية": "Mahdia", "المنستير": "Monastir", "نابل": "Nabeul",
+  "الرباط": "Rabat", "الدار البيضاء": "Casablanca", "فاس": "Fez", "مراكش": "Marrakesh", "طنجة": "Tangier",
+  "مكناس": "Meknes", "وجدة": "Oujda", "القنيطرة": "Kenitra", "اكادير": "Agadir", "اغادير": "Agadir",
+  "طرابلس الغرب": "Tripoli", "بنغازي": "Benghazi", "مصراتة": "Misrata", "نواكشوط": "Nouakchott",
+  "نواذيبو": "Nouadhibou",
+  // Afghanistan and Pakistan (Persian and Urdu script)
+  "کابل": "Kabul", "هرات": "Herat", "مزار شریف": "Mazar-i-Sharif", "قندهار": "Kandahar",
+  "کراچی": "Karachi", "لاہور": "Lahore", "لاهور": "Lahore", "اسلام آباد": "Islamabad", "پشاور": "Peshawar",
+  "کوئٹہ": "Quetta", "کوئته": "Quetta", "راولپنڈی": "Rawalpindi", "ملتان": "Multan", "فیصل آباد": "Faisalabad",
+  "حیدرآباد": "Hyderabad", "سکھر": "Sukkur",
+  // And the railway words that come with them in route names.
+  "الاتحاد للقطارات": "Etihad Rail", "سكة حديد": "Railway", "سکه حدید": "Railway", "راه آهن": "Railway",
+  "خط": "Line", "محطة": "Station", "محطة القطار": "Station", "ایستگاه": "Station", "فرع": "Branch",
+  "قطار": "Train", "مترو": "Metro", "حومه ای": "Suburban", "ریل باس": "Railbus"
+};
+// Arabic and Persian letter variants made the same, vowel marks, tatweel and joiners off.
+const normalizeArabic = text => text
+  .replace(/[\u064B-\u065F\u0670\u0640\u200B-\u200F]/g, "")
+  .replace(/[أإآٱ]/g, "ا").replace(/ك/g, "ک").replace(/[يى]/g, "ی").replace(/ؤ/g, "و").replace(/ئ/g, "ی");
+// Arabic-script letters only (not its comma, digits or other marks): a name ends where they do.
+const AR_LETTERS = "\\u0621-\\u063A\\u0641-\\u064A\\u066E-\\u06D3\\u06FA-\\u06FF";
+const CITY_PATTERNS = Object.entries(CITIES_AR)
+  .map(([name, latin]) => [normalizeArabic(name), latin])
+  .sort((a, b) => b[0].length - a[0].length)
+  .map(([name, latin]) => [new RegExp(`(^|[^${AR_LETTERS}])${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?=$|[^${AR_LETTERS}])`, "g"), latin]);
+function knownCities(text) {
+  if (!/[\u0600-\u06FF]/.test(text)) return text;
+  // Right-to-left names are written first-to-last; "تبریز ← جلفا" means Tabriz to Jolfa, which
+  // reads backwards in Latin, so every arrow points the way the names go.
+  let out = normalizeArabic(text).replace(/←/g, "→");
+  for (const [pattern, latin] of CITY_PATTERNS) out = out.replace(pattern, (match, before) => `${before}${latin}`);
+  return out;
+}
+
 // Korean: a syllable block is (initial × 21 + medial) × 28 + final, from U+AC00.
 const KO_INITIAL = ["g", "kk", "n", "d", "tt", "r", "m", "b", "pp", "s", "ss", "", "j", "jj", "ch", "k", "t", "p", "h"];
 const KO_MEDIAL = ["a", "ae", "ya", "yae", "eo", "e", "yeo", "ye", "o", "wa", "wae", "oe", "yo", "u", "wo", "we", "wi", "yu", "eu", "ui", "i"];
@@ -35801,8 +35881,9 @@ function toLatin(text, iso = "") {
   if (LATIN_ONLY.test(value)) return value;
   const cyrillic = { ...CYRILLIC, ...(CYRILLIC_BY_COUNTRY[iso] || {}) };
   let out = "";
+  const source = knownCities(value);
   // Greek: accents off first (without touching other scripts), then pairs.
-  const chars = [...value.replace(/[άέήίόύώϊϋΐΰ]/g, c => GREEK_ACCENTS[c]).replace(/[ΆΈΉΊΌΎΏ]/g, c => GREEK_ACCENTS[c.toLowerCase()]?.toUpperCase() || c)];
+  const chars = [...source.replace(/[άέήίόύώϊϋΐΰ]/g, c => GREEK_ACCENTS[c]).replace(/[ΆΈΉΊΌΎΏ]/g, c => GREEK_ACCENTS[c.toLowerCase()]?.toUpperCase() || c)];
   // Korean words get a capital at the start (Hangul has no cases).
   let wordStart = true;
   for (let i = 0; i < chars.length; i += 1) {
