@@ -4072,6 +4072,7 @@ h1, h2, h3 { font-weight: normal; }
 .duel-code { padding: 14px; border: 2px dashed color-mix(in srgb, var(--duel) 60%, transparent); border-radius: 12px; color: var(--duel); font: 700 34px var(--font-mono); letter-spacing: 0.25em; text-align: center; }
 .duel-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .duel-actions > * { flex: 1; }
+.duel-actions > .duel-rematch-note { flex-basis: 100%; margin: 0; text-align: center; color: var(--text); }
 .duel-cats { display: grid; gap: 8px; }
 .duel-cat { padding: 14px; border: 2px solid color-mix(in srgb, var(--duel) 55%, transparent); border-radius: 10px; background: rgba(10, 15, 30, 0.6); color: var(--text); font: 600 16px var(--font-body); text-align: left; cursor: pointer; }
 .duel-cat:hover:not(:disabled), .duel-cat:focus-visible { border-color: var(--duel); background: color-mix(in srgb, var(--duel) 18%, transparent); outline: none; }
@@ -4804,6 +4805,12 @@ h1, h2, h3 { font-weight: normal; }
 .lobby-seat small { color: var(--muted); font: 7px var(--font-display); letter-spacing: var(--ls-pixel); }
 .lobby-seat.is-empty { border-style: dashed; border-color: var(--glass-line); background: rgba(10, 15, 30, 0.4); }
 .lobby-seat.is-empty b { color: var(--faint); }
+/* The rematch lobby (22 November 2026): who's ready, who left, and the last match's score. */
+.lobby-seat.is-ready { box-shadow: 0 0 0 1px var(--me), 0 0 14px color-mix(in srgb, var(--me) 45%, transparent); }
+.lobby-seat.is-ready small:not(.lobby-last) { color: #5cd26a; }
+.lobby-seat.is-out { border-style: dashed; opacity: 0.45; }
+.lobby-seat .lobby-last { color: var(--faint); font: 12px var(--font-mono, monospace); letter-spacing: 0; }
+#heroGo.is-ready { background: color-mix(in srgb, #5cd26a 22%, transparent); border-color: #5cd26a; color: #5cd26a; }
 .lobby-empty { display: grid; place-items: center; width: 44px; height: 44px; border: 2px dashed var(--faint); border-radius: 10px; color: var(--faint); font: 14px var(--font-display); animation: lobby-blink 1.4s steps(2) infinite; }
 @keyframes lobby-blink { 50% { opacity: 0.35; } }
 .lobby-host { position: absolute; top: -8px; left: 50%; padding: 2px 5px; border-radius: 4px; background: var(--me); color: #04060d; font: 6px var(--font-display); letter-spacing: var(--ls-pixel); transform: translateX(-50%); }
@@ -7325,6 +7332,26 @@ const EN = {
   "duel.drawMatch": "It's a draw",
   "duel.youLeft": "You left the match",
   "duel.theyLeft": "{name} left the match",
+  "duel.rematch.go": "↻ REMATCH",
+  "duel.rematch.readyBack": "✓ READY · TO THE LOBBY",
+  "duel.rematch.toLobby": "Back to the lobby",
+  "duel.rematch.wants": "{name} wants a rematch.",
+  "duel.rematch.readyCount": "{have} of {n} ready",
+  "duel.rematch.ribbon": "REMATCH",
+  "duel.rematch.title": "REMATCH?",
+  "duel.rematch.text": "Same players, same seats. It starts when you both press REMATCH.",
+  "duel.rematch.textParty": "Same players, same seats. It starts when everyone presses REMATCH, or when the host starts it once {n} are ready.",
+  "duel.rematch.starting": "Starting the rematch…",
+  "duel.rematch.seatReady": "READY",
+  "duel.rematch.seatDeciding": "DECIDING…",
+  "duel.rematch.seatLeft": "LEFT",
+  "duel.rematch.lastScore": "{n} last match",
+  "duel.rematch.readyCancel": "✓ READY",
+  "duel.rematch.cancelTitle": "Click to take it back",
+  "duel.rematch.off": "The rematch is off: too few players are left.",
+  "duel.rematch.offName": "{name} left: the rematch is off.",
+  "duel.rematch.withoutYou": "The rematch started without you.",
+  "duel.rematch.lost": "Couldn't open the rematch. Try again from the menu.",
   "duel.newMatch": "▶ NEW MATCH",
   "duel.menu": "Back to the menu",
   "duel.continue": "CONTINUE",
@@ -8701,6 +8728,26 @@ const NL = {
   "duel.drawMatch": "Gelijkspel",
   "duel.youLeft": "Je hebt de wedstrijd verlaten",
   "duel.theyLeft": "{name} heeft de wedstrijd verlaten",
+  "duel.rematch.go": "↻ REVANCHE",
+  "duel.rematch.readyBack": "✓ KLAAR · NAAR DE LOBBY",
+  "duel.rematch.toLobby": "Terug naar de lobby",
+  "duel.rematch.wants": "{name} wil revanche.",
+  "duel.rematch.readyCount": "{have} van {n} klaar",
+  "duel.rematch.ribbon": "REVANCHE",
+  "duel.rematch.title": "REVANCHE?",
+  "duel.rematch.text": "Dezelfde spelers, dezelfde plaatsen. Hij begint als jullie allebei op REVANCHE drukken.",
+  "duel.rematch.textParty": "Dezelfde spelers, dezelfde plaatsen. Hij begint als iedereen op REVANCHE drukt, of als de host hem start zodra er {n} klaar zijn.",
+  "duel.rematch.starting": "De revanche begint…",
+  "duel.rematch.seatReady": "KLAAR",
+  "duel.rematch.seatDeciding": "TWIJFELT…",
+  "duel.rematch.seatLeft": "WEG",
+  "duel.rematch.lastScore": "{n} vorige keer",
+  "duel.rematch.readyCancel": "✓ KLAAR",
+  "duel.rematch.cancelTitle": "Klik om het terug te nemen",
+  "duel.rematch.off": "Geen revanche: er zijn te weinig spelers over.",
+  "duel.rematch.offName": "{name} is weg: geen revanche.",
+  "duel.rematch.withoutYou": "De revanche is zonder jou begonnen.",
+  "duel.rematch.lost": "De revanche kon niet openen. Probeer het opnieuw vanuit het menu.",
   "duel.newMatch": "▶ NIEUWE WEDSTRIJD",
   "duel.menu": "Terug naar het menu",
   "duel.continue": "VERDER",
@@ -8764,6 +8811,81 @@ __modules["content-nl.js"] = (() => {
 // Built from numbered translation lists; edit by hand as needed.
 
 const NL_TEXT = {
+  // Pre-season, redone 2026-11-22 (extremes-proposals.js, casual-proposals.js).
+  "Origin Story": "Hoe het begon",
+  "Year the brand was founded": "Jaar waarin het merk begon",
+  "Population of five brand home countries": "Inwoners van vijf thuislanden van merken",
+  "Where things come from: brands, stars, the Olympics.": "Waar dingen vandaan komen: merken, sterren, de Olympische Spelen.",
+  "Shakira, who sang Hips Don't Lie, was born here.": "Shakira, die Hips Don't Lie zong, is hier geboren.",
+  "Gabriel García Márquez, who wrote One Hundred Years of Solitude, was born here.": "Gabriel García Márquez, die Honderd jaar eenzaamheid schreef, is hier geboren.",
+  "It is the only country in South America with coasts on both the Pacific Ocean and the Caribbean Sea.": "Het is het enige land in Zuid-Amerika met een kust aan zowel de Grote Oceaan als de Caribische Zee.",
+  "Guinness, Peugeot, Coca-Cola, Samsung and Red Bull, by the year each began.": "Guinness, Peugeot, Coca-Cola, Samsung en Red Bull, naar het jaar waarin elk begon.",
+  "Arthur Guinness signed the lease on his Dublin brewery in 1759, Peugeot began in 1810 as a family steel foundry, Coca-Cola was first sold in 1886, Samsung began in 1938 as a trading firm, and Red Bull was first sold in Austria in 1987. From each company's own history.": "Arthur Guinness tekende in 1759 de huur van zijn brouwerij in Dublin, Peugeot begon in 1810 als staalgieterij van een familie, Coca-Cola werd voor het eerst verkocht in 1886, Samsung begon in 1938 als handelsbedrijf, en Red Bull werd in 1987 voor het eerst verkocht in Oostenrijk. Uit de eigen geschiedenis van elk bedrijf.",
+  "The homes of Coca-Cola, Peugeot, Samsung, Red Bull and Guinness. World Bank, 2025.": "Het thuisland van Coca-Cola, Peugeot, Samsung, Red Bull en Guinness. Wereldbank, 2025.",
+  "Wait, Really?": "Echt waar?",
+  "Surprising extremes, one from each part of the world.": "Verrassende uitersten, uit elk deel van de wereld.",
+  "Where are women the largest share of government ministers?": "Waar zijn vrouwen het grootste deel van de ministers?",
+  "Where are men and women the closest in height?": "Waar zijn mannen en vrouwen het dichtst bij elkaar in lengte?",
+  "Which country has the most threatened mammal species?": "Welk land heeft de meeste bedreigde zoogdiersoorten?",
+  "Where are people the least likely to die of heart disease, cancer, diabetes or lung disease before 70?": "Waar is de kans het kleinst om vóór je 70e te sterven aan hartziekte, kanker, diabetes of longziekte?",
+  "Where do the most adults get enough exercise?": "Waar bewegen de meeste volwassenen genoeg?",
+  "Where does the largest share of people live less than 5 metres above sea level?": "Waar woont het grootste deel van de mensen minder dan 5 meter boven zeeniveau?",
+  "Back of the Net": "Achter in het net",
+  "Football: the big titles of every part of the world.": "Voetbal: de grote titels van elk deel van de wereld.",
+  "Which country has played at the most men's World Cups for the size of its population?": "Welk land speelde het vaakst op een WK voor mannen, voor zijn aantal inwoners?",
+  "Which country has won the men's Africa Cup of Nations the most times?": "Welk land won de Africa Cup of Nations bij de mannen het vaakst?",
+  "Which country has won the men's Copa América the most times?": "Welk land won de Copa América bij de mannen het vaakst?",
+  "Which country has won the men's Asian Cup the most times?": "Welk land won de Azië Cup bij de mannen het vaakst?",
+  "Which country has won the men's Gold Cup (North America, Central America and the Caribbean) the most times?": "Welk land won de Gold Cup (Noord- en Midden-Amerika en het Caribisch gebied) bij de mannen het vaakst?",
+  "Which country has won the Women's European Championship the most times?": "Welk land won het EK voetbal voor vrouwen het vaakst?",
+  "Slam Dunk": "Slam Dunk",
+  "Basketball: the big titles, the NBA, and tall people.": "Basketbal: de grote titels, de NBA en lange mensen.",
+  "Which country has won the men's European basketball championship (EuroBasket) the most times?": "Welk land won het EK basketbal voor mannen (EuroBasket) het vaakst?",
+  "Which country has won the men's African basketball championship (AfroBasket) the most times?": "Welk land won het Afrikaans kampioenschap basketbal voor mannen (AfroBasket) het vaakst?",
+  "Which country has won the men's Asian basketball championship (FIBA Asia Cup) the most times?": "Welk land won het Aziatisch kampioenschap basketbal voor mannen (FIBA Asia Cup) het vaakst?",
+  "Where are women the tallest, on average?": "Waar zijn vrouwen gemiddeld het langst?",
+  "Where is the height difference between men and women the biggest?": "Waar is het lengteverschil tussen mannen en vrouwen het grootst?",
+  "Outside the US, which country has sent the most players to the NBA for the size of its population?": "Welk land buiten de VS leverde de meeste NBA-spelers, voor zijn aantal inwoners?",
+  "Getaway": "Er even tussenuit",
+  "Holiday: sights, beaches, weather and money.": "Vakantie: bezienswaardigheden, stranden, weer en geld.",
+  "Which country has the most UNESCO World Heritage Sites?": "Welk land heeft de meeste plekken op de Werelderfgoedlijst van UNESCO?",
+  "In 2025, which country was the cheapest to shop in?": "Welk land was in 2025 het goedkoopst om te winkelen?",
+  "In 2018, which country had the fewest foreign tourists for the size of its population?": "Welk land had in 2018 de minste buitenlandse toeristen, voor zijn aantal inwoners?",
+  "Which country has the longest coastline?": "Welk land heeft de langste kustlijn?",
+  "Where does it rain the least?": "Waar regent het het minst?",
+  "In 2025, which country's money was worth the most against the US dollar?": "Van welk land was het geld in 2025 het meest waard tegenover de Amerikaanse dollar?",
+  "Animal Kingdom": "Dierenrijk",
+  "Animals on the farm, in the wild and in the water.": "Dieren op de boerderij, in het wild en in het water.",
+  "Where are there the most goats per person?": "Waar zijn er de meeste geiten per persoon?",
+  "Where are there the most pigs per person?": "Waar zijn er de meeste varkens per persoon?",
+  "Where is the most fish and seafood farmed per person?": "Waar wordt de meeste vis en zeevruchten gekweekt per persoon?",
+  "Which country has the most kinds of sharks and rays that live nowhere else?": "Welk land heeft de meeste soorten haaien en roggen die nergens anders leven?",
+  "Which country has the most kinds of freshwater crabs that live nowhere else?": "Welk land heeft de meeste soorten zoetwaterkrabben die nergens anders leven?",
+  "Which country is losing the most forest each year?": "Welk land verliest elk jaar het meeste bos?",
+  "On the Move": "Onderweg",
+  "People on the move: refugees, migrants, the money they send home, and what makes people leave.": "Mensen onderweg: vluchtelingen, migranten, het geld dat ze naar huis sturen, en waarom mensen vertrekken.",
+  "At the end of 2024, which country had the most people forced from their homes within its own borders?": "Welk land had eind 2024 de meeste mensen die op de vlucht waren binnen de eigen grenzen?",
+  "Which country has taken in the most refugees for the size of its population?": "Welk land vangt de meeste vluchtelingen op, voor zijn aantal inwoners?",
+  "Which country receives the most money in total from its people working abroad?": "Welk land krijgt in totaal het meeste geld van zijn mensen die in het buitenland werken?",
+  "Where is the smallest share of people born in another country?": "Waar is het kleinste deel van de mensen in een ander land geboren?",
+  "Where does the largest share of workers serve in the armed forces?": "Waar zit het grootste deel van de werkenden in het leger?",
+  "Which country's people spend the least money on trips abroad, in total?": "Welk land geeft in totaal het minste geld uit aan reizen naar het buitenland?",
+  "Home Sweet Home": "Oost west, thuis best",
+  "Everyday life: homes, cities, power, money, work and health.": "Het dagelijks leven: huizen, steden, stroom, geld, werk en gezondheid.",
+  "Where does the largest share of city dwellers live in slums?": "Waar woont het grootste deel van de stedelingen in sloppenwijken?",
+  "Which country's capital city has the most people?": "Welke hoofdstad heeft de meeste inwoners?",
+  "Where is the most electricity made from hydropower, per person?": "Waar wordt de meeste stroom uit waterkracht gemaakt, per persoon?",
+  "Where are there the most cash machines for the number of adults?": "Waar zijn er de meeste geldautomaten voor het aantal volwassenen?",
+  "Where does the largest share of women have a job or look for one?": "Waar heeft het grootste deel van de vrouwen werk of zoekt het werk?",
+  "Where do the most women have anaemia (too little iron in the blood)?": "Waar hebben de meeste vrouwen bloedarmoede (te weinig ijzer in het bloed)?",
+  "Hot Air": "Hete lucht",
+  "Greenhouse gases, fires, disasters and clean power.": "Broeikasgassen, branden, rampen en schone stroom.",
+  "In 2025, where did fires burn the most land?": "Waar verbrandde in 2025 het meeste land?",
+  "Which country has emitted the most CO₂ in total since 1750?": "Welk land stootte sinds 1750 in totaal de meeste CO₂ uit?",
+  "Which country lets out the most methane per person?": "Welk land stoot de meeste methaan uit per persoon?",
+  "Where does air pollution kill the most people, for the size of the population?": "Waar doodt luchtvervuiling de meeste mensen, voor het aantal inwoners?",
+  "In 2021, where did natural disasters kill the most people, for the size of the population?": "Waar kwamen in 2021 de meeste mensen om door natuurrampen, voor het aantal inwoners?",
+  "Where does the biggest share of the electricity made in the country come from solar power?": "Waar komt het grootste deel van de stroom die het land zelf maakt uit zonne-energie?",
   // Highs & Lows: day names and questions (extremes-days.js)
   "Breakfast Club": "Ontbijtclub",
   "Where do people drink the most milk (and eat the most dairy)?": "Waar drinken mensen de meeste melk (en eten ze de meeste zuivel)?",
@@ -9969,6 +10091,10 @@ const NL_STATS = {
   threatenedplants: {"name": "Bedreigde planten", "highest": "Waar worden de meeste plantensoorten bedreigd?", "lowest": "Waar worden de minste plantensoorten bedreigd?"},
   forestgain: {"name": "Verandering in bos", "highest": "Welk land krijgt er het meeste bos bij?", "lowest": "Welk land verliest het meeste bos?"},
   landprotected: {"name": "Beschermd land", "highest": "Welk land beschermt het grootste deel van zijn land?", "lowest": "Welk land beschermt het kleinste deel van zijn land?"},
+  copa: {"name": "Copa América gewonnen", "highest": "Welk land won de Copa América bij de mannen het vaakst?", "lowest": "Welk land won de Copa América bij de mannen het minst vaak?"},
+  asiancup: {"name": "Azië Cup gewonnen", "highest": "Welk land won de Azië Cup bij de mannen het vaakst?", "lowest": "Welk land won de Azië Cup bij de mannen het minst vaak?"},
+  goldcup: {"name": "Gold Cup gewonnen", "highest": "Welk land won de Gold Cup bij de mannen het vaakst?", "lowest": "Welk land won de Gold Cup bij de mannen het minst vaak?"},
+  womenseuro: {"name": "EK's voor vrouwen gewonnen", "highest": "Welk land won het EK voetbal voor vrouwen het vaakst?", "lowest": "Welk land won het EK voetbal voor vrouwen het minst vaak?"},
   sheep: {"name": "Schapen per persoon", "highest": "Waar zijn er de meeste schapen per persoon?", "lowest": "Waar zijn er de minste schapen per persoon?"},
   bananas: {"name": "Bananen gegeten per persoon", "highest": "Waar eten mensen de meeste bananen?", "lowest": "Waar eten mensen de minste bananen?"},
   dates: {"name": "Dadels gegeten per persoon", "highest": "Waar eten mensen de meeste dadels?", "lowest": "Waar eten mensen de minste dadels?"},
@@ -20789,7 +20915,22 @@ function offerCategories(all, used, random, count = DUEL_CATEGORY_OFFER) {
   return open.slice(0, count);
 }
 
-return { DUEL_ROUNDS, DUEL_TIMES, roundTime, DUEL_MAX_ROUND, DUEL_CATEGORY_OFFER, BID_MIN, BID_MAX, BID_POINTS, ROUTE_STEP_PENALTY, GRACE_MS, DUEL_MAX_SPEED_BONUS, speedMultiplier, withSpeed, PIN_RADII, kmBetween, scorePin, GUESS_COST_PER_COUNTRY, countriesBetween, scoreGuess, OVERSEAS_BORDERS, routeGraph, shortestRoute, canStep, scoreRoute, bidWinner, scoreBid, scorePaint, picker, roundWinner, roundWinnerOf, SEATS, PARTY_SIZES, PARTY_MIN_START, seatsOf, activeSeats, standings, rivalOf, partyPicker, seededRandom, offerCategories };
+// The rematch after a match (22 November 2026; the vote itself is in referee.js).
+// Who can be in a rematch: everyone who played to the end (not a 1v1 or lobby someone left,
+// nor a Party player who left mid-match).
+function rematchSeats(state) {
+  if (state.phase !== "done" || state.left) return [];
+  const seats = activeSeats(state);
+  return seats.length >= rematchMinFor(state) ? seats : [];
+}
+const rematchMinFor = state => seatsOf(state).length === 2 ? 2 : PARTY_MIN_START;
+const rematchIn = state => rematchSeats(state).filter(seat => !state.rematch?.out?.[seat]);
+const rematchHost = state => rematchIn(state)[0] || null; // seat a while it's in
+// Ready players who'd play now (READY count for the lobby).
+const rematchReady = state => rematchIn(state).filter(seat => state.rematch?.ready?.[seat]);
+
+
+return { DUEL_ROUNDS, DUEL_TIMES, roundTime, DUEL_MAX_ROUND, DUEL_CATEGORY_OFFER, BID_MIN, BID_MAX, BID_POINTS, ROUTE_STEP_PENALTY, GRACE_MS, DUEL_MAX_SPEED_BONUS, speedMultiplier, withSpeed, PIN_RADII, kmBetween, scorePin, GUESS_COST_PER_COUNTRY, countriesBetween, scoreGuess, OVERSEAS_BORDERS, routeGraph, shortestRoute, canStep, scoreRoute, bidWinner, scoreBid, scorePaint, picker, roundWinner, roundWinnerOf, SEATS, PARTY_SIZES, PARTY_MIN_START, seatsOf, activeSeats, standings, rivalOf, partyPicker, seededRandom, offerCategories, rematchSeats, rematchMinFor, rematchIn, rematchHost, rematchReady };
 })();
 
 // ---- round-pictures.js
@@ -23873,6 +24014,13 @@ __modules["extremes-proposals.js"] = (() => {
 // other four and every question chosen by Claude (the team skipped the 12-option step this
 // time). All 42 stats were fetched for real (tools/build-stats.mjs, 2026-11-15); the sources
 // still need the team's review: node tools/list-extreme-sources.mjs --proposals.
+// Redone on 2026-11-22 (team request, after Sky's review of 402 questions): same eight names,
+// all 48 questions chosen again with the rules in tools/question-rules.mjs and the lessons in
+// review/taste.md (plain words, no jargon, nothing you can read off the map, no ties on
+// screen, no small-island data artefacts, no answer twice on a day). New data for it: men's
+// Copa América, Asian Cup and Gold Cup titles and the Women's Euro. `rev: 2` makes saved
+// progress from the old questions start fresh (getDayRevision in daily.js).
+const REDO = "redone 2026-11-22 after the team review of 2026-11-22 (review/taste.md), sources in review";
 const REVIEW = "proposed 2026-11-15, reviewed against the guidelines 2026-11-17, sources in review";
 // "Wait, Really?" (2026-11-16): a test day written to docs/casual-question-guidelines.md
 // (answers people wouldn't guess first, but can reason towards, from six parts of the
@@ -23885,106 +24033,114 @@ const REVIEW = "proposed 2026-11-15, reviewed against the guidelines 2026-11-17,
 const PROPOSED_DAYS = [
   {
     name: "Wait, Really?",
-    theme: "Surprising extremes, one from each part of the world. A test day for the question guidelines.",
-    status: "test day 2026-11-16, reviewed 2026-11-17, sources in review",
+    theme: "Surprising extremes, one from each part of the world.",
+    rev: 2,
+    status: REDO,
     rounds: [
-      ["tempmean", "lowest", "Which country was the coldest on average in 2025?"],
-      ["refugeesout", "highest", "Which country do the most refugees come from?"],
-      ["inactive", "lowest", "Where do the fewest adults get too little exercise?"],
-      ["threatenedmammals", "highest", "Where are the most mammal species threatened?"],
-      ["inflation", "lowest", "In 2025, where did consumer prices rise the slowest (or fall)?"],
-      ["fx", "lowest", "In 2025, which country's money was worth the most (the fewest units for one US dollar)?"]
+      ["womenministers", "highest", "Where are women the largest share of government ministers?"],
+      ["heightgap", "lowest", "Where are men and women the closest in height?"],
+      ["threatenedmammals", "highest", "Which country has the most threatened mammal species?"],
+      ["ncddeaths", "lowest", "Where are people the least likely to die of heart disease, cancer, diabetes or lung disease before 70?"],
+      ["inactive", "lowest", "Where do the most adults get enough exercise?"],
+      ["lowlandpeople", "highest", "Where does the largest share of people live less than 5 metres above sea level?"]
     ]
   },
   {
     name: "Back of the Net",
-    theme: "Football: the World Cups, the Olympics and the big regional titles.",
-    status: REVIEW,
+    theme: "Football: the big titles of every part of the world.",
+    rev: 2,
+    status: REDO,
     rounds: [
-      ["wcappspp", "highest", "For its population, which country has played at the most men's World Cups?"],
-      ["wwcwins", "highest", "Which country has won the most matches at Women's World Cups?"],
-      ["wclost", "highest", "Which country has lost the most matches at men's World Cups?"],
-      ["olyfootball", "highest", "Which country has won the most Olympic medals in football?"],
-      ["euros", "highest", "Which country has won the most men's European Championships in football?"],
-      ["afcon", "highest", "Which country has won the most men's Africa Cup of Nations?"]
+      ["wcappspp", "highest", "Which country has played at the most men's World Cups for the size of its population?"],
+      ["afcon", "highest", "Which country has won the men's Africa Cup of Nations the most times?"],
+      ["copa", "highest", "Which country has won the men's Copa América the most times?"],
+      ["asiancup", "highest", "Which country has won the men's Asian Cup the most times?"],
+      ["goldcup", "highest", "Which country has won the men's Gold Cup (North America, Central America and the Caribbean) the most times?"],
+      ["womenseuro", "highest", "Which country has won the Women's European Championship the most times?"]
     ]
   },
   {
     name: "Slam Dunk",
-    theme: "Basketball: the Olympics, the NBA, the big regional titles, and tall people.",
-    status: REVIEW,
+    theme: "Basketball: the big titles, the NBA, and tall people.",
+    rev: 2,
+    status: REDO,
     rounds: [
-      ["olybasketball", "highest", "Which country has won the most Olympic medals in basketball?"],
-      ["nba", "highest", "Outside the US, which country has sent the most players to the NBA?"],
-      ["womenheight", "highest", "Where are women the tallest?"],
-      ["asiacup", "highest", "Which country has won the most men's FIBA Asia Cups (the Asian Championship in basketball)?"],
-      ["eurobasket", "highest", "Which country has won the most men's EuroBasket titles (the European Championship in basketball)?"],
-      ["afrobasket", "highest", "Which country has won the most men's AfroBasket titles (the African Championship in basketball)?"]
+      ["eurobasket", "highest", "Which country has won the men's European basketball championship (EuroBasket) the most times?"],
+      ["afrobasket", "highest", "Which country has won the men's African basketball championship (AfroBasket) the most times?"],
+      ["asiacup", "highest", "Which country has won the men's Asian basketball championship (FIBA Asia Cup) the most times?"],
+      ["womenheight", "highest", "Where are women the tallest, on average?"],
+      ["heightgap", "highest", "Where is the height difference between men and women the biggest?"],
+      ["nbapp", "highest", "Outside the US, which country has sent the most players to the NBA for the size of its population?"]
     ]
   },
   {
     name: "Getaway",
-    theme: "Holiday: coasts, sunshine, prices, tourists and sights.",
-    status: REVIEW,
+    theme: "Holiday: sights, beaches, weather and money.",
+    rev: 2,
+    status: REDO,
     rounds: [
+      ["heritage", "highest", "Which country has the most UNESCO World Heritage Sites?"],
+      ["pricelevel", "lowest", "In 2025, which country was the cheapest to shop in?"],
+      ["arrivalsk", "lowest", "In 2018, which country had the fewest foreign tourists for the size of its population?"],
       ["coastline", "highest", "Which country has the longest coastline?"],
-      ["tempmax", "highest", "Where was the warmest month of 2025 the hottest?"],
-      ["pricelevel", "lowest", "In 2025, which country was the cheapest, with prices compared with the US?"],
       ["rain", "lowest", "Where does it rain the least?"],
-      ["arrivalsk", "lowest", "In 2018, which country welcomed the fewest foreign tourists for its population?"],
-      ["heritage", "highest", "Which country has the most UNESCO World Heritage Sites?"]
+      ["fx", "lowest", "In 2025, which country's money was worth the most against the US dollar?"]
     ]
   },
   {
     name: "Animal Kingdom",
-    theme: "Animals on the farm, in the wild and in the sea.",
-    status: REVIEW,
+    theme: "Animals on the farm, in the wild and in the water.",
+    rev: 2,
+    status: REDO,
     rounds: [
       ["goats", "highest", "Where are there the most goats per person?"],
-      ["endemicmammals", "highest", "Where do the most mammal species live that live nowhere else?"],
       ["pigs", "highest", "Where are there the most pigs per person?"],
-      ["endemicsharks", "highest", "Where do the most shark and ray species live that live nowhere else?"],
       ["fishfarmedpp", "highest", "Where is the most fish and seafood farmed per person?"],
-      ["fishcaught", "highest", "Which country catches the most wild fish and seafood?"]
+      ["endemicsharks", "highest", "Which country has the most kinds of sharks and rays that live nowhere else?"],
+      ["endemiccrabs", "highest", "Which country has the most kinds of freshwater crabs that live nowhere else?"],
+      ["forestgain", "lowest", "Which country is losing the most forest each year?"]
     ]
   },
   {
     name: "On the Move",
-    theme: "People on the move: refugees, migrants, the money they send home, and people displaced at home.",
-    status: REVIEW,
+    theme: "People on the move: refugees, migrants, the money they send home, and what makes people leave.",
+    rev: 2,
+    status: REDO,
     rounds: [
-      ["remittancesusd", "highest", "Which country receives the most money from its people working abroad?"],
-      ["olddependency", "lowest", "Where are there the fewest people aged 65+ for every 100 of working age?"],
-      ["refugeeshost", "highest", "Which country has taken in the most refugees for its population?"],
-      ["migrantstock", "highest", "Which country is home to the most people born in another country?"],
-      ["refugeesoutpp", "highest", "Which country have the most people fled as refugees, for its population?"],
-      ["displaced", "highest", "At the end of 2024, where were the most people driven from their homes but still inside their own country?"]
+      ["displaced", "highest", "At the end of 2024, which country had the most people forced from their homes within its own borders?"],
+      ["refugeeshost", "highest", "Which country has taken in the most refugees for the size of its population?"],
+      ["remittancesusd", "highest", "Which country receives the most money in total from its people working abroad?"],
+      ["migrants", "lowest", "Where is the smallest share of people born in another country?"],
+      ["armedforces", "highest", "Where does the largest share of workers serve in the armed forces?"],
+      ["travelspend", "lowest", "Which country's people spend the least money on trips abroad, in total?"]
     ]
   },
   {
     name: "Home Sweet Home",
-    theme: "Life at home: water, energy, where people live and who lives there.",
-    status: REVIEW,
+    theme: "Everyday life: homes, cities, power, money, work and health.",
+    rev: 2,
+    status: REDO,
     rounds: [
-      ["youngdependency", "lowest", "Where are there the fewest children for every 100 people of working age?"],
-      ["basicwater", "lowest", "Where do the fewest people have at least basic drinking water?"],
-      ["lowlandpeople", "highest", "Where do the most people live less than 5 m above the sea?"],
-      ["capitalpop", "highest", "Which country's capital city is home to the most people?"],
-      ["waterpp", "lowest", "Which country has the least fresh water of its own per person?"],
-      ["energypp", "highest", "Where does each person use the most energy?"]
+      ["slums", "highest", "Where does the largest share of city dwellers live in slums?"],
+      ["capitalpop", "highest", "Which country's capital city has the most people?"],
+      ["hydropp", "highest", "Where is the most electricity made from hydropower, per person?"],
+      ["atms", "highest", "Where are there the most cash machines for the number of adults?"],
+      ["womenwork", "highest", "Where does the largest share of women have a job or look for one?"],
+      ["anaemia", "highest", "Where do the most women have anaemia (too little iron in the blood)?"]
     ]
   },
   {
     name: "Hot Air",
-    theme: "Greenhouse gases, fires, forests and rising seas.",
-    status: REVIEW,
+    theme: "Greenhouse gases, fires, disasters and clean power.",
+    rev: 2,
+    status: REDO,
     rounds: [
-      ["ghgpp", "highest", "Where does each person account for the most greenhouse gases?"],
       ["burnt", "highest", "In 2025, where did fires burn the most land?"],
-      ["n2opp", "highest", "Where does each person account for the most nitrous oxide (laughing gas)?"],
-      ["forestgain", "lowest", "Which country is losing the most forest?"],
       ["co2total", "highest", "Which country has emitted the most CO₂ in total since 1750?"],
-      ["lowland", "highest", "Which country has the most land less than 5 m above the sea?"]
+      ["methanepp", "highest", "Which country lets out the most methane per person?"],
+      ["airpollutiondeaths", "highest", "Where does air pollution kill the most people, for the size of the population?"],
+      ["disasterdeaths", "highest", "In 2021, where did natural disasters kill the most people, for the size of the population?"],
+      ["solarshare", "highest", "Where does the biggest share of the electricity made in the country come from solar power?"]
     ]
   }
 ];
@@ -24007,15 +24163,20 @@ __modules["casual-proposals.js"] = (() => {
 const PROPOSED_CASUAL_DAYS = {
   "2026-10-24": {
     name: "Origin Story",
-    theme: "Where things come from: brands, dishes, the Olympics. A test day for the question guidelines.",
+    theme: "Where things come from: brands, stars, the Olympics.",
+    rev: 2,
+    status: "redone 2026-11-22 after the team review (review/taste.md), facts in review",
     journey: "balloon",
     mystery: "MN",
     pinpoint: {
-      answer: "VN",
+      answer: "CO",
+      // Redone 2026-11-22 (team review: no city in the first clue; the old answer, Vietnam,
+      // was already an answer on a calendar day). Wikipedia: Shakira, Gabriel García
+      // Márquez, Geography of Colombia.
       clues: [
-        "Motorbikers ride the Hà Giang and Cao Bằng loops through the mountains of its far north.",
-        "It grows more robusta coffee than any other country, and drinks it with sweet condensed milk.",
-        "Phở, a noodle soup with beef or chicken, comes from here."
+        "Shakira, who sang Hips Don't Lie, was born here.",
+        "Gabriel García Márquez, who wrote One Hundred Years of Solitude, was born here.",
+        "It is the only country in South America with coasts on both the Pacific Ocean and the Caribbean Sea."
       ]
     },
     deepcut: {
@@ -24044,19 +24205,21 @@ const PROPOSED_CASUAL_DAYS = {
       picture: "Vegemite"
     },
     rank: {
+      // Redone 2026-11-22 (team review: values must be far apart; Coca-Cola 1886 and
+      // Nintendo 1889 were three years apart). Population, which the team loves, is the reroll.
       topic: "Year the brand was founded",
-      detail: "Peugeot, Nestlé, Coca-Cola, Nintendo and Samsung, by the year each company began.",
-      values: { FR: 1810, CH: 1866, US: 1886, JP: 1889, KR: 1938 },
-      labels: { FR: "Peugeot", CH: "Nestlé", US: "Coca-Cola", JP: "Nintendo", KR: "Samsung" },
+      detail: "Guinness, Peugeot, Coca-Cola, Samsung and Red Bull, by the year each began.",
+      values: { IE: 1759, FR: 1810, US: 1886, KR: 1938, AT: 1987 },
+      labels: { IE: "Guinness", FR: "Peugeot", US: "Coca-Cola", KR: "Samsung", AT: "Red Bull" },
       years: true,
-      note: "Peugeot began in 1810 as a family steel foundry, Nestlé in 1866, Coca-Cola in 1886, Nintendo in 1889 as a maker of playing cards, and Samsung in 1938 as a trading firm selling dried fish and noodles. From each company's own history.",
-      picture: "Nintendo",
+      note: "Arthur Guinness signed the lease on his Dublin brewery in 1759, Peugeot began in 1810 as a family steel foundry, Coca-Cola was first sold in 1886, Samsung began in 1938 as a trading firm, and Red Bull was first sold in Austria in 1987. From each company's own history.",
+      picture: "Guinness Storehouse",
       reroll: {
         topic: "Population of five brand home countries",
-        values: { US: 341.8, JP: 123.4, FR: 68.7, KR: 51.7, CH: 9.1 },
+        values: { US: 341.8, FR: 68.7, KR: 51.7, AT: 9.2, IE: 5.5 },
         decimals: 1,
         unit: " million",
-        note: "The homes of Coca-Cola, Nintendo, Peugeot, Samsung and Nestlé. World Bank, 2025."
+        note: "The homes of Coca-Cola, Peugeot, Samsung, Red Bull and Guinness. World Bank, 2025."
       }
     }
   }
@@ -24117,7 +24280,6 @@ const STATS = {
   calories: {"name":"Calories available","unit":"kcal per person a day","decimals":0,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/daily-per-capita-caloric-supply","year":2023,"values":{"AR":3360.43,"AU":3561.93,"AT":3755.86,"BD":2587.65,"BE":3921.31,"BO":2373.67,"BR":3423.45,"CA":3590.04,"CL":3057.47,"CN":3526.9,"CO":3126.32,"DK":3733.87,"EC":2620.91,"EG":3094.01,"ET":2558.42,"FI":3345.6,"FR":3489.55,"DE":3534.54,"GH":3124.99,"GR":3381.65,"IN":2668.5,"ID":2900.3,"IR":2875.16,"IQ":2370.58,"IE":3920.92,"IL":3753.9,"IT":3752.66,"JP":2670.09,"JO":2555.98,"KE":2146.01,"MY":2926.51,"MX":3304.56,"MA":3353.86,"NP":2919.77,"NL":3466.98,"NZ":3121.5,"NG":2470.11,"NO":3475.59,"PK":2513.76,"PE":2810.52,"PH":2982.9,"PL":3730.14,"PT":3552.93,"RU":3528.4,"SA":3659.84,"ZA":2693.94,"KR":3430.35,"ES":3377.16,"SE":3366.78,"CH":3402.39,"TZ":2518.33,"TH":2855.27,"TR":3892.23,"UA":2785.79,"AE":3125.09,"GB":3434.59,"US":3947.33,"UY":3322.74,"VE":2800.39,"VN":3086.03,"AF":2314.63,"AO":2399.33,"AL":3237.8,"AM":3129.24,"AG":2543.98,"AZ":3339.19,"BI":1697.98,"BJ":2703.31,"BF":2790.88,"BG":2999.6,"BH":3422.84,"BS":2672.35,"BA":3457.78,"BY":3396.26,"BZ":2831.8,"BB":3117.89,"BT":3106.69,"BW":2713.86,"CF":2418.77,"CI":2937.75,"CM":2900.97,"CD":2014.82,"CG":2187.12,"KM":2390.16,"CV":2793.58,"CR":3061.13,"CY":2876.46,"CZ":3384.27,"DJ":2720.94,"DM":3278.3,"DO":3313.44,"DZ":3396.01,"EE":3286.53,"FJ":2938.04,"FM":2632.83,"GA":2686.47,"GE":2999.83,"GN":2947.55,"GM":2402.32,"GW":2559.62,"GD":2826.51,"GT":2823.17,"GY":3318.03,"HN":2628.13,"HR":3447.57,"HT":1958.81,"HU":3549.11,"IS":3681.07,"JM":2892.07,"KZ":3135.92,"KG":2763.23,"KH":2642.91,"KI":3125.45,"KN":2852.14,"KW":3135.58,"LA":3188.1,"LB":2827.67,"LR":2135.15,"LY":2867.18,"LC":2654.16,"LK":2675.11,"LS":1872.7,"LT":3347.5,"LU":3521.84,"LV":3342.19,"MD":2503.61,"MG":1977.96,"MV":2671.29,"MH":3320.81,"MK":3475.55,"ML":2734.44,"MT":3406.59,"MM":2809.02,"ME":3669.41,"MN":3031.06,"MZ":2186.13,"MR":2909.38,"MU":3255.54,"MW":2618.32,"NA":2581.15,"NE":2654.02,"NI":2760.19,"NR":3082.15,"OM":2981.33,"PA":3104.59,"PG":2177.1,"PY":3067.06,"QA":3251.07,"RO":3648.94,"RW":2404.9,"SD":2513.48,"SN":2847.77,"SB":2165.62,"SL":2437.3,"SV":2896.33,"SO":1812.43,"RS":3878.93,"SS":2391.07,"ST":2279.29,"SR":2539.06,"SK":2979.96,"SI":3200.3,"SZ":2573.78,"SC":2888.39,"SY":2259.36,"TD":2097.07,"TG":2847.25,"TJ":2711.69,"TM":2814.16,"TL":2276.55,"TO":3058.67,"TT":2945.68,"TN":3431.54,"TV":3295.22,"UG":2377.7,"UZ":3297.23,"VC":3042.61,"VU":2908.95,"WS":3116.32,"YE":1810.53,"ZM":2169.77,"ZW":2393.38},"years":{"JP":2022,"BI":2022,"BJ":2022,"CF":2022,"DM":2022,"ML":2022,"SD":2022,"SO":2022,"SS":2022,"TD":2022,"TG":2022},"missing":{"SG":0,"AD":0,"BN":2009,"ER":0,"GQ":0,"LI":0,"MC":0,"PW":0,"PS":0,"SM":0,"VA":0,"CU":2019,"KP":2018}},
   protein: {"name":"Protein available","unit":"grams per person a day","decimals":0,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/daily-per-capita-protein-supply","year":2023,"values":{"AR":121.54,"AU":124.99,"AT":108.46,"BD":67.99,"BE":120.26,"BO":80.84,"BR":106.5,"CA":112.92,"CL":105.13,"CN":131.59,"CO":83.15,"DK":126.33,"EC":69.6,"EG":89.77,"ET":79.88,"FI":126.14,"FR":115.99,"DE":109.22,"GH":67.94,"GR":112.03,"IN":74.57,"ID":77.8,"IR":79.61,"IQ":63.9087,"IE":136.88,"IL":130.74,"IT":116.6,"JP":93.7589,"JO":71.0999,"KE":55.77,"MY":93.33,"MX":100.29,"MA":98.09,"NP":81.74,"NL":117.08,"NZ":100.93,"NG":57.03,"NO":125.45,"PK":73.39,"PE":88.55,"PH":77.49,"PL":117.73,"PT":126.35,"RU":117.83,"SA":103.8,"ZA":79.18,"KR":110.69,"ES":117.64,"SE":112.8,"CH":101.41,"TZ":60.46,"TH":68.63,"TR":119.68,"UA":90.53,"AE":96.6799,"GB":110.01,"US":123.1,"UY":104.53,"VE":73.58,"VN":102.2,"AF":62.58,"AO":47.47,"AL":113.95,"AM":103.18,"AG":98.1084,"AZ":101.95,"BI":38.9365,"BJ":70.3379,"BF":92.56,"BG":86.4899,"BH":99.7897,"BS":104.777,"BA":113.72,"BY":127.95,"BZ":88.6296,"BB":108.637,"BT":71.7595,"BW":73.0099,"CF":67.6868,"CI":65.01,"CM":71.3,"CD":27.72,"CG":58.89,"KM":63.04,"CV":82.6992,"CR":91.8501,"CY":98.7299,"CZ":96.08,"DJ":74.8693,"DM":108.892,"DO":90.04,"DZ":93.59,"EE":112.13,"FJ":87.01,"FM":71.9498,"GA":84.78,"GE":90.2499,"GN":58.23,"GM":58.1201,"GW":52.1199,"GD":98.4182,"GT":74.39,"GY":114.209,"HN":63.03,"HR":115.3,"HT":46.01,"HU":93.6399,"IS":151.69,"JM":91.6802,"KZ":106.7,"KG":92.84,"KH":64.43,"KI":83.3637,"KN":90.9353,"KW":95.5,"LA":81.6799,"LB":79.5799,"LR":45.04,"LY":86.53,"LC":93.0243,"LK":67.54,"LS":50.5399,"LT":123.76,"LU":122.55,"LV":110.83,"MD":77.9226,"MG":39.53,"MV":97.4065,"MH":118.982,"MK":103.11,"ML":72.7573,"MT":105.839,"MM":78.39,"ME":134.429,"MN":132.13,"MZ":44.69,"MR":83.2,"MU":104.96,"MW":65.67,"NA":64.2297,"NE":92.53,"NI":73.7699,"NR":110.943,"OM":85.6201,"PA":93.54,"PG":62.19,"PY":66.47,"QA":105.09,"RO":112.42,"RW":57.05,"SD":70.4869,"SN":71.66,"SB":54.4997,"SL":57.5799,"SV":88.8799,"SO":39.8472,"RS":135.58,"SS":74.0174,"ST":54.3872,"SR":68.3198,"SK":81.3099,"SI":101.46,"SZ":58.7801,"SC":104.341,"SY":70.56,"TD":74.2724,"TG":62.3902,"TJ":83.1399,"TM":104.65,"TL":65.3999,"TO":129.284,"TT":87.4395,"TN":105.05,"TV":102.922,"UG":56.43,"UZ":111.42,"VC":114.008,"VU":74.6272,"WS":105.294,"YE":45,"ZM":48.26,"ZW":69.11},"years":{"JP":2022,"BI":2022,"BJ":2022,"CF":2022,"DM":2022,"ML":2022,"SD":2022,"SO":2022,"SS":2022,"TD":2022,"TG":2022},"missing":{"SG":0,"AD":0,"BN":2009,"ER":0,"GQ":0,"LI":0,"MC":0,"PW":0,"PS":0,"SM":0,"VA":0,"CU":2019,"KP":2018}},
   fat: {"name":"Fat available","unit":"grams per person a day","decimals":0,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/daily-per-capita-fat-supply","year":2023,"values":{"AR":136.75,"AU":159.07,"AT":186.87,"BD":42.76,"BE":170.09,"BO":57.2,"BR":141.32,"CA":163.09,"CL":94.59,"CN":100.38,"CO":103.58,"DK":150.78,"EC":104.35,"EG":54.47,"ET":43.96,"FI":123.78,"FR":149.13,"DE":162.28,"GH":48.71,"GR":156.16,"IN":65.74,"ID":80.35,"IR":83.28,"IQ":50.9571,"IE":153.94,"IL":155.52,"IT":160.79,"JP":91.6665,"JO":84.4699,"KE":48.6,"MY":100.94,"MX":109.87,"MA":75.25,"NP":62.28,"NL":142.26,"NZ":105.01,"NG":62.67,"NO":137.28,"PK":86.23,"PE":67.11,"PH":57.95,"PL":141.12,"PT":141.4,"RU":127.12,"SA":109.04,"ZA":95.57,"KR":126.35,"ES":152.8,"SE":146.57,"CH":162.33,"TZ":54.45,"TH":57.28,"TR":141.32,"UA":78.39,"AE":125.87,"GB":143.7,"US":183.84,"UY":122.68,"VE":97.56,"VN":73.75,"AF":43.33,"AO":49.54,"AL":115.45,"AM":108.94,"AG":104.668,"AZ":94.86,"BI":15.3946,"BJ":64.0203,"BF":64.09,"BG":139.66,"BH":135.25,"BS":117.416,"BA":96.6999,"BY":125.35,"BZ":99.4695,"BB":102.347,"BT":80.5494,"BW":65.1399,"CF":96.5672,"CI":56.3,"CM":60.54,"CD":20.35,"CG":54.71,"KM":58.87,"CV":84.2792,"CR":107.82,"CY":109.36,"CZ":159.05,"DJ":67.3393,"DM":108.957,"DO":115.99,"DZ":101.81,"EE":135.55,"FJ":94.45,"FM":124.082,"GA":64.23,"GE":91.7799,"GN":65.94,"GM":45.9901,"GW":84.1599,"GD":115.246,"GT":76.97,"GY":77.0093,"HN":86.77,"HR":139.73,"HT":37.03,"HU":152.69,"IS":163.24,"JM":88.1502,"KZ":117.01,"KG":83.65,"KH":34.63,"KI":130.53,"KN":119.691,"KW":108.72,"LA":42.1399,"LB":89.8299,"LR":44.21,"LY":111.03,"LC":91.0544,"LK":39.61,"LS":42.0599,"LT":128.03,"LU":130.33,"LV":151.45,"MD":72.7501,"MG":21.84,"MV":78.4772,"MH":161.651,"MK":116,"ML":47.5616,"MT":127.549,"MM":58.75,"ME":143.659,"MN":128.75,"MZ":40.1,"MR":74.51,"MU":112.45,"MW":46.27,"NA":62.7197,"NE":59.5,"NI":65.6399,"NR":124.62,"OM":97.4601,"PA":101.88,"PG":64.36,"PY":95,"QA":108.97,"RO":137.57,"RW":36.72,"SD":69.1485,"SN":71.75,"SB":53.2497,"SL":37.7499,"SV":75.7099,"SO":38.0777,"RS":113.87,"SS":85.7711,"ST":66.5565,"SR":69.4998,"SK":139.38,"SI":110.71,"SZ":58.0101,"SC":85.7226,"SY":65.45,"TD":69.2979,"TG":60.4381,"TJ":86.2299,"TM":80.84,"TL":61.3599,"TO":124.105,"TT":107.339,"TN":99.96,"TV":116.798,"UG":52.44,"UZ":105.52,"VC":106.608,"VU":111.696,"WS":111.023,"YE":49.2,"ZM":48.5,"ZW":85.32},"years":{"JP":2022,"BI":2022,"BJ":2022,"CF":2022,"DM":2022,"ML":2022,"SD":2022,"SO":2022,"SS":2022,"TD":2022,"TG":2022},"missing":{"SG":0,"AD":0,"BN":2009,"ER":0,"GQ":0,"LI":0,"MC":0,"PW":0,"PS":0,"SM":0,"VA":0,"CU":2019,"KP":2018}},
-  foodwaste: {"name":"Food thrown away at home","unit":"kg per person a year","decimals":0,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/food-waste-per-capita","year":2022,"values":{"AR":2.76,"AU":20.9,"AT":9,"BD":9.68,"BE":11,"BO":13.32,"BR":2.67,"CA":29.83,"CL":15.06,"CN":19.8,"CO":19,"CU":19,"DK":17,"EC":19,"EG":9.68,"ET":9.68,"FI":10,"FR":12,"DE":9,"GH":9.68,"GR":14.01,"IN":9.68,"ID":49.93,"IR":9.68,"IQ":31.47,"IE":17,"IL":50.01,"IT":11,"JP":8.86,"JO":25.79,"KE":10.96,"MY":78.82,"MX":45.48,"MA":9.68,"NP":9.68,"NL":9,"NZ":3.12,"NG":9.68,"NO":12,"PK":9.68,"PE":19.01,"PH":44.25,"PL":13,"PT":22,"RU":13.72,"SA":19.65,"SG":46.02,"ZA":15.36,"KR":13.74,"ES":7,"SE":10,"CH":17.5,"TZ":9.68,"TH":49.93,"TR":31.46,"UA":7.9,"AE":27.51,"GB":3.5,"US":11.86,"UY":15.05,"VE":14.4,"VN":44.25,"AF":9.68,"AO":9.68,"AL":14.7,"AD":10.79,"AM":31.46,"AG":14.45,"AZ":31.47,"BI":9.68,"BJ":9.68,"BF":9.68,"BG":6,"BH":27.48,"BS":15.06,"BA":14.7,"BY":13.59,"BZ":19.23,"BB":14.97,"BN":46.09,"BT":9.65,"BW":15.36,"CF":9.68,"CI":9.68,"CM":9.68,"CD":9.68,"CG":9.68,"KM":9.72,"CV":9.63,"CR":19,"CY":60,"CZ":6,"DJ":9.67,"DM":18.29,"DO":19.01,"DZ":9.68,"ER":9.67,"EE":15,"FJ":21.05,"FM":9.32,"GA":15.37,"GE":31.43,"GN":9.68,"GM":9.69,"GW":9.7,"GQ":15.32,"GD":19.7,"GT":19,"GY":15.08,"HN":13.32,"HR":1,"HT":13.33,"HU":6,"IS":5,"JM":19.02,"KZ":21.04,"KG":9.68,"KH":44.25,"KI":9.59,"KN":15.8,"KW":27.52,"LA":44.25,"LB":25.78,"LR":9.67,"LY":21.04,"LC":19.02,"LI":12.46,"LK":9.68,"LS":9.7,"LT":10,"LU":13,"LV":8,"MC":13.44,"MD":13.57,"MG":9.68,"MV":20.89,"MH":20.25,"MK":14.69,"ML":9.68,"MT":9,"MM":44.25,"ME":14.78,"MN":12.01,"MZ":9.68,"MR":9.69,"MU":15.37,"MW":9.68,"NA":15.38,"NE":9.68,"NI":13.33,"NR":10.38,"OM":27.54,"PA":15.06,"PW":23.31,"PG":9.68,"KP":12,"PY":19,"PS":31.46,"QA":27.57,"RO":2,"RW":9.68,"SD":9.68,"SN":9.68,"SB":9.62,"SL":9.68,"SV":19.02,"SM":9.6,"SO":9.68,"RS":3.11,"SS":9.68,"ST":9.79,"SR":19.07,"SK":6,"SI":7,"SZ":9.66,"SC":11.72,"SY":25.79,"TD":9.68,"TG":9.68,"TJ":9.68,"TM":21.04,"TL":44.2,"TO":21.66,"TT":15.05,"TN":9.68,"TV":18.6,"UG":9.68,"UZ":9.68,"VA":0,"VC":18.28,"VU":9.77,"WS":9.57,"YE":25.78,"ZM":9.68,"ZW":8.39},"years":{},"missing":{}},
   drinkers: {"name":"Adults who drank alcohol in the past year","unit":"%","decimals":0,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/share-of-adults-who-drank-alcohol-in-last-year","year":2020,"values":{"AR":71.0196,"AU":80.6701,"AT":79.4018,"BD":5.44721,"BE":76.8067,"BO":62.2224,"BR":58.0374,"CA":69.1739,"CL":71.0661,"CN":60.2639,"CO":40.8752,"CU":49.7193,"DK":78.2876,"EC":60.232,"EG":7.62798,"ET":19.0498,"FI":78.0461,"FR":75.9668,"DE":78.8309,"GH":42.1463,"GR":69.3485,"IN":29.2026,"ID":9.7243,"IR":1.5452,"IQ":6.89268,"IE":83.2093,"IL":59.7617,"IT":73.2134,"JP":67.5001,"JO":7.54461,"KE":29.051,"MY":16.264,"MX":42.037,"MA":7.14231,"NP":25.8131,"NL":76.8755,"NZ":80.2786,"NG":25.1957,"NO":77.8209,"PK":1.57498,"PE":65.5081,"PH":46.0037,"PL":73.4785,"PT":76.2215,"RU":58.3094,"SA":1.86991,"SG":62.9198,"ZA":29.6185,"KR":72.4846,"ES":76.5926,"SE":77.5316,"CH":79.9572,"TZ":30.7764,"TH":50.7216,"TR":10.3208,"UA":66.1015,"AE":9.94292,"GB":77.9179,"US":71.1447,"UY":67.3933,"VE":36.5594,"VN":53.7044,"AF":2.05695,"AO":50.3495,"AL":48.8544,"AD":82.5058,"AM":48.7002,"AG":53.1332,"AZ":15.4988,"BI":35.7349,"BJ":45.8908,"BF":31.7115,"BG":65.764,"BH":19.9895,"BS":49.4931,"BA":42.6053,"BY":69.3018,"BZ":46.7557,"BB":53.6578,"BN":35.7947,"BT":30.3217,"BW":31.1827,"CF":37.3206,"CI":29.0118,"CM":50.21,"CD":43.2464,"CG":53.9174,"KM":0.952743,"CV":56.5239,"CR":40.2698,"CY":65.5097,"CZ":74.0674,"DJ":6.02582,"DM":49.7459,"DO":53.4795,"DZ":7.89935,"ER":15.1522,"EE":74.2521,"FJ":30.1085,"FM":27.7565,"GA":54.375,"GE":55.9448,"GN":11.1944,"GM":20.6734,"GW":26.1487,"GQ":58.0541,"GD":54.3873,"GT":34.4383,"GY":47.726,"HN":37.7984,"HR":67.5428,"HT":44.6441,"HU":71.3216,"IS":79.2047,"JM":46.1791,"KZ":24.5137,"KG":16.8223,"KH":49.2421,"KI":25.2403,"KN":51.2756,"KW":0.830784,"LA":57.3931,"LB":12.7237,"LR":40.3845,"LY":1.25847,"LC":57.0089,"LK":37.275,"LS":23.3888,"LT":75.1452,"LU":84.1951,"LV":74.9934,"MD":69.2395,"MG":29.0335,"MV":5.50938,"MK":41.7212,"ML":15.9917,"MT":77.2793,"MM":38.2334,"MN":55.6722,"MZ":23.5983,"MR":1.74313,"MU":43.4357,"MW":28.768,"NA":25.6358,"NE":9.03768,"NI":38.7149,"NR":32.3534,"OM":13.7123,"PA":42.9712,"PG":27.0161,"KP":59.0744,"PY":51.7881,"QA":31.9405,"RO":75.8951,"RW":33.4531,"SD":6.96041,"SN":9.72316,"SB":26.804,"SL":17.3458,"SV":36.853,"SO":0.922955,"ST":52.2995,"SR":44.7218,"SK":72.7559,"SI":71.3624,"SZ":28.6748,"SC":60.5328,"SY":1.4966,"TD":21.3628,"TG":36.5028,"TJ":11.8553,"TM":16.4093,"TL":34.5007,"TO":24.2736,"TT":50.888,"TN":8.51213,"TV":27.0228,"UG":41.9197,"UZ":14.2646,"VC":50.5981,"VU":28.09,"WS":29.1125,"YE":1.15292,"ZM":36.65,"ZW":19.3534},"years":{},"missing":{"LI":0,"MC":0,"MH":0,"PW":0,"PS":0,"SM":0,"SS":0,"VA":0,"ME":2016,"RS":2016}},
   chickens: {"name":"Chickens","unit":"per person","decimals":1,"source":"UN FAO livestock counts","url":"https://www.fao.org/faostat/en/#data/QCL","year":2024,"values":{"AR":2.49347,"AU":3.9294,"AT":1.9335,"BD":1.86569,"BE":4.08264,"BO":18.5735,"BR":7.43009,"CA":4.15743,"CL":2.63767,"CN":3.72797,"CO":4.04504,"CU":0.5111,"DK":3.44773,"EC":9.85768,"EG":2.30036,"ET":0.38591,"FI":2.55471,"FR":3.33696,"DE":1.87206,"GH":2.68889,"GR":3.69773,"IN":0.582625,"ID":12.9833,"IR":11.1762,"IQ":2.97741,"IL":4.82317,"JP":2.55851,"JO":3.5642,"KE":1.23796,"MY":9.06272,"MX":4.75418,"MA":6.06285,"NP":1.92166,"NL":4.93326,"NZ":4.6151,"NG":1.01757,"NO":2.9548,"PK":8.08798,"PE":5.63267,"PH":1.71107,"PL":6.71536,"PT":4.08131,"RU":3.5397,"SA":5.74489,"SG":0.500067,"ZA":2.70589,"KR":3.45314,"SE":2.42804,"CH":1.44824,"TZ":0.474273,"TH":4.12518,"TR":4.42051,"UA":4.45673,"AE":2.29199,"GB":2.40313,"US":4.54965,"UY":13.8716,"VE":4.40812,"VN":4.73465,"AF":0.307453,"AO":1.27454,"AL":1.9395,"AM":1.43422,"AG":1.69835,"AZ":2.8664,"BI":0.234468,"BJ":1.28584,"BF":1.49714,"BH":1.19848,"BS":8.16062,"BA":3.66963,"BY":13.2639,"BZ":4.07402,"BB":18.5264,"BN":45.8495,"BT":1.15981,"BW":0.314193,"CF":1.25334,"CI":4.38631,"CM":1.5253,"CD":0.169207,"CG":0.467273,"KM":0.624117,"CV":1.29142,"CR":4.63133,"CY":3.39594,"CZ":2.28872,"DM":3.09696,"DO":18.378,"DZ":4.29157,"ER":0.32021,"EE":1.66414,"FJ":6.29692,"FM":1.6977,"GA":1.32041,"GE":1.89925,"GN":2.59952,"GM":0.464194,"GW":0.941092,"GQ":0.198614,"GD":3.27357,"GT":2.52367,"GY":49.642,"HN":4.45545,"HR":2.82132,"HT":0.502012,"HU":3.02,"IS":0.586131,"JM":5.01749,"KZ":2.19015,"KG":0.839704,"KH":0.728094,"KI":4.91618,"KN":0.831167,"KW":12.2126,"LA":6.95703,"LB":12.5915,"LR":1.46043,"LY":5.09938,"LC":2.65891,"LK":0.860268,"LS":0.225953,"LT":3.62645,"LU":0.270754,"LV":3.23901,"MD":20.5255,"MG":1.33024,"MK":1.41303,"ML":2.51305,"MT":1.36276,"MM":2.46123,"ME":1.71714,"MN":0.512752,"MZ":0.557959,"MR":0.904975,"MU":13.3123,"MW":0.902003,"NA":1.35184,"NE":0.753067,"NI":3.99714,"NR":0.4158,"OM":0.925257,"PA":7.34951,"PG":0.446259,"KP":0.452184,"PY":4.19103,"PS":1.04995,"QA":11.5035,"RO":3.89416,"RW":0.253752,"SD":0.971833,"SN":5.57206,"SB":0.295715,"SL":3.05449,"SV":2.99945,"SO":0.199748,"RS":2.20136,"SS":3.54153,"ST":0.69926,"SR":7.07041,"SK":1.77195,"SI":2.37167,"SZ":1.56587,"SC":2.13477,"SY":0.76115,"TD":0.294329,"TG":4.12855,"TJ":1.10107,"TM":2.82051,"TL":0.402533,"TO":3.34484,"TT":30.3737,"TN":8.26508,"TV":6.11041,"UG":1.35332,"UZ":2.42504,"VC":2.43185,"VU":1.30084,"WS":1.99721,"YE":1.64514,"ZM":1.8962,"ZW":1.06756},"years":{"AT":2023,"BE":2023,"DE":2023,"GR":2023,"PT":2023,"SE":2023,"CY":2023,"MT":2023,"NI":2023,"PS":2022,"RO":2023},"missing":{"AD":0,"DJ":0,"LI":0,"MC":0,"MV":0,"MH":0,"PW":0,"SM":0,"VA":0,"IE":2020,"IT":2020,"ES":2020,"BG":2020}},
   cattle: {"name":"Cows","unit":"per person","decimals":2,"source":"UN FAO livestock counts","url":"https://www.fao.org/faostat/en/#data/QCL","year":2024,"values":{"AR":1.1512,"AU":1.09988,"AT":0.197654,"BD":0.142373,"BE":0.180327,"BO":0.893798,"BR":1.11921,"CA":0.263735,"CL":0.149169,"CN":0.0499973,"CO":0.56797,"CU":0.297151,"DK":0.235284,"EC":0.187878,"EG":0.0221831,"ET":0.530862,"FI":0.135312,"FR":0.239787,"DE":0.125298,"GH":0.0673755,"GR":0.057154,"IN":0.133041,"ID":0.0632265,"IR":0.0606033,"IQ":0.0447536,"IE":1.15023,"IL":0.047216,"IT":0.0978517,"JP":0.0323021,"JO":0.00770952,"KE":0.389965,"MY":0.0202991,"MX":0.27991,"MA":0.0615447,"NP":0.175514,"NL":0.19693,"NZ":1.7872,"NG":0.0881726,"NO":0.151991,"PK":0.225457,"PE":0.168963,"PH":0.02231,"PL":0.169913,"PT":0.137615,"RU":0.121058,"SA":0.0144477,"SG":0.0000289633,"ZA":0.187221,"KR":0.0752503,"ES":0.125093,"SE":0.125872,"CH":0.168655,"TZ":0.553583,"TH":0.0599441,"TR":0.195907,"UA":0.055315,"AE":0.0103445,"GB":0.135448,"US":0.255007,"UY":3.53372,"VE":0.552276,"VN":0.0611446,"AF":0.126708,"AO":0.133204,"AL":0.11578,"AM":0.159262,"AG":0.0477661,"AZ":0.227336,"BI":0.0853618,"BJ":0.186488,"BF":0.427028,"BG":0.0868559,"BH":0.004374,"BS":0.00184352,"BA":0.122076,"BY":0.451013,"BZ":0.23413,"BB":0.0397738,"BN":0.0006133,"BT":0.322717,"BW":0.358319,"CF":0.882406,"CI":0.0579721,"CM":0.198859,"CD":0.0180092,"CG":0.0516967,"KM":0.0582434,"CV":0.0564717,"CR":0.305873,"CY":0.0603172,"CZ":0.128357,"DJ":0.268473,"DM":0.210609,"DO":0.263039,"DZ":0.0375765,"ER":0.597969,"EE":0.170065,"FJ":0.0865023,"FM":0.159918,"GA":0.0153012,"GE":0.212843,"GN":0.617215,"GM":0.109562,"GW":0.330221,"GQ":0.00284766,"GD":0.0527778,"GT":0.232443,"GY":0.118245,"HN":0.263538,"HR":0.10887,"HT":0.128083,"HU":0.0914313,"IS":0.195977,"JM":0.0539883,"KZ":0.382689,"KG":0.249047,"KH":0.158102,"KN":0.0364221,"KW":0.00660515,"LA":0.341799,"LB":0.0129138,"LR":0.00754989,"LY":0.0280123,"LC":0.0582074,"LK":0.0517306,"LS":0.21895,"LT":0.207621,"LU":0.262792,"LV":0.190547,"MD":0.0418623,"MG":0.212494,"MK":0.0790556,"ML":0.557174,"MT":0.0238053,"MM":0.196898,"ME":0.108318,"MN":1.42185,"MZ":0.0692385,"MR":0.374844,"MU":0.00281409,"MW":0.103886,"NA":0.940239,"NE":0.729821,"NI":0.801931,"OM":0.0813491,"PA":0.306522,"PG":0.00844472,"KP":0.0214793,"PY":1.94354,"PS":0.00768251,"QA":0.0152829,"RO":0.0951301,"RW":0.106092,"SD":0.605011,"SN":0.19622,"SB":0.0183403,"SL":0.0773402,"SV":0.121311,"SO":0.243616,"RS":0.106671,"SS":1.1718,"ST":0.00660967,"SR":0.0450434,"SK":0.0769661,"SI":0.212995,"SZ":0.519445,"SC":0.00453842,"SY":0.0322554,"TD":1.88661,"TG":0.0555643,"TJ":0.258578,"TM":0.334098,"TL":0.168417,"TO":0.117561,"TT":0.0258955,"TN":0.0401613,"UG":0.286527,"UZ":0.388479,"VC":0.0260198,"VU":0.265538,"WS":0.174865,"YE":0.0471985,"ZM":0.223041,"ZW":0.33871},"years":{"NI":2023,"PS":2022},"missing":{"AD":0,"KI":0,"LI":0,"MC":0,"MV":0,"MH":0,"NR":0,"PW":0,"SM":0,"TV":0,"VA":0}},
@@ -24159,7 +24321,6 @@ const STATS = {
   farmland: {"name":"Land used for farming","unit":"%","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/AG.LND.AGRI.ZS","year":2024,"values":{"AR":29.5244,"AU":47.2822,"AT":31.1039,"BD":72.2056,"BE":44.4074,"BO":36.1313,"BR":28.3664,"CA":6.46239,"CL":14.4098,"CN":41.7356,"CO":36.5444,"CU":61.6667,"DK":65.125,"EC":20.2895,"EG":4.24833,"ET":34.2712,"FI":7.42533,"FR":52.774,"DE":47.4172,"GH":55.3898,"GR":38.9064,"IN":59.9424,"ID":28.9334,"IR":29.0089,"IQ":21.6475,"IE":65.1473,"IL":23.7939,"IT":43.6275,"JP":12.5706,"JO":11.5661,"KE":50.0385,"MY":24.7929,"MX":50.6338,"MA":67.2194,"NP":26.1186,"NL":53.4304,"NZ":36.8121,"NG":77.0868,"NO":2.70129,"PK":47.2045,"PE":18.9833,"PH":42.7457,"PL":46.2051,"PT":41.3432,"RU":13.1717,"SA":81.6815,"SG":0.910596,"ZA":79.4179,"KR":15.9939,"ES":49.2979,"SE":7.30474,"CH":37.7164,"TZ":45.1097,"TH":43.2667,"TR":50.2059,"UA":71.2996,"AE":5.59913,"GB":69.2119,"US":46.083,"UY":87.3569,"VE":24.4215,"VN":39.2148,"AF":58.3874,"AO":36.3242,"AL":41.1113,"AD":41.8588,"AM":59.3594,"AG":21.1221,"AZ":57.7641,"BI":74.2079,"BJ":43.1412,"BF":62.576,"BG":46.1864,"BH":10.2875,"BS":1.2987,"BA":22.4311,"BY":39.0652,"BZ":8.15432,"BB":23.2019,"BN":2.90323,"BT":13.8175,"BW":45.6328,"CF":9.34178,"CI":83.8629,"CM":21.0849,"CD":16.1926,"CG":31.1933,"KM":78.9111,"CV":24.7891,"CR":31.4331,"CY":13.5598,"CZ":45.8115,"DJ":73.5328,"DM":32.6232,"DO":51.477,"DZ":17.3487,"ER":62.8424,"EE":22.9815,"FJ":16.9967,"FM":7.70328,"GA":6.8795,"GE":33.7082,"GN":73.2241,"GM":76.1166,"GW":31.3979,"GQ":3.44331,"GD":23.2558,"GT":46.0426,"GY":3.41006,"HN":28.4909,"HR":26.2152,"HT":65.139,"HU":55.5182,"IS":16.2452,"JM":39.0489,"KZ":79.1881,"KG":53.9552,"KH":34.6728,"KI":41.9236,"KN":22.9885,"KW":8.41751,"LA":9.53713,"LB":63.6657,"LR":20.0985,"LY":8.72387,"LC":16.2787,"LI":32.3125,"LK":48.7721,"LS":92.8854,"LT":45.6463,"LU":51.673,"LV":31.6728,"MD":73.225,"MG":70.3551,"MV":19.7987,"MH":40.1657,"MK":49.207,"ML":34.1546,"MT":25.4482,"MM":19.934,"ME":18.4594,"MN":68.8133,"MZ":56.1119,"MR":38.5272,"MU":40.86,"MW":65.0423,"NA":47.1426,"NE":36.8034,"NI":42.3051,"NR":16.1905,"OM":4.77926,"PA":23.0785,"PW":9.34783,"PG":3.1025,"KP":21.5725,"PY":54.1069,"PS":64.9295,"QA":6.44038,"RO":55.1524,"RW":75.6676,"SD":60.3132,"SN":49.4082,"SB":4.13826,"SL":55.2434,"SV":57.2568,"SM":42.3203,"SO":70.3449,"RS":38.0961,"SS":44.7057,"ST":46.1042,"SR":0.473498,"SK":37.8328,"SI":30.3638,"SZ":69.6151,"SC":3.3698,"SY":74.1324,"TD":39.9758,"TG":69.0763,"TJ":28.0099,"TM":84.3247,"TL":22.959,"TO":48.4722,"TT":11.6069,"TN":62.0938,"TV":100,"UG":80.2763,"UZ":58.9487,"VC":17.9949,"VU":13.2644,"WS":17.7734,"YE":44.4194,"ZM":32.07,"ZW":48.0572},"years":{"NI":2023},"missing":{"MC":0,"VA":0}},
   arable: {"name":"Land used for crops","unit":"%","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/AG.LND.ARBL.ZS","year":2024,"values":{"AR":17.1163,"AU":4.06658,"AT":16.0063,"BD":60.5132,"BE":28.31,"BO":5.56423,"BR":6.65722,"CA":4.33102,"CL":1.90005,"CN":11.5534,"CO":2.65366,"CU":28.0212,"DK":58.85,"EC":3.74216,"EG":3.28896,"ET":14.615,"FI":7.36842,"FR":31.3239,"DE":33.3572,"GH":20.6999,"GR":14.2321,"IN":51.7322,"ID":9.3498,"IR":9.67581,"IQ":11.2957,"IE":6.28538,"IL":11.8946,"IT":23.4994,"JP":11.037,"JO":2.26367,"KE":11.5133,"MY":2.58834,"MX":10.2887,"MA":15.836,"NP":12.5832,"NL":29.7891,"NZ":1.98245,"NG":40.827,"NO":2.2099,"PK":39.8116,"PE":3.06004,"PH":18.7477,"PL":36.5505,"PT":9.32824,"RU":7.4281,"SA":2.00029,"SG":0.772627,"ZA":9.89209,"KR":13.3402,"ES":22.7828,"SE":6.18263,"CH":10.083,"TZ":15.4998,"TH":30.7871,"TR":26.2776,"UA":56.8243,"AE":0.791947,"GB":25.3148,"US":16.5679,"UY":12.3937,"VE":2.94768,"VN":21.4673,"AF":11.9758,"AO":3.66351,"AL":21.5204,"AD":0.308333,"AM":15.6599,"AG":9.08476,"AZ":25.3261,"BI":43.6577,"BJ":32.3364,"BF":28.9013,"BG":32.1665,"BH":2.625,"BS":0.799201,"BA":8.02949,"BY":27.1968,"BZ":4.5594,"BB":16.2413,"BN":0.759013,"BT":2.62192,"BW":0.458772,"CF":2.88934,"CI":15.6606,"CM":13.1159,"CD":7.28509,"CG":1.61054,"KM":29.6037,"CV":17.9727,"CR":3.30564,"CY":10.4226,"CZ":32.7308,"DJ":0.15604,"DM":7.32357,"DO":21.6559,"DZ":3.16197,"ER":5.71192,"EE":16.4989,"FJ":4.18917,"FM":3.42368,"GA":1.2613,"GE":3.94992,"GN":24.7049,"GM":58.1028,"GW":16.122,"GQ":1.88938,"GD":8.72093,"GT":17.5059,"GY":0.449133,"HN":9.09822,"HR":15.2252,"HT":36.4659,"HU":45.2377,"IS":1.20004,"JM":11.542,"KZ":11.3137,"KG":6.71272,"KH":23.3409,"KI":2.46609,"KN":19.1571,"KW":0.448934,"LA":5.30329,"LB":10.7859,"LR":5.19103,"LY":0.977528,"LC":4.36066,"LI":10.8125,"LK":22.1791,"LS":19.0053,"LT":36.6832,"LU":23.8046,"LV":21.7901,"MD":56.3923,"MG":5.15641,"MV":13.0872,"MH":2.76243,"MK":16.1776,"ML":5.49714,"MT":22.1514,"MM":16.8939,"ME":0.720565,"MN":0.720671,"MZ":10.5286,"MR":0.436596,"MU":35.31,"MW":42.4268,"NA":0.969877,"NE":13.9916,"NI":12.4896,"OM":0.301519,"PA":6.71407,"PW":0.652174,"PG":0.728702,"KP":19.0599,"PY":11.5173,"PS":6.95436,"QA":1.82158,"RO":36.425,"RW":48.9172,"SD":11.2393,"SN":19.893,"SB":0.83244,"SL":21.9451,"SV":34.7973,"SM":20.5376,"SO":1.75344,"RS":29.0079,"SS":3.7895,"ST":4.16667,"SR":0.342663,"SK":27.1215,"SI":8.80926,"SZ":10.2907,"SC":0.328228,"SY":23.9612,"TD":4.20902,"TG":48.7222,"TJ":6.0905,"TM":3.4899,"TL":7.49832,"TO":30.2639,"TT":5.84828,"TN":17.8437,"UG":43.6431,"UZ":9.2283,"VC":5.14139,"VU":1.64082,"WS":4.06115,"YE":2.16072,"ZM":5.11172,"ZW":10.3927},"years":{"NI":2022},"missing":{"MC":0,"NR":0,"TV":0,"VA":0}},
   protected: {"name":"Land and sea that is protected","unit":"%","decimals":1,"source":"World Bank","url":"https://data.worldbank.org/indicator/ER.PTD.TOTL.ZS","year":2025,"values":{"AR":9.7,"AU":33.5,"AT":29.6,"BD":5.9,"BE":18.6,"BO":30.9,"BR":29.4,"CA":11.6,"CL":37.9,"CN":14.7,"CO":26.5,"CU":6.9,"DK":23.8,"EC":20.2,"EG":11.6,"ET":17,"FI":13.5,"FR":36.7,"DE":40,"GH":7.9,"GR":11.2,"IN":4.5,"ID":5.2,"IR":7,"IQ":1.5,"IE":4,"IL":12.2,"IT":14.8,"JP":15.1,"JO":5.4,"KE":11.8,"MY":8.4,"MX":19.9,"MA":1.4,"NP":23.6,"NL":29.8,"NZ":30.6,"NG":11.6,"NO":5.4,"PK":15.2,"PE":16.5,"PH":3.6,"PL":38.1,"PT":17.2,"RU":8.6,"SA":17,"SG":2.1,"ZA":12.9,"KR":5.9,"ES":22.1,"SE":15.9,"CH":12.5,"TZ":32.3,"TH":13.4,"TR":5.7,"UA":17.9,"AE":16.1,"GB":42.1,"US":15.8,"UY":2.4,"VE":39,"VN":2.9,"AF":3.6,"AO":7.7,"AL":18,"AD":27.3,"AM":38.9,"AG":0.8,"AZ":12,"BI":7.6,"BJ":28.8,"BF":16.8,"BG":35.6,"BH":20.6,"BS":8.3,"BA":9.5,"BY":9.2,"BZ":26.8,"BB":0.1,"BN":7.5,"BT":51.6,"BW":27.6,"CF":14.8,"CI":14.9,"CM":11,"CD":14.9,"CG":34.2,"KM":0.7,"CV":0.2,"CR":28.2,"CY":11.1,"CZ":21.9,"DJ":1.2,"DM":0.6,"DO":15.3,"DZ":4.4,"ER":0,"EE":20.5,"FJ":1,"FM":0,"GA":24.4,"GE":17.4,"GN":29.6,"GM":2.9,"GW":13.2,"GQ":1.8,"GD":0.2,"GT":10.2,"GY":5.1,"HN":11.1,"HR":24.1,"HT":3,"HU":22.3,"IS":2.9,"JM":1.6,"KZ":11.8,"KG":6.8,"KH":31.8,"KI":11.9,"KN":4.8,"KW":11.5,"LA":18.8,"LB":4.7,"LR":1.2,"LY":0.2,"LC":1,"LI":44.8,"LK":3.7,"LS":23.4,"LT":18.4,"LU":39.1,"LV":18.1,"MC":99.5,"MD":11.5,"MG":5.1,"MV":0.1,"MH":0.3,"MK":29,"ML":7.5,"MT":8,"MM":4.1,"ME":16.3,"MN":19.8,"MZ":18,"MR":1,"MU":0,"MW":23.1,"NA":24.4,"NE":21,"NI":10.1,"NR":0,"OM":20.8,"PA":27.2,"PW":98,"PG":0.7,"KP":1.3,"PY":14.9,"PS":10,"QA":5.8,"RO":24.3,"RW":9.1,"SD":3.3,"SN":16.6,"SB":0.2,"SL":5.1,"SV":2.1,"SO":0,"RS":14,"SS":15.4,"ST":0.2,"SR":8.6,"SK":37.5,"SI":40.1,"SZ":4.2,"SC":32.6,"SY":0.7,"TD":21,"TG":22.1,"TJ":22.6,"TM":4.3,"TL":4.7,"TO":0.1,"TT":2,"TN":5.2,"TV":0,"UG":16.1,"UZ":14.1,"VC":0.5,"VU":0.1,"WS":0.3,"YE":0.7,"ZM":41.3,"ZW":28.3},"years":{},"missing":{"SM":0,"VA":0}},
-  farmlandpp: {"name":"Farmland per person","unit":"m² per person","decimals":0,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/agricultural-area-per-capita","year":2023,"values":{"AR":2.55029,"AU":13.7326,"AT":0.284462,"BD":0.0548152,"BE":0.115539,"BO":3.17012,"BR":1.12133,"CA":1.44723,"CL":0.544159,"CN":0.365822,"CO":0.773741,"CU":0.580857,"DK":0.440642,"EC":0.297552,"EG":0.03543,"ET":0.29883,"FI":0.403843,"FR":0.425914,"DE":0.196172,"GH":0.373025,"GR":0.524464,"IN":0.124174,"ID":0.196032,"IR":0.519453,"IQ":0.210263,"IE":0.806099,"IL":0.0579821,"IT":0.219961,"JP":0.0370424,"JO":0.0895166,"KE":0.519862,"MY":0.244005,"MX":0.759562,"MA":0.789877,"NP":0.126087,"NL":0.0996544,"NZ":1.87731,"NG":0.304534,"NO":0.177925,"PK":0.145432,"PE":0.720494,"PH":0.110736,"PL":0.376133,"PT":0.380602,"RU":1.48309,"SA":5.21994,"SG":0.000114008,"ZA":1.52408,"KR":0.0303003,"ES":0.51705,"SE":0.282614,"CH":0.168335,"TZ":0.593255,"TH":0.312067,"TR":0.442165,"UA":1.09483,"AE":0.036807,"GB":0.247652,"US":1.22727,"UY":4.20255,"VE":0.759694,"VN":0.122479,"AF":0.91946,"AO":1.25342,"AL":0.371524,"AD":0.231743,"AM":0.561358,"AG":0.096431,"AZ":0.46322,"BI":0.157362,"BJ":0.33426,"BF":0.634541,"BG":0.736188,"BH":0.00516031,"BS":0.0325446,"BA":0.349443,"BY":0.881339,"BZ":0.442702,"BB":0.0354174,"BN":0.0291965,"BT":0.670154,"BW":10.4272,"CF":1.10022,"CI":0.882359,"CM":0.348818,"CD":0.331749,"CG":1.72272,"KM":0.156399,"CV":0.151244,"CR":0.331471,"CY":0.0959094,"CZ":0.326966,"DJ":1.47786,"DM":0.375765,"DO":0.235447,"DZ":0.895601,"ER":2.18765,"EE":0.722647,"FJ":0.337175,"FM":0.0443868,"GA":0.866567,"GE":0.622956,"GN":1.2491,"GM":0.235002,"GW":0.390338,"GQ":0.0566803,"GD":0.0683212,"GT":0.254457,"GY":0.871294,"HN":0.335937,"HR":0.381415,"HT":0.154244,"HU":0.524758,"IS":4.22645,"JM":0.146842,"KZ":10.5393,"KG":1.46445,"KH":0.353213,"KI":0.256526,"KN":0.128252,"KW":0.0309995,"LA":0.298395,"LB":0.116777,"LR":0.350087,"LY":2.10111,"LC":0.0554406,"LI":0.130483,"LK":0.130896,"LS":1.02132,"LT":1.00662,"LU":0.199967,"LV":1.04707,"MD":0.795547,"MG":1.31091,"MV":0.0112165,"MH":0.180185,"MK":0.682935,"ML":1.82083,"MT":0.0155564,"MM":0.240096,"ME":0.41594,"MN":31.3139,"MZ":1.23419,"MR":7.90651,"MU":0.0674922,"MW":0.286669,"NA":13.0984,"NE":1.7813,"NI":0.746085,"NR":0.0336134,"OM":0.291474,"PA":0.491161,"PW":0.24224,"PG":0.135231,"KP":0.0982391,"PY":3.1307,"PS":0.0723212,"QA":0.0248398,"RO":0.665063,"RW":0.134948,"SD":2.25137,"SN":0.526122,"SB":0.136498,"SL":0.466756,"SV":0.189504,"SM":0.0681259,"SO":2.40373,"RS":0.501388,"SS":2.46855,"ST":0.186242,"SR":0.113584,"SK":0.330732,"SI":0.28852,"SZ":0.971144,"SC":0.0121131,"SY":0.576657,"TD":2.60557,"TG":0.464502,"TJ":0.373318,"TM":5.37424,"TL":0.246624,"TO":0.334566,"TT":0.0359296,"TN":0.795095,"TV":0.182983,"UG":0.29626,"UZ":0.717541,"VC":0.0690805,"VU":0.583605,"WS":0.225363,"YE":0.595367,"ZM":1.15031,"ZW":0.98937},"years":{},"missing":{"MC":0,"VA":0}},
   fertilizer: {"name":"Fertiliser used on cropland","unit":"kg per hectare","decimals":0,"source":"World Bank","url":"https://data.worldbank.org/indicator/AG.CON.FERT.ZS","year":2024,"values":{"AR":47.001,"AU":151.204,"AT":117.091,"BD":398.903,"BE":213.791,"BO":9.32644,"BR":397.094,"CA":136.717,"CL":263.794,"CN":393.265,"CO":416.018,"CU":3.33975,"DK":117.246,"EC":263.692,"EG":597.777,"ET":45.3661,"FI":102.253,"FR":154.668,"DE":137.659,"GH":43.313,"GR":186.646,"IN":214.08,"ID":312.641,"IR":68.2893,"IQ":51.3806,"IE":986.617,"IL":246.904,"IT":112.103,"JP":111.003,"JO":111.935,"KE":48.4107,"MY":1869.36,"MX":96.2044,"MA":56.5016,"NP":67.8429,"NL":269.602,"NZ":1341.41,"NG":13.0432,"NO":193.155,"PK":158.012,"PE":93.5024,"PH":254.475,"PL":155.809,"PT":190.547,"RU":29.1074,"SA":125.54,"SG":137.5,"ZA":120.265,"KR":285.57,"ES":136.014,"SE":97.4515,"CH":151.777,"TZ":17.7291,"TH":171.403,"TR":138.768,"UA":41.7425,"AE":1648.46,"GB":193.651,"US":127.805,"UY":186.769,"VE":50.8862,"VN":420.429,"AF":17.9813,"AO":15.5667,"AL":66.1992,"AM":41.1979,"AG":13.25,"AZ":32.0891,"BI":75.2794,"BJ":25.5369,"BF":12.8056,"BG":119.748,"BH":769.048,"BS":123,"BA":169.468,"BY":194.358,"BZ":176.529,"BB":32.2857,"BN":177.25,"BT":11.67,"BW":93.0731,"CF":0.0116667,"CI":28.3951,"CM":16.3019,"CD":2.51483,"CG":19.1164,"KM":8.25655,"CV":3.46541,"CR":1402.54,"CY":175.682,"CZ":153.618,"DJ":30.9649,"DM":72.9091,"DO":188.058,"DZ":20.6745,"ER":2.38986,"EE":72.4298,"FJ":96.888,"FM":3.33333,"GA":50.2615,"GE":181.529,"GN":4.18631,"GM":5.58163,"GW":1.09187,"GQ":4.77358,"GD":23.3333,"GT":204.887,"GY":252.03,"HN":198.023,"HR":181.791,"HT":7.29154,"HU":117.769,"IS":133.694,"JM":56.376,"KZ":3.7684,"KG":25.6326,"KH":78.3515,"KI":0,"KN":4.8,"KW":2487.5,"LA":115.4,"LB":258.999,"LR":7.55,"LY":34.5494,"LC":199.624,"LK":160.562,"LS":6.09359,"LT":92.8071,"LU":177.73,"LV":97.924,"MD":42.4626,"MG":6.46033,"MV":70.5128,"MK":72.3554,"ML":11.9986,"MT":190.947,"MM":23.4678,"ME":266.623,"MN":45.719,"MZ":14.3632,"MR":8.01111,"MU":140.782,"MW":36.5628,"NA":27.1162,"NE":0.800476,"NI":59.2881,"OM":340.667,"PA":95.5508,"PW":26.6667,"PG":164.23,"KP":9.53115,"PY":148.164,"PS":118.711,"QA":240.994,"RO":85.7527,"RW":31.7416,"SD":7.10293,"SN":19.2883,"SB":32.1888,"SL":2.66604,"SV":63.6089,"SO":0.129191,"RS":158.318,"SS":0.0931223,"ST":54.75,"SR":262.182,"SK":107.647,"SI":237.881,"SZ":74.5593,"SC":286.667,"SY":11.5193,"TD":5.85717,"TG":15.7023,"TJ":45.9636,"TM":337.044,"TL":1.17587,"TO":2.89123,"TT":127.876,"TN":46.3902,"UG":3.18775,"UZ":267.198,"VC":203,"VU":0.5,"WS":0.797166,"YE":11.4053,"ZM":78.9145,"ZW":26.2132},"years":{"NI":2022,"SL":2023,"SO":2022,"TL":2022},"missing":{"AD":0,"LI":0,"MC":0,"MH":2005,"NR":0,"TV":0,"VA":0,"SM":2020}},
   neighbours: {"name":"Land neighbours","unit":"countries","decimals":0,"source":"the game's country data","url":null,"year":null,"values":{"AR":5,"AU":0,"AT":8,"BD":2,"BE":4,"BO":5,"BR":10,"CA":1,"CL":3,"CN":14,"CO":5,"CU":0,"DK":1,"EC":2,"EG":4,"ET":6,"FI":3,"FR":10,"DE":9,"GH":3,"GR":4,"IN":6,"ID":3,"IR":7,"IQ":6,"IE":1,"IL":5,"IT":6,"JP":0,"JO":5,"KE":5,"MY":3,"MX":3,"MA":2,"NP":2,"NL":2,"NZ":0,"NG":4,"NO":3,"PK":4,"PE":5,"PH":0,"PL":7,"PT":1,"RU":14,"SA":7,"SG":0,"ZA":6,"KR":1,"ES":4,"SE":2,"CH":5,"TZ":8,"TH":4,"TR":8,"UA":7,"AE":2,"GB":1,"US":2,"UY":2,"VE":3,"VN":3,"AF":6,"AO":4,"AL":3,"AD":2,"AM":4,"AG":0,"AZ":5,"BI":3,"BJ":4,"BF":6,"BG":5,"BH":0,"BS":0,"BA":3,"BY":5,"BZ":2,"BB":0,"BN":1,"BT":2,"BW":4,"CF":6,"CI":5,"CM":6,"CD":9,"CG":5,"KM":0,"CV":0,"CR":2,"CY":0,"CZ":4,"DJ":3,"DM":0,"DO":1,"DZ":6,"ER":3,"EE":2,"FJ":0,"FM":0,"GA":3,"GE":4,"GN":6,"GM":1,"GW":2,"GQ":2,"GD":0,"GT":4,"GY":3,"HN":3,"HR":5,"HT":1,"HU":7,"IS":0,"JM":0,"KZ":5,"KG":4,"KH":3,"KI":0,"KN":0,"KW":2,"LA":5,"LB":2,"LR":3,"LY":6,"LC":0,"LI":2,"LK":0,"LS":1,"LT":4,"LU":3,"LV":4,"MC":1,"MD":2,"MG":0,"MV":0,"MH":0,"MK":4,"ML":7,"MT":0,"MM":5,"ME":4,"MN":2,"MZ":6,"MR":3,"MU":0,"MW":3,"NA":4,"NE":7,"NI":2,"NR":0,"OM":3,"PA":2,"PW":0,"PG":1,"KP":3,"PY":3,"PS":3,"QA":1,"RO":5,"RW":4,"SD":7,"SN":5,"SB":0,"SL":2,"SV":2,"SM":1,"SO":3,"RS":7,"SS":6,"ST":0,"SR":3,"SK":5,"SI":4,"SZ":2,"SC":0,"SY":5,"TD":6,"TG":3,"TJ":4,"TM":4,"TL":1,"TO":0,"TT":0,"TN":2,"TV":0,"UG":5,"UZ":5,"VA":1,"VC":0,"VU":0,"WS":0,"YE":2,"ZM":8,"ZW":4},"years":{},"missing":{}},
   languages: {"name":"Official languages","unit":"languages","decimals":0,"source":"the game's country data","url":null,"year":null,"values":{"AR":1,"AU":1,"AT":1,"BD":1,"BE":3,"BO":3,"BR":1,"CA":2,"CL":1,"CN":1,"CO":1,"CU":1,"DK":1,"EC":2,"EG":1,"ET":4,"FI":2,"FR":1,"DE":1,"GH":3,"GR":1,"IN":5,"ID":1,"IR":3,"IQ":2,"IE":2,"IL":2,"IT":1,"JP":1,"JO":1,"KE":2,"MY":2,"MX":3,"MA":3,"NP":1,"NL":1,"NZ":3,"NG":4,"NO":2,"PK":3,"PE":3,"PH":2,"PL":1,"PT":1,"RU":1,"SA":1,"SG":4,"ZA":4,"KR":1,"ES":4,"SE":1,"CH":4,"TZ":2,"TH":1,"TR":2,"UA":1,"AE":1,"GB":3,"US":2,"UY":1,"VE":1,"VN":1,"AF":3,"AO":1,"AL":1,"AD":1,"AM":1,"AG":1,"AZ":2,"BI":2,"BJ":1,"BF":1,"BG":1,"BH":1,"BS":1,"BA":3,"BY":2,"BZ":3,"BB":1,"BN":1,"BT":1,"BW":2,"CF":2,"CI":1,"CM":2,"CD":5,"CG":3,"KM":3,"CV":1,"CR":1,"CY":2,"CZ":2,"DJ":2,"DM":1,"DO":1,"DZ":1,"ER":3,"EE":1,"FJ":3,"FM":1,"GA":1,"GE":1,"GN":1,"GM":1,"GW":2,"GQ":3,"GD":1,"GT":1,"GY":1,"HN":1,"HR":1,"HT":2,"HU":1,"IS":1,"JM":2,"KZ":2,"KG":2,"KH":1,"KI":2,"KN":1,"KW":1,"LA":1,"LB":2,"LR":1,"LY":1,"LC":1,"LI":1,"LK":2,"LS":2,"LT":1,"LU":3,"LV":1,"MC":1,"MD":1,"MG":2,"MV":1,"MH":2,"MK":1,"ML":1,"MT":2,"MM":1,"ME":1,"MN":1,"MZ":1,"MR":1,"MU":3,"MW":2,"NA":9,"NE":1,"NI":1,"NR":2,"OM":1,"PA":1,"PW":2,"PG":3,"KP":1,"PY":2,"PS":1,"QA":1,"RO":1,"RW":3,"SD":2,"SN":1,"SB":1,"SL":1,"SV":1,"SM":1,"SO":2,"RS":1,"SS":1,"ST":1,"SR":1,"SK":1,"SI":1,"SZ":2,"SC":3,"SY":1,"TD":2,"TG":1,"TJ":2,"TM":2,"TL":2,"TO":2,"TT":1,"TN":1,"TV":2,"UG":2,"UZ":2,"VA":2,"VC":1,"VU":3,"WS":2,"YE":1,"ZM":1,"ZW":15},"years":{},"missing":{}},
@@ -24290,8 +24451,6 @@ const STATS = {
   nba: {"name":"NBA players from the country","unit":"players","decimals":0,"source":"Wikipedia","url":"https://en.wikipedia.org/w/index.php?title=List_of_NBA_players_born_outside_the_United_States&oldid=1384120107","year":2026,"values":{"AR":16,"AU":39,"AT":1,"BD":0,"BE":3,"BO":1,"BR":20,"CA":68,"CL":0,"CN":9,"CO":1,"CU":2,"DK":1,"EC":0,"EG":2,"ET":0,"FI":3,"FR":59,"DE":21,"GH":3,"GR":16,"IN":0,"ID":1,"IR":1,"IQ":0,"IE":3,"IL":8,"IT":14,"JP":6,"JO":1,"KE":0,"MY":0,"MX":7,"MA":0,"NP":0,"NL":9,"NZ":3,"NG":30,"NO":1,"PK":0,"PE":0,"PH":3,"PL":6,"PT":1,"RU":15,"SA":0,"SG":0,"ZA":0,"KR":1,"ES":21,"SE":4,"CH":3,"TZ":1,"TH":0,"TR":16,"UA":11,"AE":0,"GB":14,"UY":1,"VE":6,"VN":0,"AF":0,"AO":1,"AL":0,"AD":0,"AM":0,"AG":1,"AZ":1,"BI":0,"BJ":0,"BF":0,"BG":2,"BH":0,"BS":9,"BA":7,"BY":1,"BZ":3,"BB":0,"BN":0,"BT":0,"BW":0,"CF":0,"CI":3,"CM":8,"CD":6,"CG":0,"KM":0,"CV":1,"CR":0,"CY":1,"CZ":5,"DJ":0,"DM":1,"DO":15,"DZ":0,"ER":0,"EE":2,"FJ":0,"FM":0,"GA":2,"GE":11,"GN":2,"GM":0,"GW":0,"GQ":0,"GD":0,"GT":0,"GY":2,"HN":0,"HR":24,"HT":3,"HU":1,"IS":1,"JM":12,"KZ":0,"KG":0,"KH":0,"KI":0,"KN":0,"KW":0,"LA":0,"LB":6,"LR":1,"LY":2,"LC":0,"LI":0,"LK":0,"LS":0,"LT":17,"LU":1,"LV":7,"MC":0,"MD":0,"MG":0,"MV":0,"MH":0,"MK":5,"ML":4,"MT":0,"MM":0,"ME":10,"MN":0,"MZ":0,"MR":0,"MU":0,"MW":0,"NA":0,"NE":0,"NI":1,"NR":0,"OM":0,"PA":4,"PW":0,"PG":0,"KP":0,"PY":0,"PS":0,"QA":2,"RO":1,"RW":0,"SD":1,"SN":14,"SB":0,"SL":0,"SV":0,"SM":0,"SO":0,"RS":34,"SS":10,"ST":0,"SR":0,"SK":1,"SI":13,"SZ":0,"SC":0,"SY":0,"TD":0,"TG":0,"TJ":0,"TM":0,"TL":0,"TO":0,"TT":2,"TN":1,"TV":0,"UG":2,"UZ":0,"VA":0,"VC":0,"VU":0,"WS":0,"YE":0,"ZM":0,"ZW":0},"years":{},"missing":{"US":0},"leftOut":{"US":"the list counts NBA players from outside the United States"}},
   nbapp: {"name":"NBA players per million people","unit":"players per million people","decimals":2,"source":"Wikipedia (Basketball Reference) and World Bank","url":"https://en.wikipedia.org/w/index.php?title=List_of_NBA_players_born_outside_the_United_States&oldid=1384120107","year":2025,"values":{"AR":0.348954,"AU":1.41231,"AT":0.108599,"BD":0,"BE":0.251219,"BO":0.0794796,"BR":0.0939795,"CA":1.63259,"CL":0,"CN":0.00639848,"CO":0.0187176,"CU":0.182862,"DK":0.166412,"EC":0,"EG":0.0168967,"ET":0,"FI":0.531309,"FR":0.858552,"DE":0.251523,"GH":0.0855572,"GR":1.5364,"IN":0,"ID":0.00349991,"IR":0.0108204,"IQ":0,"IE":0.547009,"IL":0.790295,"IT":0.237628,"JP":0.0486355,"JO":0.0868004,"KE":0,"MY":0,"MX":0.0530516,"MA":0,"NP":0,"NL":0.497578,"NZ":0.563412,"NG":0.126301,"NO":0.178225,"PK":0,"PE":0,"PH":0.0256878,"PL":0.164673,"PT":0.0925509,"RU":0.10452,"SA":0,"SG":0,"ZA":0,"KR":0.0193481,"ES":0.425488,"SE":0.377479,"CH":0.329945,"TZ":0.0141752,"TH":0,"TR":0.18631,"UA":0.282193,"AE":0,"GB":0.201477,"UY":0.295448,"VE":0.210402,"VN":0,"AF":0,"AO":0.0256147,"AL":0,"AD":0,"AM":0,"AG":10.6147,"AZ":0.0975896,"BI":0,"BJ":0,"BF":0,"BG":0.310882,"BH":0,"BS":22.3307,"BA":2.22923,"BY":0.11006,"BZ":7.09347,"BB":0,"BN":0,"BT":0,"BW":0,"CF":0,"CI":0.0917107,"CM":0.267744,"CD":0.0531762,"CG":0,"KM":0,"CV":1.89636,"CR":0,"CY":0.729526,"CZ":0.459268,"DJ":0,"DM":15.1812,"DO":1.30203,"DZ":0,"ER":0,"EE":1.46362,"FJ":0,"FM":0,"GA":0.771269,"GE":2.79488,"GN":0.132453,"GM":0,"GW":0,"GQ":0,"GD":0,"GT":0,"GY":2.39238,"HN":0,"HR":6.19163,"HT":0.251972,"HU":0.105105,"IS":2.54839,"JM":4.22971,"KZ":0,"KG":0,"KH":0,"KI":0,"KN":0,"KW":0,"LA":0,"LB":1.02574,"LR":0.174483,"LY":0.268148,"LC":0,"LI":0,"LK":0,"LS":0,"LT":5.88485,"LU":1.45567,"LV":3.78832,"MC":0,"MD":0,"MG":0,"MV":0,"MH":0,"MK":2.74588,"ML":0.158738,"MT":0,"MM":0,"ME":16.048,"MN":0,"MZ":0,"MR":0,"MU":0,"MW":0,"NA":0,"NE":0,"NI":0.142704,"NR":0,"OM":0,"PA":0.875046,"PW":0,"PG":0,"KP":0,"PY":0,"PS":0,"QA":0.672899,"RO":0.0525755,"RW":0,"SD":0.0193565,"SN":0.73949,"SB":0,"SL":0,"SV":0,"SM":0,"SO":0,"RS":5.19152,"SS":0.820426,"ST":0,"SR":0,"SK":0.184713,"SI":6.10046,"SZ":0,"SC":0,"SY":0,"TD":0,"TG":0,"TJ":0,"TM":0,"TL":0,"TO":0,"TT":1.46224,"TN":0.080981,"TV":0,"UG":0.0389219,"UZ":0,"VC":0,"VU":0,"WS":0,"YE":0,"ZM":0,"ZW":0},"years":{},"missing":{"US":0,"VA":0},"leftOut":{"US":"the list counts NBA players from outside the United States"}},
   wcappspp: {"name":"Men's World Cups played per million people","unit":"World Cups per million people","decimals":2,"source":"Wikipedia (RSSSF) and World Bank","url":"https://en.wikipedia.org/w/index.php?title=FIFA_World_Cup_records_and_statistics&oldid=1386036684","year":2025,"values":{"AR":0.414382,"AU":0.253491,"AT":0.868794,"BD":0,"BE":1.25609,"BO":0.238439,"BR":0.108076,"CA":0.072026,"CL":0.453174,"CN":0.000710942,"CO":0.131023,"CU":0.0914311,"DK":0.998474,"EC":0.273375,"EG":0.0337935,"ET":0,"FI":0,"FR":0.247379,"DE":0.251523,"GH":0.142595,"GR":0.288075,"IN":0,"ID":0.00349991,"IR":0.0757431,"IQ":0.0425344,"IE":0.547009,"IL":0.0987869,"IT":0.305522,"JP":0.0648473,"JO":0.0868004,"KE":0,"MY":0,"MX":0.136419,"MA":0.182146,"NP":0,"NL":0.663437,"NZ":0.563412,"NG":0.0252602,"NO":0.712902,"PK":0,"PE":0.144606,"PH":0,"PL":0.247009,"PT":0.832958,"RU":0.0766479,"SA":0.189325,"SG":0,"ZA":0.0617786,"KR":0.232178,"ES":0.344442,"SE":1.22681,"CH":1.42976,"TZ":0,"TH":0,"TR":0.0349331,"UA":0.0256539,"AE":0.0868572,"US":0.0351098,"UY":4.43172,"VE":0,"VN":0,"AF":0,"AO":0.0256147,"AL":0,"AD":0,"AM":0,"AG":0,"AZ":0,"BI":0,"BJ":0,"BF":0,"BG":1.08809,"BH":0,"BS":0,"BA":0.636923,"BY":0,"BZ":0,"BB":0,"BN":0,"BT":0,"BW":0,"CF":0,"CI":0.122281,"CM":0.267744,"CD":0.0177254,"CG":0,"KM":0,"CV":1.89636,"CR":1.16438,"CY":0,"CZ":0.918537,"DJ":0,"DM":0,"DO":0,"DZ":0.105407,"ER":0,"EE":0,"FJ":0,"FM":0,"GA":0,"GE":0,"GN":0,"GM":0,"GW":0,"GQ":0,"GD":0,"GT":0,"GY":0,"HN":0.272582,"HR":1.80589,"HT":0.167981,"HU":0.945949,"IS":2.54839,"JM":0.352475,"KZ":0,"KG":0,"KH":0,"KI":0,"KN":0,"KW":0.205537,"LA":0,"LB":0,"LR":0,"LY":0,"LC":0,"LI":0,"LK":0,"LS":0,"LT":0,"LU":0,"LV":0,"MC":0,"MD":0,"MG":0,"MV":0,"MH":0,"MK":0,"ML":0,"MT":0,"MM":0,"ME":0,"MN":0,"MZ":0,"MR":0,"MU":0,"MW":0,"NA":0,"NE":0,"NI":0,"NR":0,"OM":0,"PA":0.437523,"PW":0,"PG":0,"KP":0.0752699,"PY":1.28332,"PS":0,"QA":0.672899,"RO":0.368028,"RW":0,"SD":0,"SN":0.211283,"SB":0,"SL":0,"SV":0.314194,"SM":0,"SO":0,"RS":1.98499,"SS":0,"ST":0,"SR":0,"SK":1.66241,"SI":0.938533,"SZ":0,"SC":0,"SY":0,"TD":0,"TG":0.116392,"TJ":0,"TM":0,"TL":0,"TO":0,"TT":0.73112,"TN":0.566867,"TV":0,"UG":0,"UZ":0.0269881,"VC":0,"VU":0,"WS":0,"YE":0,"ZM":0,"ZW":0},"years":{},"missing":{"GB":0,"VA":0},"leftOut":{"GB":"England, Scotland, Wales and Northern Ireland play as four separate teams"}},
-  euros: {"name":"European Championships won (men)","unit":"titles","decimals":0,"source":"Wikipedia","url":"https://en.wikipedia.org/w/index.php?title=UEFA_European_Championship&oldid=1384979470","year":2024,"values":{"AR":0,"AU":0,"AT":0,"BD":0,"BE":0,"BO":0,"BR":0,"CA":0,"CL":0,"CN":0,"CO":0,"CU":0,"DK":1,"EC":0,"EG":0,"ET":0,"FI":0,"FR":2,"DE":3,"GH":0,"GR":1,"IN":0,"ID":0,"IR":0,"IQ":0,"IE":0,"IL":0,"IT":2,"JP":0,"JO":0,"KE":0,"MY":0,"MX":0,"MA":0,"NP":0,"NL":1,"NZ":0,"NG":0,"NO":0,"PK":0,"PE":0,"PH":0,"PL":0,"PT":1,"RU":0,"SA":0,"SG":0,"ZA":0,"KR":0,"ES":4,"SE":0,"CH":0,"TZ":0,"TH":0,"TR":0,"UA":0,"AE":0,"US":0,"UY":0,"VE":0,"VN":0,"AF":0,"AO":0,"AL":0,"AD":0,"AM":0,"AG":0,"AZ":0,"BI":0,"BJ":0,"BF":0,"BG":0,"BH":0,"BS":0,"BA":0,"BY":0,"BZ":0,"BB":0,"BN":0,"BT":0,"BW":0,"CF":0,"CI":0,"CM":0,"CD":0,"CG":0,"KM":0,"CV":0,"CR":0,"CY":0,"CZ":0,"DJ":0,"DM":0,"DO":0,"DZ":0,"ER":0,"EE":0,"FJ":0,"FM":0,"GA":0,"GE":0,"GN":0,"GM":0,"GW":0,"GQ":0,"GD":0,"GT":0,"GY":0,"HN":0,"HR":0,"HT":0,"HU":0,"IS":0,"JM":0,"KZ":0,"KG":0,"KH":0,"KI":0,"KN":0,"KW":0,"LA":0,"LB":0,"LR":0,"LY":0,"LC":0,"LI":0,"LK":0,"LS":0,"LT":0,"LU":0,"LV":0,"MC":0,"MD":0,"MG":0,"MV":0,"MH":0,"MK":0,"ML":0,"MT":0,"MM":0,"ME":0,"MN":0,"MZ":0,"MR":0,"MU":0,"MW":0,"NA":0,"NE":0,"NI":0,"NR":0,"OM":0,"PA":0,"PW":0,"PG":0,"KP":0,"PY":0,"PS":0,"QA":0,"RO":0,"RW":0,"SD":0,"SN":0,"SB":0,"SL":0,"SV":0,"SM":0,"SO":0,"RS":0,"SS":0,"ST":0,"SR":0,"SK":0,"SI":0,"SZ":0,"SC":0,"SY":0,"TD":0,"TG":0,"TJ":0,"TM":0,"TL":0,"TO":0,"TT":0,"TN":0,"TV":0,"UG":0,"UZ":0,"VA":0,"VC":0,"VU":0,"WS":0,"YE":0,"ZM":0,"ZW":0},"years":{},"missing":{"GB":0},"leftOut":{"GB":"England, Scotland, Wales and Northern Ireland play as four separate teams"}},
-  afcon: {"name":"Africa Cup of Nations won (men)","unit":"titles","decimals":0,"source":"Wikipedia","url":"https://en.wikipedia.org/w/index.php?title=Africa_Cup_of_Nations&oldid=1384333078","year":2025,"values":{"AR":0,"AU":0,"AT":0,"BD":0,"BE":0,"BO":0,"BR":0,"CA":0,"CL":0,"CN":0,"CO":0,"CU":0,"DK":0,"EC":0,"EG":7,"ET":1,"FI":0,"FR":0,"DE":0,"GH":4,"GR":0,"IN":0,"ID":0,"IR":0,"IQ":0,"IE":0,"IL":0,"IT":0,"JP":0,"JO":0,"KE":0,"MY":0,"MX":0,"MA":2,"NP":0,"NL":0,"NZ":0,"NG":3,"NO":0,"PK":0,"PE":0,"PH":0,"PL":0,"PT":0,"RU":0,"SA":0,"SG":0,"ZA":1,"KR":0,"ES":0,"SE":0,"CH":0,"TZ":0,"TH":0,"TR":0,"UA":0,"AE":0,"GB":0,"US":0,"UY":0,"VE":0,"VN":0,"AF":0,"AO":0,"AL":0,"AD":0,"AM":0,"AG":0,"AZ":0,"BI":0,"BJ":0,"BF":0,"BG":0,"BH":0,"BS":0,"BA":0,"BY":0,"BZ":0,"BB":0,"BN":0,"BT":0,"BW":0,"CF":0,"CI":3,"CM":5,"CD":2,"CG":1,"KM":0,"CV":0,"CR":0,"CY":0,"CZ":0,"DJ":0,"DM":0,"DO":0,"DZ":2,"ER":0,"EE":0,"FJ":0,"FM":0,"GA":0,"GE":0,"GN":0,"GM":0,"GW":0,"GQ":0,"GD":0,"GT":0,"GY":0,"HN":0,"HR":0,"HT":0,"HU":0,"IS":0,"JM":0,"KZ":0,"KG":0,"KH":0,"KI":0,"KN":0,"KW":0,"LA":0,"LB":0,"LR":0,"LY":0,"LC":0,"LI":0,"LK":0,"LS":0,"LT":0,"LU":0,"LV":0,"MC":0,"MD":0,"MG":0,"MV":0,"MH":0,"MK":0,"ML":0,"MT":0,"MM":0,"ME":0,"MN":0,"MZ":0,"MR":0,"MU":0,"MW":0,"NA":0,"NE":0,"NI":0,"NR":0,"OM":0,"PA":0,"PW":0,"PG":0,"KP":0,"PY":0,"PS":0,"QA":0,"RO":0,"RW":0,"SD":1,"SN":1,"SB":0,"SL":0,"SV":0,"SM":0,"SO":0,"RS":0,"SS":0,"ST":0,"SR":0,"SK":0,"SI":0,"SZ":0,"SC":0,"SY":0,"TD":0,"TG":0,"TJ":0,"TM":0,"TL":0,"TO":0,"TT":0,"TN":1,"TV":0,"UG":0,"UZ":0,"VA":0,"VC":0,"VU":0,"WS":0,"YE":0,"ZM":1,"ZW":0},"years":{},"missing":{}},
   eurobasket: {"name":"EuroBasket titles (men)","unit":"titles","decimals":0,"source":"Wikipedia","url":"https://en.wikipedia.org/w/index.php?title=EuroBasket&oldid=1375424928","year":2025,"values":{"AR":0,"AU":0,"AT":0,"BD":0,"BE":0,"BO":0,"BR":0,"CA":0,"CL":0,"CN":0,"CO":0,"CU":0,"DK":0,"EC":0,"EG":1,"ET":0,"FI":0,"FR":1,"DE":2,"GH":0,"GR":2,"IN":0,"ID":0,"IR":0,"IQ":0,"IE":0,"IL":0,"IT":2,"JP":0,"JO":0,"KE":0,"MY":0,"MX":0,"MA":0,"NP":0,"NL":0,"NZ":0,"NG":0,"NO":0,"PK":0,"PE":0,"PH":0,"PL":0,"PT":0,"RU":1,"SA":0,"SG":0,"ZA":0,"KR":0,"ES":4,"SE":0,"CH":0,"TZ":0,"TH":0,"TR":0,"UA":0,"AE":0,"GB":0,"US":0,"UY":0,"VE":0,"VN":0,"AF":0,"AO":0,"AL":0,"AD":0,"AM":0,"AG":0,"AZ":0,"BI":0,"BJ":0,"BF":0,"BG":0,"BH":0,"BS":0,"BA":0,"BY":0,"BZ":0,"BB":0,"BN":0,"BT":0,"BW":0,"CF":0,"CI":0,"CM":0,"CD":0,"CG":0,"KM":0,"CV":0,"CR":0,"CY":0,"CZ":0,"DJ":0,"DM":0,"DO":0,"DZ":0,"ER":0,"EE":0,"FJ":0,"FM":0,"GA":0,"GE":0,"GN":0,"GM":0,"GW":0,"GQ":0,"GD":0,"GT":0,"GY":0,"HN":0,"HR":0,"HT":0,"HU":1,"IS":0,"JM":0,"KZ":0,"KG":0,"KH":0,"KI":0,"KN":0,"KW":0,"LA":0,"LB":0,"LR":0,"LY":0,"LC":0,"LI":0,"LK":0,"LS":0,"LT":3,"LU":0,"LV":1,"MC":0,"MD":0,"MG":0,"MV":0,"MH":0,"MK":0,"ML":0,"MT":0,"MM":0,"ME":0,"MN":0,"MZ":0,"MR":0,"MU":0,"MW":0,"NA":0,"NE":0,"NI":0,"NR":0,"OM":0,"PA":0,"PW":0,"PG":0,"KP":0,"PY":0,"PS":0,"QA":0,"RO":0,"RW":0,"SD":0,"SN":0,"SB":0,"SL":0,"SV":0,"SM":0,"SO":0,"RS":0,"SS":0,"ST":0,"SR":0,"SK":0,"SI":1,"SZ":0,"SC":0,"SY":0,"TD":0,"TG":0,"TJ":0,"TM":0,"TL":0,"TO":0,"TT":0,"TN":0,"TV":0,"UG":0,"UZ":0,"VA":0,"VC":0,"VU":0,"WS":0,"YE":0,"ZM":0,"ZW":0},"years":{},"missing":{}},
   afrobasket: {"name":"AfroBasket titles (men)","unit":"titles","decimals":0,"source":"Wikipedia","url":"https://en.wikipedia.org/w/index.php?title=AfroBasket&oldid=1375424534","year":2025,"values":{"AR":0,"AU":0,"AT":0,"BD":0,"BE":0,"BO":0,"BR":0,"CA":0,"CL":0,"CN":0,"CO":0,"CU":0,"DK":0,"EC":0,"EG":5,"ET":0,"FI":0,"FR":0,"DE":0,"GH":0,"GR":0,"IN":0,"ID":0,"IR":0,"IQ":0,"IE":0,"IL":0,"IT":0,"JP":0,"JO":0,"KE":0,"MY":0,"MX":0,"MA":1,"NP":0,"NL":0,"NZ":0,"NG":1,"NO":0,"PK":0,"PE":0,"PH":0,"PL":0,"PT":0,"RU":0,"SA":0,"SG":0,"ZA":0,"KR":0,"ES":0,"SE":0,"CH":0,"TZ":0,"TH":0,"TR":0,"UA":0,"AE":0,"GB":0,"US":0,"UY":0,"VE":0,"VN":0,"AF":0,"AO":12,"AL":0,"AD":0,"AM":0,"AG":0,"AZ":0,"BI":0,"BJ":0,"BF":0,"BG":0,"BH":0,"BS":0,"BA":0,"BY":0,"BZ":0,"BB":0,"BN":0,"BT":0,"BW":0,"CF":2,"CI":2,"CM":0,"CD":0,"CG":0,"KM":0,"CV":0,"CR":0,"CY":0,"CZ":0,"DJ":0,"DM":0,"DO":0,"DZ":0,"ER":0,"EE":0,"FJ":0,"FM":0,"GA":0,"GE":0,"GN":0,"GM":0,"GW":0,"GQ":0,"GD":0,"GT":0,"GY":0,"HN":0,"HR":0,"HT":0,"HU":0,"IS":0,"JM":0,"KZ":0,"KG":0,"KH":0,"KI":0,"KN":0,"KW":0,"LA":0,"LB":0,"LR":0,"LY":0,"LC":0,"LI":0,"LK":0,"LS":0,"LT":0,"LU":0,"LV":0,"MC":0,"MD":0,"MG":0,"MV":0,"MH":0,"MK":0,"ML":0,"MT":0,"MM":0,"ME":0,"MN":0,"MZ":0,"MR":0,"MU":0,"MW":0,"NA":0,"NE":0,"NI":0,"NR":0,"OM":0,"PA":0,"PW":0,"PG":0,"KP":0,"PY":0,"PS":0,"QA":0,"RO":0,"RW":0,"SD":0,"SN":5,"SB":0,"SL":0,"SV":0,"SM":0,"SO":0,"RS":0,"SS":0,"ST":0,"SR":0,"SK":0,"SI":0,"SZ":0,"SC":0,"SY":0,"TD":0,"TG":0,"TJ":0,"TM":0,"TL":0,"TO":0,"TT":0,"TN":3,"TV":0,"UG":0,"UZ":0,"VA":0,"VC":0,"VU":0,"WS":0,"YE":0,"ZM":0,"ZW":0},"years":{},"missing":{}},
   heritage: {"name":"UNESCO World Heritage Sites","unit":"sites","decimals":0,"source":"CIA World Factbook","url":"https://www.cia.gov/the-world-factbook/","year":2025,"values":{"AR":12,"AU":21,"AT":12,"BD":3,"BE":16,"BO":7,"BR":24,"CA":22,"CL":7,"CN":60,"CO":9,"CU":9,"DK":12,"EC":5,"EG":7,"ET":12,"FI":7,"FR":54,"DE":56,"GH":2,"GR":20,"IN":44,"ID":10,"IR":29,"IQ":6,"IE":2,"IL":9,"IT":61,"JP":26,"JO":7,"KE":8,"MY":6,"MX":36,"MA":9,"NP":4,"NL":13,"NZ":3,"NG":2,"NO":8,"PK":6,"PE":13,"PH":6,"PL":17,"PT":17,"RU":33,"SA":7,"SG":1,"ZA":12,"KR":17,"ES":50,"SE":15,"CH":13,"TZ":7,"TH":8,"TR":22,"UA":8,"AE":2,"GB":33,"US":26,"UY":3,"VE":3,"VN":9,"AF":2,"AO":1,"AL":4,"AD":1,"AM":3,"AG":1,"AZ":5,"BJ":3,"BF":4,"BG":10,"BH":3,"BA":5,"BY":4,"BZ":1,"BB":1,"BW":2,"CF":2,"CM":3,"CD":5,"CG":2,"CV":1,"CR":4,"CY":3,"CZ":17,"DO":1,"DZ":7,"ER":1,"EE":2,"FJ":1,"FM":1,"GA":2,"GE":4,"GN":1,"GM":2,"GW":1,"GT":4,"HN":2,"HR":10,"HT":1,"HU":8,"IS":3,"JM":2,"KZ":6,"KG":3,"KH":5,"KI":1,"KN":1,"LA":3,"LB":6,"LY":5,"LC":1,"LK":8,"LS":1,"LT":5,"LU":1,"LV":3,"MD":1,"MG":3,"MH":1,"MK":2,"ML":4,"MT":3,"MM":2,"ME":4,"MN":6,"MZ":1,"MR":2,"MU":2,"MW":3,"NA":2,"NE":3,"NI":2,"OM":5,"PA":6,"PW":1,"PG":1,"KP":2,"PY":1,"QA":1,"RO":11,"RW":2,"SD":3,"SN":7,"SB":1,"SL":1,"SV":1,"SM":1,"RS":4,"SR":3,"SK":8,"SI":5,"SC":2,"SY":6,"TD":2,"TG":1,"TJ":5,"TM":5,"TN":9,"UG":3,"UZ":7,"VA":2,"VU":1,"YE":5,"ZM":1,"ZW":5},"years":{},"missing":{"BI":0,"BS":0,"BN":0,"BT":0,"CI":0,"KM":0,"DJ":0,"DM":0,"GQ":0,"GD":0,"GY":0,"KW":0,"LR":0,"LI":0,"MC":0,"MV":0,"NR":0,"PS":0,"SO":0,"SS":0,"ST":0,"SZ":0,"TL":0,"TO":0,"TT":0,"TV":0,"VC":0,"WS":0}},
@@ -24322,7 +24481,15 @@ const STATS = {
   pesticides: {"name":"Pesticides used on cropland","unit":"kg per hectare","decimals":1,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/pesticide-use-per-hectare-of-cropland","year":2023,"values":{"AR":6.33,"AU":5.81,"AT":3.79,"BD":1.76,"BE":5.42,"BO":2.71,"BR":12.63,"CA":2.5,"CL":9.23,"CN":1.71,"CO":3.89,"CU":0.22,"DK":1.38,"EC":14.62,"EG":2.87,"ET":0.22,"FI":1.45,"FR":3.65,"DE":3.41,"GH":1.31,"GR":1.46,"IN":0.24,"ID":6.68,"IR":0.33,"IQ":0.1,"IE":5.16,"IL":17.09,"IT":4.17,"JP":10.61,"JO":2.26,"KE":0.69,"MY":3.65,"MX":1.53,"MA":1.56,"NP":0.6,"NL":6.95,"NZ":8.93,"NG":1.09,"NO":0.78,"PK":0.86,"PE":1.71,"PH":3.36,"PL":1.73,"PT":4.35,"RU":0.78,"SA":0.88,"ZA":3.39,"KR":13.49,"ES":3.19,"SE":0.8,"CH":3.63,"TZ":0,"TH":0.15,"TR":2.4,"UA":0.57,"GB":2.79,"US":2.78,"UY":7.35,"VE":1.19,"VN":13.9,"AO":0.01,"AL":0.44,"AD":21.55,"AM":2.01,"AG":36.59,"AZ":0.23,"BI":0.03,"BJ":1.71,"BF":0.45,"BG":0.95,"BH":4.31,"BS":16.19,"BA":6.13,"BY":0.86,"BZ":11.33,"BB":8.55,"BN":16.69,"BT":1.34,"BW":4.85,"CF":0.1,"CI":0,"CM":1.25,"CD":0.1,"CG":4.38,"KM":0.34,"CV":0.09,"CR":17.36,"CY":6.5,"CZ":1.78,"DJ":34.16,"DO":1.31,"DZ":0.71,"ER":0.04,"EE":0.99,"FJ":4.42,"FM":6.13,"GA":1.93,"GE":6.8,"GN":0.02,"GM":1.24,"GW":0.13,"GQ":0.78,"GD":18.46,"GT":4.74,"GY":3.63,"HN":5.99,"HR":1.29,"HT":0.86,"HU":1.5,"IS":0.01,"JM":8.73,"KZ":0.3,"KG":0.42,"KH":4.15,"KI":0.98,"KN":19.89,"LA":0.12,"LB":6.62,"LR":1.49,"LY":0.84,"LC":27.59,"LK":0.7,"LS":1.53,"LT":1.29,"LU":1.85,"LV":1.22,"MD":3.27,"MG":0.2,"MV":23.67,"MK":0.21,"ML":0,"MT":12.74,"MM":0.94,"ME":6.02,"MN":4.45,"MZ":0.54,"MR":1.52,"MU":7.13,"MW":0.48,"NA":1.46,"NE":0,"NI":8.36,"NR":16.89,"OM":3.41,"PA":14.46,"PW":10.8,"PG":1,"PY":3.98,"PS":11.91,"QA":35.11,"RO":1.04,"RW":1.35,"SD":0.19,"SN":0.15,"SB":0.39,"SL":0.21,"SV":3.16,"SO":0.66,"RS":0.8,"ST":0.44,"SR":38.77,"SK":1.35,"SI":2.98,"SZ":6.21,"SC":19.48,"SY":0.35,"TD":0.01,"TG":0.51,"TJ":0.65,"TM":1.01,"TL":0.79,"TO":0.65,"TT":24.96,"TN":0.65,"TV":1.21,"UG":1.05,"VC":21.89,"VU":0.11,"WS":5.95,"YE":1.04,"ZM":1.09,"ZW":0.54},"years":{},"missing":{"SG":0,"AE":0,"AF":0,"DM":0,"KW":0,"LI":0,"MC":0,"MH":0,"KP":0,"SM":0,"SS":0,"UZ":0,"VA":0}},
   disasterdeaths: {"name":"Deaths from natural disasters","unit":"per 100,000 people","decimals":2,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/death-rate-from-natural-disasters","year":2021,"values":{"AR":0,"AU":0.03,"AT":0.01,"BD":0.01,"BE":0.37,"BO":0.34,"BR":0.02,"CA":0.01,"CL":0,"CN":0.03,"CO":0.1,"CU":0,"DK":0,"EC":0.03,"EG":0,"ET":0.01,"FI":0,"FR":0,"DE":0.24,"GH":0.03,"GR":0.01,"IN":0.15,"ID":0.19,"IR":0.03,"IQ":0.04,"IE":0,"IL":0,"IT":0,"JP":0.05,"JO":0,"KE":0.02,"MY":0.16,"MX":0.06,"MA":0.06,"NP":0.8,"NL":0,"NZ":0.02,"NG":0,"NO":0,"PK":0.12,"PE":0.06,"PH":0.51,"PL":0.01,"PT":0,"RU":0.01,"SA":0,"SG":0,"ZA":0.07,"KR":0,"ES":0.02,"SE":0,"CH":0.19,"TZ":0.08,"TH":0.02,"TR":0.08,"UA":0,"AE":0,"GB":0,"US":0.17,"UY":0,"VE":0.16,"VN":0.04,"AF":1.3,"AO":0.07,"AL":0,"AD":0,"AM":0,"AG":0,"AZ":0,"BI":0,"BJ":0.07,"BF":0,"BG":0,"BH":0,"BS":0,"BA":0,"BY":0,"BZ":0,"BB":0,"BN":0,"BT":1.23,"BW":0,"CF":0,"CI":0,"CM":0,"CD":0.04,"CG":0.47,"KM":0,"CV":0,"CR":0.06,"CY":0,"CZ":0.06,"DJ":0,"DM":0,"DO":0.02,"DZ":0.03,"ER":0,"EE":0,"FJ":0.64,"FM":0,"GA":0,"GE":0,"GN":0.04,"GM":0.42,"GW":0,"GQ":0,"GD":0,"GT":0.01,"GY":0,"HN":0,"HR":0,"HT":20.3,"HU":0,"IS":0,"JM":0,"KZ":0,"KG":0.22,"KH":0.01,"KI":0,"KN":0,"KW":0,"LA":0,"LB":0,"LR":0,"LY":0,"LC":0.5,"LK":0.16,"LS":0,"LT":0,"LU":0,"LV":0,"MC":0,"MD":0,"MG":0.01,"MV":0,"MH":0,"MK":0,"ML":0,"MT":0,"MM":0,"ME":0,"MN":0.36,"MZ":0.04,"MR":0,"MU":0,"MW":0.07,"NA":0,"NE":0.25,"NI":0,"NR":0,"OM":0.44,"PA":0.02,"PW":0,"PG":0,"KP":0,"PY":0.14,"QA":0,"RO":0.01,"RW":0,"SD":0.13,"SN":0,"SB":0,"SL":0,"SV":0.07,"SM":0,"SO":0.12,"RS":0,"SS":0.07,"ST":3.94,"SR":0,"SK":0.02,"SI":0,"SZ":0,"SC":0,"SY":0.01,"TD":0.18,"TG":0,"TJ":0.24,"TM":0,"TL":2.9,"TO":0,"TT":0,"TN":0.02,"TV":0,"UG":0.01,"UZ":0.02,"VC":0,"VU":0,"WS":0,"YE":0.07,"ZM":0,"ZW":0.02},"years":{},"missing":{"LI":0,"PS":0,"VA":0},"onlyYear":2021},
   solarshare: {"name":"Electricity from solar power","unit":"% of electricity","decimals":1,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/share-electricity-solar","year":2024,"values":{"AR":3.35619,"AU":19.5886,"AT":14.0809,"BD":1.5087,"BE":14.3367,"BO":2.9347,"BR":11.8103,"CA":1.55876,"CL":25.0621,"CN":11.102,"CO":5.09075,"CU":1.2352,"DK":13.3634,"EC":0.10929,"EG":3.09715,"ET":0.119868,"FI":1.19077,"FR":5.58265,"DE":17.9072,"GH":0.700453,"GR":22.1726,"IN":9.41535,"ID":0.363353,"IR":0.227399,"IQ":0.287184,"IE":4.7496,"IL":16.1754,"IT":16.8606,"JP":9.81298,"JO":16.6033,"KE":4.62963,"MY":2.24278,"MX":7.37877,"MA":5.77528,"NP":1.07817,"NL":21.1174,"NZ":0.853715,"NG":0.312951,"NO":0.329581,"PK":18.7715,"PE":3.0278,"PH":2.43665,"PL":11.2836,"PT":17.3284,"RU":0.238097,"SA":1.81022,"SG":2.72652,"ZA":8.02439,"KR":6.05129,"ES":21.8486,"SE":2.59504,"CH":12.1347,"TZ":0.452489,"TH":5.30174,"TR":10.5268,"UA":4.55565,"AE":8.58062,"GB":6.60942,"US":8.60261,"UY":5.10888,"VE":0.0124797,"VN":7.4325,"AF":11.1111,"AO":2.82232,"AL":4.07674,"AM":11.0082,"AG":8.10811,"AZ":0,"BI":0,"BJ":3.9604,"BF":6.50888,"BG":18.1507,"BH":0.263505,"BS":0.888889,"BA":4.08587,"BY":0.79793,"BZ":2.12766,"BB":9.00901,"BN":0.179856,"BT":0,"BW":0.291545,"CF":0,"CI":0.185357,"CM":0.550964,"CD":15.7663,"CG":0.18315,"KM":0,"CV":15.3846,"CR":0.702576,"CY":23.181,"CZ":5.81457,"DJ":0,"DM":0,"DO":9.92064,"DZ":1.0274,"ER":11.1111,"EE":18.4943,"FJ":0.869565,"GA":0,"GE":0.222222,"GN":0.744417,"GM":0,"GW":0,"GQ":0,"GD":0,"GT":1.77327,"GY":1.44928,"HN":9.45513,"HR":8.77551,"HT":0,"HU":27.2863,"IS":0.0524934,"JM":3.04878,"KZ":1.64928,"KG":0,"KH":10.6419,"KI":25,"KN":4.34783,"KW":0.227052,"LA":0.172051,"LB":29.9625,"LR":1.75439,"LY":0.0289101,"LC":2.5,"LK":16.4638,"LS":0,"LT":18.7852,"LU":30.5195,"LV":13.0782,"MD":2.5974,"MG":4.11523,"MV":7.05882,"MK":23.7537,"ML":2.85235,"MT":15.5251,"MM":0.552741,"ME":5.69106,"MN":2.16718,"MZ":0.404245,"MR":7.72947,"MU":4.98534,"MW":0.546448,"NA":35.3659,"NE":3.15789,"NI":0.663717,"NR":20,"OM":4.35276,"PA":7.37156,"PG":0.211416,"KP":0.627306,"PY":0,"PS":39.3939,"QA":3.82699,"RO":9.79723,"RW":3.53982,"SD":1.08328,"SN":8.91219,"SB":9.09091,"SL":9.52381,"SV":20.2786,"SO":18.6046,"RS":0.43692,"SS":1.78571,"ST":0,"SR":0.574713,"SK":2.4055,"SI":10.3774,"SZ":4.91803,"SC":14.2857,"SY":0.401929,"TD":0,"TG":18.3099,"TJ":0,"TM":0,"TL":0,"TO":14.2857,"TT":0.104712,"TN":2.51009,"UG":2.92599,"UZ":7.49712,"VC":0,"VU":12.5,"WS":18.75,"YE":11.2381,"ZM":0.862069,"ZW":0.389864},"years":{"AR":2025,"AU":2025,"AT":2025,"BD":2025,"BE":2025,"BO":2025,"BR":2025,"CA":2025,"CL":2025,"CN":2025,"CO":2025,"DK":2025,"EC":2025,"EG":2025,"ET":2025,"FI":2025,"FR":2025,"DE":2025,"GR":2025,"IN":2025,"IR":2025,"IE":2025,"IL":2025,"IT":2025,"JP":2025,"KE":2025,"MY":2025,"MX":2025,"MA":2025,"NL":2025,"NZ":2025,"NG":2025,"NO":2025,"PK":2025,"PE":2025,"PH":2025,"PL":2025,"PT":2025,"RU":2025,"SG":2025,"ZA":2025,"KR":2025,"ES":2025,"SE":2025,"CH":2025,"TH":2025,"TR":2025,"UA":2022,"GB":2025,"US":2025,"UY":2025,"VN":2025,"AM":2025,"AZ":2025,"BG":2025,"BA":2025,"BY":2025,"CF":2023,"KM":2023,"CR":2025,"CY":2025,"CZ":2025,"DM":2023,"DO":2025,"EE":2025,"GE":2025,"HR":2025,"HU":2025,"KZ":2025,"KG":2025,"KH":2025,"KW":2025,"LK":2025,"LS":2022,"LT":2025,"LU":2025,"LV":2025,"MD":2025,"MK":2025,"MT":2025,"ME":2025,"MN":2025,"OM":2025,"PY":2025,"QA":2025,"RO":2025,"SV":2025,"RS":2025,"ST":2023,"SK":2025,"SI":2025,"TJ":2025,"TN":2025,"UZ":2025,"VU":2023},"missing":{"AD":0,"FM":0,"LI":0,"MC":0,"MH":0,"PW":0,"SM":0,"TV":0,"VA":0}},
-  hydropp: {"name":"Hydropower per person","unit":"kWh per person a year","decimals":0,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/hydro-electricity-per-capita","year":2024,"values":{"AR":572.502,"AU":453.028,"AT":4161.92,"BD":3.69976,"BE":37.4194,"BO":302.022,"BR":1826.16,"CA":8591.28,"CL":990.941,"CN":986.557,"CO":1169.85,"CU":10.9292,"DK":3.33194,"EC":1558.78,"EG":127.317,"ET":237.614,"FI":2212.21,"FR":891.362,"DE":232.649,"GH":249.801,"GR":344.104,"IN":121.575,"ID":96.2651,"IR":140.99,"IQ":43.4386,"IE":122.456,"IL":0,"IT":705.032,"JP":600.308,"JO":1.73117,"KE":51.1016,"MY":979.492,"MX":217.891,"MA":23.6789,"NP":370.982,"NL":2.72527,"NZ":4525.98,"NG":53.9726,"NO":25745.7,"PK":154.181,"PE":979.851,"PH":108.745,"PL":44.5716,"PT":1457.96,"RU":1387.04,"ZA":28.2637,"KR":73.5479,"ES":683.651,"SE":6403.52,"CH":3790.39,"TZ":40.84,"TH":106.395,"TR":653.13,"UA":268.461,"GB":79.7972,"US":695.989,"UY":960.207,"VE":2569.92,"VN":1007.4,"AF":17.586,"AO":290.346,"AL":2865.58,"AM":921.298,"AG":0,"AZ":309.684,"BI":25.6268,"BJ":0,"BF":3.82185,"BG":376.793,"BH":0,"BS":0,"BA":1684.66,"BY":103.361,"BZ":575.433,"BB":0,"BN":0,"BT":13897.1,"BW":0,"CF":27.1717,"CI":93.9431,"CM":179.579,"CD":122.625,"CG":173.694,"KM":0,"CV":0,"CR":1859.13,"CY":0,"CZ":161.18,"DJ":0,"DM":300.612,"DO":132.807,"DZ":0.42722,"ER":0,"EE":22.3175,"FJ":645.995,"GA":358.415,"GE":2795.09,"GN":203.324,"GM":0,"GW":0,"GQ":211.358,"GD":0,"GT":342.273,"GY":0,"HN":351.016,"HR":1499.42,"HT":13.5909,"HU":23.878,"IS":34214.2,"JM":42.2657,"KZ":504.228,"KG":1832.75,"KH":297.513,"KI":0,"KN":0,"KW":0,"LA":5148.12,"LB":120.566,"LR":53.4491,"LY":0,"LC":0,"LK":283.691,"LS":0,"LT":123.668,"LU":73.4804,"LV":1580.74,"MD":116.818,"MG":28.1558,"MV":0,"MK":749.81,"ML":37.5839,"MT":0,"MM":183.486,"ME":2275.85,"MN":17.0595,"MZ":470.666,"MR":40.6236,"MU":86.5344,"MW":78.041,"NA":330.019,"NE":0,"NI":93.9831,"NR":0,"OM":0,"PA":1578.98,"PG":94.5492,"KP":641.538,"PY":6432.27,"PS":0,"QA":0,"RO":639.39,"RW":36.4744,"SD":227.953,"SN":16.755,"SB":0,"SL":20.8284,"SV":307.91,"SO":0,"RS":1216.92,"SS":0,"ST":43.3122,"SR":1418.58,"SK":577.182,"SI":1908.3,"SZ":281.616,"SC":0,"SY":30.3979,"TD":0,"TG":9.51638,"TJ":2158.21,"TM":1.33431,"TL":0,"TO":0,"TT":0,"TN":0.80981,"UG":99.9698,"UZ":170.025,"VC":198.748,"VU":31.2088,"WS":137.595,"YE":0,"ZM":797.562,"ZW":342.664},"years":{"AR":2025,"AU":2025,"AT":2025,"BD":2025,"BE":2025,"BO":2025,"BR":2025,"CA":2025,"CL":2025,"CN":2025,"CO":2025,"DK":2025,"EC":2025,"EG":2025,"ET":2025,"FI":2025,"FR":2025,"DE":2025,"GR":2025,"IN":2025,"IR":2025,"IE":2025,"IL":2025,"IT":2025,"JP":2025,"KE":2025,"MY":2025,"MX":2025,"MA":2025,"NL":2025,"NZ":2025,"NG":2025,"NO":2025,"PK":2025,"PE":2025,"PH":2025,"PL":2025,"PT":2025,"RU":2025,"ZA":2025,"KR":2025,"ES":2025,"SE":2025,"CH":2025,"TH":2025,"TR":2025,"UA":2022,"GB":2025,"US":2025,"UY":2025,"VN":2025,"AM":2025,"AZ":2025,"BG":2025,"BA":2025,"BY":2025,"CF":2023,"KM":2023,"CR":2025,"CY":2025,"CZ":2025,"DM":2023,"DO":2025,"EE":2025,"GE":2025,"HR":2025,"HU":2025,"KZ":2025,"KG":2025,"KH":2025,"KW":2025,"LK":2025,"LT":2025,"LU":2025,"LV":2025,"MD":2025,"MK":2025,"MT":2025,"ME":2025,"MN":2025,"OM":2025,"PY":2025,"QA":2025,"RO":2025,"SV":2025,"RS":2025,"ST":2023,"SK":2025,"SI":2025,"TJ":2025,"TN":2025,"UZ":2025,"VU":2023},"missing":{"SA":1999,"SG":1999,"AE":1999,"AD":0,"FM":0,"LI":0,"MC":0,"MH":0,"PW":0,"SM":0,"TV":0,"VA":0}}
+  hydropp: {"name":"Hydropower per person","unit":"kWh per person a year","decimals":0,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/hydro-electricity-per-capita","year":2024,"values":{"AR":572.502,"AU":453.028,"AT":4161.92,"BD":3.69976,"BE":37.4194,"BO":302.022,"BR":1826.16,"CA":8591.28,"CL":990.941,"CN":986.557,"CO":1169.85,"CU":10.9292,"DK":3.33194,"EC":1558.78,"EG":127.317,"ET":237.614,"FI":2212.21,"FR":891.362,"DE":232.649,"GH":249.801,"GR":344.104,"IN":121.575,"ID":96.2651,"IR":140.99,"IQ":43.4386,"IE":122.456,"IL":0,"IT":705.032,"JP":600.308,"JO":1.73117,"KE":51.1016,"MY":979.492,"MX":217.891,"MA":23.6789,"NP":370.982,"NL":2.72527,"NZ":4525.98,"NG":53.9726,"NO":25745.7,"PK":154.181,"PE":979.851,"PH":108.745,"PL":44.5716,"PT":1457.96,"RU":1387.04,"ZA":28.2637,"KR":73.5479,"ES":683.651,"SE":6403.52,"CH":3790.39,"TZ":40.84,"TH":106.395,"TR":653.13,"UA":268.461,"GB":79.7972,"US":695.989,"UY":960.207,"VE":2569.92,"VN":1007.4,"AF":17.586,"AO":290.346,"AL":2865.58,"AM":921.298,"AG":0,"AZ":309.684,"BI":25.6268,"BJ":0,"BF":3.82185,"BG":376.793,"BH":0,"BS":0,"BA":1684.66,"BY":103.361,"BZ":575.433,"BB":0,"BN":0,"BT":13897.1,"BW":0,"CF":27.1717,"CI":93.9431,"CM":179.579,"CD":122.625,"CG":173.694,"KM":0,"CV":0,"CR":1859.13,"CY":0,"CZ":161.18,"DJ":0,"DM":300.612,"DO":132.807,"DZ":0.42722,"ER":0,"EE":22.3175,"FJ":645.995,"GA":358.415,"GE":2795.09,"GN":203.324,"GM":0,"GW":0,"GQ":211.358,"GD":0,"GT":342.273,"GY":0,"HN":351.016,"HR":1499.42,"HT":13.5909,"HU":23.878,"IS":34214.2,"JM":42.2657,"KZ":504.228,"KG":1832.75,"KH":297.513,"KI":0,"KN":0,"KW":0,"LA":5148.12,"LB":120.566,"LR":53.4491,"LY":0,"LC":0,"LK":283.691,"LS":0,"LT":123.668,"LU":73.4804,"LV":1580.74,"MD":116.818,"MG":28.1558,"MV":0,"MK":749.81,"ML":37.5839,"MT":0,"MM":183.486,"ME":2275.85,"MN":17.0595,"MZ":470.666,"MR":40.6236,"MU":86.5344,"MW":78.041,"NA":330.019,"NE":0,"NI":93.9831,"NR":0,"OM":0,"PA":1578.98,"PG":94.5492,"KP":641.538,"PY":6432.27,"PS":0,"QA":0,"RO":639.39,"RW":36.4744,"SD":227.953,"SN":16.755,"SB":0,"SL":20.8284,"SV":307.91,"SO":0,"RS":1216.92,"SS":0,"ST":43.3122,"SR":1418.58,"SK":577.182,"SI":1908.3,"SZ":281.616,"SC":0,"SY":30.3979,"TD":0,"TG":9.51638,"TJ":2158.21,"TM":1.33431,"TL":0,"TO":0,"TT":0,"TN":0.80981,"UG":99.9698,"UZ":170.025,"VC":198.748,"VU":31.2088,"WS":137.595,"YE":0,"ZM":797.562,"ZW":342.664},"years":{"AR":2025,"AU":2025,"AT":2025,"BD":2025,"BE":2025,"BO":2025,"BR":2025,"CA":2025,"CL":2025,"CN":2025,"CO":2025,"DK":2025,"EC":2025,"EG":2025,"ET":2025,"FI":2025,"FR":2025,"DE":2025,"GR":2025,"IN":2025,"IR":2025,"IE":2025,"IL":2025,"IT":2025,"JP":2025,"KE":2025,"MY":2025,"MX":2025,"MA":2025,"NL":2025,"NZ":2025,"NG":2025,"NO":2025,"PK":2025,"PE":2025,"PH":2025,"PL":2025,"PT":2025,"RU":2025,"ZA":2025,"KR":2025,"ES":2025,"SE":2025,"CH":2025,"TH":2025,"TR":2025,"UA":2022,"GB":2025,"US":2025,"UY":2025,"VN":2025,"AM":2025,"AZ":2025,"BG":2025,"BA":2025,"BY":2025,"CF":2023,"KM":2023,"CR":2025,"CY":2025,"CZ":2025,"DM":2023,"DO":2025,"EE":2025,"GE":2025,"HR":2025,"HU":2025,"KZ":2025,"KG":2025,"KH":2025,"KW":2025,"LK":2025,"LT":2025,"LU":2025,"LV":2025,"MD":2025,"MK":2025,"MT":2025,"ME":2025,"MN":2025,"OM":2025,"PY":2025,"QA":2025,"RO":2025,"SV":2025,"RS":2025,"ST":2023,"SK":2025,"SI":2025,"TJ":2025,"TN":2025,"UZ":2025,"VU":2023},"missing":{"SA":1999,"SG":1999,"AE":1999,"AD":0,"FM":0,"LI":0,"MC":0,"MH":0,"PW":0,"SM":0,"TV":0,"VA":0}},
+  farmlandpp: {"name":"Farmland per person","unit":"m² per person","decimals":0,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/agricultural-area-per-capita","year":2023,"values":{"AR":25502.9,"AU":137326,"AT":2844.62,"BD":548.152,"BE":1155.39,"BO":31701.2,"BR":11213.3,"CA":14472.3,"CL":5441.59,"CN":3658.22,"CO":7737.41,"CU":5808.57,"DK":4406.42,"EC":2975.52,"EG":354.3,"ET":2988.3,"FI":4038.43,"FR":4259.14,"DE":1961.72,"GH":3730.25,"GR":5244.64,"IN":1241.74,"ID":1960.32,"IR":5194.53,"IQ":2102.63,"IE":8060.99,"IL":579.821,"IT":2199.61,"JP":370.424,"JO":895.166,"KE":5198.62,"MY":2440.05,"MX":7595.62,"MA":7898.77,"NP":1260.87,"NL":996.544,"NZ":18773.1,"NG":3045.34,"NO":1779.25,"PK":1454.32,"PE":7204.94,"PH":1107.36,"PL":3761.33,"PT":3806.02,"RU":14830.9,"SA":52199.4,"SG":1.14008,"ZA":15240.8,"KR":303.003,"ES":5170.5,"SE":2826.14,"CH":1683.35,"TZ":5932.55,"TH":3120.68,"TR":4421.65,"UA":10948.3,"AE":368.07,"GB":2476.52,"US":12272.7,"UY":42025.5,"VE":7596.94,"VN":1224.79,"AF":9194.6,"AO":12534.2,"AL":3715.24,"AD":2317.43,"AM":5613.58,"AG":964.31,"AZ":4632.2,"BI":1573.62,"BJ":3342.6,"BF":6345.41,"BG":7361.88,"BH":51.6031,"BS":325.446,"BA":3494.43,"BY":8813.39,"BZ":4427.02,"BB":354.174,"BN":291.965,"BT":6701.54,"BW":104272,"CF":11002.2,"CI":8823.59,"CM":3488.18,"CD":3317.49,"CG":17227.2,"KM":1563.99,"CV":1512.44,"CR":3314.71,"CY":959.094,"CZ":3269.66,"DJ":14778.6,"DM":3757.65,"DO":2354.47,"DZ":8956.01,"ER":21876.5,"EE":7226.48,"FJ":3371.75,"FM":443.868,"GA":8665.67,"GE":6229.56,"GN":12491,"GM":2350.02,"GW":3903.38,"GQ":566.803,"GD":683.212,"GT":2544.57,"GY":8712.94,"HN":3359.37,"HR":3814.15,"HT":1542.44,"HU":5247.58,"IS":42264.5,"JM":1468.42,"KZ":105393,"KG":14644.5,"KH":3532.13,"KI":2565.26,"KN":1282.52,"KW":309.995,"LA":2983.95,"LB":1167.77,"LR":3500.87,"LY":21011.1,"LC":554.406,"LI":1304.83,"LK":1308.96,"LS":10213.2,"LT":10066.2,"LU":1999.67,"LV":10470.7,"MD":7955.47,"MG":13109.1,"MV":112.165,"MH":1801.85,"MK":6829.35,"ML":18208.3,"MT":155.564,"MM":2400.96,"ME":4159.4,"MN":313139,"MZ":12341.9,"MR":79065.1,"MU":674.922,"MW":2866.69,"NA":130984,"NE":17813,"NI":7460.85,"NR":336.134,"OM":2914.74,"PA":4911.61,"PW":2422.4,"PG":1352.31,"KP":982.391,"PY":31307,"PS":723.212,"QA":248.398,"RO":6650.63,"RW":1349.48,"SD":22513.7,"SN":5261.22,"SB":1364.98,"SL":4667.56,"SV":1895.04,"SM":681.259,"SO":24037.3,"RS":5013.88,"SS":24685.5,"ST":1862.42,"SR":1135.84,"SK":3307.32,"SI":2885.2,"SZ":9711.44,"SC":121.131,"SY":5766.57,"TD":26055.8,"TG":4645.02,"TJ":3733.18,"TM":53742.4,"TL":2466.24,"TO":3345.66,"TT":359.296,"TN":7950.95,"TV":1829.83,"UG":2962.6,"UZ":7175.41,"VC":690.805,"VU":5836.05,"WS":2253.63,"YE":5953.67,"ZM":11503.1,"ZW":9893.7},"years":{},"missing":{"MC":0,"VA":0},"factorNote":"OWID's hectares per person × 10,000 = m² per person"},
+  foodwaste: {"name":"Food thrown away at home","unit":"kg per person a year","decimals":0,"source":"Our World in Data","url":"https://ourworldindata.org/grapher/food-waste-per-capita","year":2022,"values":{"AR":91.34,"AU":97.76,"AT":70,"BD":82.38,"BE":64,"BO":90.12,"BR":94.23,"CA":78.53,"CL":88,"CN":76.21,"CO":70.43,"CU":91.32,"DK":86,"EC":95.97,"EG":162.95,"ET":69.24,"FI":55,"FR":58,"DE":75,"GH":84.02,"GR":87.04,"IN":55.17,"ID":53.46,"IR":92.7,"IQ":143.34,"IE":42,"IL":96.75,"IT":100,"JP":59.68,"JO":100.73,"KE":80.54,"MY":81.17,"MX":104.85,"MA":112.65,"NP":92.7,"NL":48,"NZ":61.06,"NG":113.44,"NO":71,"PK":130.41,"PE":87.63,"PH":25.57,"PL":69,"PT":123,"RU":33.37,"SA":104.88,"SG":68.47,"ZA":47.08,"KR":94.97,"ES":26,"SE":56,"CH":119.2,"TZ":152.07,"TH":86.2,"TR":101.88,"UA":69.47,"AE":98.55,"GB":75.5,"US":73.06,"UY":87.95,"VE":92.82,"VN":72.11,"AF":127.15,"AO":89.13,"AL":85.72,"AD":82.66,"AM":101.86,"AG":84.49,"AZ":101.9,"BI":92,"BJ":89.11,"BF":91.98,"BG":41,"BH":131.51,"BS":88.03,"BA":85.7,"BY":70.7,"BZ":53.29,"BB":87.51,"BN":75.97,"BT":19.26,"BW":50.41,"CF":92.01,"CI":89.12,"CM":89.11,"CD":62.09,"CG":89.12,"KM":89.47,"CV":88.65,"CR":91.32,"CY":77,"CZ":61,"DJ":89.06,"DM":87.9,"DO":160.26,"DZ":112.64,"ER":91.9,"EE":65,"FJ":90.29,"FM":36.83,"GA":90.35,"GE":100.86,"GN":89.13,"GM":92.13,"GW":92.19,"GQ":90.05,"GD":94.66,"GT":91.32,"GY":88.16,"HN":90.12,"HR":55,"HT":90.19,"HU":60,"IS":63,"JM":86.07,"KZ":88.1,"KG":85.71,"KH":84.68,"KI":61.39,"KN":92.35,"KW":98.59,"LA":89.49,"LB":127.84,"LR":91.95,"LY":84.1,"LC":91.41,"LI":82.27,"LK":75.86,"LS":89.29,"LT":86,"LU":65,"LV":71,"MC":88.72,"MD":70.6,"MG":91.99,"MV":205.96,"MH":60.78,"MK":85.65,"ML":91.98,"MT":88,"MM":77.93,"ME":86.19,"MN":17.76,"MZ":92,"MR":89.2,"MU":90.35,"MW":92.02,"NA":90.42,"NE":92.01,"NI":90.17,"NR":47.24,"OM":98.64,"PA":101.02,"PW":69.96,"PG":89.05,"KP":80.74,"PY":91.33,"PS":101.88,"QA":93.07,"RO":99,"RW":140.65,"SD":115.51,"SN":76.72,"SB":43.14,"SL":92.04,"SV":91.39,"SM":73.51,"SO":92.01,"RS":108.08,"SS":91.97,"ST":90.15,"SR":91.63,"SK":65,"SI":33,"SZ":89,"SC":187.54,"SY":171.66,"TD":91.98,"TG":92.01,"TJ":85.69,"TM":88.08,"TL":77.85,"TO":90.68,"TT":87.96,"TN":171.72,"TV":77.88,"UG":110.25,"UZ":85.72,"VA":0,"VC":87.87,"VU":142.89,"WS":84.8,"YE":103.57,"ZM":77.93,"ZW":48.48},"years":{},"missing":{},"column":"_12_3_1__ag_food_wst_pc__households"},
+  womenseuro: {"name":"Women's European Championships won","unit":"titles","decimals":0,"source":"Wikipedia","url":"https://en.wikipedia.org/w/index.php?title=UEFA_Women's_Championship&oldid=1368970734","year":2025,"values":{"AR":0,"AU":0,"AT":0,"BD":0,"BE":0,"BO":0,"BR":0,"CA":0,"CL":0,"CN":0,"CO":0,"CU":0,"DK":0,"EC":0,"EG":0,"ET":0,"FI":0,"FR":0,"DE":8,"GH":0,"GR":0,"IN":0,"ID":0,"IR":0,"IQ":0,"IE":0,"IL":0,"IT":0,"JP":0,"JO":0,"KE":0,"MY":0,"MX":0,"MA":0,"NP":0,"NL":1,"NZ":0,"NG":0,"NO":2,"PK":0,"PE":0,"PH":0,"PL":0,"PT":0,"RU":0,"SA":0,"SG":0,"ZA":0,"KR":0,"ES":0,"SE":1,"CH":0,"TZ":0,"TH":0,"TR":0,"UA":0,"AE":0,"US":0,"UY":0,"VE":0,"VN":0,"AF":0,"AO":0,"AL":0,"AD":0,"AM":0,"AG":0,"AZ":0,"BI":0,"BJ":0,"BF":0,"BG":0,"BH":0,"BS":0,"BA":0,"BY":0,"BZ":0,"BB":0,"BN":0,"BT":0,"BW":0,"CF":0,"CI":0,"CM":0,"CD":0,"CG":0,"KM":0,"CV":0,"CR":0,"CY":0,"CZ":0,"DJ":0,"DM":0,"DO":0,"DZ":0,"ER":0,"EE":0,"FJ":0,"FM":0,"GA":0,"GE":0,"GN":0,"GM":0,"GW":0,"GQ":0,"GD":0,"GT":0,"GY":0,"HN":0,"HR":0,"HT":0,"HU":0,"IS":0,"JM":0,"KZ":0,"KG":0,"KH":0,"KI":0,"KN":0,"KW":0,"LA":0,"LB":0,"LR":0,"LY":0,"LC":0,"LI":0,"LK":0,"LS":0,"LT":0,"LU":0,"LV":0,"MC":0,"MD":0,"MG":0,"MV":0,"MH":0,"MK":0,"ML":0,"MT":0,"MM":0,"ME":0,"MN":0,"MZ":0,"MR":0,"MU":0,"MW":0,"NA":0,"NE":0,"NI":0,"NR":0,"OM":0,"PA":0,"PW":0,"PG":0,"KP":0,"PY":0,"PS":0,"QA":0,"RO":0,"RW":0,"SD":0,"SN":0,"SB":0,"SL":0,"SV":0,"SM":0,"SO":0,"RS":0,"SS":0,"ST":0,"SR":0,"SK":0,"SI":0,"SZ":0,"SC":0,"SY":0,"TD":0,"TG":0,"TJ":0,"TM":0,"TL":0,"TO":0,"TT":0,"TN":0,"TV":0,"UG":0,"UZ":0,"VA":0,"VC":0,"VU":0,"WS":0,"YE":0,"ZM":0,"ZW":0},"years":{},"missing":{"GB":0},"leftOut":{"GB":"England, Scotland, Wales and Northern Ireland play as four separate teams"}},
+  euros: {"name":"European Championships won (men)","unit":"titles","decimals":0,"source":"Wikipedia","url":"https://en.wikipedia.org/w/index.php?title=UEFA_European_Championship&oldid=1384979470","year":2024,"values":{"AR":0,"AU":0,"AT":0,"BD":0,"BE":0,"BO":0,"BR":0,"CA":0,"CL":0,"CN":0,"CO":0,"CU":0,"DK":1,"EC":0,"EG":0,"ET":0,"FI":0,"FR":2,"DE":3,"GH":0,"GR":1,"IN":0,"ID":0,"IR":0,"IQ":0,"IE":0,"IL":0,"IT":2,"JP":0,"JO":0,"KE":0,"MY":0,"MX":0,"MA":0,"NP":0,"NL":1,"NZ":0,"NG":0,"NO":0,"PK":0,"PE":0,"PH":0,"PL":0,"PT":1,"RU":0,"SA":0,"SG":0,"ZA":0,"KR":0,"ES":4,"SE":0,"CH":0,"TZ":0,"TH":0,"TR":0,"UA":0,"AE":0,"US":0,"UY":0,"VE":0,"VN":0,"AF":0,"AO":0,"AL":0,"AD":0,"AM":0,"AG":0,"AZ":0,"BI":0,"BJ":0,"BF":0,"BG":0,"BH":0,"BS":0,"BA":0,"BY":0,"BZ":0,"BB":0,"BN":0,"BT":0,"BW":0,"CF":0,"CI":0,"CM":0,"CD":0,"CG":0,"KM":0,"CV":0,"CR":0,"CY":0,"CZ":0,"DJ":0,"DM":0,"DO":0,"DZ":0,"ER":0,"EE":0,"FJ":0,"FM":0,"GA":0,"GE":0,"GN":0,"GM":0,"GW":0,"GQ":0,"GD":0,"GT":0,"GY":0,"HN":0,"HR":0,"HT":0,"HU":0,"IS":0,"JM":0,"KZ":0,"KG":0,"KH":0,"KI":0,"KN":0,"KW":0,"LA":0,"LB":0,"LR":0,"LY":0,"LC":0,"LI":0,"LK":0,"LS":0,"LT":0,"LU":0,"LV":0,"MC":0,"MD":0,"MG":0,"MV":0,"MH":0,"MK":0,"ML":0,"MT":0,"MM":0,"ME":0,"MN":0,"MZ":0,"MR":0,"MU":0,"MW":0,"NA":0,"NE":0,"NI":0,"NR":0,"OM":0,"PA":0,"PW":0,"PG":0,"KP":0,"PY":0,"PS":0,"QA":0,"RO":0,"RW":0,"SD":0,"SN":0,"SB":0,"SL":0,"SV":0,"SM":0,"SO":0,"RS":0,"SS":0,"ST":0,"SR":0,"SK":0,"SI":0,"SZ":0,"SC":0,"SY":0,"TD":0,"TG":0,"TJ":0,"TM":0,"TL":0,"TO":0,"TT":0,"TN":0,"TV":0,"UG":0,"UZ":0,"VA":0,"VC":0,"VU":0,"WS":0,"YE":0,"ZM":0,"ZW":0},"years":{},"missing":{"GB":0},"leftOut":{"GB":"England, Scotland, Wales and Northern Ireland play as four separate teams"}},
+  afcon: {"name":"Africa Cup of Nations won (men)","unit":"titles","decimals":0,"source":"Wikipedia","url":"https://en.wikipedia.org/w/index.php?title=Africa_Cup_of_Nations&oldid=1384333078","year":2025,"values":{"AR":0,"AU":0,"AT":0,"BD":0,"BE":0,"BO":0,"BR":0,"CA":0,"CL":0,"CN":0,"CO":0,"CU":0,"DK":0,"EC":0,"EG":7,"ET":1,"FI":0,"FR":0,"DE":0,"GH":4,"GR":0,"IN":0,"ID":0,"IR":0,"IQ":0,"IE":0,"IL":0,"IT":0,"JP":0,"JO":0,"KE":0,"MY":0,"MX":0,"MA":2,"NP":0,"NL":0,"NZ":0,"NG":3,"NO":0,"PK":0,"PE":0,"PH":0,"PL":0,"PT":0,"RU":0,"SA":0,"SG":0,"ZA":1,"KR":0,"ES":0,"SE":0,"CH":0,"TZ":0,"TH":0,"TR":0,"UA":0,"AE":0,"GB":0,"US":0,"UY":0,"VE":0,"VN":0,"AF":0,"AO":0,"AL":0,"AD":0,"AM":0,"AG":0,"AZ":0,"BI":0,"BJ":0,"BF":0,"BG":0,"BH":0,"BS":0,"BA":0,"BY":0,"BZ":0,"BB":0,"BN":0,"BT":0,"BW":0,"CF":0,"CI":3,"CM":5,"CD":2,"CG":1,"KM":0,"CV":0,"CR":0,"CY":0,"CZ":0,"DJ":0,"DM":0,"DO":0,"DZ":2,"ER":0,"EE":0,"FJ":0,"FM":0,"GA":0,"GE":0,"GN":0,"GM":0,"GW":0,"GQ":0,"GD":0,"GT":0,"GY":0,"HN":0,"HR":0,"HT":0,"HU":0,"IS":0,"JM":0,"KZ":0,"KG":0,"KH":0,"KI":0,"KN":0,"KW":0,"LA":0,"LB":0,"LR":0,"LY":0,"LC":0,"LI":0,"LK":0,"LS":0,"LT":0,"LU":0,"LV":0,"MC":0,"MD":0,"MG":0,"MV":0,"MH":0,"MK":0,"ML":0,"MT":0,"MM":0,"ME":0,"MN":0,"MZ":0,"MR":0,"MU":0,"MW":0,"NA":0,"NE":0,"NI":0,"NR":0,"OM":0,"PA":0,"PW":0,"PG":0,"KP":0,"PY":0,"PS":0,"QA":0,"RO":0,"RW":0,"SD":1,"SN":1,"SB":0,"SL":0,"SV":0,"SM":0,"SO":0,"RS":0,"SS":0,"ST":0,"SR":0,"SK":0,"SI":0,"SZ":0,"SC":0,"SY":0,"TD":0,"TG":0,"TJ":0,"TM":0,"TL":0,"TO":0,"TT":0,"TN":1,"TV":0,"UG":0,"UZ":0,"VA":0,"VC":0,"VU":0,"WS":0,"YE":0,"ZM":1,"ZW":0},"years":{},"missing":{}},
+  copa: {"name":"Copa América won (men)","unit":"titles","decimals":0,"source":"Wikipedia","url":"https://en.wikipedia.org/w/index.php?title=Copa_Am%C3%A9rica&oldid=1381888266","year":2024,"values":{"AR":16,"AU":0,"AT":0,"BD":0,"BE":0,"BO":1,"BR":9,"CA":0,"CL":2,"CN":0,"CO":1,"CU":0,"DK":0,"EC":0,"EG":0,"ET":0,"FI":0,"FR":0,"DE":0,"GH":0,"GR":0,"IN":0,"ID":0,"IR":0,"IQ":0,"IE":0,"IL":0,"IT":0,"JP":0,"JO":0,"KE":0,"MY":0,"MX":0,"MA":0,"NP":0,"NL":0,"NZ":0,"NG":0,"NO":0,"PK":0,"PE":2,"PH":0,"PL":0,"PT":0,"RU":0,"SA":0,"SG":0,"ZA":0,"KR":0,"ES":0,"SE":0,"CH":0,"TZ":0,"TH":0,"TR":0,"UA":0,"AE":0,"GB":0,"US":0,"UY":15,"VE":0,"VN":0,"AF":0,"AO":0,"AL":0,"AD":0,"AM":0,"AG":0,"AZ":0,"BI":0,"BJ":0,"BF":0,"BG":0,"BH":0,"BS":0,"BA":0,"BY":0,"BZ":0,"BB":0,"BN":0,"BT":0,"BW":0,"CF":0,"CI":0,"CM":0,"CD":0,"CG":0,"KM":0,"CV":0,"CR":0,"CY":0,"CZ":0,"DJ":0,"DM":0,"DO":0,"DZ":0,"ER":0,"EE":0,"FJ":0,"FM":0,"GA":0,"GE":0,"GN":0,"GM":0,"GW":0,"GQ":0,"GD":0,"GT":0,"GY":0,"HN":0,"HR":0,"HT":0,"HU":0,"IS":0,"JM":0,"KZ":0,"KG":0,"KH":0,"KI":0,"KN":0,"KW":0,"LA":0,"LB":0,"LR":0,"LY":0,"LC":0,"LI":0,"LK":0,"LS":0,"LT":0,"LU":0,"LV":0,"MC":0,"MD":0,"MG":0,"MV":0,"MH":0,"MK":0,"ML":0,"MT":0,"MM":0,"ME":0,"MN":0,"MZ":0,"MR":0,"MU":0,"MW":0,"NA":0,"NE":0,"NI":0,"NR":0,"OM":0,"PA":0,"PW":0,"PG":0,"KP":0,"PY":2,"PS":0,"QA":0,"RO":0,"RW":0,"SD":0,"SN":0,"SB":0,"SL":0,"SV":0,"SM":0,"SO":0,"RS":0,"SS":0,"ST":0,"SR":0,"SK":0,"SI":0,"SZ":0,"SC":0,"SY":0,"TD":0,"TG":0,"TJ":0,"TM":0,"TL":0,"TO":0,"TT":0,"TN":0,"TV":0,"UG":0,"UZ":0,"VA":0,"VC":0,"VU":0,"WS":0,"YE":0,"ZM":0,"ZW":0},"years":{},"missing":{}},
+  goldcup: {"name":"CONCACAF Gold Cup won (men)","unit":"titles","decimals":0,"source":"Wikipedia","url":"https://en.wikipedia.org/w/index.php?title=CONCACAF_Gold_Cup&oldid=1386329207","year":2025,"values":{"AR":0,"AU":0,"AT":0,"BD":0,"BE":0,"BO":0,"BR":0,"CA":1,"CL":0,"CN":0,"CO":0,"CU":0,"DK":0,"EC":0,"EG":0,"ET":0,"FI":0,"FR":0,"DE":0,"GH":0,"GR":0,"IN":0,"ID":0,"IR":0,"IQ":0,"IE":0,"IL":0,"IT":0,"JP":0,"JO":0,"KE":0,"MY":0,"MX":10,"MA":0,"NP":0,"NL":0,"NZ":0,"NG":0,"NO":0,"PK":0,"PE":0,"PH":0,"PL":0,"PT":0,"RU":0,"SA":0,"SG":0,"ZA":0,"KR":0,"ES":0,"SE":0,"CH":0,"TZ":0,"TH":0,"TR":0,"UA":0,"AE":0,"GB":0,"US":7,"UY":0,"VE":0,"VN":0,"AF":0,"AO":0,"AL":0,"AD":0,"AM":0,"AG":0,"AZ":0,"BI":0,"BJ":0,"BF":0,"BG":0,"BH":0,"BS":0,"BA":0,"BY":0,"BZ":0,"BB":0,"BN":0,"BT":0,"BW":0,"CF":0,"CI":0,"CM":0,"CD":0,"CG":0,"KM":0,"CV":0,"CR":0,"CY":0,"CZ":0,"DJ":0,"DM":0,"DO":0,"DZ":0,"ER":0,"EE":0,"FJ":0,"FM":0,"GA":0,"GE":0,"GN":0,"GM":0,"GW":0,"GQ":0,"GD":0,"GT":0,"GY":0,"HN":0,"HR":0,"HT":0,"HU":0,"IS":0,"JM":0,"KZ":0,"KG":0,"KH":0,"KI":0,"KN":0,"KW":0,"LA":0,"LB":0,"LR":0,"LY":0,"LC":0,"LI":0,"LK":0,"LS":0,"LT":0,"LU":0,"LV":0,"MC":0,"MD":0,"MG":0,"MV":0,"MH":0,"MK":0,"ML":0,"MT":0,"MM":0,"ME":0,"MN":0,"MZ":0,"MR":0,"MU":0,"MW":0,"NA":0,"NE":0,"NI":0,"NR":0,"OM":0,"PA":0,"PW":0,"PG":0,"KP":0,"PY":0,"PS":0,"QA":0,"RO":0,"RW":0,"SD":0,"SN":0,"SB":0,"SL":0,"SV":0,"SM":0,"SO":0,"RS":0,"SS":0,"ST":0,"SR":0,"SK":0,"SI":0,"SZ":0,"SC":0,"SY":0,"TD":0,"TG":0,"TJ":0,"TM":0,"TL":0,"TO":0,"TT":0,"TN":0,"TV":0,"UG":0,"UZ":0,"VA":0,"VC":0,"VU":0,"WS":0,"YE":0,"ZM":0,"ZW":0},"years":{},"missing":{}},
+  asiancup: {"name":"AFC Asian Cup won (men)","unit":"titles","decimals":0,"source":"Wikipedia","url":"https://en.wikipedia.org/w/index.php?title=AFC_Asian_Cup&oldid=1384305868","year":2023,"values":{"AR":0,"AU":1,"AT":0,"BD":0,"BE":0,"BO":0,"BR":0,"CA":0,"CL":0,"CN":0,"CO":0,"CU":0,"DK":0,"EC":0,"EG":0,"ET":0,"FI":0,"FR":0,"DE":0,"GH":0,"GR":0,"IN":0,"ID":0,"IR":3,"IQ":1,"IE":0,"IL":1,"IT":0,"JP":4,"JO":0,"KE":0,"MY":0,"MX":0,"MA":0,"NP":0,"NL":0,"NZ":0,"NG":0,"NO":0,"PK":0,"PE":0,"PH":0,"PL":0,"PT":0,"RU":0,"SA":3,"SG":0,"ZA":0,"KR":2,"ES":0,"SE":0,"CH":0,"TZ":0,"TH":0,"TR":0,"UA":0,"AE":0,"GB":0,"US":0,"UY":0,"VE":0,"VN":0,"AF":0,"AO":0,"AL":0,"AD":0,"AM":0,"AG":0,"AZ":0,"BI":0,"BJ":0,"BF":0,"BG":0,"BH":0,"BS":0,"BA":0,"BY":0,"BZ":0,"BB":0,"BN":0,"BT":0,"BW":0,"CF":0,"CI":0,"CM":0,"CD":0,"CG":0,"KM":0,"CV":0,"CR":0,"CY":0,"CZ":0,"DJ":0,"DM":0,"DO":0,"DZ":0,"ER":0,"EE":0,"FJ":0,"FM":0,"GA":0,"GE":0,"GN":0,"GM":0,"GW":0,"GQ":0,"GD":0,"GT":0,"GY":0,"HN":0,"HR":0,"HT":0,"HU":0,"IS":0,"JM":0,"KZ":0,"KG":0,"KH":0,"KI":0,"KN":0,"KW":1,"LA":0,"LB":0,"LR":0,"LY":0,"LC":0,"LI":0,"LK":0,"LS":0,"LT":0,"LU":0,"LV":0,"MC":0,"MD":0,"MG":0,"MV":0,"MH":0,"MK":0,"ML":0,"MT":0,"MM":0,"ME":0,"MN":0,"MZ":0,"MR":0,"MU":0,"MW":0,"NA":0,"NE":0,"NI":0,"NR":0,"OM":0,"PA":0,"PW":0,"PG":0,"KP":0,"PY":0,"PS":0,"QA":2,"RO":0,"RW":0,"SD":0,"SN":0,"SB":0,"SL":0,"SV":0,"SM":0,"SO":0,"RS":0,"SS":0,"ST":0,"SR":0,"SK":0,"SI":0,"SZ":0,"SC":0,"SY":0,"TD":0,"TG":0,"TJ":0,"TM":0,"TL":0,"TO":0,"TT":0,"TN":0,"TV":0,"UG":0,"UZ":0,"VA":0,"VC":0,"VU":0,"WS":0,"YE":0,"ZM":0,"ZW":0},"years":{},"missing":{}}
 };
 
 return { STATS };
@@ -24330,7 +24497,7 @@ return { STATS };
 
 // ---- stat-citations.js
 __modules["stat-citations.js"] = (() => {
-// Generated by tools/build-citations.mjs on 2026-11-20. Do not edit by hand.
+// Generated by tools/build-citations.mjs on 2026-11-22. Do not edit by hand.
 // Where every stat in stats-data.js comes from: the original producer, what exactly is
 // measured, how the game works it out where it does, and links to check it.
 const CITATIONS = {
@@ -25042,18 +25209,6 @@ const CITATIONS = {
     ],
     "note": ""
   },
-  "foodwaste": {
-    "short": "UN FAO and United Nations Environment Programme, via Our World in Data",
-    "producer": "Food and Agriculture Organization of the United Nations and United Nations Environment Programme; processed by Our World in Data",
-    "what": "Retail (kilograms). Food waste per capita (KG).",
-    "links": [
-      {
-        "label": "Our World in Data: Food waste per capita",
-        "url": "https://ourworldindata.org/grapher/food-waste-per-capita"
-      }
-    ],
-    "note": ""
-  },
   "drinkers": {
     "short": "World Health Organization – Global Health Observatory, via Our World in Data",
     "producer": "World Health Organization – Global Health Observatory (2026); processed by Our World in Data",
@@ -25666,18 +25821,6 @@ const CITATIONS = {
       {
         "label": "The exact data the game uses (World Bank data service)",
         "url": "https://api.worldbank.org/v2/country/all/indicator/ER.PTD.TOTL.ZS?format=json&per_page=20000&date=2010:2026"
-      }
-    ],
-    "note": ""
-  },
-  "farmlandpp": {
-    "short": "UN FAO, via Our World in Data",
-    "producer": "Food and Agriculture Organization of the United Nations (2025); processed by Our World in Data",
-    "what": "Agricultural land use per capita - UN FAO (hectares per capita). Agricultural land is the sum of cropland and land used as pasture for grazing livestock.",
-    "links": [
-      {
-        "label": "Our World in Data: Agricultural land per capita",
-        "url": "https://ourworldindata.org/grapher/agricultural-area-per-capita"
       }
     ],
     "note": ""
@@ -27597,38 +27740,6 @@ const CITATIONS = {
     ],
     "note": "The UK is left out: England, Scotland, Wales and Northern Ireland play as four teams. Germany includes West Germany. United Kingdom is left out: England, Scotland, Wales and Northern Ireland play as four separate teams."
   },
-  "euros": {
-    "short": "Wikipedia (RSSSF)",
-    "producer": "Wikipedia editors, from RSSSF",
-    "what": "Men's UEFA European Championships won, 1960 to 2024, from the summary table of Wikipedia's \"UEFA European Championship\" (which cites RSSSF). A country that never won counts as 0.",
-    "links": [
-      {
-        "label": "Wikipedia: UEFA European Championship (the revision the game used)",
-        "url": "https://en.wikipedia.org/w/index.php?title=UEFA_European_Championship&oldid=1384979470"
-      },
-      {
-        "label": "RSSSF: European Championship",
-        "url": "https://www.rsssf.org/tablese/eurochamp.html"
-      }
-    ],
-    "note": "Germany includes West Germany. Titles of countries that no longer exist (the Soviet Union 1960, Czechoslovakia 1976) count for none. The UK is left out (England plays as its own team). United Kingdom is left out: England, Scotland, Wales and Northern Ireland play as four separate teams."
-  },
-  "afcon": {
-    "short": "Wikipedia",
-    "producer": "Wikipedia editors",
-    "what": "Men's Africa Cup of Nations won, 1957 to 2025, from the summary table of Wikipedia's \"Africa Cup of Nations\". A country that never won counts as 0.",
-    "links": [
-      {
-        "label": "Wikipedia: Africa Cup of Nations (the revision the game used)",
-        "url": "https://en.wikipedia.org/w/index.php?title=Africa_Cup_of_Nations&oldid=1384333078"
-      },
-      {
-        "label": "CAF: Africa Cup of Nations",
-        "url": "https://www.cafonline.com/caf-africa-cup-of-nations/"
-      }
-    ],
-    "note": "Egypt's titles include those won as the United Arab Republic; DR Congo's those won as Congo-Kinshasa and Zaire."
-  },
   "eurobasket": {
     "short": "Wikipedia (FIBA)",
     "producer": "FIBA; table by Wikipedia editors",
@@ -28088,6 +28199,126 @@ const CITATIONS = {
       }
     ],
     "note": ""
+  },
+  "farmlandpp": {
+    "short": "UN FAO, via Our World in Data",
+    "producer": "Food and Agriculture Organization of the United Nations (2025); processed by Our World in Data",
+    "what": "Agricultural land use per capita - UN FAO (hectares per capita). Agricultural land is the sum of cropland and land used as pasture for grazing livestock.",
+    "links": [
+      {
+        "label": "Our World in Data: Agricultural land per capita",
+        "url": "https://ourworldindata.org/grapher/agricultural-area-per-capita"
+      }
+    ],
+    "note": "The game converts the unit: OWID's hectares per person × 10,000 = m² per person."
+  },
+  "foodwaste": {
+    "short": "UN FAO and United Nations Environment Programme, via Our World in Data",
+    "producer": "Food and Agriculture Organization of the United Nations and United Nations Environment Programme; processed by Our World in Data",
+    "what": "Household (kilograms). Food waste per capita (KG).",
+    "links": [
+      {
+        "label": "Our World in Data: Food waste per capita",
+        "url": "https://ourworldindata.org/grapher/food-waste-per-capita"
+      }
+    ],
+    "note": ""
+  },
+  "womenseuro": {
+    "short": "Wikipedia",
+    "producer": "Wikipedia editors",
+    "what": "UEFA Women's Championships won (gold medals), 1984 to 2025, from the medal table of Wikipedia's \"UEFA Women's Championship\". A country that never won counts as 0.",
+    "links": [
+      {
+        "label": "Wikipedia: UEFA Women's Championship (the revision the game used)",
+        "url": "https://en.wikipedia.org/w/index.php?title=UEFA_Women's_Championship&oldid=1368970734"
+      },
+      {
+        "label": "UEFA: Women's EURO",
+        "url": "https://www.uefa.com/womenseuro/"
+      }
+    ],
+    "note": "Germany includes West Germany (1989, 1991). The UK is left out: England plays as its own team (champions in 2022 and 2025). United Kingdom is left out: England, Scotland, Wales and Northern Ireland play as four separate teams."
+  },
+  "euros": {
+    "short": "Wikipedia (RSSSF)",
+    "producer": "Wikipedia editors, from RSSSF",
+    "what": "Men's UEFA European Championships won, 1960 to 2024, from the summary table of Wikipedia's \"UEFA European Championship\" (which cites RSSSF). A country that never won counts as 0.",
+    "links": [
+      {
+        "label": "Wikipedia: UEFA European Championship (the revision the game used)",
+        "url": "https://en.wikipedia.org/w/index.php?title=UEFA_European_Championship&oldid=1384979470"
+      },
+      {
+        "label": "RSSSF: European Championship",
+        "url": "https://www.rsssf.org/tablese/eurochamp.html"
+      }
+    ],
+    "note": "Germany includes West Germany. Titles of countries that no longer exist (the Soviet Union 1960, Czechoslovakia 1976) count for none. The UK is left out (England plays as its own team). United Kingdom is left out: England, Scotland, Wales and Northern Ireland play as four separate teams."
+  },
+  "afcon": {
+    "short": "Wikipedia",
+    "producer": "Wikipedia editors",
+    "what": "Men's Africa Cup of Nations won, 1957 to 2025, from the summary table of Wikipedia's \"Africa Cup of Nations\". A country that never won counts as 0.",
+    "links": [
+      {
+        "label": "Wikipedia: Africa Cup of Nations (the revision the game used)",
+        "url": "https://en.wikipedia.org/w/index.php?title=Africa_Cup_of_Nations&oldid=1384333078"
+      },
+      {
+        "label": "CAF: Africa Cup of Nations",
+        "url": "https://www.cafonline.com/caf-africa-cup-of-nations/"
+      }
+    ],
+    "note": "Egypt's titles include those won as the United Arab Republic; DR Congo's those won as Congo-Kinshasa and Zaire."
+  },
+  "copa": {
+    "short": "Wikipedia (RSSSF)",
+    "producer": "Wikipedia editors, from RSSSF",
+    "what": "Men's Copa América titles, 1916 to 2024 (including the South American Championships before 1975, which CONMEBOL counts as Copa América), from the table \"Teams reaching the top four\" in Wikipedia's \"Copa América\". A country that never won counts as 0.",
+    "links": [
+      {
+        "label": "Wikipedia: Copa América (the revision the game used)",
+        "url": "https://en.wikipedia.org/w/index.php?title=Copa_Am%C3%A9rica&oldid=1381888266"
+      },
+      {
+        "label": "RSSSF: Copa América",
+        "url": "https://www.rsssf.org/tablesc/copa-america.html"
+      }
+    ],
+    "note": ""
+  },
+  "goldcup": {
+    "short": "Wikipedia",
+    "producer": "Wikipedia editors",
+    "what": "Men's CONCACAF Gold Cups won, 1991 to 2025, from the table \"Performances\" in Wikipedia's \"CONCACAF Gold Cup\". The CONCACAF Championships before 1991 are not counted. A country that never won counts as 0.",
+    "links": [
+      {
+        "label": "Wikipedia: CONCACAF Gold Cup (the revision the game used)",
+        "url": "https://en.wikipedia.org/w/index.php?title=CONCACAF_Gold_Cup&oldid=1386329207"
+      },
+      {
+        "label": "CONCACAF: Gold Cup",
+        "url": "https://www.concacaf.com/gold-cup/"
+      }
+    ],
+    "note": ""
+  },
+  "asiancup": {
+    "short": "Wikipedia",
+    "producer": "Wikipedia editors",
+    "what": "Men's AFC Asian Cup titles, 1956 to 2023, from the table \"Teams reaching the top four\" in Wikipedia's \"AFC Asian Cup\". A country that never won counts as 0.",
+    "links": [
+      {
+        "label": "Wikipedia: AFC Asian Cup (the revision the game used)",
+        "url": "https://en.wikipedia.org/w/index.php?title=AFC_Asian_Cup&oldid=1384305868"
+      },
+      {
+        "label": "AFC: Asian Cup",
+        "url": "https://www.the-afc.com/en/national/afc_asian_cup.html"
+      }
+    ],
+    "note": "Israel won in 1964, when it still played in Asia; Australia has played since 2007."
   }
 };
 
@@ -28353,6 +28584,10 @@ const STAT_WORDS = {
   wcappspp: ask("Men's World Cups per person", "For its population, which country has played at the most men's World Cups?", "For its population, which country has played at the fewest men's World Cups?"),
   euros: ask("European Championships won", "Which country has won the most men's European Championships in football?", "Which country has won the fewest men's European Championships in football?"),
   afcon: ask("Africa Cup of Nations won", "Which country has won the most men's Africa Cup of Nations?", "Which country has won the fewest men's Africa Cup of Nations?"),
+  copa: ask("Copa América won", "Which country has won the men's Copa América the most times?", "Which country has won the men's Copa América the fewest times?"),
+  asiancup: ask("Asian Cup won", "Which country has won the men's Asian Cup the most times?", "Which country has won the men's Asian Cup the fewest times?"),
+  goldcup: ask("Gold Cup won", "Which country has won the men's Gold Cup the most times?", "Which country has won the men's Gold Cup the fewest times?"),
+  womenseuro: ask("Women's European Championships won", "Which country has won the Women's European Championship the most times?", "Which country has won the Women's European Championship the fewest times?"),
   eurobasket: ask("EuroBasket titles", "Which country has won the most men's EuroBasket titles (the European Championship in basketball)?", "Which country has won the fewest men's EuroBasket titles?"),
   afrobasket: ask("AfroBasket titles", "Which country has won the most men's AfroBasket titles (the African Championship in basketball)?", "Which country has won the fewest men's AfroBasket titles?"),
   asiacup: ask("FIBA Asia Cup titles", "Which country has won the most men's FIBA Asia Cups (the Asian Championship in basketball)?", "Which country has won the fewest men's FIBA Asia Cups?"),
@@ -28936,6 +29171,27 @@ function pickFrom(items, random) {
 // Each competitive day spreads difficulty levels 1–5 across its five rounds in a
 // different order, so every day is equally hard overall but the tough round moves
 // around. Casual plays the very same rounds, untimed. Every round knows its mode.
+// What a saved day was played on (22 November 2026: days get redone after the team's review).
+// A day in a calendar can carry `rev` (default 1), raised when its questions are redone;
+// each round has a key that changes only when its answer does (not its wording). A save
+// keeps both: a round whose key changed starts fresh, and a save from before keys existed
+// is only trusted while the day is still on its first revision.
+const getDayRevision = (dateKey, mode = "competitive") => calendarOf(mode)[dateKey]?.rev || 1;
+function getRoundKeys(dateKey, mode = "competitive") {
+  const sorted = list => [...(list || [])].sort();
+  return getDailyPlan(dateKey, mode).map(round => {
+    if (round.type === "extreme") return `${round.stat}:${round.find}`;
+    if (round.type === "mystery" || round.type === "pinpoint") return `${round.type}:${round.answer}`;
+    if (round.type === "deepcut") return `deepcut:${sorted(Object.values(round.answers || {}).flat()).join(",")}`;
+    if (round.type === "paint") return `paint:${sorted(round.answers).join(",")}`;
+    if (round.type === "rank") {
+      const name = topic => (typeof topic === "object" ? topic?.topic : topic) ?? "";
+      return `rank:${name(round.topic)}:${(round.answer || []).join(",")}:${name(round.reroll?.topic)}:${(round.reroll?.answer || []).join(",")}`;
+    }
+    return round.type;
+  });
+}
+
 function getDailyPlan(dateKey, mode = "competitive") {
   if (mode === "extremes") return getExtremePlan(dateKey);
   const difficulties = shuffle([1, 2, 3, 4, 5], seededRandom(`plan:${dateKey}`));
@@ -29208,7 +29464,7 @@ function getDayScore(plan, states) {
   };
 }
 
-return { PRESEASON, PRESEASON_DATES, hasPreseasonDay, isPreseasonMonth, MODES, MAIN_MODE, MODE_INFO, ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, SPEED_WINDOW_MS, getSpeedWindow, MAX_SPEED_BONUS, getSpeedMultiplier, getMaxScore, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, getNeighbourHardness, getPaintPoolEntry, resolveRound, resolvePlan, getDayInfo, getDailyPlan, hasExtremeDay, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
+return { PRESEASON, PRESEASON_DATES, hasPreseasonDay, isPreseasonMonth, MODES, MAIN_MODE, MODE_INFO, ROUND_TYPES, ROUND_INFO, MAX_ROUND_SCORE, WRONG_PENALTY, MAX_GUESSES, STREAK_STEP, MAX_DAILY_SCORE, SPEED_WINDOW_MS, getSpeedWindow, MAX_SPEED_BONUS, getSpeedMultiplier, getMaxScore, RANK_METRICS, JOURNEY_TYPES, getJourney, getRankMetric, getCountry, evaluateGuess, getNeighbourHardness, getPaintPoolEntry, resolveRound, resolvePlan, getDayInfo, getDayRevision, getRoundKeys, getDailyPlan, hasExtremeDay, DEEP_CUT_TIERS, getDeepCutAnswers, getGuessSummary, getPinpointClues, createRoundState, getRankHints, getRoundProgress, getDayScore };
 })();
 
 // ---- community.js
@@ -33200,7 +33456,7 @@ const { COUNTRIES, TERRITORIES } = __modules["countries.js"];
 const { BORDER_KM } = __modules["border-data.js"];
 const { formatValue, getStat } = __modules["extremes.js"];
 const { DUEL_CATEGORIES } = __modules["duel-categories.js"];
-const { BID_MAX, BID_MIN, BID_POINTS, DUEL_MAX_ROUND, DUEL_MAX_SPEED_BONUS, DUEL_ROUNDS, DUEL_TIMES, GRACE_MS, GUESS_COST_PER_COUNTRY, PIN_RADII, ROUTE_STEP_PENALTY, PARTY_MIN_START, activeSeats, canStep, rivalOf, roundTime, routeGraph, seatsOf, standings } = __modules["duel-rules.js"];
+const { BID_MAX, BID_MIN, BID_POINTS, DUEL_MAX_ROUND, DUEL_MAX_SPEED_BONUS, DUEL_ROUNDS, DUEL_TIMES, GRACE_MS, GUESS_COST_PER_COUNTRY, PIN_RADII, ROUTE_STEP_PENALTY, PARTY_MIN_START, activeSeats, canStep, rematchHost, rematchIn, rematchReady, rematchSeats, rivalOf, roundTime, routeGraph, seatsOf, standings } = __modules["duel-rules.js"];
 const { createTentCanvas } = __modules["tents.js"];
 const { getTentLook } = __modules["base.js"];
 const { callDuel, findOpenDuel, getUser, isConfigured, watchDuel } = __modules["auth.js"];
@@ -33318,9 +33574,12 @@ function createDuel({ globe, onExit, onSignIn, onMatchStart = () => {}, notice =
     if (!data?.id) return;
     if (data.now) offset = data.now - Date.now();
     if (match && match.id === data.id && data.version != null && match.version != null && data.version < match.version) return;
+    // A finished match polled again (the rematch lobby): nothing new, nothing to redraw.
+    if (match && match.id === data.id && data.version != null && data.version === match.version && match.state?.phase === "done") return;
     const changed = !match || match.id !== data.id;
     match = { id: data.id, code: data.code ?? match?.code, you: data.you ?? match?.you, status: data.status, state: data.state, version: data.version ?? match?.version };
     if (changed) watch();
+    if (rematchSettled()) return;
     // The lobby filled while you waited on the menu: to the match.
     const live = match.state.phase !== "lobby" && match.status !== "done" && match.status !== "abandoned" && match.state.phase !== "done";
     if (!open && live) { onMatchStart(); show(); }
@@ -33350,7 +33609,69 @@ function createDuel({ globe, onExit, onSignIn, onMatchStart = () => {}, notice =
     queue = run.catch(() => {});
     return run;
   };
-  const sync = () => match && match.status !== "done" && match.status !== "abandoned" && send("sync", { id: match.id });
+  const sync = () => match && ((match.status !== "done" && match.status !== "abandoned") || inRematch()) && send("sync", { id: match.id });
+
+  // -------------------------------------------------------------------------
+  // The rematch (22 November 2026): after a match everyone goes back to the lobby on the
+  // VERSUS card (engine.js) and presses REMATCH; the referee then makes a new match with the
+  // same players in the same seats, and the old one points to it (state.rematch.next).
+  // -------------------------------------------------------------------------
+  const rematchOf = () => (state()?.phase === "done" ? state().rematch || {} : null);
+  // You can still play this match again: it ended, you're in it, nobody called it off.
+  function inRematch() {
+    const r = rematchOf();
+    return Boolean(r && rematchSeats(state()).includes(me()) && !r.out?.[me()] && !r.off && !r.next);
+  }
+  let following = null;
+  let offShown = null;
+  // On every change of a finished match: off (someone left), or started (to the new match).
+  // Returns true when the match was put aside.
+  function rematchSettled() {
+    const r = rematchOf();
+    if (!r || !rematchSeats(state()).includes(me()) || r.out?.[me()]) return false;
+    if (r.next) { followRematch(r.next); return false; }
+    if (r.off && offShown !== match.id) {
+      offShown = match.id;
+      const gone = rematchSeats(state()).filter(seat => r.out?.[seat] && seat !== me());
+      showToastNotice(gone.length === 1 ? t("duel.rematch.offName", { name: nameOf(gone[0]) }) : t("duel.rematch.off"));
+      // Waiting in the lobby on the menu: the lobby goes. On the end screen it stays (no REMATCH).
+      if (!open) { forget(); return true; }
+    }
+    return false;
+  }
+  async function followRematch(next) {
+    if (following === next.id) return;
+    following = next.id;
+    if (!next.seats.includes(me())) { showToastNotice(t("duel.rematch.withoutYou")); forget(); return; }
+    for (let attempt = 0; attempt < 6; attempt++) {
+      try {
+        const data = await callDuel("sync", { id: next.id });
+        if (data?.id) { take(data); return; }
+      } catch { /* not there yet */ }
+      await new Promise(done => setTimeout(done, 700));
+    }
+    showToastNotice(t("duel.rematch.lost"), { problem: true });
+  }
+  // REMATCH (or cancelling it); a Party's host starts once enough are ready.
+  function rematchVote() {
+    if (!inRematch()) return;
+    const s = state();
+    const ready = Boolean(s.rematch?.ready?.[me()]);
+    if (ready && rematchCanStart()) return move({ type: "rematchStart" });
+    return move({ type: "rematch", on: !ready });
+  }
+  // A Party's host, ready with enough others but not everyone: START WITH n.
+  function rematchCanStart() {
+    const s = state();
+    if (!isParty() || rematchHost(s) !== me()) return false;
+    const ready = rematchReady(s).length + (s.rematch?.ready?.[me()] ? 0 : 1);
+    return ready >= PARTY_MIN_START && ready < rematchIn(s).length;
+  }
+  // From the end screen to the lobby on the menu (REMATCH presses it on the way).
+  function toLobby(vote = false) {
+    if (vote && !state().rematch?.ready?.[me()]) move({ type: "rematch", on: true });
+    hide();
+  }
 
   async function watch() {
     stopWatching();
@@ -33361,7 +33682,7 @@ function createDuel({ globe, onExit, onSignIn, onMatchStart = () => {}, notice =
     });
     clearInterval(syncTimer);
     // Also while the lobby waits on the menu (Realtime first; this is the fallback).
-    syncTimer = setInterval(() => { if (!document.hidden && (open || match?.state?.phase === "lobby")) sync(); }, SYNC_MS);
+    syncTimer = setInterval(() => { if (!document.hidden && (open || match?.state?.phase === "lobby" || inRematch())) sync(); }, SYNC_MS);
   }
 
   // -------------------------------------------------------------------------
@@ -34507,8 +34828,23 @@ function createDuel({ globe, onExit, onSignIn, onMatchStart = () => {}, notice =
       dots.children[1].classList.toggle("is-on", onSecond);
     }, { passive: true });
     const actions = el("div", "duel-actions");
-    actions.append(button(t("duel.menu"), "duel-go is-small is-ghost", () => { forget(); hide(); }), button(t("duel.newMatch"), "duel-go is-small is-ghost", () => { forget(); hide(); create(2); }));
+    actions.append(...doneActions(2));
     panel.replaceChildren(pages, dots, actions);
+  }
+
+  // Under both end screens: REMATCH and BACK TO THE LOBBY (the lobby on the VERSUS card),
+  // with who's ready; without a rematch (someone left) the menu and a new lobby, as before.
+  function doneActions(size) {
+    if (!inRematch()) return [button(t("duel.menu"), "duel-go is-small is-ghost", () => { forget(); hide(); }), button(t("duel.newMatch"), "duel-go is-small is-ghost", () => { forget(); hide(); create(size); })];
+    const s = state();
+    const ready = rematchReady(s);
+    const others = ready.filter(seat => seat !== me());
+    const mine = Boolean(s.rematch?.ready?.[me()]);
+    const go = button(mine ? t("duel.rematch.readyBack") : t("duel.rematch.go"), "duel-go is-small", () => toLobby(true));
+    if (others.length) go.dataset.note = isParty() ? t("duel.rematch.readyCount", { have: ready.length, n: rematchIn(s).length }) : t("duel.rematch.wants", { name: nameOf(others[0]) });
+    const list = [go, button(t("duel.rematch.toLobby"), "duel-go is-small is-ghost", () => toLobby(false))];
+    if (go.dataset.note) list.unshift(el("p", "duel-fine duel-rematch-note", go.dataset.note));
+    return list;
   }
 
   // A Party's end, in the same two pages: the podium (everyone by place, the winner raised
@@ -34585,7 +34921,7 @@ function createDuel({ globe, onExit, onSignIn, onMatchStart = () => {}, notice =
     }, { passive: true });
     const size = seats().length;
     const actions = el("div", "duel-actions");
-    actions.append(button(t("duel.menu"), "duel-go is-small is-ghost", () => { forget(); hide(); }), button(t("duel.newMatch"), "duel-go is-small is-ghost", () => { forget(); hide(); create(size); }));
+    actions.append(...doneActions(size));
     panel.replaceChildren(pages, dots, actions);
   }
 
@@ -34627,7 +34963,11 @@ function createDuel({ globe, onExit, onSignIn, onMatchStart = () => {}, notice =
     // Your tent changed under My tent while you wait: the others see the new one.
     refreshTent: () => { if (match && ["lobby", "versus"].includes(match.state.phase)) move({ type: "tent" }); },
     current: () => match,
-    inLobby: () => match?.state?.phase === "lobby",
+    // In a lobby: waiting for players, or after a match deciding on a rematch.
+    inLobby: () => match?.state?.phase === "lobby" || inRematch(),
+    inRematch,
+    rematchVote,
+    rematchCanStart,
     onChange: listener => changeListeners.push(listener),
     isOpen: () => open,
     // An invite still waiting (you went to sign in): open the match screen again.
@@ -36356,7 +36696,7 @@ const { COUNTRIES, LEGACY_COUNTRY_ISOS, TERRITORIES } = __modules["countries.js"
 const { LIGHT_DEVICE, PixelGlobe } = __modules["globe.js"];
 const { JOURNEYS, ROUND_COLORS, createJourney, scoreTier } = __modules["journeys.js"];
 const { getAccountUnits, getDuelHistory, saveUnits } = __modules["auth.js"];
-const { DUEL_ROUNDS, PARTY_MIN_START, seatsOf, standings } = __modules["duel-rules.js"];
+const { DUEL_ROUNDS, PARTY_MIN_START, rematchHost, rematchIn, rematchReady, rematchSeats, seatsOf, standings } = __modules["duel-rules.js"];
 const { getAccountLanguage, getProfile, getUser, initAuth, isConfigured: isAuthConfigured, pullDays, pushDay, saveLanguage, sendEmailLink, signIn, signOut, takeAuthRedirectError, verifyEmailCode } = __modules["auth.js"];
 const { ROUND_PICTURES } = __modules["round-pictures.js"];
 const { CLUES } = __modules["clues.js"];
@@ -36380,7 +36720,7 @@ const { setUnits } = __modules["i18n.js"];
 const { LANGUAGES, applyI18n, clueText, countryName, getLang, localNames, locale, num, onLangChange, placeName, setLang, t, tapWords, unitText } = __modules["i18n.js"];
 // Note: every module must import a given file with the same "?v=" tag, or the browser
 // loads two separate copies of it. All files use one shared tag, bumped on each release.
-const { hasExtremeDay, MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MAIN_MODE, MODES, MODE_INFO, getSpeedWindow, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayScore, getPinpointClues, getRoundProgress, PRESEASON_DATES } = __modules["daily.js"];
+const { hasExtremeDay, MAX_DAILY_SCORE, MAX_GUESSES, MAX_SPEED_BONUS, MAIN_MODE, MODES, MODE_INFO, getSpeedWindow, getMaxScore, getSpeedMultiplier, MAX_ROUND_SCORE, RANK_METRICS, getRankMetric, getJourney, STREAK_STEP, WRONG_PENALTY, ROUND_INFO, ROUND_TYPES, createRoundState, evaluateGuess, getGuessSummary, DEEP_CUT_TIERS, getDayInfo, getDeepCutAnswers, getRankHints, resolvePlan, resolveRound, getCountry, getDailyPlan, getDayRevision, getRoundKeys, getDayScore, getPinpointClues, getRoundProgress, PRESEASON_DATES } = __modules["daily.js"];
 const { showHowToSet, createFlagImage, PLAY_ART, PLAY_ART_COLORS, createPixelArt, createGuessRow, initializeCountryInput, createCountryInput, initializeMainMenu, isCloseMatch, normalizeCountryName, renderGlobeMarkerTooltip, resetCountryInput, setGuessHighlight, playGuessReveal, playClueCard, playRankReveal, getMysteryClue, showToastNotice, showSkip, updateDailyScoreUI } = __modules["ui.js"];
 
 // v3: Deep Cut and Paint the Map replaced Capital Call and Border Patrol (October 2026).
@@ -36552,15 +36892,21 @@ function readJson(key) {
 const dayRef = () => `${activeMode}:${activeDate}`;
 
 // Saved day state, merged over fresh defaults so older or partial saves still load.
+// A save from before its day was redone is ignored (isStaleSave), and a round whose
+// question changed starts fresh (keys, getRoundKeys in daily.js).
 function readDayState(dateKey, mode = "competitive") {
   const saved = readJson(`${storagePrefix(mode)}${dateKey}`);
-  if (!saved || !Array.isArray(saved.rounds)) return null;
+  if (!saved || !Array.isArray(saved.rounds) || isStaleSave(saved, dateKey, mode)) return null;
+  const keys = getRoundKeys(dateKey, mode);
   return {
     version: 2,
+    rev: getDayRevision(dateKey, mode),
+    keys,
     rounds: roundTypesOf(dateKey, mode).map((type, index) => {
       const fresh = createRoundState(type);
       const stored = saved.rounds[index];
       if (!stored || typeof stored !== "object") return fresh;
+      if (Array.isArray(saved.keys) && saved.keys[index] !== keys[index]) return fresh;
       return Object.fromEntries(Object.entries(fresh).map(([key, value]) =>
         [key, Array.isArray(value) ? (Array.isArray(stored[key]) ? stored[key] : value) : (stored[key] ?? value)]
       ));
@@ -36569,7 +36915,14 @@ function readDayState(dateKey, mode = "competitive") {
 }
 
 function loadDay(dateKey, mode = "competitive") {
-  return readDayState(dateKey, mode) || { version: 2, rounds: roundTypesOf(dateKey, mode).map(createRoundState) };
+  return readDayState(dateKey, mode) || { version: 2, rev: getDayRevision(dateKey, mode), keys: getRoundKeys(dateKey, mode), rounds: roundTypesOf(dateKey, mode).map(createRoundState) };
+}
+
+// A save without round keys comes from before 22 November 2026: it's only trusted while
+// its day is on its first revision. With keys, readDayState resets just the changed rounds.
+function isStaleSave(saved, dateKey, mode) {
+  if (!saved) return false;
+  return !Array.isArray(saved.keys) && (saved.rev || 1) !== getDayRevision(dateKey, mode);
 }
 
 // The round types of a day in a mode (the globe mode has six of its own).
@@ -39576,6 +39929,7 @@ function renderHero() {
     document.getElementById("heroNewer").disabled = index <= 0;
   }
   const go = document.getElementById("heroGo");
+  go.classList.remove("is-ready");
   const record = daily && state === "done" ? getDayRecord(today, key) : null;
   go.textContent = key === "duel" ? t("menu.duelGoShort") : key === "tent" ? t("menu.tentGo") : camp ? t("menu.pinGoCamp")
     : daily ? (state === "done" ? `✓ ${num(record.score ?? 0)}` : state === "started" ? t("menu.continueGo") : t("menu.startGame", { name: info.title() }))
@@ -39624,6 +39978,7 @@ function renderHero() {
 const LOBBY_COLORS = ["#c58cff", "#45e3ff", "#ff8a5c"]; // the others, as in the match
 function renderLobby(card) {
   const match = duel.current();
+  if (duel.inRematch()) { renderRematchLobby(card, match); return; }
   const { state, you } = match;
   const seats = seatsOf(state);
   const filled = seats.filter(seat => state.players[seat]);
@@ -39662,6 +40017,7 @@ function renderLobby(card) {
     } else item.append(Object.assign(document.createElement("small"), { textContent: t("lobby.joined") }));
     return item;
   }));
+  document.querySelector("#heroLobby .lobby-invite").hidden = false;
   setText("lobbyCode", match.code);
   document.getElementById("lobbyShare").hidden = !navigator.share;
   // START WITH 3 (the host of a Party of 4, once 3 are in) and LEAVE.
@@ -39678,6 +40034,58 @@ function renderLobby(card) {
   document.getElementById("heroSide2").hidden = true;
   card.querySelector(".hero-actions").classList.remove("is-three");
 }
+// After a match (22 November 2026): the same lobby, now for a rematch. Everyone who played
+// to the end, with READY or still deciding, and the last match's score; REMATCH (or ✓ READY
+// to take it back; a Party's host: START WITH n once enough are ready) and LEAVE. No code:
+// it's the same players.
+function renderRematchLobby(card, match) {
+  const { state, you } = match;
+  const seats = rematchSeats(state);
+  const ready = rematchReady(state);
+  const inIt = rematchIn(state);
+  const mine = Boolean(state.rematch?.ready?.[you]);
+  const party = seatsOf(state).length > 2;
+  const host = rematchHost(state);
+  card.classList.add("is-lobby");
+  setText("heroRibbon", `${party ? t("duel.party.label", { n: inIt.length }) : "1V1"} · ${t("duel.rematch.ribbon")}`);
+  document.getElementById("heroRibbon").hidden = false;
+  setText("heroTitle", t("duel.rematch.title"));
+  setText("heroText", party ? t("duel.rematch.textParty", { n: PARTY_MIN_START }) : t("duel.rematch.text"));
+  setText("heroStatus", state.rematch?.starting ? t("duel.rematch.starting") : t("duel.rematch.readyCount", { have: ready.length, n: inIt.length }));
+  document.getElementById("heroLobby").hidden = false;
+  const others = seatsOf(state).filter(seat => seat !== you);
+  const box = document.getElementById("lobbySeats");
+  box.style.setProperty("--n", String(seats.length));
+  box.replaceChildren(...seats.map(seat => {
+    const player = state.players[seat];
+    const out = Boolean(state.rematch?.out?.[seat]);
+    const isReady = Boolean(state.rematch?.ready?.[seat]);
+    const item = document.createElement("div");
+    const isMine = seat === you;
+    item.className = `lobby-seat${isMine ? " is-you" : ""}${out ? " is-out" : ""}${isReady ? " is-ready" : ""}`;
+    item.style.setProperty("--me", isMine ? "#ffd45c" : LOBBY_COLORS[others.indexOf(seat)] || LOBBY_COLORS[0]);
+    if (seat === host && party) item.append(Object.assign(document.createElement("span"), { className: "lobby-host", textContent: t("lobby.host") }));
+    const look = isMine ? getTentLook() : player.tent || { style: "aframe", avatar: "none", color: "#5b8cff" };
+    item.append(createTentCanvas(look, 3, "lobby-tent", { centred: true }), Object.assign(document.createElement("b"), { textContent: isMine ? t("duel.you") : player.name }));
+    item.append(Object.assign(document.createElement("small"), { textContent: out ? t("duel.rematch.seatLeft") : isReady ? t("duel.rematch.seatReady") : t("duel.rematch.seatDeciding") }));
+    item.append(Object.assign(document.createElement("small"), { className: "lobby-last", textContent: t("duel.rematch.lastScore", { n: num(state.totals?.[seat] || 0) }) }));
+    return item;
+  }));
+  document.querySelector("#heroLobby .lobby-invite").hidden = true;
+  const go = document.getElementById("heroGo");
+  const canStart = duel.rematchCanStart();
+  go.hidden = false;
+  go.disabled = Boolean(state.rematch?.starting);
+  go.textContent = canStart && mine ? t("duel.party.startNow", { n: ready.length }) : mine ? t("duel.rematch.readyCancel") : t("duel.rematch.go");
+  go.title = mine && !canStart ? t("duel.rematch.cancelTitle") : "";
+  go.classList.toggle("is-ready", mine && !canStart);
+  const side = document.getElementById("heroSide");
+  side.hidden = false;
+  side.textContent = t("lobby.leave");
+  side.title = "";
+  document.getElementById("heroSide2").hidden = true;
+  card.querySelector(".hero-actions").classList.remove("is-three");
+}
 // Around the card: the pill when you're away from your lobby, the dot on VERSUS, and YOUR
 // VERSUS on the VERSUS card.
 function renderLobbyAround() {
@@ -39686,7 +40094,11 @@ function renderLobbyAround() {
   const pill = document.getElementById("lobbyPill");
   pill.hidden = !lobby || hero.key === "duel";
   document.getElementById("menuDuelButton").toggleAttribute("data-lobby", Boolean(lobby));
-  if (lobby) {
+  if (lobby && duel.inRematch()) {
+    const seats = rematchIn(lobby.state);
+    setText("lobbyPillMode", `${seatsOf(lobby.state).length > 2 ? t("duel.party.label", { n: seats.length }) : "1V1"} · ${t("duel.rematch.ribbon")}`);
+    setText("lobbyPillCount", t("duel.rematch.readyCount", { have: rematchReady(lobby.state).length, n: seats.length }));
+  } else if (lobby) {
     const seats = seatsOf(lobby.state);
     setText("lobbyPillMode", seats.length > 2 ? t("duel.party.label", { n: seats.length }) : "1V1");
     setText("lobbyPillCount", t("lobby.count", { have: seats.filter(seat => lobby.state.players[seat]).length, n: seats.length }));
@@ -39880,6 +40292,7 @@ document.getElementById("heroSide2").addEventListener("click", () => {
 // VERSUS: make a match (its lobby comes up on this card), or, in a lobby, start a Party of 4
 // with 3 (heroGo) or leave (heroSide).
 function createVersus(size) {
+  if (duel.inRematch()) { duel.rematchVote(); return; }
   if (duel.inLobby()) { if (duel.current().you === "a") duel.startNow(); return; }
   if (!getUser()) { document.getElementById("accountModal").classList.remove("hidden"); return; }
   duel.create(size);
@@ -40485,7 +40898,10 @@ const mainMenu = initializeMainMenu({
 // ---------------------------------------------------------------------------
 
 // How far a saved day got, to pick the further one when the browser and the account differ.
-function getSaveProgress(state) {
+// How far a save got; a stale one (from before its day was redone) counts as nothing, so
+// it never wins over a fresh one between this browser and the account.
+function getSaveProgress(state, dateKey = null, mode = null) {
+  if (dateKey && isStaleSave(state, dateKey, mode)) return -1;
   return (state?.rounds || []).reduce((sum, round) => sum
     + ["guesses", "tries", "found", "wrong", "submissions"].reduce((count, key) => count + (round?.[key]?.length || 0), 0)
     + (round?.gaveUp ? 1 : 0) + (round?.finished ? 1 : 0) + (round?.answer ? 1 : 0) + (round?.pick ? 1 : 0), 0);
@@ -40534,7 +40950,7 @@ async function pushDaysAhead(remote) {
   const saved = await Promise.all(getLocalDayDates()
     .filter(dateKey => {
       const account = splitAccountDay(remote.get(dateKey));
-      return MODES.some(mode => getSaveProgress(readJson(`${storagePrefix(mode)}${dateKey}`)) > getSaveProgress(account[mode]));
+      return MODES.some(mode => getSaveProgress(readJson(`${storagePrefix(mode)}${dateKey}`), dateKey, mode) > getSaveProgress(account[mode], dateKey, mode));
     })
     .map(syncDayToAccount));
   return saved.every(Boolean);
@@ -40562,7 +40978,7 @@ async function mergeAccountDays() {
       const account = splitAccountDay(state);
       MODES.forEach(mode => {
         const key = `${storagePrefix(mode)}${dateKey}`;
-        if (getSaveProgress(account[mode]) > getSaveProgress(readJson(key))) localStorage.setItem(key, JSON.stringify(account[mode]));
+        if (getSaveProgress(account[mode], dateKey, mode) > getSaveProgress(readJson(key), dateKey, mode)) localStorage.setItem(key, JSON.stringify(account[mode]));
       });
     });
     await pushDaysAhead(remote);
@@ -40933,6 +41349,8 @@ duel = createDuel({
     document.getElementById("mainMenu").classList.remove("hidden");
     showMenuGlobe();
     mainMenu.refreshPlayTiles();
+    // From the end screen to the rematch lobby on the VERSUS card.
+    if (duel?.inRematch()) selectHero("duel");
   },
   // The sign-in window; Google brings you back here, and the invite waits (duel-view.js).
   onSignIn: () => document.getElementById("accountModal").classList.remove("hidden"),
@@ -40954,9 +41372,12 @@ document.addEventListener("open-tent-creator", () => tentCreator.open());
 duel.onChange(match => {
   if (match?.state?.phase === "lobby" && duelLobbyShown !== match.id) { duelLobbyShown = match.id; selectHero("duel"); }
   if (!match) { duelLobbyShown = null; loadVersusHistory(true); }
+  // A match just ended (a rematch may follow, so it isn't forgotten yet): YOUR VERSUS counts it.
+  if (match?.state?.phase === "done" && duelDoneSeen !== match.id) { duelDoneSeen = match.id; setTimeout(() => loadVersusHistory(true), 1500); }
   renderHero();
 });
 let duelLobbyShown = null;
+let duelDoneSeen = null;
 // Your tent changed (My tent) while you wait: the others get the new one.
 onBaseChange(() => { if (duel.inLobby()) { renderHero(); setTimeout(() => duel.refreshTent(), 1500); } });
 community = initializeCommunity({ globe, getDays: archive.loadDays, today, dayLabel: dateKey => t("common.day", { n: getPuzzleNumber(dateKey) }), getOrigin: () => gameOrigin(featuredMode(), today) });
