@@ -5121,6 +5121,23 @@ h1, h2, h3 { font-weight: normal; }
 .crew-duel-side.is-winner { color: var(--gold, #ffd45c); }
 .crew-duel-score { font-family: "Space Mono", monospace; font-size: 16px; }
 
+/* Reactions on a crewmate's day (social.js openReact). */
+.crew-react-open { font: 7px var(--font-display); letter-spacing: var(--ls-pixel); color: #070b1c; background: var(--cyan); border: 0; border-radius: 4px; padding: 4px 5px; cursor: pointer; }
+.crew-react-open.is-sent { background: transparent; color: var(--muted); border: 1px solid #2a3360; font-size: 14px; padding: 1px 5px; }
+.crew-react { display: grid; gap: 8px; margin-top: 10px; padding: 12px; background: #10162f; border: 2px solid #2a3360; }
+.crew-react-stickers { display: flex; flex-wrap: wrap; gap: 6px; }
+.crew-react-sticker { width: 44px; height: 44px; font-size: 22px; background: #1a2248; border: 2px solid transparent; border-radius: 6px; cursor: pointer; }
+.crew-react-sticker.is-active { border-color: var(--gold); background: color-mix(in srgb, var(--gold) 20%, #1a2248); }
+.crew-react-input { width: 100%; min-height: 44px; padding: 8px 10px; font: 16px "Space Grotesk", sans-serif; color: #fff; background: #0b1020; border: 2px solid #2a3360; border-radius: 6px; box-sizing: border-box; }
+.crew-react-warn { min-height: 0; color: #ff8a8a; font-size: 12px; }
+.crew-react-warn:empty { display: none; }
+.crew-react-actions { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.crew-react-count { margin-right: auto; color: var(--faint); font: 12px "Space Mono", monospace; }
+.crew-inbox { display: grid; gap: 6px; margin-top: 12px; }
+.crew-inbox-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 6px 8px; background: #141b3a; font-size: 14px; }
+.crew-inbox-sticker { font-size: 18px; }
+.crew-inbox-text { color: var(--muted); flex-basis: 100%; padding-left: 30px; }
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -5818,15 +5835,6 @@ h1, h2, h3 { font-weight: normal; }
           <h2 id="communityTitle" data-i18n="menu.community">BASE CAMP</h2>
           <p class="modal-note" data-i18n="community.note">Your friends, your groups and the logbook.</p>
         </div>
-        <!-- Atlas keeps quiet (no bubbles, typing or sounds); he stays, and so does everything else. -->
-        <button class="camp-quiet" id="atlasQuietButton" type="button" aria-pressed="false">
-          <svg class="menu-pixel-icon" viewBox="0 0 16 16" aria-hidden="true" shape-rendering="crispEdges">
-            <path class="camp-quiet-bubble" d="M2 2h12v1h1v7h-1v1H7l-3 3v-3H2v-1H1V3h1z" fill="currentColor"/>
-            <path class="camp-quiet-dots" d="M4 6h2v2H4zm3 0h2v2H7zm3 0h2v2h-2z" fill="#0b1020"/>
-            <path class="camp-quiet-slash" d="M13 0h2v2h-1v1h-1v1h-1v1h-1v1h-1v1H9v1H8v1H7v1H6v1H5v1H4v1H3v1H1v-2h1v-1h1v-1h1V9h1V8h1V7h1V6h1V5h1V4h1V3h1V2h1z" fill="#ff6b9d"/>
-          </svg>
-          <span>ATLAS: ON</span>
-        </button>
         <button class="modal-close" id="closeCommunityButton" type="button" aria-label="Close Base Camp" data-i18n-attr="aria-label:community.close">×</button>
       </header>
       <div class="camp-body" id="communityBody"></div>
@@ -6225,18 +6233,6 @@ class SoundEngine {
 const sounds = new SoundEngine();
 
 return { sounds };
-})();
-
-// ---- config.js
-__modules["config.js"] = (() => {
-// Settings for player accounts (Supabase). Both values are public: they're meant to sit in
-// the page, and the database's row rules keep each player's data their own. Leave them
-// empty to play without accounts. See docs/accounts-setup.md for where to find them.
-const SUPABASE_URL = "https://fazhbzlcxkrdpdgueakt.supabase.co";
-// The publishable key (Supabase's newer name for the anon key).
-const SUPABASE_ANON_KEY = "sb_publishable_p7laS_eGSFWeoQBINPLyDg_1QrZKnGS";
-
-return { SUPABASE_URL, SUPABASE_ANON_KEY };
 })();
 
 // ---- i18n-en.js
@@ -7101,6 +7097,26 @@ const EN = {
   "crew.you": "You",
   "crew.which": "Which crew",
   "crew.all": "All crews",
+  "react.button": "REACT",
+  "react.sent": "SENT",
+  "react.hint": "React to {name}'s day",
+  "react.title": "REACT TO {name}'S DAY",
+  "react.placeholder": "Say something (optional)",
+  "react.friendly": "Please keep it friendly.",
+  "react.empty": "Pick a sticker or write something.",
+  "react.send": "SEND",
+  "react.cancel": "CANCEL",
+  "react.done": "Sent to {name}.",
+  "react.inbox": "REACTIONS ON YOUR DAY",
+  "react.got": "{sticker}{name} reacted to your day",
+  "react.gotText": "{sticker}{name}: “{text}”",
+  "react.gotMany": "{n} reactions on your day. Open Crew to see them.",
+  "react.fire": "On fire",
+  "react.clap": "Applause",
+  "react.wow": "Wow",
+  "react.lol": "Ha!",
+  "react.bullseye": "Spot on",
+  "react.salute": "Respect",
   "duels.tab": "DUELS",
   "duels.needTwo": "Duels start once your crew has two people: one rival a week.",
   "duels.resting": "You rest this week (an odd number in the crew). Next week you get a rival.",
@@ -8582,6 +8598,26 @@ const NL = {
   "crew.you": "Jij",
   "crew.which": "Welke crew",
   "crew.all": "Alle crews",
+  "react.button": "REAGEER",
+  "react.sent": "VERSTUURD",
+  "react.hint": "Reageer op de dag van {name}",
+  "react.title": "REAGEER OP DE DAG VAN {name}",
+  "react.placeholder": "Zeg iets (hoeft niet)",
+  "react.friendly": "Hou het vriendelijk.",
+  "react.empty": "Kies een sticker of schrijf iets.",
+  "react.send": "STUUR",
+  "react.cancel": "ANNULEER",
+  "react.done": "Verstuurd naar {name}.",
+  "react.inbox": "REACTIES OP JOUW DAG",
+  "react.got": "{sticker}{name} reageerde op je dag",
+  "react.gotText": "{sticker}{name}: “{text}”",
+  "react.gotMany": "{n} reacties op je dag. Open Crew om ze te zien.",
+  "react.fire": "In vuur en vlam",
+  "react.clap": "Applaus",
+  "react.wow": "Wauw",
+  "react.lol": "Haha!",
+  "react.bullseye": "Raak",
+  "react.salute": "Respect",
   "duels.tab": "DUELS",
   "duels.needTwo": "Duels beginnen zodra je crew twee mensen heeft: elke week één rivaal.",
   "duels.resting": "Je rust deze week (een oneven aantal in de crew). Volgende week krijg je een rivaal.",
@@ -12368,345 +12404,6 @@ function applyI18n(root = document) {
 return { LANGUAGES, getLang, locale, setLang, setUnits, onLangChange, t, num, tr, clueText, statWords, unitText, countryName, localNames, placeName, tOr, tapWords, applyI18n };
 })();
 
-// ---- auth.js
-__modules["auth.js"] = (() => {
-// Player accounts, optional: sign in with Google, X or an email link through Supabase, and your days are
-// kept in your account so they follow you to other devices. Without an account (or before
-// config.js is filled in) the game works as before, with progress in this browser only.
-const { SUPABASE_ANON_KEY, SUPABASE_URL } = __modules["config.js"];
-const { t } = __modules["i18n.js"];
-
-const SUPABASE_JS = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm";
-
-// "x" is Supabase's X / Twitter (OAuth 2.0) login; the older "twitter" one isn't used.
-const PROVIDERS = [
-  { id: "google", name: "Google" },
-  { id: "x", name: "X" }
-];
-const isConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
-
-let client = null;
-let user = null;
-
-async function getClient() {
-  if (!isConfigured) return null;
-  if (!client) {
-    const { createClient } = await import(SUPABASE_JS);
-    client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
-  return client;
-}
-
-// Calls onChange(user or null) now and whenever someone signs in or out (also when they
-// come back from the provider's sign-in page).
-async function initAuth(onChange) {
-  try {
-    const supabase = await getClient();
-    if (!supabase) return;
-    const { data } = await supabase.auth.getSession();
-    user = data.session?.user || null;
-    onChange(user);
-    supabase.auth.onAuthStateChange((_event, session) => {
-      const next = session?.user || null;
-      if (next?.id === user?.id) return;
-      user = next;
-      onChange(user);
-    });
-  } catch (error) {
-    console.warn("Accounts are unavailable right now.", error);
-  }
-}
-
-const getUser = () => user;
-
-// A name and picture to show, from whatever the provider shares.
-function getProfile(account = user) {
-  const meta = account?.user_metadata || {};
-  const providerId = account?.app_metadata?.provider;
-  const provider = providerId === "email" ? { name: "email" } : PROVIDERS.find(item => item.id === providerId);
-  return {
-    // An email account has no name: the part before the @ will do.
-    name: meta.full_name || meta.name || meta.user_name || meta.preferred_username || account?.email?.split("@")[0] || t("account.player"),
-    avatar: meta.avatar_url || meta.picture || "",
-    provider: provider?.name || ""
-  };
-}
-
-// Off to the provider's sign-in page; it sends the player back here afterwards.
-async function signIn(providerId) {
-  const supabase = await getClient();
-  if (!supabase) throw new Error(t("account.notSetUp"));
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: providerId,
-    options: { redirectTo: `${location.origin}${location.pathname}` }
-  });
-  if (error) throw error;
-}
-
-// Email sign-in, without a password: Supabase emails a link (and, if the email template
-// includes {{ .Token }}, a 6-digit code). `create: false` only signs in an existing account
-// ("Log in"); `create: true` makes one if needed ("Sign up"; an existing account just gets a
-// sign-in link, so nobody can find out which emails have accounts). Passwords never exist,
-// so none are stored or reset. The link brings the player back to this page, signed in.
-async function sendEmailLink(email, { create }) {
-  const supabase = await getClient();
-  if (!supabase) throw new Error(t("account.notSetUp"));
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: { shouldCreateUser: create, emailRedirectTo: `${location.origin}${location.pathname}` }
-  });
-  if (error) throw explainAuthError(error);
-}
-
-// The 6-digit code from the email, for when the link would open in another browser (an
-// app's built-in browser, or the home-screen app on a phone).
-async function verifyEmailCode(email, token) {
-  const supabase = await getClient();
-  if (!supabase) throw new Error(t("account.notSetUp"));
-  const { error } = await supabase.auth.verifyOtp({ email, token, type: "email" });
-  if (error) throw explainAuthError(error);
-}
-
-// Supabase's errors in the game's words. `noAccount` lets the form offer "Sign up".
-function explainAuthError(error) {
-  const code = error.code || "";
-  const message = error.message || "";
-  if (code === "otp_disabled" || /signups? not allowed/i.test(message)) return Object.assign(new Error(t("auth.noAccount")), { noAccount: true });
-  // Supabase's own mail server only writes to the project's team until a mail service
-  // (SMTP) is set up: see docs/accounts-setup.md.
-  if (code === "email_address_not_authorized") return new Error(t("auth.notOpen"));
-  if (code === "over_email_send_rate_limit" || error.status === 429) return new Error(t("auth.tooMany"));
-  if (code === "otp_expired" || /expired|invalid/i.test(message) && /token|otp|code/i.test(message)) return new Error(t("auth.badCode"));
-  if (code === "email_address_invalid" || /invalid.*email|email.*invalid/i.test(message)) return new Error(t("auth.badEmail"));
-  return new Error(t("auth.unknown"));
-}
-
-// Coming back from an email link that didn't work (expired or already used): Supabase puts
-// the reason in the address. Returns a message for the player (or null) and tidies the
-// address so a reload doesn't show it again.
-function takeAuthRedirectError() {
-  const params = new URLSearchParams(location.hash.replace(/^#/, "") || location.search);
-  const code = params.get("error_code");
-  if (!code && !params.get("error")) return null;
-  history.replaceState(null, "", `${location.pathname}${location.search.replace(/([?&])(error|error_code|error_description)=[^&]*/g, "$1").replace(/[?&]+$/, "")}`);
-  return code === "otp_expired"
-    ? t("auth.linkExpired")
-    : t("account.failed");
-}
-
-// The language a player chose, kept in the account (user metadata) so it follows them to
-// every device; null when the account has none yet.
-function getAccountLanguage(account = user) {
-  return account?.user_metadata?.lang || null;
-}
-async function saveLanguage(lang) {
-  const supabase = await getClient();
-  if (!supabase || !user || user.user_metadata?.lang === lang) return;
-  const { data, error } = await supabase.auth.updateUser({ data: { lang } });
-  if (error) console.warn("Couldn't save the language to your account.", error);
-  else if (data?.user) user = data.user;
-}
-
-// The measurement system (units.js), "metric" or "imperial", kept like the language.
-function getAccountUnits(account = user) {
-  return account?.user_metadata?.units || null;
-}
-async function saveUnits(units) {
-  const supabase = await getClient();
-  if (!supabase || !user || user.user_metadata?.units === units) return;
-  const { data, error } = await supabase.auth.updateUser({ data: { units } });
-  if (error) console.warn("Couldn't save the measurement system to your account.", error);
-  else if (data?.user) user = data.user;
-}
-
-// Your base (base.js), an ISO code kept in the account like the language.
-async function saveBase(base) {
-  const supabase = await getClient();
-  if (!supabase || !user || user.user_metadata?.base === base) return;
-  const { data, error } = await supabase.auth.updateUser({ data: { base } });
-  if (error) console.warn("Couldn't save your base to your account.", error);
-  else if (data?.user) user = data.user;
-}
-
-// Where your tent stands ({ iso, city, lat, lon }), kept in the account beside the base.
-async function saveTent(tent) {
-  const supabase = await getClient();
-  const stored = user?.user_metadata?.tent;
-  if (!supabase || !user || (stored && stored.iso === tent.iso && stored.lat === tent.lat && stored.lon === tent.lon)) return;
-  const { data, error } = await supabase.auth.updateUser({ data: { base: tent.iso, tent } });
-  if (error) console.warn("Couldn't save your tent to your account.", error);
-  else if (data?.user) user = data.user;
-}
-
-// Your tent pin's colour (base.js TENT_COLORS), kept in the account like the tent.
-async function saveTentColor(tentColor) {
-  const supabase = await getClient();
-  if (!supabase || !user || user.user_metadata?.tentColor === tentColor) return;
-  const { data, error } = await supabase.auth.updateUser({ data: { tentColor } });
-  if (error) console.warn("Couldn't save your tent colour to your account.", error);
-  else if (data?.user) user = data.user;
-}
-
-// Your tent's style and explorer (base.js), kept in the account like the tent.
-async function saveTentLook(tentLook) {
-  const supabase = await getClient();
-  const stored = user?.user_metadata?.tentLook;
-  if (!supabase || !user || (stored && JSON.stringify(stored) === JSON.stringify(tentLook))) return;
-  const { data, error } = await supabase.auth.updateUser({ data: { tentLook } });
-  if (error) console.warn("Couldn't save your tent to your account.", error);
-  else if (data?.user) user = data.user;
-}
-
-// Whether Atlas (Base Camp's guide) keeps quiet, kept in the account like the language.
-async function saveAtlasQuiet(atlasQuiet) {
-  const supabase = await getClient();
-  if (!supabase || !user || user.user_metadata?.atlasQuiet === atlasQuiet) return;
-  const { data, error } = await supabase.auth.updateUser({ data: { atlasQuiet } });
-  if (error) console.warn("Couldn't save Atlas's setting to your account.", error);
-  else if (data?.user) user = data.user;
-}
-
-async function signOut() {
-  const supabase = await getClient();
-  await supabase?.auth.signOut();
-  user = null;
-}
-
-// Every day saved in the account: [{ date, state }].
-async function pullDays() {
-  const supabase = await getClient();
-  if (!supabase || !user) return [];
-  const { data, error } = await supabase.from("day_results").select("date, state").eq("user_id", user.id);
-  if (error) throw error;
-  return data || [];
-}
-
-// Saves one day's progress in the account, with the score and whether it's finished (for
-// group boards). Returns whether it was saved.
-async function pushDay(date, state, { score = null, completed = false } = {}) {
-  const supabase = await getClient();
-  if (!supabase || !user) return false;
-  const { error } = await supabase.from("day_results").upsert(
-    { user_id: user.id, date, state, score, completed, updated_at: new Date().toISOString() },
-    { onConflict: "user_id,date" }
-  );
-  if (error) console.warn("Couldn't save this day to your account.", error);
-  return !error;
-}
-
-// ---------------------------------------------------------------------------
-// Community (supabase/social.sql): your profile and invite code, friends, and groups.
-// Each call goes through a database function that checks who is asking.
-// ---------------------------------------------------------------------------
-
-async function call(name, args = {}) {
-  const supabase = await getClient();
-  if (!supabase || !user) throw new Error(t("auth.signInFirst"));
-  const { data, error } = await supabase.rpc(name, args);
-  if (error) {
-    // The functions aren't there until social.sql has been run in Supabase.
-    if (error.code === "PGRST202" || error.code === "42883") throw Object.assign(new Error(t("auth.communityOff")), { notSetUp: true });
-    throw new Error(error.message);
-  }
-  return data;
-}
-
-const getMyProfile = async () => (await call("my_profile", { fallback_name: getProfile().name }))?.[0] || null;
-const setDisplayName = name => call("set_display_name", { new_name: name });
-const addFriend = code => call("add_friend", { code });
-const removeFriend = friendId => call("remove_friend", { friend: friendId });
-const getFriends = () => call("my_friends");
-const createGroup = (name, memberIds, kind = "friends") => call("create_group", { group_name: name, members: memberIds, group_kind: kind });
-const setGroupKind = (groupId, kind) => call("set_group_kind", { group_ref: groupId, group_kind: kind });
-const setGroupAdmin = (groupId, memberId, admin) => call("set_group_admin", { group_ref: groupId, member: memberId, admin });
-const addToGroup = (groupId, friendId) => call("add_to_group", { group_ref: groupId, friend: friendId });
-const leaveGroup = groupId => call("leave_group", { group_ref: groupId });
-const getGroups = () => call("my_groups");
-// Challenges: making one needs an account; reading one doesn't (guests can take it on).
-const createChallenge = dateKey => call("create_challenge", { day: dateKey });
-async function getChallenge(code) {
-  const supabase = await getClient();
-  if (!supabase) return null;
-  const { data, error } = await supabase.rpc("get_challenge", { challenge_code: code });
-  if (error) throw new Error(error.message);
-  return data?.[0] || null;
-}
-const setPublicTent = tent => call("set_public_tent", { new_tent: tent });
-const getCrewTents = dateKey => call("crew_tents", { day: dateKey });
-const getCrewPicks = dateKey => call("crew_picks", { day: dateKey });
-const sendNudge = (userId, dateKey) => call("send_nudge", { target: userId, day: dateKey });
-const takeNudges = dateKey => call("take_nudges", { day: dateKey });
-const setGroupWebhook = (groupId, url, hour) => call("set_group_webhook", { group_ref: groupId, hook_url: url, hour });
-const getGroupWebhook = async groupId => (await call("group_webhook", { group_ref: groupId }))?.[0] || null;
-// A test post to the group's channel right now (Edge Function crew-post; owner or admin).
-async function testGroupPost(groupId) {
-  const supabase = await getClient();
-  if (!supabase || !user) throw new Error(t("auth.signInFirst"));
-  const { data, error } = await supabase.functions.invoke("crew-post", { body: { test: groupId } });
-  if (error) throw new Error(error.message);
-  return data;
-}
-const setPublicLook = look => call("set_public_look", { new_look: look });
-const joinGroup = async code => (await call("join_group", { code }))?.[0] || null;
-const renameGroup = (groupId, name) => call("rename_group", { group_ref: groupId, new_name: name });
-const newJoinCode = groupId => call("new_join_code", { group_ref: groupId });
-const removeFromGroup = (groupId, memberId) => call("remove_from_group", { group_ref: groupId, member: memberId });
-// Rows of { user_id, display_name, date, score } for the group's finished days.
-const getGroupBoard = (groupId, from, to) => call("group_board", { group_ref: groupId, from_date: from, to_date: to });
-
-// ---------------------------------------------------------------------------
-// 1v1 and Party (docs/1v1-plan.md): the Edge Function `duel` is the referee; a match's changes come
-// in live through Realtime (supabase/duel.sql).
-// ---------------------------------------------------------------------------
-
-// Calls the referee. Returns its answer ({ id, code, you, status, state, version, now,
-// outcome }); throws with the referee's own reason when it refuses.
-async function callDuel(action, body = {}) {
-  const supabase = await getClient();
-  if (!supabase || !user) throw new Error(t("auth.signInFirst"));
-  const { data, error } = await supabase.functions.invoke("duel", { body: { action, ...body } });
-  if (error) {
-    let message = error.message;
-    try { message = (await error.context.json()).problem || message; } catch { /* no JSON body */ }
-    throw new Error(message);
-  }
-  return data;
-}
-
-// Every change to the match (its row in `duels`), as it happens. Returns a function that stops.
-async function watchDuel(id, onRow) {
-  const supabase = await getClient();
-  if (!supabase) return () => {};
-  const channel = supabase.channel(`duel:${id}`)
-    .on("postgres_changes", { event: "UPDATE", schema: "public", table: "duels", filter: `id=eq.${id}` }, payload => onRow(payload.new))
-    .subscribe();
-  return () => supabase.removeChannel(channel);
-}
-
-// Your finished matches (for YOUR VERSUS in the lobby): every row you sat in, newest first.
-async function getDuelHistory() {
-  const supabase = await getClient();
-  if (!supabase || !user) return [];
-  const { data } = await supabase.from("duels").select("player_a, player_b, player_c, player_d, status, state")
-    .eq("status", "done").order("updated_at", { ascending: false }).limit(300);
-  return data || [];
-}
-
-// Your match still going (waiting for a friend or being played), if any.
-async function findOpenDuel() {
-  const supabase = await getClient();
-  if (!supabase || !user) return null;
-  const { data } = await supabase.from("duels").select("id, code, player_a, player_b, player_c, player_d, status, state, version")
-    .in("status", ["lobby", "playing"]).order("updated_at", { ascending: false }).limit(5);
-  // A Party you left goes on without you: not yours any more.
-  const seatOf = row => ["a", "b", "c", "d"].find(seat => row[`player_${seat}`] === user.id);
-  const row = (data || []).find(item => seatOf(item) && !item.state?.gone?.[seatOf(item)]);
-  return row ? { ...row, you: seatOf(row) } : null;
-}
-
-return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, getAccountUnits, saveUnits, saveBase, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, setGroupKind, setGroupAdmin, addToGroup, leaveGroup, getGroups, createChallenge, getChallenge, setPublicTent, getCrewTents, getCrewPicks, sendNudge, takeNudges, setGroupWebhook, getGroupWebhook, testGroupPost, setPublicLook, joinGroup, renameGroup, newJoinCode, removeFromGroup, getGroupBoard, callDuel, watchDuel, getDuelHistory, findOpenDuel };
-})();
-
 // ---- atlas.js
 __modules["atlas.js"] = (() => {
 // Atlas, the old explorer who keeps Base Camp's logbook. A 24×24 pixel sprite in the game's
@@ -12715,11 +12412,9 @@ __modules["atlas.js"] = (() => {
 // "Quiet" (a toggle, kept in the browser and the account) silences his bubbles, typing and
 // sounds; he stays on screen and nothing else changes.
 const { sounds } = __modules["audio.js"];
-const { getUser, saveAtlasQuiet } = __modules["auth.js"];
 const { t } = __modules["i18n.js"];
 
 const SVG_NS = "http://www.w3.org/2000/svg";
-const QUIET_KEY = "daily-geography:atlas-quiet:v1";
 const TYPE_MS = 24; // per letter
 
 const ATLAS_COLORS = {
@@ -12925,23 +12620,15 @@ function createFlag(size = 48) {
 // ----- Quiet -----
 
 const listeners = new Set();
-let quiet = (() => { try { return localStorage.getItem(QUIET_KEY) === "1"; } catch { return false; } })();
+// Since 24 November 2026 there is no quiet switch any more (Atlas only speaks at moments);
+// an old "quiet" setting is ignored.
+let quiet = false;
 
 const isAtlasQuiet = () => quiet;
-function setAtlasQuiet(value, { save = true } = {}) {
-  quiet = Boolean(value);
-  try { localStorage.setItem(QUIET_KEY, quiet ? "1" : "0"); } catch { /* storage off */ }
-  if (save && getUser()) saveAtlasQuiet(quiet);
-  listeners.forEach(listener => listener(quiet));
-}
+function setAtlasQuiet() { /* no quiet switch any more */ }
 const onAtlasQuietChange = listener => listeners.add(listener);
 
-// After signing in: the account's choice wins; an account without one gets the browser's.
-function syncAtlasQuiet(account) {
-  const stored = account?.user_metadata?.atlasQuiet;
-  if (typeof stored === "boolean") setAtlasQuiet(stored, { save: false });
-  else if (account && quiet) saveAtlasQuiet(quiet);
-}
+function syncAtlasQuiet() { /* no quiet switch any more */ }
 
 // ----- Atlas on screen -----
 
@@ -30506,6 +30193,360 @@ const drawBubble = (p, x, y) => p.sprite(BUBBLE, BUBBLE_COLORS, x - 3, y - BUBBL
 return { ROUND_COLORS, JOURNEYS, scoreTier, createJourney };
 })();
 
+// ---- config.js
+__modules["config.js"] = (() => {
+// Settings for player accounts (Supabase). Both values are public: they're meant to sit in
+// the page, and the database's row rules keep each player's data their own. Leave them
+// empty to play without accounts. See docs/accounts-setup.md for where to find them.
+const SUPABASE_URL = "https://fazhbzlcxkrdpdgueakt.supabase.co";
+// The publishable key (Supabase's newer name for the anon key).
+const SUPABASE_ANON_KEY = "sb_publishable_p7laS_eGSFWeoQBINPLyDg_1QrZKnGS";
+
+return { SUPABASE_URL, SUPABASE_ANON_KEY };
+})();
+
+// ---- auth.js
+__modules["auth.js"] = (() => {
+// Player accounts, optional: sign in with Google, X or an email link through Supabase, and your days are
+// kept in your account so they follow you to other devices. Without an account (or before
+// config.js is filled in) the game works as before, with progress in this browser only.
+const { SUPABASE_ANON_KEY, SUPABASE_URL } = __modules["config.js"];
+const { t } = __modules["i18n.js"];
+
+const SUPABASE_JS = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm";
+
+// "x" is Supabase's X / Twitter (OAuth 2.0) login; the older "twitter" one isn't used.
+const PROVIDERS = [
+  { id: "google", name: "Google" },
+  { id: "x", name: "X" }
+];
+const isConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+
+let client = null;
+let user = null;
+
+async function getClient() {
+  if (!isConfigured) return null;
+  if (!client) {
+    const { createClient } = await import(SUPABASE_JS);
+    client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+  return client;
+}
+
+// Calls onChange(user or null) now and whenever someone signs in or out (also when they
+// come back from the provider's sign-in page).
+async function initAuth(onChange) {
+  try {
+    const supabase = await getClient();
+    if (!supabase) return;
+    const { data } = await supabase.auth.getSession();
+    user = data.session?.user || null;
+    onChange(user);
+    supabase.auth.onAuthStateChange((_event, session) => {
+      const next = session?.user || null;
+      if (next?.id === user?.id) return;
+      user = next;
+      onChange(user);
+    });
+  } catch (error) {
+    console.warn("Accounts are unavailable right now.", error);
+  }
+}
+
+const getUser = () => user;
+
+// A name and picture to show, from whatever the provider shares.
+function getProfile(account = user) {
+  const meta = account?.user_metadata || {};
+  const providerId = account?.app_metadata?.provider;
+  const provider = providerId === "email" ? { name: "email" } : PROVIDERS.find(item => item.id === providerId);
+  return {
+    // An email account has no name: the part before the @ will do.
+    name: meta.full_name || meta.name || meta.user_name || meta.preferred_username || account?.email?.split("@")[0] || t("account.player"),
+    avatar: meta.avatar_url || meta.picture || "",
+    provider: provider?.name || ""
+  };
+}
+
+// Off to the provider's sign-in page; it sends the player back here afterwards.
+async function signIn(providerId) {
+  const supabase = await getClient();
+  if (!supabase) throw new Error(t("account.notSetUp"));
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: providerId,
+    options: { redirectTo: `${location.origin}${location.pathname}` }
+  });
+  if (error) throw error;
+}
+
+// Email sign-in, without a password: Supabase emails a link (and, if the email template
+// includes {{ .Token }}, a 6-digit code). `create: false` only signs in an existing account
+// ("Log in"); `create: true` makes one if needed ("Sign up"; an existing account just gets a
+// sign-in link, so nobody can find out which emails have accounts). Passwords never exist,
+// so none are stored or reset. The link brings the player back to this page, signed in.
+async function sendEmailLink(email, { create }) {
+  const supabase = await getClient();
+  if (!supabase) throw new Error(t("account.notSetUp"));
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: { shouldCreateUser: create, emailRedirectTo: `${location.origin}${location.pathname}` }
+  });
+  if (error) throw explainAuthError(error);
+}
+
+// The 6-digit code from the email, for when the link would open in another browser (an
+// app's built-in browser, or the home-screen app on a phone).
+async function verifyEmailCode(email, token) {
+  const supabase = await getClient();
+  if (!supabase) throw new Error(t("account.notSetUp"));
+  const { error } = await supabase.auth.verifyOtp({ email, token, type: "email" });
+  if (error) throw explainAuthError(error);
+}
+
+// Supabase's errors in the game's words. `noAccount` lets the form offer "Sign up".
+function explainAuthError(error) {
+  const code = error.code || "";
+  const message = error.message || "";
+  if (code === "otp_disabled" || /signups? not allowed/i.test(message)) return Object.assign(new Error(t("auth.noAccount")), { noAccount: true });
+  // Supabase's own mail server only writes to the project's team until a mail service
+  // (SMTP) is set up: see docs/accounts-setup.md.
+  if (code === "email_address_not_authorized") return new Error(t("auth.notOpen"));
+  if (code === "over_email_send_rate_limit" || error.status === 429) return new Error(t("auth.tooMany"));
+  if (code === "otp_expired" || /expired|invalid/i.test(message) && /token|otp|code/i.test(message)) return new Error(t("auth.badCode"));
+  if (code === "email_address_invalid" || /invalid.*email|email.*invalid/i.test(message)) return new Error(t("auth.badEmail"));
+  return new Error(t("auth.unknown"));
+}
+
+// Coming back from an email link that didn't work (expired or already used): Supabase puts
+// the reason in the address. Returns a message for the player (or null) and tidies the
+// address so a reload doesn't show it again.
+function takeAuthRedirectError() {
+  const params = new URLSearchParams(location.hash.replace(/^#/, "") || location.search);
+  const code = params.get("error_code");
+  if (!code && !params.get("error")) return null;
+  history.replaceState(null, "", `${location.pathname}${location.search.replace(/([?&])(error|error_code|error_description)=[^&]*/g, "$1").replace(/[?&]+$/, "")}`);
+  return code === "otp_expired"
+    ? t("auth.linkExpired")
+    : t("account.failed");
+}
+
+// The language a player chose, kept in the account (user metadata) so it follows them to
+// every device; null when the account has none yet.
+function getAccountLanguage(account = user) {
+  return account?.user_metadata?.lang || null;
+}
+async function saveLanguage(lang) {
+  const supabase = await getClient();
+  if (!supabase || !user || user.user_metadata?.lang === lang) return;
+  const { data, error } = await supabase.auth.updateUser({ data: { lang } });
+  if (error) console.warn("Couldn't save the language to your account.", error);
+  else if (data?.user) user = data.user;
+}
+
+// The measurement system (units.js), "metric" or "imperial", kept like the language.
+function getAccountUnits(account = user) {
+  return account?.user_metadata?.units || null;
+}
+async function saveUnits(units) {
+  const supabase = await getClient();
+  if (!supabase || !user || user.user_metadata?.units === units) return;
+  const { data, error } = await supabase.auth.updateUser({ data: { units } });
+  if (error) console.warn("Couldn't save the measurement system to your account.", error);
+  else if (data?.user) user = data.user;
+}
+
+// Your base (base.js), an ISO code kept in the account like the language.
+async function saveBase(base) {
+  const supabase = await getClient();
+  if (!supabase || !user || user.user_metadata?.base === base) return;
+  const { data, error } = await supabase.auth.updateUser({ data: { base } });
+  if (error) console.warn("Couldn't save your base to your account.", error);
+  else if (data?.user) user = data.user;
+}
+
+// Where your tent stands ({ iso, city, lat, lon }), kept in the account beside the base.
+async function saveTent(tent) {
+  const supabase = await getClient();
+  const stored = user?.user_metadata?.tent;
+  if (!supabase || !user || (stored && stored.iso === tent.iso && stored.lat === tent.lat && stored.lon === tent.lon)) return;
+  const { data, error } = await supabase.auth.updateUser({ data: { base: tent.iso, tent } });
+  if (error) console.warn("Couldn't save your tent to your account.", error);
+  else if (data?.user) user = data.user;
+}
+
+// Your tent pin's colour (base.js TENT_COLORS), kept in the account like the tent.
+async function saveTentColor(tentColor) {
+  const supabase = await getClient();
+  if (!supabase || !user || user.user_metadata?.tentColor === tentColor) return;
+  const { data, error } = await supabase.auth.updateUser({ data: { tentColor } });
+  if (error) console.warn("Couldn't save your tent colour to your account.", error);
+  else if (data?.user) user = data.user;
+}
+
+// Your tent's style and explorer (base.js), kept in the account like the tent.
+async function saveTentLook(tentLook) {
+  const supabase = await getClient();
+  const stored = user?.user_metadata?.tentLook;
+  if (!supabase || !user || (stored && JSON.stringify(stored) === JSON.stringify(tentLook))) return;
+  const { data, error } = await supabase.auth.updateUser({ data: { tentLook } });
+  if (error) console.warn("Couldn't save your tent to your account.", error);
+  else if (data?.user) user = data.user;
+}
+
+// Whether Atlas (Base Camp's guide) keeps quiet, kept in the account like the language.
+async function saveAtlasQuiet(atlasQuiet) {
+  const supabase = await getClient();
+  if (!supabase || !user || user.user_metadata?.atlasQuiet === atlasQuiet) return;
+  const { data, error } = await supabase.auth.updateUser({ data: { atlasQuiet } });
+  if (error) console.warn("Couldn't save Atlas's setting to your account.", error);
+  else if (data?.user) user = data.user;
+}
+
+async function signOut() {
+  const supabase = await getClient();
+  await supabase?.auth.signOut();
+  user = null;
+}
+
+// Every day saved in the account: [{ date, state }].
+async function pullDays() {
+  const supabase = await getClient();
+  if (!supabase || !user) return [];
+  const { data, error } = await supabase.from("day_results").select("date, state").eq("user_id", user.id);
+  if (error) throw error;
+  return data || [];
+}
+
+// Saves one day's progress in the account, with the score and whether it's finished (for
+// group boards). Returns whether it was saved.
+async function pushDay(date, state, { score = null, completed = false } = {}) {
+  const supabase = await getClient();
+  if (!supabase || !user) return false;
+  const { error } = await supabase.from("day_results").upsert(
+    { user_id: user.id, date, state, score, completed, updated_at: new Date().toISOString() },
+    { onConflict: "user_id,date" }
+  );
+  if (error) console.warn("Couldn't save this day to your account.", error);
+  return !error;
+}
+
+// ---------------------------------------------------------------------------
+// Community (supabase/social.sql): your profile and invite code, friends, and groups.
+// Each call goes through a database function that checks who is asking.
+// ---------------------------------------------------------------------------
+
+async function call(name, args = {}) {
+  const supabase = await getClient();
+  if (!supabase || !user) throw new Error(t("auth.signInFirst"));
+  const { data, error } = await supabase.rpc(name, args);
+  if (error) {
+    // The functions aren't there until social.sql has been run in Supabase.
+    if (error.code === "PGRST202" || error.code === "42883") throw Object.assign(new Error(t("auth.communityOff")), { notSetUp: true });
+    throw new Error(error.message);
+  }
+  return data;
+}
+
+const getMyProfile = async () => (await call("my_profile", { fallback_name: getProfile().name }))?.[0] || null;
+const setDisplayName = name => call("set_display_name", { new_name: name });
+const addFriend = code => call("add_friend", { code });
+const removeFriend = friendId => call("remove_friend", { friend: friendId });
+const getFriends = () => call("my_friends");
+const createGroup = (name, memberIds, kind = "friends") => call("create_group", { group_name: name, members: memberIds, group_kind: kind });
+const setGroupKind = (groupId, kind) => call("set_group_kind", { group_ref: groupId, group_kind: kind });
+const setGroupAdmin = (groupId, memberId, admin) => call("set_group_admin", { group_ref: groupId, member: memberId, admin });
+const addToGroup = (groupId, friendId) => call("add_to_group", { group_ref: groupId, friend: friendId });
+const leaveGroup = groupId => call("leave_group", { group_ref: groupId });
+const getGroups = () => call("my_groups");
+// Challenges: making one needs an account; reading one doesn't (guests can take it on).
+const createChallenge = dateKey => call("create_challenge", { day: dateKey });
+async function getChallenge(code) {
+  const supabase = await getClient();
+  if (!supabase) return null;
+  const { data, error } = await supabase.rpc("get_challenge", { challenge_code: code });
+  if (error) throw new Error(error.message);
+  return data?.[0] || null;
+}
+const setPublicTent = tent => call("set_public_tent", { new_tent: tent });
+const getCrewTents = dateKey => call("crew_tents", { day: dateKey });
+const getCrewPicks = dateKey => call("crew_picks", { day: dateKey });
+const sendNudge = (userId, dateKey) => call("send_nudge", { target: userId, day: dateKey });
+const takeNudges = dateKey => call("take_nudges", { day: dateKey });
+const setGroupWebhook = (groupId, url, hour) => call("set_group_webhook", { group_ref: groupId, hook_url: url, hour });
+const getGroupWebhook = async groupId => (await call("group_webhook", { group_ref: groupId }))?.[0] || null;
+// A test post to the group's channel right now (Edge Function crew-post; owner or admin).
+async function testGroupPost(groupId) {
+  const supabase = await getClient();
+  if (!supabase || !user) throw new Error(t("auth.signInFirst"));
+  const { data, error } = await supabase.functions.invoke("crew-post", { body: { test: groupId } });
+  if (error) throw new Error(error.message);
+  return data;
+}
+const setPublicLook = look => call("set_public_look", { new_look: look });
+const joinGroup = async code => (await call("join_group", { code }))?.[0] || null;
+const renameGroup = (groupId, name) => call("rename_group", { group_ref: groupId, new_name: name });
+const newJoinCode = groupId => call("new_join_code", { group_ref: groupId });
+const removeFromGroup = (groupId, memberId) => call("remove_from_group", { group_ref: groupId, member: memberId });
+// Rows of { user_id, display_name, date, score } for the group's finished days.
+const getGroupBoard = (groupId, from, to) => call("group_board", { group_ref: groupId, from_date: from, to_date: to });
+
+// ---------------------------------------------------------------------------
+// 1v1 and Party (docs/1v1-plan.md): the Edge Function `duel` is the referee; a match's changes come
+// in live through Realtime (supabase/duel.sql).
+// ---------------------------------------------------------------------------
+
+// Calls the referee. Returns its answer ({ id, code, you, status, state, version, now,
+// outcome }); throws with the referee's own reason when it refuses.
+async function callDuel(action, body = {}) {
+  const supabase = await getClient();
+  if (!supabase || !user) throw new Error(t("auth.signInFirst"));
+  const { data, error } = await supabase.functions.invoke("duel", { body: { action, ...body } });
+  if (error) {
+    let message = error.message;
+    try { message = (await error.context.json()).problem || message; } catch { /* no JSON body */ }
+    throw new Error(message);
+  }
+  return data;
+}
+
+// Every change to the match (its row in `duels`), as it happens. Returns a function that stops.
+async function watchDuel(id, onRow) {
+  const supabase = await getClient();
+  if (!supabase) return () => {};
+  const channel = supabase.channel(`duel:${id}`)
+    .on("postgres_changes", { event: "UPDATE", schema: "public", table: "duels", filter: `id=eq.${id}` }, payload => onRow(payload.new))
+    .subscribe();
+  return () => supabase.removeChannel(channel);
+}
+
+// Your finished matches (for YOUR VERSUS in the lobby): every row you sat in, newest first.
+async function getDuelHistory() {
+  const supabase = await getClient();
+  if (!supabase || !user) return [];
+  const { data } = await supabase.from("duels").select("player_a, player_b, player_c, player_d, status, state")
+    .eq("status", "done").order("updated_at", { ascending: false }).limit(300);
+  return data || [];
+}
+
+// Your match still going (waiting for a friend or being played), if any.
+async function findOpenDuel() {
+  const supabase = await getClient();
+  if (!supabase || !user) return null;
+  const { data } = await supabase.from("duels").select("id, code, player_a, player_b, player_c, player_d, status, state, version")
+    .in("status", ["lobby", "playing"]).order("updated_at", { ascending: false }).limit(5);
+  // A Party you left goes on without you: not yours any more.
+  const seatOf = row => ["a", "b", "c", "d"].find(seat => row[`player_${seat}`] === user.id);
+  const row = (data || []).find(item => seatOf(item) && !item.state?.gone?.[seatOf(item)]);
+  return row ? { ...row, you: seatOf(row) } : null;
+}
+const sendReaction = (userId, dateKey, sticker, message) => call("send_reaction", { target: userId, day: dateKey, sticker: sticker || null, message: message || null });
+const getDayReactions = dateKey => call("day_reactions_for", { day: dateKey });
+const takeReactions = () => call("take_reactions");
+
+return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, getAccountUnits, saveUnits, saveBase, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, setGroupKind, setGroupAdmin, addToGroup, leaveGroup, getGroups, createChallenge, getChallenge, setPublicTent, getCrewTents, getCrewPicks, sendNudge, takeNudges, setGroupWebhook, getGroupWebhook, testGroupPost, setPublicLook, joinGroup, renameGroup, newJoinCode, removeFromGroup, getGroupBoard, callDuel, watchDuel, getDuelHistory, findOpenDuel, sendReaction, getDayReactions, takeReactions };
+})();
+
 // ---- duel-rules.js
 __modules["duel-rules.js"] = (() => {
 // The rules of 1v1 and Party (3 or 4 players; docs/1v1-plan.md), without DOM, network or imports, so the same file
@@ -33385,6 +33426,25 @@ function duelTable(people, seed, month, today, firstDay, options = {}) {
 return { FREE_MISSES, MISS_SHARE, LATE_SHARE, isWeekend, monthEnd, seasonOf, seasonTable, daysLeft, weekIndexOf, mondayOf, duelists, weekPairs, duelOf, weekDuels, duelTable };
 })();
 
+// ---- profanity.js
+__modules["profanity.js"] = (() => {
+// Is a crew message friendly? The same check as is_clean in supabase/social.sql (the
+// server has the last word; this one only answers straight away). Keep the lists alike.
+const WORDS = /\b(ass|asshole|ashole|arse|dick|cock|pussy|pusy|slut|bastard|twat|piss|pis|rape|raped|retard|retarded|spast|spastic|fag|fagot|kut|lul|hoer|trut|tering|kanker|mongool|flikker|neuk|neuken|tyfus|wanker|whore|bitch|cunt|shit|fuck|fuk|fck|motherfucker|klootzak|godverdomme|godverdome|kutwijf|kankerlijer)(s|es|ed|ing|je|jes|en|e)?\b/;
+const JOINED = /(fuck|shit|cunt|bitch|whore|kanker|klotzak|godverdom|wanker|fagot|retard|tyfus|motherf)/;
+const LEET = { 0: "o", 1: "i", 3: "e", 4: "a", 5: "s", 7: "t", "@": "a", $: "s", "!": "i" };
+
+function isClean(text) {
+  const plain = String(text || "").toLowerCase().replace(/[013457@$!]/g, char => LEET[char]);
+  const squeezed = plain.replace(/([a-z])\1+/g, "$1");
+  if (WORDS.test(plain) || WORDS.test(squeezed)) return false;
+  if (JOINED.test(squeezed.replace(/[^a-z]/g, ""))) return false;
+  return !/nigg/.test(plain.replace(/[^a-z]/g, ""));
+}
+
+return { isClean };
+})();
+
 // ---- camp-scene.js
 __modules["camp-scene.js"] = (() => {
 // The scene behind Crew: Everest at sunrise in 8-bit pixels (13 November 2026, team choice
@@ -33551,8 +33611,8 @@ __modules["social.js"] = (() => {
 // The menu also gets a glance at the week (refreshGlance): a card beside the games on a
 // wide screen, a line on the Base Camp tile on a phone.
 const { sounds } = __modules["audio.js"];
-const { addFriend, addToGroup, createGroup, getFriends, getGroupBoard, getGroups, getMyProfile, getUser, isConfigured, joinGroup, leaveGroup, newJoinCode, removeFromGroup, renameGroup, removeFriend, getCrewTents, sendNudge, setDisplayName, setGroupAdmin, setGroupKind, setGroupWebhook, getGroupWebhook, testGroupPost, setPublicLook, setPublicTent, takeNudges } = __modules["auth.js"];
-const { createAtlas, createAtlasSprite, isAtlasQuiet, onAtlasQuietChange, setAtlasQuiet, syncAtlasQuiet } = __modules["atlas.js"];
+const { addFriend, addToGroup, createGroup, getFriends, getGroupBoard, getGroups, getMyProfile, getUser, isConfigured, joinGroup, leaveGroup, newJoinCode, removeFromGroup, renameGroup, removeFriend, getCrewTents, sendNudge, sendReaction, getDayReactions, takeReactions, setDisplayName, setGroupAdmin, setGroupKind, setGroupWebhook, getGroupWebhook, testGroupPost, setPublicLook, setPublicTent, takeNudges } = __modules["auth.js"];
+const { createAtlas, createAtlasSprite, isAtlasQuiet } = __modules["atlas.js"];
 const { createBadge, createMedal, getGroupMedal } = __modules["badges.js"];
 const { createBaseLine, getTent, getTentLook } = __modules["base.js"];
 const { FREE_MISSES, daysLeft, duelTable, isWeekend, monthEnd, seasonTable, weekDuels } = __modules["crew-league.js"];
@@ -33561,6 +33621,7 @@ const { createExplorerHead, createTentCanvas, explorerOf } = __modules["tents.js
 const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getTopPercent } = __modules["community.js"];
 const { isPreseasonMonth } = __modules["daily.js"];
 const { showToastNotice } = __modules["ui.js"];
+const { isClean } = __modules["profanity.js"];
 const { drawCampScene } = __modules["camp-scene.js"];
 const { countryName, locale, onLangChange, t } = __modules["i18n.js"];
 
@@ -33653,8 +33714,6 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
   const phone = window.matchMedia("(max-width: 760px)");
   const state = { profile: null, friends: [], groups: [], groupId: null, boards: new Map(), view: "season", dateKey: today, creating: false, error: null, loaded: false };
   let dove = false; // whether the globe dived (so it rises again on closing)
-  let lastLine = null;
-  let pokes = 0;
 
   // An invite link (?invite=CODE) is kept until you're signed in, then used.
   const invite = new URLSearchParams(location.search).get("invite");
@@ -33674,22 +33733,10 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
   // Everest, his bubble beside him ("On the ridge"); on a phone on the glacier in the band
   // at the top ("Centre stage"). Once the page scrolls past the band, he steps into the
   // bottom corner, so he's still there.
-  const atlas = createAtlas({ size: 96, onPoke: () => sayNext() });
-  const quietButton = document.getElementById("atlasQuietButton");
-  function renderQuietButton() {
-    const quiet = isAtlasQuiet();
-    quietButton.setAttribute("aria-pressed", String(quiet));
-    quietButton.querySelector("span").textContent = t(quiet ? "atlas.quietOn" : "atlas.quietOff");
-    quietButton.title = t(quiet ? "atlas.unmute" : "atlas.mute");
-    quietButton.setAttribute("aria-label", t(quiet ? "atlas.unmute" : "atlas.mute"));
-  }
-  quietButton.addEventListener("click", () => {
-    sounds.playClick();
-    setAtlasQuiet(!isAtlasQuiet());
-    if (!isAtlasQuiet()) sayNext(true);
-  });
-  onAtlasQuietChange(renderQuietButton);
-  renderQuietButton();
+  // Since 24 November 2026 (team request) he's there only at moments: when you have no
+  // crew yet (signed out, no friends, no group), with one line; a click says it again. No
+  // tips and no quiet switch any more.
+  const atlas = createAtlas({ size: 96, onPoke: () => speak() });
 
   // The scene's layout: how tall the band of sky and mountains is, where Atlas stands, and
   // where the page starts (just under the band). Redrawn when the window changes size.
@@ -33738,7 +33785,6 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
   function placeAtlas() {
     if (atlas.element.parentNode !== modal) modal.appendChild(atlas.element);
     atlas.element.hidden = crewShown();
-    quietButton.hidden = crewShown();
     if (crewShown()) atlas.close();
     if (!atlasSpot) return;
     // Scrolled past the band: Atlas in the bottom corner (CSS .is-docked).
@@ -33895,7 +33941,6 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     const fromMenu = !menu.classList.contains("hidden") && globe.mode === "menu";
     modal.classList.remove("hidden", "is-open", "is-landing", "is-over-game");
     modal.classList.toggle("is-over-game", !fromMenu);
-    lastLine = null;
     buildBackdrop();
     page.scrollTop = 0;
     const rendering = render(true);
@@ -33954,58 +33999,22 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     if (state.error) return { text: t("atlas.closed"), pose: "think" };
     if (!state.friends.length) return { text: t("atlas.noFriends"), pose: "point" };
     if (!state.groups.length) return { text: t("atlas.noGroup"), pose: "think" };
-    const week = weekStanding(state.boards.get(state.groupId));
-    if (week?.leader && week.you?.place === 1 && week.count > 1) return { text: t("atlas.leading", { group: groupName() }), pose: "cheer" };
-    if (week?.ahead) return { text: t("atlas.behind", { name: week.ahead.person.name, n: (week.ahead.score - week.you.score).toLocaleString(locale()) }), pose: "think" };
-    const todayDay = getDays().find(day => day.dateKey === today);
-    if (todayDay && !todayDay.noGame && !todayDay.completed) return { text: t("atlas.notToday"), pose: "point" };
-    const shield = shieldLine();
-    if (shield) return { text: shield, pose: "idle" };
     return null;
   }
 
-  const TIPS = ["atlas.tip1", "atlas.tip2", "atlas.tip3", "atlas.tip4", "atlas.tip5"];
   function speak() {
-    const line = currentLine() || { text: t(TIPS[0]), pose: "idle" };
-    lastLine = line.text;
-    atlas.say(line.text, line.pose);
-  }
-  // A click on Atlas (or switching him back on): the next tip, never the same line twice.
-  function sayNext(fresh = false) {
-    const line = fresh ? (currentLine() || null) : null;
-    if (line && line.text !== lastLine) { lastLine = line.text; atlas.say(line.text, line.pose); return; }
-    pokes += 1;
-    const text = t(TIPS[pokes % TIPS.length]);
-    lastLine = text;
-    atlas.say(text, pokes % 2 ? "think" : "idle");
+    const line = currentLine();
+    if (line) atlas.say(line.text, line.pose);
+    else atlas.close();
   }
 
-  const groupName = () => state.groups.find(group => group.id === state.groupId)?.name || "";
 
-  function shieldLine() {
-    const month = today.slice(0, 7);
-    const badge = getMonthBadge(getDays(), month);
-    if (!badge.next) return badge.tier ? t("atlas.topShield") : null;
-    const left = Math.max(0, badge.next.minDays - badge.played);
-    if (!left) return null;
-    return t("atlas.shield", { n: left, name: badge.next.name });
-  }
 
-  // This week in a group: your place, who's first, and who's just ahead of you.
-  function weekStanding(board) {
-    if (!board?.people) return null;
-    const monday = mondayOf(today);
-    const ranked = withPlaces(standings(board.people, monday, addDays(monday, 6)));
-    const me = getUser()?.id;
-    const youIndex = ranked.findIndex(entry => entry.person.id === me);
-    const you = ranked[youIndex] || null;
-    const ahead = you && youIndex > 0 ? ranked.slice(0, youIndex).reverse().find(entry => entry.score > you.score) : null;
-    return { ranked, you, ahead, leader: ranked[0] || null, count: board.people.length };
-  }
 
   // ----- The page -----
 
   async function render(reload = false) {
+    if (reload) reactions.day = null;
     const left = element("section", "camp-column camp-left");
     const center = element("section", "camp-column camp-center");
     const right = element("section", "camp-column camp-right");
@@ -34311,6 +34320,7 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     }
     const people = board.people;
     const me = getUser().id;
+    await loadReactions();
     const month = today.slice(0, 7);
     const options = leagueOptions(group);
     const season = seasonTable(people, month, today, firstDay, options);
@@ -34517,7 +34527,12 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
       const ring = element("span", "crew-face-ring");
       ring.appendChild(createExplorerHead(explorerOf(look) || {}, 3, "crew-face-head"));
       face.append(ring, element("small", "", person.name));
-      if (person.days.has(today)) face.appendChild(element("span", "crew-face-mark", "✓"));
+      if (person.days.has(today) && person.id !== me && people.find(other => other.id === me)?.days.has(today)) {
+        const sent = reactionsFrom(me).find(reaction => reaction.to_id === person.id);
+        const react = button(`crew-react-open${sent ? " is-sent" : ""}`, sent?.sticker ? STICKERS[sent.sticker] : t(sent ? "react.sent" : "react.button"), () => openReact(strip, person));
+        react.title = t("react.hint", { name: person.name });
+        face.appendChild(react);
+      } else if (person.days.has(today)) face.appendChild(element("span", "crew-face-mark", "✓"));
       else if (person.id === me) face.appendChild(element("span", "crew-face-mark", ""));
       else {
         const poke = button("crew-nudge", t(nudged.has(person.id) ? "community.nudgeSent" : "community.nudge"), () => nudge(person, poke));
@@ -34528,7 +34543,87 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
       row.appendChild(face);
     });
     strip.appendChild(row);
+    const inbox = reactionsTo(me);
+    if (inbox.length) {
+      const box = element("div", "crew-inbox");
+      box.appendChild(element("span", "field-label", t("react.inbox")));
+      inbox.forEach(reaction => {
+        const item = element("div", "crew-inbox-row");
+        item.append(createExplorerHead(explorerOf(reaction.from_look || {}) || {}, 2, "crew-duel-head"), element("b", "", reaction.from_name));
+        if (reaction.sticker) item.appendChild(element("span", "crew-inbox-sticker", STICKERS[reaction.sticker]));
+        if (reaction.message) item.appendChild(element("span", "crew-inbox-text", `“${reaction.message}”`));
+        box.appendChild(item);
+      });
+      strip.appendChild(box);
+    }
     return strip;
+  }
+
+  // ----- Reactions on a crewmate's day (24 November 2026, team request) -----
+  // Once you've played today: a sticker and/or a short message to a crewmate who finished
+  // too. Only they see it. Messages are checked for profanity (profanity.js, and again on
+  // the server, is_clean in supabase/social.sql).
+  const STICKERS = { fire: "🔥", clap: "👏", wow: "😮", lol: "😂", bullseye: "🎯", salute: "🫡" };
+  let reactions = { day: null, list: [] };
+  async function loadReactions(force = false) {
+    if (!force && reactions.day === today) return;
+    try {
+      reactions = { day: today, list: (await getDayReactions(today)) || [] };
+    } catch {
+      reactions = { day: today, list: [] };
+    }
+  }
+  const reactionsTo = me => reactions.list.filter(reaction => reaction.to_id === me);
+  const reactionsFrom = me => reactions.list.filter(reaction => reaction.from_id === me);
+
+  function openReact(strip, person) {
+    strip.querySelector(".crew-react")?.remove();
+    const me = getUser().id;
+    const sent = reactionsFrom(me).find(reaction => reaction.to_id === person.id);
+    let sticker = sent?.sticker || null;
+    const panel = element("div", "crew-react");
+    panel.appendChild(element("span", "field-label", t("react.title", { name: person.name })));
+    const stickers = element("div", "crew-react-stickers");
+    Object.entries(STICKERS).forEach(([key, glyph]) => {
+      const choice = button(`crew-react-sticker${key === sticker ? " is-active" : ""}`, glyph, () => {
+        sticker = sticker === key ? null : key;
+        stickers.querySelectorAll(".crew-react-sticker").forEach(node => node.classList.toggle("is-active", node === choice && sticker === key));
+      });
+      choice.setAttribute("aria-label", t(`react.${key}`));
+      stickers.appendChild(choice);
+    });
+    const input = element("input", "crew-react-input");
+    input.maxLength = 80;
+    input.placeholder = t("react.placeholder");
+    input.value = sent?.message || "";
+    const count = element("small", "crew-react-count", `${input.value.length}/80`);
+    const warn = element("small", "crew-react-warn");
+    input.addEventListener("input", () => {
+      count.textContent = `${input.value.length}/80`;
+      warn.textContent = isClean(input.value) ? "" : t("react.friendly");
+    });
+    const send = button("btn btn-primary crew-react-send", t("react.send"), async () => {
+      const message = input.value.trim();
+      if (!sticker && !message) { warn.textContent = t("react.empty"); return; }
+      if (!isClean(message)) { warn.textContent = t("react.friendly"); return; }
+      send.disabled = true;
+      try {
+        await sendReaction(person.id, today, sticker, message);
+        await loadReactions(true);
+        showToastNotice(t("react.done", { name: person.name }));
+        render();
+      } catch (error) {
+        warn.textContent = error.message;
+        send.disabled = false;
+      }
+    });
+    input.addEventListener("keydown", event => { if (event.key === "Enter") send.click(); });
+    const cancel = button("btn btn-secondary", t("react.cancel"), () => panel.remove());
+    const actions = element("div", "crew-react-actions");
+    actions.append(count, cancel, send);
+    panel.append(stickers, input, warn, actions);
+    strip.appendChild(panel);
+    input.focus({ preventScroll: true });
   }
 
   // The season table: place, explorer, season score, days, free misses left, and a late
@@ -34849,6 +34944,7 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     const data = await loadGlance();
     renderGlance(data);
     checkNudges();
+    checkReactions();
   }
 
   // Nudges for today, shown once when the menu appears (and only if today's game isn't
@@ -34864,6 +34960,22 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
       if (names.length) showToastNotice(t("community.nudgedYou", { names: names.join(", "), n: names.length }));
     } catch { /* not set up yet */ }
     checkingNudges = false;
+  }
+
+  // Reactions you haven't seen yet, once when the menu appears: "🔥 Sky: “nice one”".
+  let checkingReactions = false;
+  async function checkReactions() {
+    if (!signedIn() || checkingReactions) return;
+    checkingReactions = true;
+    try {
+      const fresh = (await takeReactions()) || [];
+      if (fresh.length === 1) {
+        const [one] = fresh;
+        showToastNotice(t(one.message ? "react.gotText" : "react.got", { sticker: one.sticker ? `${STICKERS[one.sticker]} ` : "", name: one.display_name, text: one.message || "" }));
+      } else if (fresh.length) showToastNotice(t("react.gotMany", { n: fresh.length }));
+      if (fresh.length) reactions.day = null;
+    } catch { /* not set up yet */ }
+    checkingReactions = false;
   }
 
   function renderGlance(data) {
@@ -34946,9 +35058,8 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
 
   // A language switch redraws the screen if it's open (without loading it again).
   onLangChange(() => {
-    renderQuietButton();
     atlas.relabel();
-    if (!modal.classList.contains("hidden")) render().then(() => { if (!isAtlasQuiet()) speak(); });
+    if (!modal.classList.contains("hidden")) render().then(speak);
     renderGlance(glanceData);
   });
   renderGlance(null);
@@ -34972,9 +35083,9 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     // After signing in or out: refresh the screen if it's open, use a waiting invite, and
     // take Atlas's setting from the account.
     onAccountChange(account) {
-      syncAtlasQuiet(account);
       glanceData = null;
       state.loaded = false;
+      reactions = { day: null, list: [] };
       refreshGlance();
       if (account && storage.get(PENDING_INVITE_KEY)) open();
       else if (!modal.classList.contains("hidden")) render(true).then(speak);
