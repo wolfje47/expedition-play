@@ -4684,7 +4684,7 @@ h1, h2, h3 { font-weight: normal; }
 .dock-item { gap: 5px; }
 .dock-sub { color: var(--muted); font: 11px/1.1 var(--font-body); text-align: center; }
 .dock-item.is-active .dock-sub { color: color-mix(in srgb, var(--tile) 70%, var(--text)); }
-#menuDailyButton .dock-art svg { width: 26px; height: 26px; }
+#menuDailyButton .dock-art svg { width: 32px; height: 32px; }
 
 /* DAILY on the shared card: two buttons to pick the game (in the hero buttons' style), then
    START under them. */
@@ -5251,9 +5251,7 @@ h1, h2, h3 { font-weight: normal; }
         </div>
         <nav class="menu-dock" id="menuDock" aria-label="Main menu" data-i18n-attr="aria-label:menu.mainMenu">
           <button class="dock-item" id="menuDailyButton" type="button" data-select="daily" style="--tile: #ff6b9d">
-            <span class="dock-art" aria-hidden="true">
-              <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M2 2h12v12H2zm1 3v8h10V5z" fill-rule="evenodd" fill="currentColor"/><path d="M4 6h2v2H4zm3 0h2v2H7zm3 0h2v2h-2zM4 9h2v2H4zm3 0h2v2H7z" fill="currentColor" opacity=".55"/><path d="M10 9h2v2h-2z" fill="#ffd45c"/><path d="M4 1h1v2H4zm7 0h1v2h-1z" fill="currentColor"/></svg>
-            </span>
+            <span class="dock-art" id="dailyDockArt" aria-hidden="true"></span>
             <span class="dock-label" data-i18n="menu.daily">DAILY</span>
             <small class="dock-sub" data-i18n="menu.dailySub">vs the world</small>
           </button>
@@ -39053,6 +39051,27 @@ const AUTO_CONTINUE_CLUE_MS = 3500;
 const AUTO_CONTINUE_WRONG_MS = 2000;
 
 const today = toUtcDateKey(new Date());
+
+// DAILY's icon in the menu bar (24 November 2026, team choice from mockups/menu-icons, option
+// G): a calendar page with today's date (the puzzle day, which changes at midnight UTC).
+function drawDailyIcon() {
+  const art = document.getElementById("dailyDockArt");
+  if (!art) return;
+  const DIGITS = { 0: "111101101101111", 1: "010110010010111", 2: "111001111100111", 3: "111001111001111", 4: "101101111001001", 5: "111100111001111", 6: "111100111101111", 7: "111001010010010", 8: "111101111101111", 9: "111101111001111" };
+  const px = [];
+  const box = (x, y, w, h, fill) => px.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}"/>`);
+  box(1, 3, 14, 13, "#0b1020"); // outline
+  box(2, 4, 12, 2, "#ff6b9d");
+  box(2, 6, 12, 1, "#c94677");
+  box(2, 7, 12, 7, "#f4f6ff");
+  box(2, 14, 12, 1, "#b9c2dd");
+  const digits = String(Number(today.slice(8, 10))).split("");
+  const left = 8 - Math.ceil((digits.length * 4 - 1) / 2);
+  digits.forEach((digit, i) => [...DIGITS[digit]].forEach((on, n) => { if (on === "1") box(left + i * 4 + (n % 3), 8 + Math.floor(n / 3), 1, 1, "#0b1020"); }));
+  [4, 11].forEach(x => { box(x, 2, 1, 2, "#dfe6f2"); box(x, 4, 1, 1, "#8a96b0"); });
+  art.innerHTML = `<svg viewBox="0 0 16 16" shape-rendering="crispEdges">${px.join("")}</svg>`;
+}
+drawDailyIcon();
 // The day being played: today, or an unplayed past day opened from the archive, in one
 // of the two modes (each day has a competitive and a casual puzzle).
 let activeDate = today;
