@@ -5138,6 +5138,23 @@ h1, h2, h3 { font-weight: normal; }
 .crew-inbox-sticker { font-size: 18px; }
 .crew-inbox-text { color: var(--muted); flex-basis: 100%; padding-left: 30px; }
 
+/* Live invites to Versus (live-invite.js). */
+.hero-invite { grid-column: 1 / -1; width: 100%; }
+.community-versus { background: none; border: 0; color: var(--cyan); font-size: 16px; cursor: pointer; padding: 4px 8px; min-width: 32px; min-height: 32px; }
+.live-invite { max-width: 440px; display: grid; gap: 12px; }
+.live-invite h2 { margin: 0; }
+.live-invite p { margin: 0; color: var(--muted); }
+.live-invite-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-height: 50vh; overflow-y: auto; }
+.live-invite-empty { color: var(--muted); font-size: 14px; }
+.live-invite-person { width: 100%; min-height: 48px; display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 10px; padding: 6px 10px; background: #141b3a; color: var(--text); border: 2px solid transparent; border-radius: 8px; cursor: pointer; text-align: left; font: 16px var(--font-body, "Space Grotesk", sans-serif); }
+.live-invite-person small { font: 9px var(--font-display); letter-spacing: var(--ls-pixel); color: var(--faint); }
+.live-invite-tick { width: 18px; height: 18px; border: 2px solid #2a3360; border-radius: 4px; }
+.live-invite-person.is-picked { border-color: #c58cff; background: color-mix(in srgb, #c58cff 18%, #141b3a); }
+.live-invite-person.is-picked .live-invite-tick { background: #c58cff; border-color: #c58cff; box-shadow: inset 0 0 0 3px #141b3a; }
+.live-invite-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.live-invite-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.live-invite-face { justify-self: center; width: 64px; height: 64px; border-color: #c58cff; }
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -5199,6 +5216,8 @@ h1, h2, h3 { font-weight: normal; }
               <input class="hero-join-field" id="heroJoinField" maxlength="6" autocapitalize="characters" autocomplete="off" spellcheck="false" data-i18n-attr="placeholder:lobby.codePlaceholder;aria-label:lobby.codePlaceholder">
               <button class="hero-side" id="heroJoinGo" type="button" data-i18n="duel.join">JOIN</button>
             </div>
+            <!-- VERSUS: invite friends or crewmates straight into a match (live-invite.js). -->
+            <button class="hero-side hero-invite" id="heroInvite" type="button" hidden data-i18n="live.button">✉ INVITE FRIENDS</button>
             <div class="hero-lobby" id="heroLobby" hidden>
               <div class="lobby-seats" id="lobbySeats"></div>
               <div class="lobby-invite">
@@ -7097,6 +7116,32 @@ const EN = {
   "crew.you": "You",
   "crew.which": "Which crew",
   "crew.all": "All crews",
+  "live.button": "✉ INVITE FRIENDS",
+  "live.crewButton": "⚔ PLAY LIVE",
+  "live.friendHint": "Play {name} live",
+  "live.badge": "VERSUS · LIVE",
+  "live.title": "Who do you want to play?",
+  "live.text": "Pick 1 for a duel, or 2–3 for a Party. They get an invite in the game.",
+  "live.titleLobby": "Invite to your lobby",
+  "live.textLobby": "{n} seat(s) still open. They get an invite in the game.",
+  "live.noContacts": "No friends or crew yet. Add them in Crew, or share the lobby code.",
+  "live.friend": "FRIEND",
+  "live.crew": "CREW",
+  "live.max": "{n} at most.",
+  "live.pick": "PICK UP TO {n}",
+  "live.duelWith": "⚔ DUEL {name}",
+  "live.partyOf": "▶ PARTY OF {n}",
+  "live.inviteN": "✉ INVITE {n}",
+  "live.cancel": "CANCEL",
+  "live.sent": "Invite sent to {names}. They'll see it when they're on the menu.",
+  "live.full": "Your lobby is full.",
+  "live.inRematch": "Decide on the rematch first.",
+  "live.gotDuel": "{name} wants a live duel!",
+  "live.gotParty": "{name} invites you to a Party of {n}!",
+  "live.gotText": "Join now: the match starts when everyone is in.",
+  "live.join": "▶ JOIN",
+  "live.notNow": "NOT NOW",
+  "live.leaveLobby": "Leave the lobby you're in to join this one?",
   "react.button": "REACT",
   "react.sent": "SENT",
   "react.hint": "React to {name}'s day",
@@ -8598,6 +8643,32 @@ const NL = {
   "crew.you": "Jij",
   "crew.which": "Welke crew",
   "crew.all": "Alle crews",
+  "live.button": "✉ NODIG VRIENDEN UIT",
+  "live.crewButton": "⚔ SPEEL LIVE",
+  "live.friendHint": "Speel live tegen {name}",
+  "live.badge": "VERSUS · LIVE",
+  "live.title": "Tegen wie wil je spelen?",
+  "live.text": "Kies 1 voor een duel, of 2–3 voor een Party. Ze krijgen een uitnodiging in het spel.",
+  "live.titleLobby": "Nodig uit voor je lobby",
+  "live.textLobby": "Nog {n} plaats(en) vrij. Ze krijgen een uitnodiging in het spel.",
+  "live.noContacts": "Nog geen vrienden of crew. Voeg ze toe in Crew, of deel de code van de lobby.",
+  "live.friend": "VRIEND",
+  "live.crew": "CREW",
+  "live.max": "Hoogstens {n}.",
+  "live.pick": "KIES ER TOT {n}",
+  "live.duelWith": "⚔ DUEL {name}",
+  "live.partyOf": "▶ PARTY VAN {n}",
+  "live.inviteN": "✉ NODIG {n} UIT",
+  "live.cancel": "ANNULEER",
+  "live.sent": "Uitnodiging verstuurd naar {names}. Ze zien hem als ze in het menu zijn.",
+  "live.full": "Je lobby is vol.",
+  "live.inRematch": "Beslis eerst over de revanche.",
+  "live.gotDuel": "{name} wil een live duel!",
+  "live.gotParty": "{name} nodigt je uit voor een Party van {n}!",
+  "live.gotText": "Doe nu mee: de match begint als iedereen er is.",
+  "live.join": "▶ DOE MEE",
+  "live.notNow": "NU NIET",
+  "live.leaveLobby": "De lobby waar je in zit verlaten om hieraan mee te doen?",
   "react.button": "REAGEER",
   "react.sent": "VERSTUURD",
   "react.hint": "Reageer op de dag van {name}",
@@ -30543,8 +30614,11 @@ async function findOpenDuel() {
 const sendReaction = (userId, dateKey, sticker, message) => call("send_reaction", { target: userId, day: dateKey, sticker: sticker || null, message: message || null });
 const getDayReactions = dateKey => call("day_reactions_for", { day: dateKey });
 const takeReactions = () => call("take_reactions");
+const getLiveContacts = () => call("live_contacts");
+const sendMatchInvites = (ids, code) => call("send_match_invites", { targets: ids, match_code: code });
+const takeMatchInvites = () => call("take_match_invites");
 
-return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, getAccountUnits, saveUnits, saveBase, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, setGroupKind, setGroupAdmin, addToGroup, leaveGroup, getGroups, createChallenge, getChallenge, setPublicTent, getCrewTents, getCrewPicks, sendNudge, takeNudges, setGroupWebhook, getGroupWebhook, testGroupPost, setPublicLook, joinGroup, renameGroup, newJoinCode, removeFromGroup, getGroupBoard, callDuel, watchDuel, getDuelHistory, findOpenDuel, sendReaction, getDayReactions, takeReactions };
+return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, getAccountUnits, saveUnits, saveBase, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, setGroupKind, setGroupAdmin, addToGroup, leaveGroup, getGroups, createChallenge, getChallenge, setPublicTent, getCrewTents, getCrewPicks, sendNudge, takeNudges, setGroupWebhook, getGroupWebhook, testGroupPost, setPublicLook, joinGroup, renameGroup, newJoinCode, removeFromGroup, getGroupBoard, callDuel, watchDuel, getDuelHistory, findOpenDuel, sendReaction, getDayReactions, takeReactions, getLiveContacts, sendMatchInvites, takeMatchInvites };
 })();
 
 // ---- duel-rules.js
@@ -33445,6 +33519,183 @@ function isClean(text) {
 return { isClean };
 })();
 
+// ---- live-invite.js
+__modules["live-invite.js"] = (() => {
+// Live invites (24 November 2026, team request): play Versus with friends without sending
+// a code. Pick up to 3 friends or crewmates (supabase/social.sql, live_contacts): one makes
+// a 1v1, two a Party of 3, three a Party of 4. The lobby is made (duel.create) and each of
+// them is invited (send_match_invites). Already in a lobby: invite people to its open seats.
+// The invited see a card while they're on the menu or in Crew (asked every 15 s; no phone
+// notifications), with JOIN; an invite counts for 10 minutes while the lobby waits.
+const { sounds } = __modules["audio.js"];
+const { getLiveContacts, getUser, isConfigured, sendMatchInvites, takeMatchInvites } = __modules["auth.js"];
+const { t } = __modules["i18n.js"];
+const { createExplorerHead, explorerOf } = __modules["tents.js"];
+const { showToastNotice } = __modules["ui.js"];
+
+const MAX_INVITED = 3;
+const POLL_MS = 15000;
+let deps = null; // { duel, showLobby, canShowInvite, signIn }
+
+function element(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+function button(className, text, onClick) {
+  const node = element("button", className, text);
+  node.type = "button";
+  node.addEventListener("click", () => { sounds.playClick(); onClick(); });
+  return node;
+}
+function overlay(id) {
+  document.getElementById(id)?.remove();
+  const back = element("div", "modal-overlay live-invite-overlay");
+  back.id = id;
+  const card = element("div", "modal live-invite");
+  card.setAttribute("role", "dialog");
+  card.setAttribute("aria-modal", "true");
+  back.appendChild(card);
+  back.addEventListener("click", event => { if (event.target === back) back.remove(); });
+  document.body.appendChild(back);
+  return { back, card };
+}
+
+// duel: duel-view.js; showLobby(): the menu's VERSUS card (closing Crew if it's open);
+// canShowInvite(): true on the menu or in Crew (not mid-game); signIn(): open sign-in.
+function initLiveInvites(options) {
+  deps = options;
+  setTimeout(checkInvites, 3000);
+  setInterval(checkInvites, POLL_MS);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) checkInvites(); });
+}
+
+// Open seats of the lobby you're in (0 when you're not in one).
+function openSeats() {
+  const match = deps?.duel.current();
+  if (!match || match.state?.phase !== "lobby") return 0;
+  const seats = match.state.seats || ["a", "b"];
+  return seats.filter(seat => !match.state.players?.[seat]).length;
+}
+
+// The picker. preselect: user ids ticked from the start (a friend's ⚔ in Crew).
+async function openLivePicker({ preselect = [] } = {}) {
+  if (!deps) return;
+  if (!isConfigured || !getUser()) { deps.signIn(); return; }
+  if (deps.duel.inRematch()) { showToastNotice(t("live.inRematch"), { problem: true }); return; }
+  const inLobby = deps.duel.inLobby();
+  const max = inLobby ? openSeats() : MAX_INVITED;
+  if (inLobby && !max) { showToastNotice(t("live.full")); return; }
+  let contacts;
+  try {
+    contacts = (await getLiveContacts()) || [];
+  } catch (error) {
+    showToastNotice(error.message, { problem: true });
+    return;
+  }
+  const { back, card } = overlay("livePicker");
+  card.append(element("span", "modal-badge", t("live.badge")), element("h2", "", t(inLobby ? "live.titleLobby" : "live.title")),
+    element("p", "", inLobby ? t("live.textLobby", { n: max }) : t("live.text")));
+  const picked = new Set(preselect.filter(id => contacts.some(contact => contact.user_id === id)).slice(0, max));
+  const go = button("btn btn-primary live-invite-go", "", () => send());
+  const list = element("ul", "live-invite-list");
+  if (!contacts.length) list.appendChild(element("li", "live-invite-empty", t("live.noContacts")));
+  contacts.forEach(contact => {
+    const row = element("li");
+    const choice = button("live-invite-person", "", () => {
+      if (picked.has(contact.user_id)) picked.delete(contact.user_id);
+      else if (picked.size < max) picked.add(contact.user_id);
+      else { showToastNotice(t("live.max", { n: max })); return; }
+      update();
+    });
+    choice.dataset.id = contact.user_id;
+    choice.append(createExplorerHead(explorerOf(contact.look || {}) || {}, 2, "live-invite-head"), element("span", "live-invite-name", contact.display_name),
+      element("small", "", t(contact.is_friend ? "live.friend" : "live.crew")), element("i", "live-invite-tick"));
+    row.appendChild(choice);
+    list.appendChild(row);
+  });
+  const actions = element("div", "live-invite-actions");
+  actions.append(button("btn btn-secondary", t("live.cancel"), () => back.remove()), go);
+  card.append(list, actions);
+
+  function update() {
+    list.querySelectorAll(".live-invite-person").forEach(node => node.classList.toggle("is-picked", picked.has(node.dataset.id)));
+    const n = picked.size;
+    go.disabled = !n;
+    const first = contacts.find(contact => picked.has(contact.user_id))?.display_name || "";
+    go.textContent = !n ? t("live.pick", { n: max }) : inLobby ? t("live.inviteN", { n }) : n === 1 ? t("live.duelWith", { name: first }) : t("live.partyOf", { n: n + 1 });
+  }
+  update();
+
+  async function send() {
+    const ids = [...picked];
+    if (!ids.length) return;
+    go.disabled = true;
+    if (!inLobby) {
+      const made = await deps.duel.create(ids.length + 1);
+      if (!made) { go.disabled = false; return; }
+    }
+    const code = deps.duel.current()?.code;
+    if (!code) { go.disabled = false; return; }
+    try {
+      await sendMatchInvites(ids, code);
+      const names = contacts.filter(contact => picked.has(contact.user_id)).map(contact => contact.display_name);
+      showToastNotice(t("live.sent", { names: names.join(", ") }));
+    } catch (error) {
+      showToastNotice(error.message, { problem: true });
+    }
+    back.remove();
+    deps.showLobby();
+  }
+}
+
+// Invites waiting for you: one card at a time.
+let checking = false;
+const queue = [];
+async function checkInvites() {
+  if (!deps || checking || document.hidden || !isConfigured || !getUser()) return;
+  if (!deps.canShowInvite()) return;
+  const match = deps.duel.current();
+  if (match && !deps.duel.inLobby() && !["done", "abandoned"].includes(match.status)) return; // playing a match
+  checking = true;
+  try {
+    const fresh = (await takeMatchInvites()) || [];
+    fresh.forEach(invite => { if (!queue.some(other => other.code === invite.code)) queue.push(invite); });
+  } catch { /* not set up yet */ }
+  checking = false;
+  showNext();
+}
+
+function showNext() {
+  if (!queue.length || document.getElementById("liveInvite")) return;
+  const invite = queue.shift();
+  if (deps.duel.current()?.code === invite.code) { showNext(); return; }
+  const { back, card } = overlay("liveInvite");
+  sounds.playClick();
+  const face = element("span", "crew-face-ring live-invite-face");
+  face.appendChild(createExplorerHead(explorerOf(invite.look || {}) || {}, 3, "crew-face-head"));
+  card.append(element("span", "modal-badge", t("live.badge")), face,
+    element("h2", "", invite.size > 2 ? t("live.gotParty", { name: invite.display_name, n: invite.size }) : t("live.gotDuel", { name: invite.display_name })),
+    element("p", "", t("live.gotText")));
+  const actions = element("div", "live-invite-actions");
+  const close = () => { back.remove(); showNext(); };
+  actions.append(button("btn btn-secondary", t("live.notNow"), close), button("btn btn-primary", t("live.join"), async () => {
+    if (deps.duel.inLobby()) {
+      if (!confirm(t("live.leaveLobby"))) return;
+      await deps.duel.leave();
+    }
+    back.remove();
+    const joined = await deps.duel.join(invite.code);
+    if (joined) deps.showLobby();
+    showNext();
+  }));
+  card.appendChild(actions);
+}
+
+return { initLiveInvites, openLivePicker };
+})();
+
 // ---- camp-scene.js
 __modules["camp-scene.js"] = (() => {
 // The scene behind Crew: Everest at sunrise in 8-bit pixels (13 November 2026, team choice
@@ -33622,6 +33873,7 @@ const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getTopPercent 
 const { isPreseasonMonth } = __modules["daily.js"];
 const { showToastNotice } = __modules["ui.js"];
 const { isClean } = __modules["profanity.js"];
+const { openLivePicker } = __modules["live-invite.js"];
 const { drawCampScene } = __modules["camp-scene.js"];
 const { countryName, locale, onLangChange, t } = __modules["i18n.js"];
 
@@ -34218,7 +34470,9 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     const list = element("ul", "community-friends");
     state.friends.forEach(friend => {
       const row = element("li");
-      row.append(element("span", "", friend.display_name), button("community-remove", "×", async () => {
+      const versus = button("community-versus", "⚔", () => openLivePicker({ preselect: [friend.user_id] }));
+      versus.title = t("live.friendHint", { name: friend.display_name });
+      row.append(element("span", "", friend.display_name), versus, button("community-remove", "×", async () => {
         if (!confirm(t("community.removeConfirm", { name: friend.display_name }))) return;
         await removeFriend(friend.user_id);
         await render(true);
@@ -34354,7 +34608,7 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
       state.groupId = null;
       await render(true);
     });
-    tools.append(addSelect, leave);
+    tools.append(addSelect, button("community-leave crew-live", t("live.crewButton"), () => openLivePicker()), leave);
     card.append(head, tools, createTodayStrip(people, me, options), createGroupInvite(group, people.length));
     if (manages) card.appendChild(createGroupSettings(group, people, me));
 
@@ -38736,6 +38990,7 @@ const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getTopPercent 
 const { initializeCommunity } = __modules["social.js"];
 const { initChallenges } = __modules["challenge.js"];
 const { createDuel } = __modules["duel-view.js"];
+const { initLiveInvites, openLivePicker } = __modules["live-invite.js"];
 const { createBaseLine, defaultBaseIso, getBase, getTent, getTentColor, getTentLook, onBaseChange, pickBase, setBase, setTentLevelSource, syncBase, tentLonLat } = __modules["base.js"];
 const { initCrewCard } = __modules["crew-card.js"];
 const { celebrateTent, createExplorerHead, createTentCanvas, tentLevel, tentToCelebrate } = __modules["tents.js"];
@@ -42023,6 +42278,7 @@ function renderHero() {
   side.title = unplayed ? t("menu.archiveOpen", { n: unplayed }) : "";
   // VERSUS: a code to join; in a match of yours that's waiting, the lobby takes the card.
   document.getElementById("heroJoin").hidden = !(versus && !duel?.inLobby());
+  document.getElementById("heroInvite").hidden = !versus || Boolean(duel?.inRematch());
   document.getElementById("heroLobby").hidden = true;
   card.classList.remove("is-lobby");
   if (versus && duel?.inLobby()) renderLobby(card);
@@ -42189,6 +42445,7 @@ const joinWithCode = () => {
   duel.join(code);
 };
 document.getElementById("heroJoinGo").addEventListener("click", () => { sounds.playClick(); joinWithCode(); });
+document.getElementById("heroInvite").addEventListener("click", () => { sounds.playClick(); openLivePicker(); });
 document.getElementById("heroJoinField").addEventListener("keydown", event => { if (event.key === "Enter") joinWithCode(); });
 
 // YOUR VERSUS: your record from your finished matches (a 1v1 is won by the higher score or
@@ -43433,6 +43690,14 @@ duel = createDuel({
     selectHero("daily");
   },
   notice: (message, options) => showToastNotice(message, options)
+});
+// Live invites to a Versus match (live-invite.js): sent from VERSUS or Crew, received as a
+// card on the menu or in Crew.
+initLiveInvites({
+  duel,
+  showLobby: () => { community?.close(); selectHero("duel"); },
+  canShowInvite: () => globe.mode === "menu",
+  signIn: () => document.getElementById("accountModal").classList.remove("hidden")
 });
 // Create your camp (tent-creator.js): from My tent (base.js asks with an event) and the lobby.
 const tentCreator = createTentCreator();
