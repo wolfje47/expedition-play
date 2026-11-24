@@ -5155,6 +5155,10 @@ h1, h2, h3 { font-weight: normal; }
 .live-invite-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
 .live-invite-face { justify-self: center; width: 64px; height: 64px; border-color: #c58cff; }
 
+/* A note shown off the game screen (ui.js showToastNotice): floating on top. */
+.input-toast.is-floating { position: fixed; top: max(16px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 10000; width: max-content; max-width: min(520px, calc(100vw - 32px)); margin: 0; padding: 12px 16px; border: 0; border-radius: 12px; background: #141b3a; box-shadow: inset 3px 0 0 var(--cyan), 0 8px 24px rgba(0, 0, 0, 0.5); color: var(--text); font-size: 14px; }
+.input-toast.is-floating.is-problem { box-shadow: inset 3px 0 0 var(--danger), 0 8px 24px rgba(0, 0, 0, 0.5); }
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -31209,6 +31213,11 @@ function showToastNotice(message, { problem = false, near = null } = {}) {
   if (near && phoneScreen.matches && near.closest(".side-right")) document.getElementById("gameView").appendChild(toast);
   else if (near) near.after(toast);
   else toastHome.parent.insertBefore(toast, toastHome.next);
+  // Off the game screen (the menu, Crew, the end screen, any window over it) the note's home
+  // isn't visible: it floats on top of the screen instead.
+  const floating = !near && (toastHome.parent.offsetParent === null || Boolean(document.querySelector(".modal-overlay:not(.hidden)")));
+  if (floating) document.body.appendChild(toast);
+  toast.classList.toggle("is-floating", floating);
   toast.classList.remove("hidden");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.add("hidden"), 2400);
