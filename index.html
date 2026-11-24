@@ -5027,6 +5027,70 @@ h1, h2, h3 { font-weight: normal; }
 .crew-channel-status { color: var(--text); font-size: 12px; }
 .crew-channel input { width: 100%; }
 
+/* YOUR CREW on the Highs & Lows score card (crew-card.js), and the end screen's invitation
+   to make a crew. */
+.crew-card {
+  width: 100%;
+  margin: 10px 0 4px;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--accent, #ff6b9d) 40%, transparent);
+  border-radius: 12px;
+  background: rgba(8, 12, 30, 0.55);
+  text-align: left;
+}
+.crew-card[hidden], .crew-invite[hidden] { display: none; }
+.crew-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.crew-card-title { font-family: "Press Start 2P", monospace; font-size: 9px; letter-spacing: var(--ls-pixel); color: var(--accent, #ff6b9d); }
+.crew-card-group { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crew-card-select {
+  max-width: 55%;
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font: 12px "Space Grotesk", sans-serif;
+}
+.crew-card-select option { color: #000; }
+.crew-card-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.crew-card-row {
+  display: grid;
+  grid-template-columns: 16px 22px minmax(0, 0.8fr) minmax(0, 1.2fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 6px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+.crew-card-row.is-me { background: color-mix(in srgb, var(--accent, #ff6b9d) 16%, transparent); }
+.crew-card-place { font-family: "Space Mono", monospace; color: var(--faint); text-align: right; }
+.crew-card-row.is-top .crew-card-place { color: #ffd45c; }
+.crew-card-head-img { width: 22px; height: 20px; image-rendering: pixelated; }
+.crew-card-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crew-card-pick { display: flex; align-items: center; gap: 5px; min-width: 0; color: var(--muted); }
+.crew-card-pick span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crew-card-flag { width: 16px; height: 12px; flex: none; border-radius: 2px; object-fit: cover; }
+.crew-card-points { font-family: "Space Mono", monospace; font-weight: 700; }
+.crew-card-note { margin: 6px 0 0; font-size: 12px; color: var(--muted); }
+.crew-invite {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  width: 100%;
+  margin: 8px 0;
+  padding: 12px;
+  border: 1px dashed color-mix(in srgb, var(--accent, #ff6b9d) 50%, transparent);
+  border-radius: 12px;
+  text-align: center;
+}
+.crew-invite strong { font-family: "Press Start 2P", monospace; font-size: 9px; letter-spacing: var(--ls-pixel); color: var(--accent, #ff6b9d); }
+.crew-invite p { margin: 0; font-size: 12px; color: var(--muted); }
+@media (max-width: 760px) {
+  .crew-card { margin: 6px 0 2px; padding: 8px 10px; }
+  .crew-card-row { grid-template-columns: 14px 22px minmax(0, 0.9fr) minmax(0, 1.1fr) auto; gap: 6px; }
+}
+#scoreBurst .is-paged .crew-card { order: 3; flex: none; margin: 4px 0 0; }
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -5683,6 +5747,7 @@ h1, h2, h3 { font-weight: normal; }
           <div class="end-squares" id="endSquares" aria-hidden="true"></div>
           <div class="end-climb-chart" id="endClimb"></div>
           <div class="end-versus" id="endVersus" hidden></div>
+          <div class="crew-invite" id="endCrew" hidden></div>
           <button class="btn btn-primary end-share" id="copyResultBtn" type="button">COPY RESULT</button>
           <button class="btn btn-secondary end-challenge" id="challengeBtn" type="button" hidden data-i18n="challenge.button">⚔ CHALLENGE A FRIEND</button>
           <p class="end-next-line"><span id="endNextDay"></span><button class="end-next-page" id="endNextPage" type="button" data-i18n="end.roundsNext">ROUNDS ›</button></p>
@@ -7002,6 +7067,18 @@ const EN = {
   "community.nudgedHint": "Hasn't played today · nudged",
   "community.shareTent": "Show my tent to my crew",
   "community.shareTentHint": "Your tent's city appears on the menu globe of people in your groups.",
+  "crew.title": "YOUR CREW",
+  "crew.you": "You",
+  "crew.which": "Which crew",
+  "crew.all": "All crews",
+  "crew.more": n => `${n} more`,
+  "crew.waiting": n => `${n} still to play this one`,
+  "crew.waitingNames": "{names} still to play",
+  "crew.empty": "Nobody in your crew has played this round yet.",
+  "crew.inviteTitle": "PLAY WITH YOUR CREW",
+  "crew.inviteText": "Make a group with friends or colleagues: see each other's picks after every round and race for the month.",
+  "crew.makeOne": "MAKE A CREW ›",
+  "crew.signIn": "SIGN IN FOR A CREW ›",
   "challenge.button": "⚔ CHALLENGE A FRIEND",
   "challenge.shareText": "I got {score} on Expedition {day} (Highs & Lows). Can you beat me?",
   "challenge.copied": "Challenge link copied. Send it to a friend!",
@@ -8448,6 +8525,18 @@ const NL = {
   "community.nudgedHint": "Nog niet gespeeld · gepord",
   "community.shareTent": "Toon mijn tent aan mijn crew",
   "community.shareTentHint": "De stad van je tent staat op de menuglobe van wie in je groepen zit.",
+  "crew.title": "JOUW CREW",
+  "crew.you": "Jij",
+  "crew.which": "Welke crew",
+  "crew.all": "Alle crews",
+  "crew.more": n => `nog ${n}`,
+  "crew.waiting": n => `${n} moeten deze nog spelen`,
+  "crew.waitingNames": "{names} moeten nog spelen",
+  "crew.empty": "Nog niemand van je crew speelde deze ronde.",
+  "crew.inviteTitle": "SPEEL MET JE CREW",
+  "crew.inviteText": "Maak een groep met vrienden of collega's: zie na elke ronde elkaars keuzes en strijd om de maand.",
+  "crew.makeOne": "MAAK EEN CREW ›",
+  "crew.signIn": "LOG IN VOOR EEN CREW ›",
   "challenge.button": "⚔ DAAG EEN VRIEND UIT",
   "challenge.shareText": "Ik haalde {score} op Expedition {day} (Highs & Lows). Kun jij beter?",
   "challenge.copied": "Uitdaging gekopieerd. Stuur hem naar een vriend!",
@@ -12468,6 +12557,7 @@ async function getChallenge(code) {
 }
 const setPublicTent = tent => call("set_public_tent", { new_tent: tent });
 const getCrewTents = dateKey => call("crew_tents", { day: dateKey });
+const getCrewPicks = dateKey => call("crew_picks", { day: dateKey });
 const sendNudge = (userId, dateKey) => call("send_nudge", { target: userId, day: dateKey });
 const takeNudges = dateKey => call("take_nudges", { day: dateKey });
 const setGroupWebhook = (groupId, url, hour) => call("set_group_webhook", { group_ref: groupId, hook_url: url, hour });
@@ -12538,7 +12628,7 @@ async function findOpenDuel() {
   return row ? { ...row, you: seatOf(row) } : null;
 }
 
-return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, getAccountUnits, saveUnits, saveBase, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, setGroupKind, setGroupAdmin, addToGroup, leaveGroup, getGroups, createChallenge, getChallenge, setPublicTent, getCrewTents, sendNudge, takeNudges, setGroupWebhook, getGroupWebhook, testGroupPost, setPublicLook, joinGroup, renameGroup, newJoinCode, removeFromGroup, getGroupBoard, callDuel, watchDuel, getDuelHistory, findOpenDuel };
+return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, getAccountUnits, saveUnits, saveBase, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, setGroupKind, setGroupAdmin, addToGroup, leaveGroup, getGroups, createChallenge, getChallenge, setPublicTent, getCrewTents, getCrewPicks, sendNudge, takeNudges, setGroupWebhook, getGroupWebhook, testGroupPost, setPublicLook, joinGroup, renameGroup, newJoinCode, removeFromGroup, getGroupBoard, callDuel, watchDuel, getDuelHistory, findOpenDuel };
 })();
 
 // ---- atlas.js
@@ -36361,6 +36451,169 @@ function createDuel({ globe, onExit, onSignIn, onMatchStart = () => {}, notice =
 return { createDuel };
 })();
 
+// ---- crew-card.js
+__modules["crew-card.js"] = (() => {
+// YOUR CREW (24 November 2026, team request): after each Highs & Lows round, the score card
+// shows what your crewmates picked on that round and how many points it got, next to your
+// own pick. The server (crew_picks in supabase/social.sql) only gives picks for rounds you've
+// picked yourself, so nothing leaks early. In several groups you pick which crew to see (ALL
+// CREWS or one group, remembered). Not in a group (or signed out): the end screen invites
+// you to make one instead.
+const { sounds } = __modules["audio.js"];
+const { getCrewPicks, getGroups, getUser, isConfigured } = __modules["auth.js"];
+const { getCountry } = __modules["daily.js"];
+const { scorePick } = __modules["extremes.js"];
+const { countryName, locale, t } = __modules["i18n.js"];
+const { createExplorerHead, explorerOf } = __modules["tents.js"];
+const { createFlagImage } = __modules["ui.js"];
+
+const CHOICE_KEY = "daily-geography:crew-card:v1"; // "all" or a group id
+// Fewer rows on a phone, where the journey shares the page.
+const maxRows = () => (window.matchMedia("(max-width: 760px)").matches ? 3 : 5);
+
+const storage = {
+  get: () => { try { return localStorage.getItem(CHOICE_KEY) || "all"; } catch { return "all"; } },
+  set: value => { try { localStorage.setItem(CHOICE_KEY, value); } catch { /* storage off */ } }
+};
+
+function element(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+// syncDay(date): sends your day to the account (awaited, so the server knows you picked);
+// openCrew(): opens Crew; myLook(): your tent look (for your own head).
+function initCrewCard({ syncDay, openCrew, myLook }) {
+  let groups = null; // null: not loaded yet
+  let groupsFor = null; // the user id they were loaded for
+  let request = 0;
+  let endRequest = 0;
+
+  async function loadGroups() {
+    const user = getUser();
+    if (!user) return [];
+    if (groups && groupsFor === user.id) return groups;
+    groups = (await getGroups()) || [];
+    groupsFor = user.id;
+    return groups;
+  }
+
+  // The score card of one Highs & Lows round. round: { stat, find }; mine: { pick, points }.
+  async function renderRound(box, { date, index, round, mine }) {
+    const ticket = ++request;
+    box.hidden = true;
+    box.replaceChildren();
+    if (!isConfigured || !getUser()) return;
+    let mates;
+    try {
+      const myGroups = await loadGroups();
+      if (!myGroups.length) return;
+      await syncDay(date);
+      mates = (await getCrewPicks(date)) || [];
+      if (ticket !== request) return;
+      draw(box, { round, index, mine, mates, myGroups });
+    } catch {
+      /* no crew block when the server can't be reached */
+    }
+  }
+
+  function draw(box, { round, index, mine, mates, myGroups }) {
+    let choice = storage.get();
+    if (choice !== "all" && !myGroups.some(group => group.id === choice)) choice = "all";
+    const shown = mates.filter(mate => choice === "all" || (mate.groups || []).includes(choice));
+    const rows = [];
+    const waiting = [];
+    shown.forEach(mate => {
+      const pick = mate.picks?.[index];
+      const result = pick ? scorePick(round.stat, round.find, pick) : null;
+      if (!result) { waiting.push(mate.display_name); return; }
+      rows.push({ name: mate.display_name, look: mate.look, pick, ...result });
+    });
+    const me = { name: t("crew.you"), look: myLook(), pick: mine.pick, points: mine.points, rank: scorePick(round.stat, round.find, mine.pick)?.rank, isMe: true };
+    const all = [...rows, me].sort((a, b) => b.points - a.points || Number(Boolean(b.isMe)) - Number(Boolean(a.isMe)));
+    // Places (shared on equal points), then the top rows, always with you in them.
+    let place = 0;
+    all.forEach((row, i) => { if (!i || all[i - 1].points !== row.points) place = i + 1; row.place = place; });
+    const max = maxRows();
+    let visible = all.slice(0, max);
+    if (!visible.includes(me)) visible = [...all.slice(0, max - 1), me];
+
+    const head = element("div", "crew-card-head");
+    head.appendChild(element("span", "crew-card-title", t("crew.title")));
+    if (myGroups.length > 1) {
+      const select = element("select", "crew-card-select");
+      select.setAttribute("aria-label", t("crew.which"));
+      [["all", t("crew.all")], ...myGroups.map(group => [group.id, group.name])].forEach(([value, label]) => {
+        const option = element("option", "", label);
+        option.value = value;
+        option.selected = value === choice;
+        select.appendChild(option);
+      });
+      select.addEventListener("click", event => event.stopPropagation());
+      select.addEventListener("change", () => {
+        sounds.playClick();
+        storage.set(select.value);
+        draw(box, { round, index, mine, mates, myGroups });
+      });
+      head.appendChild(select);
+    } else {
+      head.appendChild(element("span", "crew-card-group", myGroups[0].name));
+    }
+
+    const list = element("ol", "crew-card-list");
+    if (rows.length) {
+      visible.forEach(row => {
+        const item = element("li", `crew-card-row${row.isMe ? " is-me" : ""}${row.place === 1 ? " is-top" : ""}`);
+        item.appendChild(element("span", "crew-card-place", String(row.place)));
+        item.appendChild(createExplorerHead(explorerOf(row.look || {}) || {}, 2, "crew-card-head-img"));
+        item.appendChild(element("span", "crew-card-name", row.name));
+        const pick = element("span", "crew-card-pick");
+        const country = getCountry(row.pick);
+        if (country) pick.appendChild(createFlagImage(country, "crew-card-flag"));
+        pick.appendChild(element("span", "", `${countryName(country)} · #${row.rank}`));
+        item.appendChild(pick);
+        item.appendChild(element("b", "crew-card-points", row.points.toLocaleString(locale())));
+        list.appendChild(item);
+      });
+    }
+    const notes = [];
+    if (all.length > visible.length) notes.push(t("crew.more", { n: all.length - visible.length }));
+    if (waiting.length) notes.push(waiting.length <= 2 ? t("crew.waitingNames", { names: waiting.join(" & ") }) : t("crew.waiting", { n: waiting.length }));
+    if (!rows.length && !waiting.length) notes.push(t("crew.empty"));
+    box.replaceChildren(head, ...(rows.length ? [list] : []), ...(notes.length ? [element("p", "crew-card-note", notes.join(" · "))] : []));
+    box.hidden = false;
+  }
+
+  // The end screen of the main game: without a crew, an invitation to make one.
+  async function renderEnd(box, { show }) {
+    const ticket = ++endRequest;
+    box.hidden = true;
+    if (!show || !isConfigured) return;
+    groups = null; // a group may have been made in Crew since
+    try {
+      if (getUser() && (await loadGroups()).length) return;
+    } catch { return; }
+    if (ticket !== endRequest) return;
+    const go = element("button", "btn btn-secondary crew-invite-go", t(getUser() ? "crew.makeOne" : "crew.signIn"));
+    go.type = "button";
+    go.addEventListener("click", () => { sounds.playClick(); openCrew(); });
+    box.replaceChildren(element("strong", "", t("crew.inviteTitle")), element("p", "", t("crew.inviteText")), go);
+    box.hidden = false;
+  }
+
+  return {
+    renderRound,
+    renderEnd,
+    // After signing in or out, or a group change in Crew.
+    forget() { groups = null; groupsFor = null; }
+  };
+}
+
+return { initCrewCard };
+})();
+
 // ---- tent-creator.js
 __modules["tent-creator.js"] = (() => {
 // Create your camp (19 November 2026, mockups/tent-creator): your tent and your explorer,
@@ -38086,6 +38339,7 @@ const { initializeCommunity } = __modules["social.js"];
 const { initChallenges } = __modules["challenge.js"];
 const { createDuel } = __modules["duel-view.js"];
 const { createBaseLine, defaultBaseIso, getBase, getTent, getTentColor, getTentLook, onBaseChange, pickBase, setBase, setTentLevelSource, syncBase, tentLonLat } = __modules["base.js"];
+const { initCrewCard } = __modules["crew-card.js"];
 const { celebrateTent, createExplorerHead, createTentCanvas, tentLevel, tentToCelebrate } = __modules["tents.js"];
 const { createTentCreator } = __modules["tent-creator.js"];
 const { createWorldMap } = __modules["world-map.js"];
@@ -38895,7 +39149,8 @@ function arrangeBurstPages(info, index) {
     const second = Object.assign(document.createElement("section"), { className: "burst-page burst-page-answer" });
     const hint = Object.assign(document.createElement("button"), { type: "button", id: "scoreBurstSwipe", className: "burst-swipe" });
     hint.addEventListener("click", event => { event.stopPropagation(); pages.scrollTo({ left: pages.clientWidth, behavior: "smooth" }); });
-    first.append(part("scoreBurstRound"), part("scoreBurstLabel"), part("scoreBurstPointsBox"), part("scoreBurstStreak"), part("scoreBurstClimb"), part("scoreBurstTotalLine"), hint);
+    const crewBox = Object.assign(document.createElement("div"), { id: "scoreBurstCrew", className: "crew-card", hidden: true });
+    first.append(part("scoreBurstRound"), part("scoreBurstLabel"), part("scoreBurstPointsBox"), part("scoreBurstStreak"), crewBox, part("scoreBurstClimb"), part("scoreBurstTotalLine"), hint);
     second.append(part("scoreBurstAnswer"), part("scoreBurstInfo"));
     pages.append(first, second);
     const dots = Object.assign(document.createElement("div"), { id: "scoreBurstDots", className: "burst-dots" });
@@ -38946,6 +39201,12 @@ function fillScoreBurst(index) {
   // Highs & Lows: the pecking order gets the room (see style.css).
   document.querySelector(".score-burst-card").classList.toggle("is-extreme", plan[index].type === "extreme");
   arrangeBurstPages(info, index);
+  // YOUR CREW: what your crewmates picked on this Highs & Lows round (crew-card.js).
+  const crewBox = document.getElementById("scoreBurstCrew");
+  if (plan[index].type === "extreme" && activeMode === MAIN_MODE) {
+    const state = day.rounds[index];
+    crewCard?.renderRound(crewBox, { date: activeDate, index, round: plan[index], mine: { pick: state.pick, points: result.points } });
+  } else if (crewBox) crewBox.hidden = true;
   // A missed round's card puts the answer first, in gold. Every card waits for its
   // button (or Enter), so there's time to read it.
   overlay.classList.toggle("is-missed", !result.solved);
@@ -40764,6 +41025,7 @@ function showFinalModal() {
 
   // A challenge you took for this day, and CHALLENGE A FRIEND (challenge.js).
   challenges?.renderEnd(activeDate, activeMode, dayScore.total, dayScore.completed);
+  crewCard?.renderEnd(document.getElementById("endCrew"), { show: activeMode === MAIN_MODE && dayScore.completed });
 
   // You against everyone who played today (sample numbers for now).
   const stats = getDayStats(activeDate, activeMode);
@@ -42413,6 +42675,7 @@ async function signOutAndForgetDays() {
 
 // The Community screen, set up at the end of this file.
 let community = null;
+let crewCard = null;
 let challenges = null;
 
 function renderAccount(account) {
@@ -42653,6 +42916,7 @@ document.getElementById("signOutButton").addEventListener("click", async () => {
   const cleared = await signOutAndForgetDays();
   renderAccount(null);
   community?.onAccountChange(null);
+  crewCard?.forget();
   showToastNotice(t(cleared ? "account.signedOut" : "account.signedOutKept"));
 });
 renderAccount(null);
@@ -42673,6 +42937,7 @@ initAuth(account => {
   renderAccount(account);
   if (account) mergeAccountDays();
   community?.onAccountChange(account);
+  crewCard?.forget();
   if (account) duel?.signedIn();
 });
 
@@ -42787,6 +43052,7 @@ let duelDoneSeen = null;
 // Your tent changed (My tent) while you wait: the others get the new one.
 onBaseChange(() => { if (duel.inLobby()) { renderHero(); setTimeout(() => duel.refreshTent(), 1500); } });
 // Challenge links (challenge.js): made on the end screen, taken from ?challenge=CODE.
+crewCard = initCrewCard({ syncDay: syncDayToAccount, openCrew: () => community?.open(), myLook: getTentLook });
 challenges = initChallenges({
   mainMode: MAIN_MODE,
   dayName: dateKey => t("common.day", { n: getPuzzleNumber(dateKey) }),
