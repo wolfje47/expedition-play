@@ -4947,6 +4947,86 @@ h1, h2, h3 { font-weight: normal; }
 .camp-create:hover, .camp-create:focus-visible { filter: brightness(1.08); outline: none; }
 .base-line .camp-preview { grid-column: 1 / -1; flex-basis: 100%; width: 100%; box-sizing: border-box; }
 
+/* ----- Crew camp (24 November 2026, team choice A from mockups/crew-league) -----
+   With a group: everyone's tent in the scene (placeCrew in social.js), a header with the
+   crest, season and your place, who's played today, and the season table. */
+.camp-crew { position: absolute; inset: 0; pointer-events: none; }
+.camp-member { position: absolute; transform: translate(-50%, -100%); display: grid; justify-items: center; gap: 2px; pointer-events: auto; }
+.camp-member-pair { display: flex; align-items: flex-end; }
+.camp-member-tent { image-rendering: pixelated; display: block; }
+.camp-lantern { width: 6px; height: 8px; margin-left: -6px; background: #3a3f5c; border: 1px solid #0b1020; }
+.camp-lantern.is-lit { background: var(--gold); box-shadow: 0 0 10px 4px rgba(255, 212, 92, 0.55); }
+.camp-member-name { font: 8px var(--font-display); letter-spacing: var(--ls-pixel); text-transform: uppercase; color: var(--text); background: rgba(7, 11, 28, 0.82); padding: 3px 5px; border-radius: 4px; white-space: nowrap; max-width: 84px; overflow: hidden; text-overflow: ellipsis; }
+.camp-member.is-you .camp-member-name { color: var(--gold); }
+.camp-more { position: absolute; right: 3%; transform: translateY(-100%); font: 9px var(--font-display); background: rgba(7, 11, 28, 0.85); border: 1px solid var(--glass-line-soft); border-radius: 6px; padding: 8px; }
+.camp-leader { position: absolute; left: 47%; transform: translate(-50%, -100%); display: grid; justify-items: start; }
+.camp-leader span { font: 8px var(--font-display); letter-spacing: var(--ls-pixel); text-transform: uppercase; color: #070b1c; background: var(--gold); padding: 3px 5px; }
+.camp-leader i { width: 2px; height: 22px; background: #2a1d12; }
+
+.crew-head { flex-wrap: nowrap; }
+.crew-crest { flex: none; width: 48px; height: 48px; display: grid; place-items: center; border-radius: 10px; background: var(--crest, #2bb3a3); color: #070b1c; font: 14px var(--font-display); box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.25); }
+.crew-head .crew-place { flex: none; display: grid; justify-items: end; gap: 0.2rem; text-align: right; }
+.crew-place b { font: 20px var(--font-display); color: var(--gold); }
+.crew-place span { color: var(--muted); font-size: 12px; }
+.crew-tools { display: flex; justify-content: flex-end; align-items: center; gap: 0.6rem; }
+.crew-today { display: grid; gap: 0.5rem; }
+.crew-faces { display: flex; gap: 0.6rem; overflow-x: auto; padding-bottom: 4px; }
+.crew-face { flex: none; display: grid; justify-items: center; gap: 4px; width: 56px; }
+.crew-face-ring { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: end center; overflow: hidden; background: #141b3a; border: 2px solid #2a3360; }
+.crew-face.is-done .crew-face-ring { border-color: var(--green, #5cf28a); }
+.crew-face.is-you small { color: var(--gold); }
+.crew-face-head { image-rendering: pixelated; display: block; margin-bottom: 2px; }
+.crew-face small { font: 8px var(--font-display); color: var(--muted); max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crew-face-mark { font: 8px var(--font-display); color: var(--green, #5cf28a); min-height: 8px; }
+.crew-misses { display: inline-flex; justify-content: flex-end; gap: 3px; }
+.crew-misses i { width: 8px; height: 8px; background: var(--cyan); }
+.crew-misses i.is-used { background: #2a3360; }
+.crew-late { color: #ff8a3d; }
+@media (max-width: 760px) {
+  .crew-head { flex-wrap: wrap; }
+  .crew-head .crew-place { flex: 1 1 100%; justify-items: start; text-align: left; width: 100%; grid-auto-flow: column; justify-content: start; align-items: baseline; gap: 0.6rem; }
+  .crew-place b { font-size: 16px; }
+  .crew-tools { justify-content: flex-start; }
+  /* With a crew, the group comes first and you below it (mockups/crew-league, A). */
+  .camp-body.has-crew .camp-center { order: -1; }
+}
+
+/* ----- Challenges (24 November 2026, challenge.js) ----- */
+.end-challenge { width: 100%; }
+.end-versus { display: grid; }
+.challenge-versus { display: grid; gap: 0.35rem; justify-items: center; text-align: center; padding: 0.7rem; border: 1px solid var(--glass-line-soft); border-radius: 12px; background: rgba(255, 255, 255, 0.04); }
+.challenge-versus strong { font: 12px var(--font-display); letter-spacing: var(--ls-pixel); color: var(--gold); }
+.challenge-versus strong.is-win { color: var(--green, #5cf28a); }
+.challenge-versus strong.is-loss { color: #ff8a3d; }
+.challenge-versus small { color: var(--muted); font: 14px var(--font-mono, "Space Mono", monospace); }
+.challenge-overlay { z-index: 80; }
+.challenge-card { max-width: 420px; display: grid; gap: 0.8rem; text-align: center; justify-items: center; }
+.challenge-card h2 { margin: 0; font: 14px var(--font-display); letter-spacing: var(--ls-pixel); }
+.challenge-card p { margin: 0; color: var(--muted); font-size: 16px; }
+.challenge-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; }
+
+/* ----- Nudges and sharing your tent (24 November 2026) ----- */
+.crew-nudge { font: 7px var(--font-display); letter-spacing: var(--ls-pixel); color: #070b1c; background: var(--gold); border: 0; border-radius: 4px; padding: 4px 5px; cursor: pointer; }
+.crew-nudge:disabled { background: transparent; color: var(--faint); cursor: default; }
+.crew-share-tent { display: flex; gap: 0.7rem; align-items: flex-start; cursor: pointer; }
+.crew-share-tent input { margin-top: 3px; accent-color: var(--cyan); }
+.crew-share-tent span { display: grid; gap: 0.2rem; }
+.crew-share-tent strong { font: 9px var(--font-display); letter-spacing: var(--ls-pixel); text-transform: uppercase; }
+.crew-share-tent small { color: var(--muted); font-size: 12px; }
+
+/* ----- Work groups (24 November 2026) ----- */
+.crew-kind { margin-left: 0.5rem; font: 8px var(--font-display); letter-spacing: var(--ls-pixel); color: #070b1c; background: var(--cyan); padding: 3px 5px; border-radius: 4px; vertical-align: middle; }
+.crew-kind-switch { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+.crew-kind-switch .field-label { width: 100%; }
+.crew-kind-hint { color: var(--muted); font-size: 12px; }
+.crew-admin { margin-left: auto; font: 8px var(--font-display); letter-spacing: var(--ls-pixel); color: var(--muted); background: transparent; border: 1px solid var(--glass-line-soft); border-radius: 4px; padding: 4px 6px; cursor: pointer; }
+.crew-admin.is-on { color: #070b1c; background: var(--cyan); border-color: var(--cyan); }
+
+/* ----- Daily post to Slack or Teams (24 November 2026) ----- */
+.crew-channel { display: grid; gap: 0.5rem; padding-top: 0.6rem; border-top: 1px solid var(--glass-line-soft); }
+.crew-channel-status { color: var(--text); font-size: 12px; }
+.crew-channel input { width: 100%; }
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -5602,7 +5682,9 @@ h1, h2, h3 { font-weight: normal; }
           </div>
           <div class="end-squares" id="endSquares" aria-hidden="true"></div>
           <div class="end-climb-chart" id="endClimb"></div>
+          <div class="end-versus" id="endVersus" hidden></div>
           <button class="btn btn-primary end-share" id="copyResultBtn" type="button">COPY RESULT</button>
+          <button class="btn btn-secondary end-challenge" id="challengeBtn" type="button" hidden data-i18n="challenge.button">⚔ CHALLENGE A FRIEND</button>
           <p class="end-next-line"><span id="endNextDay"></span><button class="end-next-page" id="endNextPage" type="button" data-i18n="end.roundsNext">ROUNDS ›</button></p>
         </section>
         <section class="end-page end-more" aria-label="Your rounds" data-i18n-attr="aria-label:end.yourRoundsLabel">
@@ -6864,9 +6946,9 @@ const EN = {
   "community.copyCode": "COPY CODE",
   "community.linkCopied": "Invite link copied.",
   "community.codeCopied": "Code copied.",
-  "community.codePlaceholder": "Friend's code, e.g. K7Q2XM",
+  "community.codePlaceholder": "Friend's or group's code, e.g. K7Q2XM",
   "community.codeAria": "Friend's invite code",
-  "community.addFriend": "ADD A FRIEND",
+  "community.addFriend": "ADD A FRIEND OR GROUP",
   "community.add": "ADD",
   "community.friends": "FRIENDS · {n}",
   "community.noFriends": "No friends yet. Share your invite link to add some.",
@@ -6875,7 +6957,7 @@ const EN = {
   "community.newGroup": "+ NEW GROUP",
   "community.groupPlaceholder": "Group name, e.g. Office crew",
   "community.groupName": "Group name",
-  "community.friendsFirst": "Add friends first; you can still make a group and add them later.",
+  "community.friendsFirst": "No friends yet? Make the group anyway and share its link once it's made.",
   "community.newGroupHead": "NEW GROUP",
   "community.with": "WITH",
   "community.createGroup": "CREATE GROUP",
@@ -6884,6 +6966,86 @@ const EN = {
   "community.addToGroup": "Add a friend to this group",
   "community.addOption": "+ Add a friend",
   "community.leave": "Leave group",
+  "community.joined": "You joined {name}.",
+  "community.postHead": "DAILY POST TO SLACK OR TEAMS",
+  "community.postPlaceholder": "Incoming-webhook link (Slack or Teams)",
+  "community.postLink": "The channel's incoming-webhook link",
+  "community.postHour": "Time of the daily post",
+  "community.postOn": "Posting to {service} (…{hint}) every day at {time}.",
+  "community.postOnWork": "Posting to {service} (…{hint}) every workday at {time}.",
+  "community.postOff": "No channel yet. Paste a link to post the group's day and season once a day.",
+  "community.postNeedLink": "Paste the channel's incoming-webhook link first.",
+  "community.postSaved": "Saved. The group's day gets posted at that time.",
+  "community.postTest": "SEND TEST",
+  "community.postTestConfirm": "Post today's standings to the channel now?",
+  "community.postTestSent": "Posted to the channel.",
+  "community.postRemove": "Stop posting",
+  "community.postRemoveConfirm": "Stop the daily post to this channel?",
+  "community.postHelp": "Slack: add the Incoming Webhooks app to the channel. Teams: in the channel, Workflows › \"Post to a channel when a webhook request is received\". Only scores are posted, never answers.",
+  "community.workTag": "WORK",
+  "community.seasonLineWork": "{month} season · Mon–Fri · {n} workdays left",
+  "community.seasonRuleWork": "A work league: Monday to Friday, weekends don't count. Your average workday this season; 3 missed workdays are free, after that a missed one counts as half your average. Workdays before you joined count as ¾.",
+  "community.weekend": "WEEKEND · THE WORK LEAGUE IS OFF TODAY",
+  "community.kindHead": "KIND OF GROUP",
+  "community.kindFriends": "FRIENDS",
+  "community.kindWork": "WORK",
+  "community.kindFriendsHint": "Every day counts, weekends too.",
+  "community.kindWorkHint": "A league for colleagues: only Monday to Friday counts, and you can make admins.",
+  "community.adminOn": "ADMIN ✓",
+  "community.adminOff": "MAKE ADMIN",
+  "community.nudge": "NUDGE",
+  "community.nudgeSent": "SENT",
+  "community.nudgeHint": "Remind {name} that today's day is waiting",
+  "community.nudged": "Nudged {name}.",
+  "community.nudgedYou": p => `🔔 ${p.names} nudged you: today's Highs & Lows is waiting.`,
+  "community.tapToNudge": "Hasn't played today · tap to nudge",
+  "community.nudgedHint": "Hasn't played today · nudged",
+  "community.shareTent": "Show my tent to my crew",
+  "community.shareTentHint": "Your tent's city appears on the menu globe of people in your groups.",
+  "challenge.button": "⚔ CHALLENGE A FRIEND",
+  "challenge.shareText": "I got {score} on Expedition {day} (Highs & Lows). Can you beat me?",
+  "challenge.copied": "Challenge link copied. Send it to a friend!",
+  "challenge.signInFirst": "Sign in to send a challenge.",
+  "challenge.notFound": "That challenge link doesn't work any more.",
+  "challenge.badge": "CHALLENGE",
+  "challenge.title": "{name} challenges you",
+  "challenge.text": "{name} scored {score} on {day} of Highs & Lows. Can you beat it?",
+  "challenge.play": "▶ PLAY {day}",
+  "challenge.later": "NOT NOW",
+  "challenge.ok": "OK",
+  "challenge.won": "You beat {name} by {n}!",
+  "challenge.lost": "{name} wins by {n}",
+  "challenge.tie": "A tie with {name}!",
+  "challenge.scores": "You {you} · {name} {them}",
+  "challenge.add": "+ ADD {name} AS A FRIEND",
+  "challenge.signInAdd": "SIGN IN TO ADD {name}",
+  "community.season": "SEASON",
+  "community.seasonLine": "{month} season · {n} days left",
+  "community.ordinal": p => `${p.n}${p.n % 100 >= 11 && p.n % 100 <= 13 ? "TH" : ["TH", "ST", "ND", "RD"][p.n % 10] || "TH"}`,
+  "community.behind": "{n} behind {name}",
+  "community.ahead": "{n} ahead of {name}",
+  "community.alone": "The only one on the board so far",
+  "community.notRanked": "Play a day to get on the board",
+  "community.todayHead": "TODAY · {n} OF {total} PLAYED",
+  "community.lateStart": "LATE START −{n}%",
+  "community.freeMissesLeft": p => `${p.n} free ${plural(p.n, "miss", "misses")} left this season`,
+  "community.seasonRule": "Your average day this season. 3 missed days are free; after that a missed day counts as half your average. Days before you joined count as ¾.",
+  "community.more": "+{n}",
+  "community.playedToday": "{name} played today",
+  "community.notToday": "{name} hasn't played today",
+  "community.groupInvite": "INVITE TO THIS GROUP",
+  "community.groupCode": "GROUP CODE",
+  "community.groupInviteText": "Anyone who opens this link (or enters the code) while signed in joins the group, friends or not. Room for {n} more.",
+  "community.groupFull": "This group is full (50 members).",
+  "community.groupShareText": "Join {name} on Expedition and let's see who climbs highest.",
+  "community.groupSettings": "GROUP SETTINGS",
+  "community.rename": "GROUP NAME",
+  "community.save": "SAVE",
+  "community.newCode": "NEW CODE",
+  "community.newCodeConfirm": "Make a new code? Links with the old one stop working.",
+  "community.membersHead": "MEMBERS",
+  "community.removeMember": "Remove {name}",
+  "community.removeMemberConfirm": "Remove {name} from {group}?",
   "community.leaveConfirm": "Leave {name}?",
   "community.day": "DAY",
   "community.week": "THIS WEEK",
@@ -8230,9 +8392,9 @@ const NL = {
   "community.copyCode": "KOPIEER CODE",
   "community.linkCopied": "Uitnodigingslink gekopieerd.",
   "community.codeCopied": "Code gekopieerd.",
-  "community.codePlaceholder": "Code van een vriend, bijv. K7Q2XM",
+  "community.codePlaceholder": "Code van een vriend of groep, bijv. K7Q2XM",
   "community.codeAria": "Uitnodigingscode van een vriend",
-  "community.addFriend": "VRIEND TOEVOEGEN",
+  "community.addFriend": "VRIEND OF GROEP TOEVOEGEN",
   "community.add": "VOEG TOE",
   "community.friends": "VRIENDEN · {n}",
   "community.noFriends": "Nog geen vrienden. Deel je uitnodigingslink om er een paar toe te voegen.",
@@ -8241,7 +8403,7 @@ const NL = {
   "community.newGroup": "+ NIEUWE GROEP",
   "community.groupPlaceholder": "Groepsnaam, bijv. Collega's",
   "community.groupName": "Groepsnaam",
-  "community.friendsFirst": "Voeg eerst vrienden toe; je kunt ook nu al een groep maken en ze later toevoegen.",
+  "community.friendsFirst": "Nog geen vrienden? Maak de groep toch en deel daarna zijn link.",
   "community.newGroupHead": "NIEUWE GROEP",
   "community.with": "MET",
   "community.createGroup": "MAAK GROEP",
@@ -8250,6 +8412,86 @@ const NL = {
   "community.addToGroup": "Een vriend aan deze groep toevoegen",
   "community.addOption": "+ Vriend toevoegen",
   "community.leave": "Groep verlaten",
+  "community.joined": "Je zit nu in {name}.",
+  "community.postHead": "DAGELIJKS BERICHT IN SLACK OF TEAMS",
+  "community.postPlaceholder": "Webhooklink (Slack of Teams)",
+  "community.postLink": "De webhooklink van het kanaal",
+  "community.postHour": "Tijd van het dagelijkse bericht",
+  "community.postOn": "Bericht in {service} (…{hint}) elke dag om {time}.",
+  "community.postOnWork": "Bericht in {service} (…{hint}) elke werkdag om {time}.",
+  "community.postOff": "Nog geen kanaal. Plak een link om de dag en het seizoen van de groep één keer per dag te posten.",
+  "community.postNeedLink": "Plak eerst de webhooklink van het kanaal.",
+  "community.postSaved": "Bewaard. De dag van de groep wordt op dat uur gepost.",
+  "community.postTest": "TEST STUREN",
+  "community.postTestConfirm": "De stand van vandaag nu in het kanaal posten?",
+  "community.postTestSent": "Gepost in het kanaal.",
+  "community.postRemove": "Stop met posten",
+  "community.postRemoveConfirm": "Het dagelijkse bericht in dit kanaal stoppen?",
+  "community.postHelp": "Slack: voeg de app Incoming Webhooks toe aan het kanaal. Teams: in het kanaal Workflows › \"Post to a channel when a webhook request is received\". Alleen scores worden gepost, nooit antwoorden.",
+  "community.workTag": "WERK",
+  "community.seasonLineWork": "seizoen {month} · ma–vr · nog {n} werkdagen",
+  "community.seasonRuleWork": "Een werkcompetitie: maandag tot vrijdag, weekends tellen niet. Je gemiddelde werkdag dit seizoen; 3 gemiste werkdagen zijn gratis, daarna telt een gemiste als de helft van je gemiddelde. Werkdagen voordat je erbij kwam tellen als ¾.",
+  "community.weekend": "WEEKEND · DE WERKCOMPETITIE LIGT VANDAAG STIL",
+  "community.kindHead": "SOORT GROEP",
+  "community.kindFriends": "VRIENDEN",
+  "community.kindWork": "WERK",
+  "community.kindFriendsHint": "Elke dag telt, ook in het weekend.",
+  "community.kindWorkHint": "Een competitie voor collega's: alleen maandag tot vrijdag telt, en je kunt beheerders aanwijzen.",
+  "community.adminOn": "BEHEERDER ✓",
+  "community.adminOff": "MAAK BEHEERDER",
+  "community.nudge": "POREN",
+  "community.nudgeSent": "GEPORD",
+  "community.nudgeHint": "Laat {name} weten dat de dag van vandaag wacht",
+  "community.nudged": "{name} gepord.",
+  "community.nudgedYou": p => `🔔 ${p.names} ${p.n === 1 ? "port" : "porren"} je: Highs & Lows van vandaag wacht.`,
+  "community.tapToNudge": "Nog niet gespeeld · tik om te poren",
+  "community.nudgedHint": "Nog niet gespeeld · gepord",
+  "community.shareTent": "Toon mijn tent aan mijn crew",
+  "community.shareTentHint": "De stad van je tent staat op de menuglobe van wie in je groepen zit.",
+  "challenge.button": "⚔ DAAG EEN VRIEND UIT",
+  "challenge.shareText": "Ik haalde {score} op Expedition {day} (Highs & Lows). Kun jij beter?",
+  "challenge.copied": "Uitdaging gekopieerd. Stuur hem naar een vriend!",
+  "challenge.signInFirst": "Log in om iemand uit te dagen.",
+  "challenge.notFound": "Die uitdaging werkt niet meer.",
+  "challenge.badge": "UITDAGING",
+  "challenge.title": "{name} daagt je uit",
+  "challenge.text": "{name} haalde {score} op {day} van Highs & Lows. Kun jij beter?",
+  "challenge.play": "▶ SPEEL {day}",
+  "challenge.later": "NU NIET",
+  "challenge.ok": "OK",
+  "challenge.won": "Je wint van {name} met {n}!",
+  "challenge.lost": "{name} wint met {n}",
+  "challenge.tie": "Gelijk met {name}!",
+  "challenge.scores": "Jij {you} · {name} {them}",
+  "challenge.add": "+ {name} ALS VRIEND",
+  "challenge.signInAdd": "LOG IN OM {name} TOE TE VOEGEN",
+  "community.season": "SEIZOEN",
+  "community.seasonLine": "seizoen {month} · nog {n} dagen",
+  "community.ordinal": p => `${p.n}E`,
+  "community.behind": "{n} achter {name}",
+  "community.ahead": "{n} voor op {name}",
+  "community.alone": "Nog de enige op het bord",
+  "community.notRanked": "Speel een dag om op het bord te komen",
+  "community.todayHead": "VANDAAG · {n} VAN {total} GESPEELD",
+  "community.lateStart": "LATE INSTAP −{n}%",
+  "community.freeMissesLeft": p => `Nog ${p.n} ${plural(p.n, "vrije misser", "vrije missers")} dit seizoen`,
+  "community.seasonRule": "Je gemiddelde dag dit seizoen. 3 gemiste dagen zijn gratis; daarna telt een gemiste dag als de helft van je gemiddelde. Dagen voordat je erbij kwam tellen als ¾.",
+  "community.more": "+{n}",
+  "community.playedToday": "{name} heeft vandaag gespeeld",
+  "community.notToday": "{name} heeft vandaag nog niet gespeeld",
+  "community.groupInvite": "UITNODIGEN VOOR DEZE GROEP",
+  "community.groupCode": "GROEPSCODE",
+  "community.groupInviteText": "Wie deze link opent (of de code invult) terwijl hij of zij is ingelogd, komt in de groep, vriend of niet. Nog plaats voor {n}.",
+  "community.groupFull": "Deze groep is vol (50 leden).",
+  "community.groupShareText": "Kom bij {name} op Expedition en kijk wie het hoogst klimt.",
+  "community.groupSettings": "GROEPSINSTELLINGEN",
+  "community.rename": "NAAM VAN DE GROEP",
+  "community.save": "BEWAAR",
+  "community.newCode": "NIEUWE CODE",
+  "community.newCodeConfirm": "Een nieuwe code maken? Links met de oude werken dan niet meer.",
+  "community.membersHead": "LEDEN",
+  "community.removeMember": "{name} verwijderen",
+  "community.removeMemberConfirm": "{name} uit {group} verwijderen?",
   "community.leaveConfirm": "{name} verlaten?",
   "community.day": "DAG",
   "community.week": "DEZE WEEK",
@@ -12209,10 +12451,40 @@ const setDisplayName = name => call("set_display_name", { new_name: name });
 const addFriend = code => call("add_friend", { code });
 const removeFriend = friendId => call("remove_friend", { friend: friendId });
 const getFriends = () => call("my_friends");
-const createGroup = (name, memberIds) => call("create_group", { group_name: name, members: memberIds });
+const createGroup = (name, memberIds, kind = "friends") => call("create_group", { group_name: name, members: memberIds, group_kind: kind });
+const setGroupKind = (groupId, kind) => call("set_group_kind", { group_ref: groupId, group_kind: kind });
+const setGroupAdmin = (groupId, memberId, admin) => call("set_group_admin", { group_ref: groupId, member: memberId, admin });
 const addToGroup = (groupId, friendId) => call("add_to_group", { group_ref: groupId, friend: friendId });
 const leaveGroup = groupId => call("leave_group", { group_ref: groupId });
 const getGroups = () => call("my_groups");
+// Challenges: making one needs an account; reading one doesn't (guests can take it on).
+const createChallenge = dateKey => call("create_challenge", { day: dateKey });
+async function getChallenge(code) {
+  const supabase = await getClient();
+  if (!supabase) return null;
+  const { data, error } = await supabase.rpc("get_challenge", { challenge_code: code });
+  if (error) throw new Error(error.message);
+  return data?.[0] || null;
+}
+const setPublicTent = tent => call("set_public_tent", { new_tent: tent });
+const getCrewTents = dateKey => call("crew_tents", { day: dateKey });
+const sendNudge = (userId, dateKey) => call("send_nudge", { target: userId, day: dateKey });
+const takeNudges = dateKey => call("take_nudges", { day: dateKey });
+const setGroupWebhook = (groupId, url, hour) => call("set_group_webhook", { group_ref: groupId, hook_url: url, hour });
+const getGroupWebhook = async groupId => (await call("group_webhook", { group_ref: groupId }))?.[0] || null;
+// A test post to the group's channel right now (Edge Function crew-post; owner or admin).
+async function testGroupPost(groupId) {
+  const supabase = await getClient();
+  if (!supabase || !user) throw new Error(t("auth.signInFirst"));
+  const { data, error } = await supabase.functions.invoke("crew-post", { body: { test: groupId } });
+  if (error) throw new Error(error.message);
+  return data;
+}
+const setPublicLook = look => call("set_public_look", { new_look: look });
+const joinGroup = async code => (await call("join_group", { code }))?.[0] || null;
+const renameGroup = (groupId, name) => call("rename_group", { group_ref: groupId, new_name: name });
+const newJoinCode = groupId => call("new_join_code", { group_ref: groupId });
+const removeFromGroup = (groupId, memberId) => call("remove_from_group", { group_ref: groupId, member: memberId });
 // Rows of { user_id, display_name, date, score } for the group's finished days.
 const getGroupBoard = (groupId, from, to) => call("group_board", { group_ref: groupId, from_date: from, to_date: to });
 
@@ -12266,7 +12538,7 @@ async function findOpenDuel() {
   return row ? { ...row, you: seatOf(row) } : null;
 }
 
-return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, getAccountUnits, saveUnits, saveBase, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, addToGroup, leaveGroup, getGroups, getGroupBoard, callDuel, watchDuel, getDuelHistory, findOpenDuel };
+return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, getAccountUnits, saveUnits, saveBase, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, setGroupKind, setGroupAdmin, addToGroup, leaveGroup, getGroups, createChallenge, getChallenge, setPublicTent, getCrewTents, sendNudge, takeNudges, setGroupWebhook, getGroupWebhook, testGroupPost, setPublicLook, joinGroup, renameGroup, newJoinCode, removeFromGroup, getGroupBoard, callDuel, watchDuel, getDuelHistory, findOpenDuel };
 })();
 
 // ---- atlas.js
@@ -32752,6 +33024,85 @@ function createBaseLine({ onChange = null } = {}) {
 return { TENT_COLORS, getTentColor, setTentLevelSource, getTentLook, setTentLook, defaultBaseIso, setTentColor, getBase, onBaseChange, tentSpots, getTent, tentLonLat, setBase, syncBase, pickBase, createBaseLine };
 })();
 
+// ---- crew-league.js
+__modules["crew-league.js"] = (() => {
+// The league of a Crew group (24 November 2026, team decision): a season is a calendar
+// month, and your season score is your average day, with two rules on top.
+//  - Free misses: the first 3 days you miss in a season cost nothing (left out).
+//  - Every missed day after that counts as half your season average.
+//  - A late start: days of the season before you joined count as missed days too, but
+//    milder, at ¾ of your average. The free misses go to ordinary misses first (they cost
+//    more), then to the days before you joined. Joining on day 20 ≈ ×0.85, on day 5 ≈ ×0.98.
+// Today only counts once you've played it (the day isn't over). A work group (`weekdays`)
+// plays Monday to Friday: weekends don't count at all, played or not. No DOM, no imports,
+// so a test can run it in Node.
+
+const FREE_MISSES = 3;
+const MISS_SHARE = 0.5; // a missed day after the free ones
+const LATE_SHARE = 0.75; // a day of the season before you joined
+
+const toKey = date => date.toISOString().slice(0, 10);
+const nextDay = dateKey => {
+  const date = new Date(`${dateKey}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + 1);
+  return toKey(date);
+};
+const isWeekend = dateKey => [0, 6].includes(new Date(`${dateKey}T00:00:00Z`).getUTCDay());
+const monthEnd = month => {
+  const date = new Date(`${month}-01T00:00:00Z`);
+  date.setUTCMonth(date.getUTCMonth() + 1, 0);
+  return toKey(date);
+};
+
+// One member's season. person: { days: Map(dateKey → score), joined: dateKey | null }.
+// firstDay: the game's first day (Day 1); today: the current puzzle date.
+function seasonOf(person, month, today, firstDay = `${month}-01`, { weekdays = false } = {}) {
+  const start = [`${month}-01`, firstDay].sort().at(-1);
+  const end = [monthEnd(month), today].sort()[0];
+  const joined = person.joined && person.joined > start ? person.joined : start;
+  let played = 0, total = 0, missed = 0, late = 0;
+  for (let day = start; day <= end; day = nextDay(day)) {
+    if (weekdays && isWeekend(day)) continue;
+    const score = person.days.get(day);
+    if (score !== undefined && score !== null) { played += 1; total += score; continue; }
+    if (day === today) continue; // still open
+    if (day < joined) late += 1;
+    else missed += 1;
+  }
+  if (!played) return { played, missed, late, freeLeft: Math.max(0, FREE_MISSES - missed - late), score: null, average: null, factor: 1 };
+  const average = total / played;
+  let free = FREE_MISSES;
+  const paidMisses = Math.max(0, missed - free);
+  free = Math.max(0, free - missed);
+  const paidLate = Math.max(0, late - free);
+  free = Math.max(0, free - late);
+  const score = (total + paidMisses * MISS_SHARE * average + paidLate * LATE_SHARE * average) / (played + paidMisses + paidLate);
+  return { played, missed, late, freeLeft: free, paidMisses, paidLate, average: Math.round(average), score: Math.round(score), factor: score / average };
+}
+
+// Everyone's season, best first (more days played breaks a tie), with shared places.
+function seasonTable(people, month, today, firstDay, options = {}) {
+  const rows = people.map(person => ({ person, ...seasonOf(person, month, today, firstDay, options) }))
+    .filter(row => row.score !== null)
+    .sort((a, b) => b.score - a.score || b.played - a.played);
+  let place = 0;
+  return rows.map((row, index) => {
+    const previous = rows[index - 1];
+    if (!previous || previous.score !== row.score || previous.played !== row.played) place = index + 1;
+    return { ...row, place };
+  });
+}
+
+// Days left in a season, today included.
+function daysLeft(month, today, { weekdays = false } = {}) {
+  let left = 0;
+  for (let day = today; day <= monthEnd(month); day = nextDay(day)) if (!weekdays || !isWeekend(day)) left += 1;
+  return left;
+}
+
+return { FREE_MISSES, MISS_SHARE, LATE_SHARE, isWeekend, monthEnd, seasonOf, seasonTable, daysLeft };
+})();
+
 // ---- camp-scene.js
 __modules["camp-scene.js"] = (() => {
 // The scene behind Crew: Everest at sunrise in 8-bit pixels (13 November 2026, team choice
@@ -32918,10 +33269,13 @@ __modules["social.js"] = (() => {
 // The menu also gets a glance at the week (refreshGlance): a card beside the games on a
 // wide screen, a line on the Base Camp tile on a phone.
 const { sounds } = __modules["audio.js"];
-const { addFriend, addToGroup, createGroup, getFriends, getGroupBoard, getGroups, getMyProfile, getUser, isConfigured, leaveGroup, removeFriend, setDisplayName } = __modules["auth.js"];
+const { addFriend, addToGroup, createGroup, getFriends, getGroupBoard, getGroups, getMyProfile, getUser, isConfigured, joinGroup, leaveGroup, newJoinCode, removeFromGroup, renameGroup, removeFriend, getCrewTents, sendNudge, setDisplayName, setGroupAdmin, setGroupKind, setGroupWebhook, getGroupWebhook, testGroupPost, setPublicLook, setPublicTent, takeNudges } = __modules["auth.js"];
 const { createAtlas, createAtlasSprite, isAtlasQuiet, onAtlasQuietChange, setAtlasQuiet, syncAtlasQuiet } = __modules["atlas.js"];
 const { createBadge, createMedal, getGroupMedal } = __modules["badges.js"];
-const { createBaseLine } = __modules["base.js"];
+const { createBaseLine, getTent, getTentLook } = __modules["base.js"];
+const { FREE_MISSES, daysLeft, isWeekend, monthEnd, seasonTable } = __modules["crew-league.js"];
+const { cleanColor, cleanLook } = __modules["look-parts.js"];
+const { createExplorerHead, createTentCanvas, explorerOf } = __modules["tents.js"];
 const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getTopPercent } = __modules["community.js"];
 const { isPreseasonMonth } = __modules["daily.js"];
 const { showToastNotice } = __modules["ui.js"];
@@ -32929,8 +33283,13 @@ const { drawCampScene } = __modules["camp-scene.js"];
 const { countryName, locale, onLangChange, t } = __modules["i18n.js"];
 
 const PENDING_INVITE_KEY = "daily-geography:pending-invite:v1";
+const PENDING_JOIN_KEY = "daily-geography:pending-join:v1";
+const GROUP_CODE_LENGTH = 8; // friend codes have 6
+// Whether your tent shows on your crew's menu globe (on unless switched off in Crew).
+const SHARE_TENT_KEY = "daily-geography:share-tent:v1";
 const MET_ATLAS_KEY = "daily-geography:atlas-met:v1";
 const GLANCE_ROWS = 3;
+const GROUP_LIMIT = 50; // as group_limit() in supabase/social.sql
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
@@ -32964,7 +33323,14 @@ const storage = {
 function membersOf(rows) {
   const members = new Map();
   rows.forEach(row => {
-    if (!members.has(row.user_id)) members.set(row.user_id, { id: row.user_id, name: row.display_name, days: new Map() });
+    if (!members.has(row.user_id)) members.set(row.user_id, {
+      id: row.user_id,
+      name: row.display_name,
+      days: new Map(),
+      joined: row.joined_at ? String(row.joined_at).slice(0, 10) : null,
+      admin: Boolean(row.is_admin),
+      look: row.look ? { ...cleanLook(row.look), color: cleanColor(row.look.color) } : null
+    });
     if (row.date) members.get(row.user_id).days.set(row.date, row.score);
   });
   return [...members.values()];
@@ -33003,7 +33369,7 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
   const body = document.getElementById("communityBody");
   const menu = document.getElementById("mainMenu");
   const phone = window.matchMedia("(max-width: 760px)");
-  const state = { profile: null, friends: [], groups: [], groupId: null, boards: new Map(), view: "day", dateKey: today, creating: false, error: null, loaded: false };
+  const state = { profile: null, friends: [], groups: [], groupId: null, boards: new Map(), view: "season", dateKey: today, creating: false, error: null, loaded: false };
   let dove = false; // whether the globe dived (so it rises again on closing)
   let lastLine = null;
   let pokes = 0;
@@ -33012,6 +33378,12 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
   const invite = new URLSearchParams(location.search).get("invite");
   if (invite) {
     storage.set(PENDING_INVITE_KEY, invite.toUpperCase());
+    history.replaceState(null, "", location.pathname);
+  }
+  // A group's link (?join=CODE) likewise, joined the next time Crew loads signed in.
+  const joinCode = new URLSearchParams(location.search).get("join");
+  if (joinCode) {
+    storage.set(PENDING_JOIN_KEY, joinCode.toUpperCase());
     history.replaceState(null, "", location.pathname);
   }
 
@@ -33052,16 +33424,19 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     const px = small ? 4 : 6;
     modal.style.setProperty("--camp-band", `${band}px`);
     const headBottom = page.offsetTop + head.offsetTop + head.offsetHeight; // (not the rect: the page slides in)
-    const key = `${W}x${H}x${Math.round(headBottom)}`;
+    const crew = crewShown();
+    const key = `${W}x${H}x${Math.round(headBottom)}x${crew}`;
     if (key !== sceneSize) {
       sceneSize = key;
       // On a phone a strip of glacier shows above the page, for Atlas to stand on.
-      const base = (small ? band - 34 : band) / H;
+      // With a crew, a strip of glacier in front of the mountains for their tents.
+      const base = (crew ? band - (small ? 46 : 74) : small ? band - 34 : band) / H;
       const top = (headBottom + (small ? 14 : 24)) / H; // the summit clear of the header
       drawCampScene(canvas, small
-        ? { px, summitX: 0.56, base, ground: base + 0.06, sunX: 0.84, flags: [0.04, 0.42, base * 0.62], tents: [[0.86, base + 0.045, 2, "#45e3ff"]], top }
-        : { px, summitX: 0.58, base, ground: base + 0.08, sunX: 0.86, flags: [0.7, 0.97, base * 0.72], tents: [[0.84, base + 0.07, 3, "#ffd45c"]], outcrop: [0.1, base * 0.84, base + 0.08], top });
+        ? { px, summitX: 0.56, base, ground: base + 0.06, sunX: 0.84, flags: [0.04, 0.42, base * 0.62], tents: crew ? [] : [[0.86, base + 0.045, 2, "#45e3ff"]], top }
+        : { px, summitX: 0.58, base, ground: base + 0.08, sunX: 0.86, flags: [0.7, 0.97, base * 0.72], tents: crew ? [] : [[0.84, base + 0.07, 3, "#ffd45c"]], outcrop: crew ? null : [0.1, base * 0.84, base + 0.08], top });
     }
+    placeCrew(band, band - (small ? 46 : 74), small);
     // Atlas: on the rock (wide), or on the glacier left of middle (phone).
     const snap = value => Math.round(value / px) * px;
     atlasSpot = small
@@ -33075,8 +33450,14 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     atlasSpot.dockAt = page.offsetTop + body.offsetTop - (atlasSpot.top + size) - 4;
     placeAtlas();
   }
+  // Atlas only where there's no crew yet (signed out, no group, an error): with a group,
+  // the scene belongs to your crew (24 November 2026, team choice A from mockups/crew-league).
+  const crewShown = () => Boolean(signedIn() && !state.error && state.groupId && !state.creating);
   function placeAtlas() {
     if (atlas.element.parentNode !== modal) modal.appendChild(atlas.element);
+    atlas.element.hidden = crewShown();
+    quietButton.hidden = crewShown();
+    if (crewShown()) atlas.close();
     if (!atlasSpot) return;
     // Scrolled past the band: Atlas in the bottom corner (CSS .is-docked).
     const docked = page.scrollTop > atlasSpot.dockAt;
@@ -33088,6 +33469,55 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     Object.assign(atlas.element.style, docked ? { left: "", top: "" } : { left: `${atlasSpot.left}px`, top: `${atlasSpot.top}px` });
     atlas.element.style.setProperty("--atlas-size", `${atlasSpot.size}px`);
   }
+  // Your crew's camp: everyone's own tent on the glacier in two staggered rows, a lantern
+  // lit if they've played today, and a flag up the slope for the season's leader. On a
+  // phone the five who played most this season (you always), then "+N".
+  function placeCrew(band, foot, small) {
+    const backdrop = document.getElementById("baseCampBackdrop");
+    let layer = document.getElementById("campCrew");
+    if (!layer) {
+      layer = element("div", "camp-crew");
+      layer.id = "campCrew";
+      backdrop.appendChild(layer);
+    }
+    layer.replaceChildren();
+    const board = crewShown() ? state.boards.get(state.groupId) : null;
+    if (!board?.people?.length) return;
+    const me = getUser()?.id;
+    const month = today.slice(0, 7);
+    const table = seasonTable(board.people, month, today, getDays()[0]?.dateKey, leagueOptions(state.groups.find(group => group.id === state.groupId)));
+    const playedOf = person => table.find(row => row.person === person)?.played || 0;
+    const room = small ? 5 : Math.max(5, Math.min(16, Math.floor(modal.clientWidth / 86)));
+    let shown = [...board.people].sort((a, b) => playedOf(b) - playedOf(a)).slice(0, room);
+    const you = board.people.find(person => person.id === me);
+    if (you && !shown.includes(you)) shown = [...shown.slice(0, room - 1), you];
+    const rest = board.people.length - shown.length;
+    const span = rest ? 0.82 : 0.9;
+    shown.forEach((person, index) => {
+      const spot = element("div", `camp-member${person.id === me ? " is-you" : ""}`);
+      const pair = element("div", "camp-member-pair");
+      const look = person.id === me ? getTentLook() : person.look || {};
+      pair.append(createTentCanvas(look, small ? 2 : 3, "camp-member-tent"), element("i", `camp-lantern${person.days.has(today) ? " is-lit" : ""}`));
+      spot.append(pair, element("span", "camp-member-name", person.name));
+      spot.title = person.days.has(today) ? t("community.playedToday", { name: person.name }) : t("community.notToday", { name: person.name });
+      const row = index % 2;
+      spot.style.left = `${(0.05 + (span * (index + 0.5)) / shown.length) * 100}%`;
+      spot.style.top = `${Math.round(foot + (small ? (row ? 40 : 22) : (row ? 66 : 34)))}px`;
+      layer.appendChild(spot);
+    });
+    if (rest) {
+      const more = element("span", "camp-more", t("community.more", { n: rest }));
+      more.style.top = `${Math.round(foot + (small ? 30 : 48))}px`;
+      layer.appendChild(more);
+    }
+    const leader = table[0];
+    if (leader && table.length > 1) {
+      const flag = element("div", "camp-leader");
+      flag.append(element("span", "", `★ ${leader.person.name}`), element("i"));
+      flag.style.top = `${Math.round(foot * (small ? 0.72 : 0.7))}px`;
+      layer.appendChild(flag);
+    }
+  }
   phone.addEventListener("change", layoutScene);
   window.addEventListener("resize", layoutScene);
   page.addEventListener("scroll", placeAtlas, { passive: true });
@@ -33096,6 +33526,7 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     state.error = null;
     try {
       state.profile = await getMyProfile();
+      sharePublic();
       const pending = storage.get(PENDING_INVITE_KEY);
       if (pending) {
         storage.remove(PENDING_INVITE_KEY);
@@ -33106,6 +33537,19 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
           } catch (error) {
             showToastNotice(error.message);
           }
+        }
+      }
+      const pendingJoin = storage.get(PENDING_JOIN_KEY);
+      if (pendingJoin) {
+        storage.remove(PENDING_JOIN_KEY);
+        try {
+          const joined = await joinGroup(pendingJoin);
+          if (joined) {
+            state.groupId = joined.id;
+            showToastNotice(t("community.joined", { name: joined.name }));
+          }
+        } catch (error) {
+          showToastNotice(error.message);
         }
       }
       [state.friends, state.groups] = await Promise.all([getFriends(), getGroups()]);
@@ -33135,6 +33579,32 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
 
   const signedIn = () => isConfigured && getUser();
 
+  // Your look and tent spot as your crewmates see them (user metadata is private): sent
+  // once per visit, and again when the switch changes.
+  let shared = false;
+  const sharesTent = () => storage.get(SHARE_TENT_KEY) !== "0";
+  function sharePublic(force = false) {
+    if (!signedIn() || (shared && !force)) return;
+    shared = true;
+    setPublicLook(getTentLook()).catch(() => {});
+    const spot = getTent();
+    setPublicTent(sharesTent() && spot ? { iso: spot.iso, city: spot.city || null, lat: spot.lat, lon: spot.lon } : null).catch(() => {});
+  }
+
+  // Nudges you've sent today (so the button says SENT).
+  const nudged = new Set();
+  async function nudge(person, buttonNode = null) {
+    if (nudged.has(person.id)) return;
+    try {
+      await sendNudge(person.id, today);
+      nudged.add(person.id);
+      showToastNotice(t("community.nudged", { name: person.name }));
+      if (buttonNode) { buttonNode.textContent = t("community.nudgeSent"); buttonNode.disabled = true; }
+    } catch (error) {
+      showToastNotice(error.message);
+    }
+  }
+
   // ----- Opening and closing -----
 
   async function open() {
@@ -33159,7 +33629,7 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     // Instant, like the other screens (16 November 2026, team request).
     modal.classList.add("is-open");
     await rendering;
-    speak();
+    if (!crewShown()) speak();
   }
 
   // The full-screen scene behind the page: Everest at sunrise (camp-scene.js), drawn by
@@ -33262,13 +33732,13 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
       center.appendChild(createSignInCard());
       right.appendChild(createShieldHistory());
       body.replaceChildren(left, center, right);
-      placeAtlas();
+      layoutScene();
       return;
     }
     if (reload) {
       center.appendChild(element("p", "community-loading", t("community.loading")));
       body.replaceChildren(left, center, right);
-      placeAtlas();
+      layoutScene();
       await load();
       // Closed (or redrawn) while loading: start again from what's there now.
       if (modal.classList.contains("hidden")) return;
@@ -33280,10 +33750,10 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
         : t("community.loadFailed", { message: state.error.message })));
       right.appendChild(createShieldHistory());
       body.replaceChildren(left, center, right);
-      placeAtlas();
+      layoutScene();
       return;
     }
-    left.appendChild(createInviteCard());
+    left.append(createInviteCard(), createShareTentSwitch());
     center.append(createGroupTabs());
     if (state.creating) center.appendChild(createNewGroupCard());
     else if (state.groupId) center.appendChild(await createGroupCard(state.groups.find(group => group.id === state.groupId)));
@@ -33292,7 +33762,8 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
       : t("community.addFirst")));
     right.append(createAddFriendCard(), createFriendsCard(), createShieldHistory());
     body.replaceChildren(left, center, right);
-    placeAtlas();
+    body.classList.toggle("has-crew", crewShown());
+    layoutScene();
   }
 
   // You: name, this month's shield and the way to the next one. (The scene with Atlas is
@@ -33391,6 +33862,20 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     return details;
   }
 
+  // Show my tent on my crew's globe (the city of your tent, never more precise).
+  function createShareTentSwitch() {
+    const label = element("label", "community-card crew-share-tent");
+    const box = Object.assign(element("input"), { type: "checkbox", checked: sharesTent() });
+    box.addEventListener("change", () => {
+      storage.set(SHARE_TENT_KEY, box.checked ? "1" : "0");
+      sharePublic(true);
+    });
+    const text = element("span");
+    text.append(element("strong", "", t("community.shareTent")), element("small", "", t("community.shareTentHint")));
+    label.append(box, text);
+    return label;
+  }
+
   function createSignInCard() {
     const card = element("div", "community-card community-signin");
     card.append(
@@ -33408,13 +33893,22 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
 
   function createAddFriendCard() {
     const card = element("form", "community-card community-add");
-    const input = Object.assign(element("input"), { placeholder: t("community.codePlaceholder"), maxLength: 6 });
+    const input = Object.assign(element("input"), { placeholder: t("community.codePlaceholder"), maxLength: GROUP_CODE_LENGTH });
     input.setAttribute("aria-label", t("community.codeAria"));
     card.append(element("span", "field-label", t("community.addFriend")), input, Object.assign(element("button", "btn btn-secondary", t("community.add")), { type: "submit" }));
     card.addEventListener("submit", async event => {
       event.preventDefault();
       if (!input.value.trim()) return;
       try {
+        // An 8-character code is a group's; 6 is a friend's.
+        if (input.value.trim().length === GROUP_CODE_LENGTH) {
+          const joined = await joinGroup(input.value);
+          state.groupId = joined.id;
+          state.creating = false;
+          showToastNotice(t("community.joined", { name: joined.name }));
+          await render(true);
+          return;
+        }
         const name = await addFriend(input.value);
         showToastNotice(t("community.nowFriends", { name }));
         atlas.say(t("atlas.newFriend", { name }), "cheer");
@@ -33496,12 +33990,23 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
       picks.appendChild(label);
     });
     if (!state.friends.length) picks.appendChild(element("p", "community-empty", t("community.friendsFirst")));
-    card.append(element("span", "field-label", t("community.newGroupHead")), name, element("span", "field-label", t("community.with")), picks, Object.assign(element("button", "btn btn-primary", t("community.createGroup")), { type: "submit" }));
+    let newKind = "friends";
+    const kinds = element("div", "crew-kind-switch");
+    [["friends", t("community.kindFriends")], ["work", t("community.kindWork")]].forEach(([key, label]) => {
+      const choice = button(`board-tab${key === newKind ? " is-active" : ""}`, label, () => {
+        newKind = key;
+        kinds.querySelectorAll(".board-tab").forEach(tab => tab.classList.toggle("is-active", tab === choice));
+        kindHint.textContent = t(key === "work" ? "community.kindWorkHint" : "community.kindFriendsHint");
+      });
+      kinds.appendChild(choice);
+    });
+    const kindHint = element("small", "crew-kind-hint", t("community.kindFriendsHint"));
+    card.append(element("span", "field-label", t("community.newGroupHead")), name, element("span", "field-label", t("community.kindHead")), kinds, kindHint, element("span", "field-label", t("community.with")), picks, Object.assign(element("button", "btn btn-primary", t("community.createGroup")), { type: "submit" }));
     card.addEventListener("submit", async event => {
       event.preventDefault();
       if (!name.value.trim()) { showToastNotice(t("community.nameGroup")); return; }
       try {
-        state.groupId = await createGroup(name.value.trim(), [...picks.querySelectorAll("input:checked")].map(box => box.value));
+        state.groupId = await createGroup(name.value.trim(), [...picks.querySelectorAll("input:checked")].map(box => box.value), newKind);
         state.creating = false;
         await render(true);
       } catch (error) {
@@ -33511,9 +34016,9 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     return card;
   }
 
-  // A group: who's in it, then one of four tables. DAY ranks a day's scores; THIS WEEK and
-  // THIS MONTH rank average daily scores; each gives gold, silver and bronze to the top
-  // three. HISTORY shows the podium of every month that has ended.
+  // A group (24 November 2026, team choice A from mockups/crew-league): a header with its
+  // crest, the season and your place; who's played today; then SEASON (the league, see
+  // crew-league.js), THIS WEEK (average day), DAY and HISTORY (each season's podium).
   async function createGroupCard(group) {
     const card = element("div", "community-card community-group");
     const firstDay = getDays()[0]?.dateKey || today;
@@ -33524,10 +34029,20 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     }
     const people = board.people;
     const me = getUser().id;
+    const month = today.slice(0, 7);
+    const options = leagueOptions(group);
+    const season = seasonTable(people, month, today, firstDay, options);
+    const manages = group.owner_id === me || group.is_admin;
 
-    const head = element("div", "community-group-head");
+    const head = element("div", "community-group-head crew-head");
+    const crest = element("span", "crew-crest", group.name.replace(/[^\p{L}\p{N} ]/gu, "").split(/\s+/).filter(Boolean).slice(0, 2).map(word => word[0]).join("").toUpperCase() || "?");
+    crest.style.setProperty("--crest", crestColor(group.id));
     const title = element("div");
-    title.append(element("strong", "", group.name), element("small", "", t("community.members", { n: people.length })));
+    const name = element("strong", "", group.name);
+    if (options.weekdays) name.appendChild(element("span", "crew-kind", t("community.workTag")));
+    title.append(name, element("small", "", `${t("community.members", { n: people.length })} · ${t(options.weekdays ? "community.seasonLineWork" : "community.seasonLine", { month: monthName(month), n: daysLeft(month, today, options) })}`));
+    head.append(crest, title, createPlace(season, me));
+    const tools = element("div", "crew-tools");
     const addSelect = element("select", "board-day");
     addSelect.setAttribute("aria-label", t("community.addToGroup"));
     addSelect.appendChild(Object.assign(element("option", "", t("community.addOption")), { value: "" }));
@@ -33547,16 +34062,20 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
       state.groupId = null;
       await render(true);
     });
-    head.append(title, addSelect, leave);
+    tools.append(addSelect, leave);
+    card.append(head, tools, createTodayStrip(people, me, options), createGroupInvite(group, people.length));
+    if (manages) card.appendChild(createGroupSettings(group, people, me));
 
     const views = element("div", "board-tabs community-views");
-    [["day", t("community.day")], ["week", t("community.week")], ["month", t("community.month")], ["history", t("community.history")]].forEach(([key, label]) => views.appendChild(button(`board-tab${state.view === key ? " is-active" : ""}`, label, () => {
+    [["season", t("community.season")], ["week", t("community.week")], ["day", t("community.day")], ["history", t("community.history")]].forEach(([key, label]) => views.appendChild(button(`board-tab${state.view === key ? " is-active" : ""}`, label, () => {
       state.view = key;
       render();
     })));
-    card.append(head, views);
+    card.appendChild(views);
 
-    if (state.view === "day") {
+    if (state.view === "season") {
+      card.append(createSeasonTable(season, people, me), element("p", "community-range", t(options.weekdays ? "community.seasonRuleWork" : "community.seasonRule")));
+    } else if (state.view === "day") {
       const picker = element("select", "board-day community-day-picker");
       picker.setAttribute("aria-label", t("community.dayAria"));
       getDays().map(day => day.dateKey).filter(dateKey => dateKey <= today).reverse().forEach(dateKey => {
@@ -33569,17 +34088,270 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
       card.append(picker, createRanking(standings(people, state.dateKey, state.dateKey), people, me, { perDay: false }));
     } else if (state.view === "week") {
       const weekStart = mondayOf(today);
-      card.append(element("p", "community-range", t("community.perDay", { range: formatRange(weekStart, addDays(weekStart, 6)) })),
-        createRanking(standings(people, weekStart, addDays(weekStart, 6)), people, me, { perDay: true }));
-    } else if (state.view === "month") {
-      const month = today.slice(0, 7);
-      card.append(element("p", "community-range", t("community.perDay", { range: monthName(month) })),
-        createRanking(standings(people, `${month}-01`, `${month}-31`), people, me, { perDay: true }));
+      const weekEnd = addDays(weekStart, options.weekdays ? 4 : 6);
+      card.append(element("p", "community-range", t("community.perDay", { range: formatRange(weekStart, weekEnd) })),
+        createRanking(standings(people, weekStart, weekEnd), people, me, { perDay: true }));
     } else {
-      card.appendChild(createHistory(people, firstDay, me));
+      card.appendChild(createHistory(people, firstDay, me, options));
     }
-    card.appendChild(element("p", "sample-note", t("community.sample")));
     return card;
+  }
+
+  // A work group plays Monday to Friday (crew-league.js).
+  const leagueOptions = group => ({ weekdays: group?.kind === "work" });
+
+  // A steady colour per group for its crest.
+  function crestColor(id) {
+    const colors = ["#2bb3a3", "#ff6b9d", "#ffd45c", "#45e3ff", "#c58cff", "#ff8a3d", "#5cf28a"];
+    let hash = 0;
+    for (const char of id) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+    return colors[hash % colors.length];
+  }
+
+  // Your place this season, big, and the gap to the one above (or below, if you lead).
+  function createPlace(season, me) {
+    const place = element("div", "crew-place");
+    const index = season.findIndex(row => row.person.id === me);
+    if (index < 0) {
+      place.appendChild(element("span", "", t("community.notRanked")));
+      return place;
+    }
+    const you = season[index];
+    const gap = (other, key) => t(key, { n: Math.abs(you.score - other.score).toLocaleString(locale()), name: other.person.name });
+    place.append(element("b", "", t("community.ordinal", { n: you.place })),
+      element("span", "", index > 0 ? gap(season[index - 1], "community.behind") : season[1] ? gap(season[1], "community.ahead") : t("community.alone")));
+    return place;
+  }
+
+  // TODAY · 3 OF 5 PLAYED: everyone's explorer, ✓ when they've played.
+  function createTodayStrip(people, me, options = {}) {
+    const strip = element("div", "crew-today");
+    // A work league on a weekend: nothing to play for, so no nudges.
+    if (options.weekdays && isWeekend(today)) {
+      strip.appendChild(element("span", "field-label", t("community.weekend")));
+      return strip;
+    }
+    const played = people.filter(person => person.days.has(today)).length;
+    strip.appendChild(element("span", "field-label", t("community.todayHead", { n: played, total: people.length })));
+    const row = element("div", "crew-faces");
+    [...people].sort((a, b) => (b.id === me) - (a.id === me) || b.days.has(today) - a.days.has(today)).forEach(person => {
+      const face = element("div", `crew-face${person.days.has(today) ? " is-done" : ""}${person.id === me ? " is-you" : ""}`);
+      const look = person.id === me ? getTentLook() : person.look || {};
+      const ring = element("span", "crew-face-ring");
+      ring.appendChild(createExplorerHead(explorerOf(look) || {}, 3, "crew-face-head"));
+      face.append(ring, element("small", "", person.name));
+      if (person.days.has(today)) face.appendChild(element("span", "crew-face-mark", "✓"));
+      else if (person.id === me) face.appendChild(element("span", "crew-face-mark", ""));
+      else {
+        const poke = button("crew-nudge", t(nudged.has(person.id) ? "community.nudgeSent" : "community.nudge"), () => nudge(person, poke));
+        poke.disabled = nudged.has(person.id);
+        poke.title = t("community.nudgeHint", { name: person.name });
+        face.appendChild(poke);
+      }
+      row.appendChild(face);
+    });
+    strip.appendChild(row);
+    return strip;
+  }
+
+  // The season table: place, explorer, season score, days, free misses left, and a late
+  // start where there is one. Members who haven't played this season at the bottom.
+  function createSeasonTable(season, people, me) {
+    const list = element("ol", "board-list community-board crew-season");
+    season.forEach(entry => {
+      const row = element("li", "board-row");
+      row.classList.toggle("is-you", entry.person.id === me);
+      const medal = getGroupMedal(entry.place);
+      const rank = element("span", "board-rank");
+      if (medal) rank.appendChild(createMedal(medal, 26));
+      else rank.textContent = `#${entry.place}`;
+      const name = memberName(entry.person, entry.played);
+      if (entry.paidLate) name.querySelector(".board-name-text").appendChild(element("small", "crew-late", t("community.lateStart", { n: Math.round((1 - entry.factor) * 100) })));
+      const tokens = element("span", "board-extra crew-misses");
+      tokens.title = t("community.freeMissesLeft", { n: entry.freeLeft });
+      for (let index = 0; index < FREE_MISSES; index += 1) tokens.appendChild(element("i", index < entry.freeLeft ? "" : "is-used"));
+      row.append(rank, name, tokens, element("strong", "board-score", entry.score.toLocaleString(locale())));
+      list.appendChild(row);
+    });
+    people.filter(person => !season.some(entry => entry.person === person)).forEach(person => {
+      const row = element("li", "board-row is-waiting");
+      row.classList.toggle("is-you", person.id === me);
+      row.append(element("span", "board-rank", "—"), memberName(person), element("span", "board-extra", t("community.notPlayed")), element("strong", "board-score", "—"));
+      list.appendChild(row);
+    });
+    return list;
+  }
+
+  // INVITE TO THIS GROUP: the group's own code and link, for anyone (friends or not), up
+  // to 50 members. Open while you're the only one in it.
+  function createGroupInvite(group, count) {
+    const details = element("details", "camp-invite community-group-invite");
+    details.open = count <= 1;
+    details.appendChild(element("summary", "", t("community.groupInvite")));
+    const link = joinLink(group.join_code);
+    const code = element("div", "community-code");
+    code.append(
+      element("span", "field-label", t("community.groupCode")),
+      element("strong", "", group.join_code),
+      element("small", "", count >= GROUP_LIMIT ? t("community.groupFull") : t("community.groupInviteText", { n: GROUP_LIMIT - count }))
+    );
+    const actions = element("div", "community-actions");
+    if (navigator.share) actions.appendChild(button("btn btn-primary", t("camp.share"), () => {
+      navigator.share({ title: "Expedition", text: t("community.groupShareText", { name: group.name }), url: link }).catch(() => {});
+    }));
+    actions.append(
+      button(`btn ${navigator.share ? "btn-secondary" : "btn-primary"}`, t("community.copyLink"), () => copy(link, t("community.linkCopied"))),
+      button("btn btn-secondary", t("community.copyCode"), () => copy(group.join_code, t("community.codeCopied")))
+    );
+    details.append(code, actions);
+    return details;
+  }
+
+  // The owner's settings: rename, a new code (old links stop working), remove members.
+  function createGroupSettings(group, people, me) {
+    const details = element("details", "camp-invite community-group-settings");
+    details.appendChild(element("summary", "", t("community.groupSettings")));
+    const form = element("form", "community-add");
+    const name = Object.assign(element("input"), { value: group.name, maxLength: 30 });
+    name.setAttribute("aria-label", t("community.groupName"));
+    form.append(element("span", "field-label", t("community.rename")), name, Object.assign(element("button", "btn btn-secondary", t("community.save")), { type: "submit" }));
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!name.value.trim() || name.value.trim() === group.name) return;
+      try {
+        await renameGroup(group.id, name.value.trim());
+        await render(true);
+      } catch (error) {
+        showToastNotice(error.message);
+      }
+    });
+    const reset = button("btn btn-secondary", t("community.newCode"), async () => {
+      if (!confirm(t("community.newCodeConfirm"))) return;
+      try {
+        await newJoinCode(group.id);
+        await render(true);
+      } catch (error) {
+        showToastNotice(error.message);
+      }
+    });
+    const owner = group.owner_id === me;
+    // Friends or work (owner only): a work league runs Monday to Friday.
+    const kind = element("div", "crew-kind-switch");
+    if (owner) {
+      kind.appendChild(element("span", "field-label", t("community.kindHead")));
+      [["friends", t("community.kindFriends")], ["work", t("community.kindWork")]].forEach(([key, label]) => {
+        const choice = button(`board-tab${group.kind === key ? " is-active" : ""}`, label, async () => {
+          if (group.kind === key) return;
+          try {
+            await setGroupKind(group.id, key);
+            await render(true);
+          } catch (error) {
+            showToastNotice(error.message);
+          }
+        });
+        kind.appendChild(choice);
+      });
+    }
+    const list = element("ul", "community-friends");
+    people.filter(person => person.id !== me && person.id !== group.owner_id).forEach(person => {
+      const row = element("li");
+      // The owner makes admins (they can rename, make a new code and remove members).
+      if (owner) {
+        const admin = button(`crew-admin${person.admin ? " is-on" : ""}`, t(person.admin ? "community.adminOn" : "community.adminOff"), async () => {
+          try {
+            await setGroupAdmin(group.id, person.id, !person.admin);
+            state.boards.delete(group.id);
+            await render(true);
+          } catch (error) {
+            showToastNotice(error.message);
+          }
+        });
+        row.appendChild(admin);
+      }
+      const remove = button("community-remove", "×", async () => {
+        if (!confirm(t("community.removeMemberConfirm", { name: person.name, group: group.name }))) return;
+        try {
+          await removeFromGroup(group.id, person.id);
+          state.boards.delete(group.id);
+          await render(true);
+        } catch (error) {
+          showToastNotice(error.message);
+        }
+      });
+      remove.setAttribute("aria-label", t("community.removeMember", { name: person.name }));
+      row.prepend(element("span", "", person.name));
+      row.appendChild(remove);
+      list.appendChild(row);
+    });
+    details.append(form, kind, element("div", "community-actions", ""), createChannelPost(group), element("span", "field-label", t("community.membersHead")), list);
+    details.querySelector(".community-actions").appendChild(reset);
+    return details;
+  }
+
+  // DAILY POST TO SLACK OR TEAMS (owner or admins): the channel's incoming-webhook link and
+  // an hour, picked in your own time and kept in UTC; the Edge Function crew-post posts the
+  // group's day and season then (scores only). Loaded when the settings open.
+  function createChannelPost(group) {
+    const box = element("div", "crew-channel");
+    box.appendChild(element("span", "field-label", t("community.postHead")));
+    const status = element("small", "crew-channel-status", t("community.loading"));
+    const url = Object.assign(element("input"), { type: "url", placeholder: t("community.postPlaceholder"), autocomplete: "off" });
+    url.setAttribute("aria-label", t("community.postLink"));
+    const offset = new Date().getTimezoneOffset() / 60; // hours behind UTC
+    const toUtc = local => ((Math.round(local + offset) % 24) + 24) % 24;
+    const toLocal = utc => ((Math.round(utc - offset) % 24) + 24) % 24;
+    const hour = element("select", "board-day");
+    hour.setAttribute("aria-label", t("community.postHour"));
+    for (let local = 0; local < 24; local += 1) hour.appendChild(Object.assign(element("option", "", `${String(local).padStart(2, "0")}:00`), { value: String(local), selected: local === 17 }));
+    const actions = element("div", "community-actions");
+    let current = null;
+    const describe = () => {
+      status.textContent = current
+        ? t(group.kind === "work" ? "community.postOnWork" : "community.postOn", { service: current.service === "slack" ? "Slack" : "Teams", hint: current.hint, time: `${String(toLocal(current.post_hour)).padStart(2, "0")}:00` })
+        : t("community.postOff");
+      test.hidden = remove.hidden = !current;
+    };
+    const save = button("btn btn-secondary", t("community.save"), async () => {
+      if (!url.value.trim() && !current) { showToastNotice(t("community.postNeedLink")); return; }
+      try {
+        // An empty link keeps the one there and only changes the hour.
+        if (!url.value.trim()) { showToastNotice(t("community.postNeedLink")); return; }
+        await setGroupWebhook(group.id, url.value.trim(), toUtc(Number(hour.value)));
+        url.value = "";
+        current = await getGroupWebhook(group.id);
+        describe();
+        showToastNotice(t("community.postSaved"));
+      } catch (error) {
+        showToastNotice(error.message);
+      }
+    });
+    const test = button("btn btn-secondary", t("community.postTest"), async () => {
+      if (!confirm(t("community.postTestConfirm"))) return;
+      try {
+        await testGroupPost(group.id);
+        showToastNotice(t("community.postTestSent"));
+      } catch (error) {
+        showToastNotice(error.message);
+      }
+    });
+    const remove = button("community-leave", t("community.postRemove"), async () => {
+      if (!confirm(t("community.postRemoveConfirm"))) return;
+      try {
+        await setGroupWebhook(group.id, null, 0);
+        current = null;
+        describe();
+      } catch (error) {
+        showToastNotice(error.message);
+      }
+    });
+    actions.append(save, test, remove);
+    box.append(status, url, hour, actions, element("small", "crew-kind-hint", t("community.postHelp")));
+    getGroupWebhook(group.id).then(hook => {
+      current = hook;
+      if (hook) hour.value = String(toLocal(hook.post_hour));
+      describe();
+    }).catch(() => { status.textContent = t("community.postOff"); test.hidden = remove.hidden = true; });
+    return box;
   }
 
   // A member's name with the badge they've earned this month.
@@ -33623,12 +34395,12 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
   }
 
   // Every month that has ended, newest first, with its winner and podium.
-  function createHistory(people, firstDay, me) {
+  function createHistory(people, firstDay, me, options = {}) {
     const history = element("div", "community-history");
     const months = [];
     for (let month = firstDay.slice(0, 7); month < today.slice(0, 7); month = addDays(`${month}-28`, 7).slice(0, 7)) months.unshift(month);
     months.filter(month => !isPreseasonMonth(month)).forEach(month => {
-      const podium = withPlaces(standings(people, `${month}-01`, `${month}-31`)).filter(entry => entry.place <= 3);
+      const podium = seasonTable(people, month, monthEnd(month), firstDay, options).filter(entry => entry.place <= 3);
       if (!podium.length) return;
       const block = element("section", "community-podium");
       block.appendChild(element("h3", "", `${monthName(month)} · 👑 ${podium[0].person.name}`));
@@ -33642,7 +34414,7 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
         const label = element("span", "board-name-text");
         label.append(element("span", "", entry.person.name), element("small", "board-days", t("common.days", { n: entry.played })));
         name.appendChild(label);
-        row.append(rank, name, element("span", "board-extra", formatTopPercent(entry.topPercent)), element("strong", "board-score", entry.score.toLocaleString(locale())));
+        row.append(rank, name, element("span", "board-extra", ""), element("strong", "board-score", entry.score.toLocaleString(locale())));
         list.appendChild(row);
       });
       block.appendChild(list);
@@ -33661,6 +34433,7 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     return `${format(from)} – ${format(to)}`;
   }
 
+  const joinLink = code => `${location.origin}${location.pathname}?join=${code}`;
   const inviteLink = code => `${location.origin}${location.pathname}?invite=${code}`;
   const copy = (text, done) => navigator.clipboard?.writeText(text).then(() => showToastNotice(done), () => showToastNotice(text));
   function shareInvite(link) {
@@ -33682,6 +34455,9 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
       const firstDay = getDays()[0]?.dateKey || today;
       const people = group ? membersOf(await getGroupBoard(group.id, firstDay, today)) : null;
       glanceData = { profile, friends, group, people };
+      sharePublic();
+      crew = (await getCrewTents(today)).filter(person => person.tent && Number.isFinite(person.tent.lat) && Number.isFinite(person.tent.lon))
+        .map(person => ({ id: person.user_id, name: person.display_name, lat: person.tent.lat, lon: person.tent.lon, played: person.played, look: person.look ? { ...cleanLook(person.look), color: cleanColor(person.look.color) } : null }));
     } catch (error) {
       glanceData = { error };
     }
@@ -33691,9 +34467,26 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
 
   const glanceCard = document.getElementById("menuCommunityCard");
   const tileNote = document.querySelector("#menuCommunityButton .menu-option-note");
+  let crew = [];
   async function refreshGlance() {
     const data = await loadGlance();
     renderGlance(data);
+    checkNudges();
+  }
+
+  // Nudges for today, shown once when the menu appears (and only if today's game isn't
+  // done yet): "Sky nudged you".
+  let checkingNudges = false;
+  async function checkNudges() {
+    if (!signedIn() || checkingNudges) return;
+    const todayDay = getDays().find(day => day.dateKey === today);
+    if (todayDay?.completed) return;
+    checkingNudges = true;
+    try {
+      const names = [...new Set((await takeNudges(today)).map(row => row.display_name))];
+      if (names.length) showToastNotice(t("community.nudgedYou", { names: names.join(", "), n: names.length }));
+    } catch { /* not set up yet */ }
+    checkingNudges = false;
   }
 
   function renderGlance(data) {
@@ -33784,9 +34577,20 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
   renderGlance(null);
   refreshGlance();
 
+  // A group link (?join=CODE) opens Crew by itself, so the join happens (or, signed out,
+  // the sign-in card shows; the code waits for the account).
+  function openPendingJoin() {
+    if (storage.get(PENDING_JOIN_KEY) && modal.classList.contains("hidden")) open();
+  }
+
   return {
     open,
     close,
+    openPendingJoin,
+    // Your crewmates' tents for the menu globe, and nudging one.
+    crewTents: () => crew,
+    nudge: person => nudge(person),
+    hasNudged: id => nudged.has(id),
     refreshGlance,
     // After signing in or out: refresh the screen if it's open, use a waiting invite, and
     // take Atlas's setting from the account.
@@ -33802,6 +34606,158 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
 }
 
 return { initializeCommunity };
+})();
+
+// ---- challenge.js
+__modules["challenge.js"] = (() => {
+// Challenges (24 November 2026, team request): "I got 4,210 today, can you beat me?" with a
+// link. On the end screen of the main game, CHALLENGE A FRIEND makes a short code for your
+// finished day (supabase/social.sql, create_challenge: the score comes from your account,
+// never from the browser) and shares it as ?challenge=CODE. Whoever opens the link, signed
+// in or a guest, gets a card: who, which day, their score, and PLAY. When they finish that
+// day, their end screen says who won and offers to add the challenger as a friend.
+const { sounds } = __modules["audio.js"];
+const { addFriend, createChallenge, getChallenge, getUser, isConfigured } = __modules["auth.js"];
+const { locale, t } = __modules["i18n.js"];
+const { showToastNotice } = __modules["ui.js"];
+
+const TAKEN_KEY = "daily-geography:challenges:v1"; // { date: { name, invite, score } }
+
+const read = () => { try { return JSON.parse(localStorage.getItem(TAKEN_KEY)) || {}; } catch { return {}; } };
+const write = value => { try { localStorage.setItem(TAKEN_KEY, JSON.stringify(value)); } catch { /* storage off */ } };
+const fmt = n => n.toLocaleString(locale());
+
+function element(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+function button(className, text, onClick) {
+  const node = element("button", className, text);
+  node.type = "button";
+  node.addEventListener("click", () => { sounds.playClick(); onClick(); });
+  return node;
+}
+
+// mainMode: the game challenges are for; dayName(date): "Day 24"; scoreOf(date): your
+// finished score that day or null; play(date): start that day; syncDay(date): send that
+// day to the account (awaited before a challenge is made); signIn(): open sign-in.
+function initChallenges({ mainMode, dayName, scoreOf, play, syncDay, signIn }) {
+  // A challenge link: kept for its day, then the card.
+  const code = new URLSearchParams(location.search).get("challenge");
+  if (code) {
+    const params = new URLSearchParams(location.search);
+    params.delete("challenge");
+    history.replaceState(null, "", `${location.pathname}${params.size ? `?${params}` : ""}`);
+    openLink(code.toUpperCase());
+  }
+
+  async function openLink(challengeCode) {
+    let challenge = null;
+    try {
+      challenge = await getChallenge(challengeCode);
+    } catch { /* below */ }
+    if (!challenge) { showToastNotice(t("challenge.notFound")); return; }
+    const taken = read();
+    taken[challenge.date] = { name: challenge.display_name, invite: challenge.invite_code, score: challenge.score };
+    write(taken);
+    showCard(challenge.date);
+  }
+
+  // The card over the menu: who challenges you to which day, and PLAY (or, if you've
+  // already played that day, the result straight away).
+  function showCard(date) {
+    const them = read()[date];
+    if (!them) return;
+    document.getElementById("challengeCard")?.remove();
+    const overlay = element("div", "modal-overlay challenge-overlay");
+    overlay.id = "challengeCard";
+    const card = element("div", "modal challenge-card");
+    card.setAttribute("role", "dialog");
+    card.setAttribute("aria-modal", "true");
+    const close = () => overlay.remove();
+    card.append(element("span", "modal-badge", t("challenge.badge")),
+      element("h2", "", t("challenge.title", { name: them.name })),
+      element("p", "", t("challenge.text", { name: them.name, day: dayName(date), score: fmt(them.score) })));
+    const mine = scoreOf(date);
+    const actions = element("div", "challenge-actions");
+    if (mine === null) {
+      actions.append(button("btn btn-primary", t("challenge.play", { day: dayName(date).toUpperCase() }), () => { close(); play(date); }),
+        button("btn btn-secondary", t("challenge.later"), close));
+    } else {
+      card.appendChild(createVersus(date, mine));
+      actions.appendChild(button("btn btn-secondary", t("challenge.ok"), close));
+    }
+    card.appendChild(actions);
+    overlay.appendChild(card);
+    overlay.addEventListener("click", event => { if (event.target === overlay) close(); });
+    document.body.appendChild(overlay);
+  }
+
+  // You against the challenger: who won and by how much, and adding them as a friend.
+  function createVersus(date, mine) {
+    const them = read()[date];
+    const box = element("div", "challenge-versus");
+    const diff = mine - them.score;
+    box.append(element("strong", diff > 0 ? "is-win" : diff < 0 ? "is-loss" : "",
+      diff > 0 ? t("challenge.won", { name: them.name, n: fmt(diff) }) : diff < 0 ? t("challenge.lost", { name: them.name, n: fmt(-diff) }) : t("challenge.tie", { name: them.name })),
+    element("small", "", t("challenge.scores", { you: fmt(mine), name: them.name, them: fmt(them.score) })));
+    if (them.invite && isConfigured) {
+      const add = button("btn btn-secondary challenge-add", getUser() ? t("challenge.add", { name: them.name }) : t("challenge.signInAdd", { name: them.name }), async () => {
+        if (!getUser()) { signIn(); return; }
+        try {
+          const name = await addFriend(them.invite);
+          showToastNotice(t("community.nowFriends", { name }));
+          add.disabled = true;
+        } catch (error) {
+          showToastNotice(error.message);
+        }
+      });
+      box.appendChild(add);
+    }
+    return box;
+  }
+
+  // The end screen: the result against a challenge you took for this day, and the
+  // CHALLENGE A FRIEND button (main game only).
+  function renderEnd(date, mode, total, completed) {
+    const versus = document.getElementById("endVersus");
+    const share = document.getElementById("challengeBtn");
+    const taken = mode === mainMode && completed ? read()[date] : null;
+    versus.hidden = !taken;
+    versus.replaceChildren(...(taken ? [createVersus(date, total)] : []));
+    share.hidden = !(mode === mainMode && completed && isConfigured);
+    share.onclick = () => { sounds.playClick(); send(date, total); };
+  }
+
+  async function send(date, total) {
+    if (!getUser()) { showToastNotice(t("challenge.signInFirst")); signIn(); return; }
+    let challengeCode;
+    try {
+      await syncDay(date);
+      challengeCode = await createChallenge(date);
+    } catch (error) {
+      showToastNotice(error.message);
+      return;
+    }
+    const link = `${location.origin}${location.pathname}?challenge=${challengeCode}`;
+    const text = t("challenge.shareText", { score: fmt(total), day: dayName(date) });
+    if (navigator.share && window.matchMedia("(pointer: coarse)").matches) {
+      try { await navigator.share({ text, url: link }); return; } catch (error) { if (error.name === "AbortError") return; }
+    }
+    try {
+      await navigator.clipboard.writeText(`${text}\n${link}`);
+      showToastNotice(t("challenge.copied"));
+    } catch {
+      showToastNotice(link);
+    }
+  }
+
+  return { renderEnd };
+}
+
+return { initChallenges };
 })();
 
 // ---- duel-categories.js
@@ -37127,6 +38083,7 @@ const { sounds } = __modules["audio.js"];
 const { createDistributionChart, initializeHistoryScreens } = __modules["screens.js"];
 const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getTopPercent } = __modules["community.js"];
 const { initializeCommunity } = __modules["social.js"];
+const { initChallenges } = __modules["challenge.js"];
 const { createDuel } = __modules["duel-view.js"];
 const { createBaseLine, defaultBaseIso, getBase, getTent, getTentColor, getTentLook, onBaseChange, pickBase, setBase, setTentLevelSource, syncBase, tentLonLat } = __modules["base.js"];
 const { celebrateTent, createExplorerHead, createTentCanvas, tentLevel, tentToCelebrate } = __modules["tents.js"];
@@ -39805,6 +40762,9 @@ function showFinalModal() {
   const hideSkip = endSkip;
   const skipTimer = setTimeout(hideSkip, Math.max(1800, replayMs || 0));
 
+  // A challenge you took for this day, and CHALLENGE A FRIEND (challenge.js).
+  challenges?.renderEnd(activeDate, activeMode, dayScore.total, dayScore.completed);
+
   // You against everyone who played today (sample numbers for now).
   const stats = getDayStats(activeDate, activeMode);
   const topPercent = getTopPercent(stats, dayScore.total);
@@ -40106,6 +41066,20 @@ startAmbient(menuTravel, {
       if (hit) placeRideCard(hit.x, hit.y);
       else previewRide(null);
     }
+    // Your crew's tents (social.js, crew_tents): each in its own look and colour, with a
+    // lantern lit if they've played today. Several in one city fan out a little.
+    const seenSpots = new Map();
+    (community?.crewTents() || []).forEach(person => {
+      const spotKey = `${person.lat.toFixed(1)},${person.lon.toFixed(1)}`;
+      const nth = seenSpots.get(spotKey) || 0;
+      seenSpots.set(spotKey, nth + 1);
+      const spot = globe.projectLonLat([person.lon, person.lat]);
+      if (!spot.visible) return;
+      const x = spot.x + nth * 22;
+      const box = drawMenuPin(layer.ctx, x, spot.y, crewPinIcon(person.look), person.look?.color || "#8f9bbd", false);
+      drawLantern(layer.ctx, box.right - 3, box.bottom - 18, person.played);
+      menuMarks.push({ x, y: spot.y, kind: "crew", person, box });
+    });
     const base = getBase();
     if (base) {
       const here = globe.projectLonLat(tentLonLat());
@@ -40807,6 +41781,11 @@ function menuHit(event, { countries = false } = {}) {
   if (mark) {
     const base = getBase();
     if (mark.kind === "pole") return { kind: "pole", title: t(`menu.${mark.pole}Pole`), hint: mark.pole === "north" ? "90°N" : "90°S" };
+    if (mark.kind === "crew") {
+      const { person } = mark;
+      if (person.played) return { kind: "crew", title: person.name, hint: t("community.playedToday", { name: person.name }), color: "#5cf28a" };
+      return { kind: "crew", title: person.name, hint: community?.hasNudged(person.id) ? t("community.nudgedHint", { name: person.name }) : t("community.tapToNudge", { name: person.name }), action: () => community?.nudge(person) };
+    }
     if (mark.kind === "base") return { kind: "base", title: `${t("base.label")} · ${countryName(base)}`, hint: t("menu.tipBase"), iso: base.iso, action: () => pickBase() };
     // The pins tell you what they are; the games start from the hero card or the menu.
     return { kind: mark.kind, pin: true, box: mark.box };
@@ -41434,6 +42413,7 @@ async function signOutAndForgetDays() {
 
 // The Community screen, set up at the end of this file.
 let community = null;
+let challenges = null;
 
 function renderAccount(account) {
   const profile = account ? getProfile(account) : null;
@@ -41677,6 +42657,7 @@ document.getElementById("signOutButton").addEventListener("click", async () => {
 });
 renderAccount(null);
 initAuth(account => {
+  setTimeout(() => community?.openPendingJoin(), 0);
   // Signed in: the account's language wins; an account without one takes this browser's.
   if (account) {
     syncBase(account);
@@ -41805,6 +42786,15 @@ let duelLobbyShown = null;
 let duelDoneSeen = null;
 // Your tent changed (My tent) while you wait: the others get the new one.
 onBaseChange(() => { if (duel.inLobby()) { renderHero(); setTimeout(() => duel.refreshTent(), 1500); } });
+// Challenge links (challenge.js): made on the end screen, taken from ?challenge=CODE.
+challenges = initChallenges({
+  mainMode: MAIN_MODE,
+  dayName: dateKey => t("common.day", { n: getPuzzleNumber(dateKey) }),
+  scoreOf: dateKey => getDayRecord(dateKey, MAIN_MODE).score,
+  play: dateKey => { if (!lobbyBlocks()) enterGameView(dateKey, MAIN_MODE); },
+  syncDay: dateKey => syncDayToAccount(dateKey),
+  signIn: () => document.getElementById("accountModal").classList.remove("hidden")
+});
 community = initializeCommunity({ globe, getDays: archive.loadDays, today, dayLabel: dateKey => t("common.day", { n: getPuzzleNumber(dateKey) }), getOrigin: () => gameOrigin(featuredMode(), today) });
 
 // ---------------------------------------------------------------------------
@@ -41833,6 +42823,21 @@ async function checkTentUpgrade() {
 // Your tent on the menu globe: its look (style, explorer, colour) as a pin icon, made once per look.
 const tentLookKey = () => JSON.stringify(getTentLook());
 const tentPinIcons = {};
+// A crewmate's tent on the menu globe (their look, or a plain tent), and its lantern.
+const crewPinIcons = {};
+const crewPinIcon = look => (crewPinIcons[JSON.stringify(look || {})] ||= createTentCanvas(look || {}, 1, "tent-pin-icon"));
+function drawLantern(ctx, x, y, lit) {
+  x = Math.round(x);
+  y = Math.round(y);
+  if (lit) {
+    ctx.fillStyle = "rgba(255, 212, 92, 0.35)";
+    ctx.fillRect(x - 4, y - 4, 14, 16);
+  }
+  ctx.fillStyle = "#0b1020";
+  ctx.fillRect(x - 1, y - 1, 8, 10);
+  ctx.fillStyle = lit ? "#ffd45c" : "#3a3f5c";
+  ctx.fillRect(x, y, 6, 8);
+}
 const tentPinIcon = () => (tentPinIcons[tentLookKey()] ||= createTentCanvas(getTentLook(), 1, "tent-pin-icon"));
 setTentLevelSource(() => currentTentLevel());
 renderTentTile();
