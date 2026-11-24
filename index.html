@@ -5091,6 +5091,36 @@ h1, h2, h3 { font-weight: normal; }
 }
 #scoreBurst .is-paged .crew-card { order: 3; flex: none; margin: 4px 0 0; }
 
+/* DUELS in a Crew group (crew-league.js weekDuels): your rival this week, day by day. */
+.crew-duels { display: grid; gap: 10px; }
+.crew-duel { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px 12px; padding: 14px; border: 2px solid #2a3360; background: #10162f; }
+.crew-duel-face { display: grid; justify-items: center; gap: 4px; min-width: 0; }
+.crew-duel-face small { font-size: 12px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crew-duel-face:first-child .crew-face-ring { border-color: var(--gold, #ffd45c); }
+.crew-duel-face:nth-child(3) .crew-face-ring { border-color: #c58cff; }
+.crew-duel-big { display: grid; justify-items: center; gap: 4px; }
+.crew-duel-big strong { font-family: "Space Mono", monospace; font-size: 32px; line-height: 1; }
+.crew-duel-big small, .crew-duel-day b { font-family: "Press Start 2P", monospace; font-size: 9px; letter-spacing: var(--ls-pixel); color: var(--muted); }
+.crew-duel-status { grid-column: 1 / -1; margin: 0; text-align: center; font-size: 14px; }
+.crew-duel-status.is-win { color: var(--gold, #ffd45c); }
+.crew-duel-status.is-loss { color: #c58cff; }
+.crew-duel-days { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(30px, 1fr)); gap: 4px; }
+.crew-duel-day { display: grid; justify-items: center; gap: 4px; padding: 6px 0; background: #1a2248; border: 2px solid transparent; }
+.crew-duel-day small { font-family: "Space Mono", monospace; font-size: 12px; }
+.crew-duel-day.is-you { background: color-mix(in srgb, var(--gold, #ffd45c) 30%, #1a2248); }
+.crew-duel-day.is-them { background: color-mix(in srgb, #c58cff 30%, #1a2248); }
+.crew-duel-day.is-open { background: transparent; border: 2px dashed #2a3360; }
+.crew-duel-day.is-today { border-color: #fff; }
+.crew-duel-note { margin: 0; color: var(--muted); font-size: 14px; }
+.crew-duel-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.crew-duel-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; padding: 6px 8px; background: #141b3a; }
+.crew-duel-row.is-you { outline: 2px solid var(--gold, #ffd45c); }
+.crew-duel-side { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 14px; }
+.crew-duel-side span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crew-duel-row .crew-duel-side:last-child { flex-direction: row-reverse; }
+.crew-duel-side.is-winner { color: var(--gold, #ffd45c); }
+.crew-duel-score { font-family: "Space Mono", monospace; font-size: 16px; }
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -7071,8 +7101,31 @@ const EN = {
   "crew.you": "You",
   "crew.which": "Which crew",
   "crew.all": "All crews",
-  "crew.more": n => `${n} more`,
-  "crew.waiting": n => `${n} still to play this one`,
+  "duels.tab": "DUELS",
+  "duels.needTwo": "Duels start once your crew has two people: one rival a week.",
+  "duels.resting": "You rest this week (an odd number in the crew). Next week you get a rival.",
+  "duels.nextWeek": "You joined this week: your first duel starts on Monday.",
+  "duels.thisWeek": "THIS WEEK'S DUELS",
+  "duels.rests": "Resting this week: {name}",
+  "duels.season": "{month} DUELS",
+  "duels.noneYet": "No duel has finished yet this season. The first ones end on Sunday.",
+  "duels.record": "{w}W {d}D {l}L",
+  "duels.days": "Days won {won}, lost {lost}",
+  "duels.points": p => `${p.n} ${p.n === 1 ? "pt" : "pts"}`,
+  "duels.daysWon": "DAYS WON",
+  "duels.youWon": "You won the week against {name}!",
+  "duels.theyWon": "{name} won the week.",
+  "duels.drawn": "A draw with {name}.",
+  "duels.youLead": "You lead",
+  "duels.theyLead": "{name} leads",
+  "duels.level": "Level",
+  "duels.left": p => `${p.n} ${p.n === 1 ? "day" : "days"} to go`,
+  "duels.missed": "missed",
+  "duels.notYet": "not yet",
+  "duels.rule": "Every week one rival from your crew; over the weeks you meet everyone. Each day the higher score wins the day (a day only one of you played goes to them). Most days wins the week: 3 points, a draw 1.",
+  "duels.ruleWork": "Every work week (Mon–Fri) one rival from your crew; over the weeks you meet everyone. Each workday the higher score wins the day (a day only one of you played goes to them). Most days wins the week: 3 points, a draw 1.",
+  "crew.more": "{n} more",
+  "crew.waiting": "{n} still to play this one",
   "crew.waitingNames": "{names} still to play",
   "crew.empty": "Nobody in your crew has played this round yet.",
   "crew.inviteTitle": "PLAY WITH YOUR CREW",
@@ -8529,8 +8582,31 @@ const NL = {
   "crew.you": "Jij",
   "crew.which": "Welke crew",
   "crew.all": "Alle crews",
-  "crew.more": n => `nog ${n}`,
-  "crew.waiting": n => `${n} moeten deze nog spelen`,
+  "duels.tab": "DUELS",
+  "duels.needTwo": "Duels beginnen zodra je crew twee mensen heeft: elke week één rivaal.",
+  "duels.resting": "Je rust deze week (een oneven aantal in de crew). Volgende week krijg je een rivaal.",
+  "duels.nextWeek": "Je kwam er deze week bij: je eerste duel begint maandag.",
+  "duels.thisWeek": "DUELS VAN DEZE WEEK",
+  "duels.rests": "Rust deze week: {name}",
+  "duels.season": "DUELS VAN {month}",
+  "duels.noneYet": "Dit seizoen is nog geen duel afgelopen. De eerste eindigen zondag.",
+  "duels.record": "{w}W {d}G {l}V",
+  "duels.days": "Dagen gewonnen {won}, verloren {lost}",
+  "duels.points": p => `${p.n} ${p.n === 1 ? "pt" : "ptn"}`,
+  "duels.daysWon": "DAGEN GEWONNEN",
+  "duels.youWon": "Je won de week tegen {name}!",
+  "duels.theyWon": "{name} won de week.",
+  "duels.drawn": "Gelijk tegen {name}.",
+  "duels.youLead": "Je staat voor",
+  "duels.theyLead": "{name} staat voor",
+  "duels.level": "Gelijk",
+  "duels.left": p => `nog ${p.n} ${p.n === 1 ? "dag" : "dagen"}`,
+  "duels.missed": "gemist",
+  "duels.notYet": "nog niet",
+  "duels.rule": "Elke week één rivaal uit je crew; over de weken speel je tegen iedereen. Elke dag wint de hoogste score de dag (een dag die maar één van jullie speelde, is voor die). Wie de meeste dagen wint, wint de week: 3 punten, gelijk 1.",
+  "duels.ruleWork": "Elke werkweek (ma–vr) één rivaal uit je crew; over de weken speel je tegen iedereen. Elke werkdag wint de hoogste score de dag (een dag die maar één van jullie speelde, is voor die). Wie de meeste dagen wint, wint de week: 3 punten, gelijk 1.",
+  "crew.more": "nog {n}",
+  "crew.waiting": "{n} moeten deze nog spelen",
   "crew.waitingNames": "{names} moeten nog spelen",
   "crew.empty": "Nog niemand van je crew speelde deze ronde.",
   "crew.inviteTitle": "SPEEL MET JE CREW",
@@ -33190,7 +33266,123 @@ function daysLeft(month, today, { weekdays = false } = {}) {
   return left;
 }
 
-return { FREE_MISSES, MISS_SHARE, LATE_SHARE, isWeekend, monthEnd, seasonOf, seasonTable, daysLeft };
+// Head-to-head duels (24 November 2026, team request): each week the crew is paired off,
+// one rival each (round robin, so over the weeks you meet everyone). Every day of the week
+// you both play is a point for the higher score; a day only one of you played goes to that
+// one; a day neither played, or a tie, nobody. Today counts once both played (or the other
+// can no longer). The week goes to whoever won more days (a draw if equal). A season (month)
+// counts the duels of the weeks that start in it: 3 points a win, 1 a draw.
+const LEAGUE_MONDAY = "2026-10-26"; // week 0 of every crew's rotation
+
+const weekIndexOf = monday => Math.round((Date.parse(`${monday}T00:00:00Z`) - Date.parse(`${LEAGUE_MONDAY}T00:00:00Z`)) / (7 * 86400000));
+const mondayOf = dateKey => {
+  const date = new Date(`${dateKey}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7));
+  return toKey(date);
+};
+const addDays = (dateKey, n) => {
+  const date = new Date(`${dateKey}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + n);
+  return toKey(date);
+};
+const hash = text => {
+  let value = 2166136261;
+  for (const char of text) value = Math.imul(value ^ char.charCodeAt(0), 16777619) >>> 0;
+  return value;
+};
+
+// Who's in a week's duels: members who joined by its Monday. A crew's first week (fewer
+// than 2 by Monday) takes everyone who joined by the week's end, so a new crew can start.
+function duelists(people, monday, options = {}) {
+  const end = addDays(monday, options.weekdays ? 4 : 6);
+  const by = day => people.filter(person => !person.joined || person.joined <= day);
+  const early = by(monday);
+  return early.length >= 2 ? early : by(end);
+}
+
+// The pairs of one week: [a, b] (b null for the one who rests when the number is odd).
+// The order is fixed per crew (seed), the circle method turns it each week.
+function weekPairs(people, seed, monday) {
+  const order = [...people].sort((a, b) => hash(`${seed}:${a.id}`) - hash(`${seed}:${b.id}`) || String(a.id).localeCompare(String(b.id)));
+  if (order.length < 2) return [];
+  if (order.length % 2) order.push(null);
+  const n = order.length;
+  const turn = ((weekIndexOf(monday) % (n - 1)) + (n - 1)) % (n - 1);
+  const rest = order.slice(1);
+  const turned = [order[0], ...rest.slice(rest.length - turn), ...rest.slice(0, rest.length - turn)];
+  const pairs = [];
+  for (let i = 0; i < n / 2; i += 1) {
+    const [a, b] = [turned[i], turned[n - 1 - i]];
+    pairs.push(a ? [a, b] : [b, a]);
+  }
+  return pairs;
+}
+
+// One duel: the days (each { date, a, b, winner: "a" | "b" | null, open }) and the result.
+function duelOf(a, b, monday, today, { weekdays = false } = {}) {
+  const days = [];
+  let winsA = 0, winsB = 0, open = 0;
+  for (let i = 0; i < (weekdays ? 5 : 7); i += 1) {
+    const date = addDays(monday, i);
+    const scoreA = a.days.get(date) ?? null;
+    const scoreB = b.days.get(date) ?? null;
+    const future = date > today;
+    const pending = future || (date === today && (scoreA === null || scoreB === null));
+    let winner = null;
+    if (!pending) {
+      if (scoreA !== null && (scoreB === null || scoreA > scoreB)) winner = "a";
+      else if (scoreB !== null && (scoreA === null || scoreB > scoreA)) winner = "b";
+    }
+    if (winner === "a") winsA += 1;
+    if (winner === "b") winsB += 1;
+    if (pending) open += 1;
+    days.push({ date, a: scoreA, b: scoreB, winner, open: pending, future });
+  }
+  const over = !open;
+  return { a, b, days, winsA, winsB, open, over, result: winsA > winsB ? "a" : winsB > winsA ? "b" : "draw" };
+}
+
+// All duels of one week, and who rests.
+function weekDuels(people, seed, monday, today, options = {}) {
+  const pairs = weekPairs(duelists(people, monday, options), seed, monday);
+  return {
+    monday,
+    duels: pairs.filter(([, b]) => b).map(([a, b]) => duelOf(a, b, monday, today, options)),
+    resting: pairs.filter(([, b]) => !b).map(([a]) => a)
+  };
+}
+
+// A season's duel table: the finished duels of the weeks that start in the month (and on or
+// after firstDay's week). Best first: points, then days won minus lost, then days won.
+function duelTable(people, seed, month, today, firstDay, options = {}) {
+  const rows = new Map(people.map(person => [person.id, { person, played: 0, won: 0, drawn: 0, lost: 0, daysFor: 0, daysAgainst: 0, points: 0 }]));
+  const weeks = [];
+  for (let monday = mondayOf(`${month}-01`) < `${month}-01` ? addDays(mondayOf(`${month}-01`), 7) : `${month}-01`; monday <= monthEnd(month) && monday <= today; monday = addDays(monday, 7)) {
+    if (firstDay && addDays(monday, 6) < firstDay) continue;
+    const week = weekDuels(people, seed, monday, today, options);
+    weeks.push(week);
+    week.duels.filter(duel => duel.over).forEach(duel => {
+      [[duel.a, duel.winsA, duel.winsB, "a"], [duel.b, duel.winsB, duel.winsA, "b"]].forEach(([person, mine, theirs, side]) => {
+        const row = rows.get(person.id);
+        row.played += 1;
+        row.daysFor += mine;
+        row.daysAgainst += theirs;
+        if (duel.result === "draw") { row.drawn += 1; row.points += 1; } else if (duel.result === side) { row.won += 1; row.points += 3; } else row.lost += 1;
+      });
+    });
+  }
+  const table = [...rows.values()].filter(row => row.played)
+    .sort((x, y) => y.points - x.points || (y.daysFor - y.daysAgainst) - (x.daysFor - x.daysAgainst) || y.daysFor - x.daysFor);
+  let place = 0;
+  table.forEach((row, i) => {
+    const prev = table[i - 1];
+    if (!prev || prev.points !== row.points || prev.daysFor - prev.daysAgainst !== row.daysFor - row.daysAgainst || prev.daysFor !== row.daysFor) place = i + 1;
+    row.place = place;
+  });
+  return { table, weeks };
+}
+
+return { FREE_MISSES, MISS_SHARE, LATE_SHARE, isWeekend, monthEnd, seasonOf, seasonTable, daysLeft, weekIndexOf, mondayOf, duelists, weekPairs, duelOf, weekDuels, duelTable };
 })();
 
 // ---- camp-scene.js
@@ -33363,7 +33555,7 @@ const { addFriend, addToGroup, createGroup, getFriends, getGroupBoard, getGroups
 const { createAtlas, createAtlasSprite, isAtlasQuiet, onAtlasQuietChange, setAtlasQuiet, syncAtlasQuiet } = __modules["atlas.js"];
 const { createBadge, createMedal, getGroupMedal } = __modules["badges.js"];
 const { createBaseLine, getTent, getTentLook } = __modules["base.js"];
-const { FREE_MISSES, daysLeft, isWeekend, monthEnd, seasonTable } = __modules["crew-league.js"];
+const { FREE_MISSES, daysLeft, duelTable, isWeekend, monthEnd, seasonTable, weekDuels } = __modules["crew-league.js"];
 const { cleanColor, cleanLook } = __modules["look-parts.js"];
 const { createExplorerHead, createTentCanvas, explorerOf } = __modules["tents.js"];
 const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getTopPercent } = __modules["community.js"];
@@ -34157,7 +34349,7 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     if (manages) card.appendChild(createGroupSettings(group, people, me));
 
     const views = element("div", "board-tabs community-views");
-    [["season", t("community.season")], ["week", t("community.week")], ["day", t("community.day")], ["history", t("community.history")]].forEach(([key, label]) => views.appendChild(button(`board-tab${state.view === key ? " is-active" : ""}`, label, () => {
+    [["season", t("community.season")], ["week", t("community.week")], ["duels", t("duels.tab")], ["day", t("community.day")], ["history", t("community.history")]].forEach(([key, label]) => views.appendChild(button(`board-tab${state.view === key ? " is-active" : ""}`, label, () => {
       state.view = key;
       render();
     })));
@@ -34176,6 +34368,8 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
         render();
       });
       card.append(picker, createRanking(standings(people, state.dateKey, state.dateKey), people, me, { perDay: false }));
+    } else if (state.view === "duels") {
+      card.appendChild(createDuels(group, people, me, firstDay, options));
     } else if (state.view === "week") {
       const weekStart = mondayOf(today);
       const weekEnd = addDays(weekStart, options.weekdays ? 4 : 6);
@@ -34184,6 +34378,99 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     } else {
       card.appendChild(createHistory(people, firstDay, me, options));
     }
+    return card;
+  }
+
+  // DUELS: one rival a week (crew-league.js): your duel day by day, every duel of the week,
+  // and the season's table (3 a win, 1 a draw).
+  function createDuels(group, people, me, firstDay, options) {
+    const box = element("div", "crew-duels");
+    if (people.length < 2) {
+      box.appendChild(element("p", "community-empty", t("duels.needTwo")));
+      return box;
+    }
+    const week = weekDuels(people, group.id, mondayOf(today), today, options);
+    const mine = week.duels.find(duel => duel.a.id === me || duel.b.id === me);
+    if (mine) box.appendChild(createMyDuel(mine, me));
+    else box.appendChild(element("p", "crew-duel-note", t(week.resting.some(person => person.id === me) ? "duels.resting" : "duels.nextWeek")));
+
+    if (week.duels.length > (mine ? 1 : 0)) {
+      box.appendChild(element("span", "field-label", t("duels.thisWeek")));
+      const list = element("ol", "crew-duel-list");
+      week.duels.forEach(duel => {
+        const row = element("li", `crew-duel-row${duel === mine ? " is-you" : ""}`);
+        const side = (person, wins, other) => {
+          const cell = element("span", `crew-duel-side${wins > other && duel.over ? " is-winner" : ""}`);
+          cell.append(createExplorerHead(explorerOf(person.id === me ? getTentLook() : person.look || {}) || {}, 2, "crew-duel-head"), element("span", "", person.id === me ? t("crew.you") : person.name));
+          return cell;
+        };
+        const [left, leftWins, right, rightWins] = duel.b.id === me ? [duel.b, duel.winsB, duel.a, duel.winsA] : [duel.a, duel.winsA, duel.b, duel.winsB];
+        row.append(side(left, leftWins, rightWins), element("b", "crew-duel-score", `${leftWins}–${rightWins}`), side(right, rightWins, leftWins));
+        list.appendChild(row);
+      });
+      box.appendChild(list);
+      if (week.resting.length) box.appendChild(element("p", "community-range", t("duels.rests", { name: week.resting.map(person => person.name).join(", ") })));
+    }
+
+    const { table } = duelTable(people, group.id, today.slice(0, 7), today, firstDay, options);
+    box.appendChild(element("span", "field-label", t("duels.season", { month: monthName(today.slice(0, 7)) })));
+    if (!table.length) box.appendChild(element("p", "community-range", t("duels.noneYet")));
+    else {
+      const list = element("ol", "board-list community-board crew-duel-table");
+      table.forEach(entry => {
+        const row = element("li", "board-row");
+        row.classList.toggle("is-you", entry.person.id === me);
+        const medal = getGroupMedal(entry.place);
+        const rank = element("span", "board-rank");
+        if (medal) rank.appendChild(createMedal(medal, 26));
+        else rank.textContent = `#${entry.place}`;
+        const record = element("span", "board-extra", t("duels.record", { w: entry.won, d: entry.drawn, l: entry.lost }));
+        record.title = t("duels.days", { won: entry.daysFor, lost: entry.daysAgainst });
+        row.append(rank, memberName(entry.person), record, element("strong", "board-score", t("duels.points", { n: entry.points })));
+        list.appendChild(row);
+      });
+      box.appendChild(list);
+    }
+    box.appendChild(element("p", "community-range", t(options.weekdays ? "duels.ruleWork" : "duels.rule")));
+    return box;
+  }
+
+  // Your duel this week: both of you, the days won, and each day of the week.
+  function createMyDuel(duel, me) {
+    const flip = duel.b.id === me; // you on the left
+    const you = flip ? duel.b : duel.a;
+    const them = flip ? duel.a : duel.b;
+    const yourWins = flip ? duel.winsB : duel.winsA;
+    const theirWins = flip ? duel.winsA : duel.winsB;
+    const card = element("div", "crew-duel");
+    const face = (person, look, label) => {
+      const side = element("div", "crew-duel-face");
+      const ring = element("span", "crew-face-ring");
+      ring.appendChild(createExplorerHead(explorerOf(look) || {}, 3, "crew-face-head"));
+      side.append(ring, element("small", "", label));
+      return side;
+    };
+    const score = element("div", "crew-duel-big");
+    score.append(element("strong", "", `${yourWins}–${theirWins}`), element("small", "", t("duels.daysWon")));
+    card.append(face(you, getTentLook(), t("crew.you")), score, face(them, them.look || {}, them.name));
+    const lead = yourWins - theirWins;
+    let status;
+    if (duel.over) status = lead > 0 ? t("duels.youWon", { name: them.name }) : lead < 0 ? t("duels.theyWon", { name: them.name }) : t("duels.drawn", { name: them.name });
+    else status = `${lead > 0 ? t("duels.youLead") : lead < 0 ? t("duels.theyLead", { name: them.name }) : t("duels.level")} · ${t("duels.left", { n: duel.open })}`;
+    card.appendChild(element("p", `crew-duel-status${duel.over ? (lead > 0 ? " is-win" : lead < 0 ? " is-loss" : "") : ""}`, status));
+    const days = element("div", "crew-duel-days");
+    duel.days.forEach(day => {
+      const yours = flip ? day.b : day.a;
+      const theirs = flip ? day.a : day.b;
+      const won = day.winner && (day.winner === "a") !== flip;
+      const cell = element("span", `crew-duel-day${day.open ? " is-open" : day.winner ? (won ? " is-you" : " is-them") : " is-none"}${day.date === today ? " is-today" : ""}`);
+      cell.appendChild(element("b", "", new Date(`${day.date}T00:00:00Z`).toLocaleDateString(locale(), { weekday: "narrow", timeZone: "UTC" })));
+      cell.appendChild(element("small", "", day.open ? "·" : day.winner ? (won ? "✓" : "✕") : "–"));
+      const fmt = value => (value === null ? t("duels.missed") : value.toLocaleString(locale()));
+      cell.title = day.future ? "" : `${t("crew.you")} ${fmt(yours)} · ${them.name} ${day.date === today && theirs === null ? t("duels.notYet") : fmt(theirs)}`;
+      days.appendChild(cell);
+    });
+    card.appendChild(days);
     return card;
   }
 
