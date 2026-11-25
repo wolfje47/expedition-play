@@ -13030,7 +13030,10 @@ __modules["camp-pixels.js"] = (() => {
 // The camp (camp-art.js): shared pixel helpers, the camp backgrounds and their effects,
 // and the flag you paint yourself. Moved from mockups/camp-creator/art.js (24 November 2026).
 // The backgrounds are drawn on a 128×72 canvas; camp-art.js scales them up behind the camp.
-const W = 128, H = 72, GROUND = 54;
+// One name per export: the single-file build (tools/build-share.mjs) reads one per line.
+const W = 128;
+const H = 72;
+const GROUND = 54;
 const K = "#0b1020";
 
 const toRgb = hex => { const v = parseInt(hex.slice(1), 16); return [(v >> 16) & 255, (v >> 8) & 255, v & 255]; };
@@ -13229,7 +13232,7 @@ function fitSprite(canvas, sprite, { pad = 2, rows = null, bg = null } = {}) {
   for (let y = y0; y < y1; y++) for (let x = 0; x < sprite.w; x++) { const v = sprite.get(x, y); if (v === null) continue; ctx.fillStyle = v; ctx.fillRect(ox + x * scale, oy + y * scale, scale, scale); }
 }
 
-return { W, K, mix, shade, light, rng, Sprite, hsl, FLAG_COLORS, FLAG_PRESETS, flagSprite, BIOMES, drawBiome, drawEffect, drawAurora, fitSprite };
+return { W, H, GROUND, K, mix, shade, light, rng, Sprite, hsl, FLAG_COLORS, FLAG_PRESETS, flagSprite, BIOMES, drawBiome, drawEffect, drawAurora, fitSprite };
 })();
 
 // ---- camp-hd.js
@@ -13476,7 +13479,10 @@ const { cleanLook } = __modules["look-parts.js"];
 // per design pixel, so the explorer is 48×72 real pixels and the scene 312×176.
 HD.K = 1.5;
 
-const W = 312, H = 176, GROUND = 121;
+// One name per export: the single-file build (tools/build-share.mjs) reads one per line.
+const W = 312;
+const H = 176;
+const GROUND = 121;
 const HEAD_ROWS = [0, 37];
 const ink = "#1a1020";
 const fin = hd => hd.toSprite(Sprite);
@@ -14207,7 +14213,7 @@ function drawAtlas(canvas, { pose = "idle", frame = 0, blink = false } = {}) {
   const fits = k => Math.floor((canvas.height - 2) / Math.round((head ? 27 : 52) * k)) * k;
   const density = fits(DENSITY) >= fits(DENSITY_SMALL) ? DENSITY : DENSITY_SMALL;
   const sprite = atDensity(density, () => explorerSprite({ ...ATLAS_LOOK, ...(head ? { _head: true } : {}) }, { pose: head ? "idle" : p, blink, frame }));
-  fitSprite(canvas, sprite, { pad: 1, rows: head ? [0, 25] : null });
+  fitSprite(canvas, sprite, { pad: 1, rows: head ? [0, Math.round(27 * density) + 1] : null });
 }
 
 // A locked item: its shape in one dark colour with a "?" (a camp or an effect is darkened).
@@ -14219,7 +14225,7 @@ function drawSilhouette(canvas, catId) {
   ctx.fillText("?", canvas.width / 2, canvas.height / 2 + 2);
 }
 
-return { W, HEAD_ROWS, explorerSprite, petSprite, propSprite, fireSprite, flagSprite, tentSprite, crateSprite, parachuteSprite, SPOTS, drawScene, drawItemThumb, createHeadshot, createLoadout, ATLAS_LOOK, drawAtlas, drawSilhouette, Sprite, shade, light, drawBiome, drawEffect, fitSprite, FLAG_COLORS, FLAG_PRESETS, BIOMES };
+return { W, H, GROUND, HEAD_ROWS, explorerSprite, petSprite, propSprite, fireSprite, flagSprite, tentSprite, crateSprite, parachuteSprite, SPOTS, drawScene, drawItemThumb, createHeadshot, createLoadout, ATLAS_LOOK, drawAtlas, drawSilhouette, Sprite, shade, light, drawBiome, drawEffect, fitSprite, FLAG_COLORS, FLAG_PRESETS, BIOMES };
 })();
 
 // ---- atlas.js
