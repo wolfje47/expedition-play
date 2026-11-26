@@ -5647,12 +5647,25 @@ h1, h2, h3 { font-weight: normal; }
 .menu-dock .dock-item::after { content: ""; position: absolute; left: 28%; right: 28%; bottom: 3px; height: 3px; border-radius: 2px; background: transparent; transition: background 0.15s ease; }
 .menu-dock .dock-item.is-active { background: color-mix(in srgb, var(--tile) 10%, transparent); box-shadow: none; }
 .menu-dock .dock-item.is-active::after { background: var(--tile); }
-.menu-dock .dock-soon { top: 6px; right: auto; left: calc(50% + 14px); }
+/* DAILY played today: the tab green, like its card (26 November 2026); the old done dot off. */
+.menu-dock .dock-item[data-state="done"] { --tile: #5cf28a !important; }
+.menu-dock .dock-item[data-state="done"]::after { top: auto; width: auto; box-shadow: none; background: transparent; }
+.menu-dock .dock-item[data-state="done"].is-active::after { background: var(--tile); }
+.menu-dock .dock-item[data-state="done"] .dock-label { color: #5cf28a; }
+/* Crew's card: your own head (engine.js heroArtFor). */
+.hero-art-sprite.is-head { width: 56px; height: 56px; border-radius: 50%; image-rendering: pixelated; }
+/* Bigger on a computer (26 November 2026, team request), and all three icons one size: the
+   calendar and swords (32-pixel art, as SVG) and your head, without the ring round it. */
+.menu-dock .dock-art.is-head { border-radius: 0; background: none; box-shadow: none; overflow: visible; }
+.menu-dock .dock-art svg, .menu-dock .dock-art.is-head canvas { width: 100%; height: 100%; }
+@media (min-width: 761px) {
+  .menu-dock .dock-item { min-height: 92px; gap: 6px; }
+  .menu-dock .dock-art { width: 44px; height: 44px; }
+  .menu-dock .dock-label { font-size: 10px; }
+}
 @media (max-width: 760px) {
   .menu-dock .dock-item { min-height: 68px; padding: 8px 1px; }
-  .menu-dock .dock-art { width: 32px; height: 32px; }
-  .menu-dock .dock-art svg { width: 28px; height: 28px; }
-  .menu-dock .dock-art.is-head canvas { width: 32px; height: 32px; }
+  .menu-dock .dock-art { width: 34px; height: 34px; }
 }
 
 </style>
@@ -5764,7 +5777,6 @@ h1, h2, h3 { font-weight: normal; }
             <span class="dock-art" id="versusDockArt" aria-hidden="true"></span>
             <span class="dock-label" data-i18n="menu.versus">VERSUS</span>
             <small class="dock-sub" data-i18n="menu.versusSub">live</small>
-            <small class="dock-soon" data-i18n="menu.beta">BETA</small>
           </button>
           <button class="dock-item" id="menuCommunityButton" data-select="camp" type="button" style="--tile: var(--cyan)">
             <span class="dock-art is-head" aria-hidden="true"></span>
@@ -7576,6 +7588,13 @@ const EN = {
   "common.pts": "{n} pts",
   "common.off": "{n}% off",
   "common.or": "{list} or {last}",
+  "share.balloon": "🎈 Floated up to {score} m.",
+  "share.climb": "🏔️ Climbed to {score} m.",
+  "share.mine": "⛏️ Dug {score} m down.",
+  "share.train": "🚂 Rode {score} km.",
+  "share.dive": "🌊 Sank to {score} m.",
+  "share.sled": "🛷 {score} km towards the Pole.",
+  "share.top": "{top} today.",
   "common.topPercent": "Top {n}%",
 
   // Problems and notes
@@ -9335,6 +9354,13 @@ const NL = {
   "common.pts": "{n} ptn",
   "common.off": "{n}% ernaast",
   "common.or": "{list} of {last}",
+  "share.balloon": "🎈 Opgestegen tot {score} m.",
+  "share.climb": "🏔️ Geklommen tot {score} m.",
+  "share.mine": "⛏️ {score} m diep gegraven.",
+  "share.train": "🚂 {score} km gereden.",
+  "share.dive": "🌊 Gezakt tot {score} m.",
+  "share.sled": "🛷 {score} km richting de Pool.",
+  "share.top": "{top} vandaag.",
   "common.topPercent": "Top {n}%",
 
   // Problemen en meldingen
@@ -13976,7 +14002,12 @@ const LOOK_PARTS = {
 const TITLE_IDS = ["rookie", "skycaptain", "diver", "polewalker", "yeti", "digger", "host"];
 // The flag everyone starts with: cyan, white, gold, white, cyan.
 const DEFAULT_FLAG = [7, 7, 7, 7, 7, 7, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 7, 7, 7, 7, 7];
-const DEFAULT_EXPLORER = { base: "man", shape: "square", eyes: "round", brows: "bold", mouth: "flat", skin: "#f2c29b", hair: "short", hairColor: "#5c3a1f", face: "none", hat: "beanie", hatColor: "#ff5a5a", outfit: "parka", outfitColor: "#2bb3a3", legs: "#2b313b", gear: "scarf", gearColor: "#ffd45c" };
+// The explorer of someone who never made one (a guest, too). Since 26 November 2026 (the team:
+// the red beanie, teal parka and gold scarf were Atlas's) a blue cap, an orange puffer and
+// binoculars.
+const DEFAULT_EXPLORER = { base: "man", shape: "square", eyes: "round", brows: "bold", mouth: "smile", skin: "#f2c29b", hair: "short", hairColor: "#5c3a1f", face: "none", hat: "cap", hatColor: "#5b8cff", outfit: "puffer", outfitColor: "#ff9f43", legs: "#1f3f8a", gear: "binoculars", gearColor: "#5b8cff" };
+// The default before then: a look saved without some parts keeps what it showed.
+const OLD_DEFAULT_EXPLORER = { base: "man", shape: "square", eyes: "round", brows: "bold", mouth: "flat", skin: "#f2c29b", hair: "short", hairColor: "#5c3a1f", face: "none", hat: "beanie", hatColor: "#ff5a5a", outfit: "parka", outfitColor: "#2bb3a3", legs: "#2b313b", gear: "scarf", gearColor: "#ffd45c" };
 
 const pick = (list, value, fallback = list[0]) => (list.includes(value) ? value : fallback);
 // Old tent styles (before 24 November 2026) and the explorer presets of before.
@@ -13987,7 +14018,7 @@ const OLD_PRESETS = {
 };
 function cleanExplorer(value, avatar) {
   const old = OLD_PRESETS[avatar] || {};
-  const raw = { ...DEFAULT_EXPLORER, ...old, ...(value || {}) };
+  const raw = { ...(value || avatar in OLD_PRESETS ? OLD_DEFAULT_EXPLORER : DEFAULT_EXPLORER), ...old, ...(value || {}) };
   if (raw.jacket && !(value || {}).outfitColor) raw.outfitColor = raw.jacket;
   if (raw.legs === "skin") raw.legs = DEFAULT_EXPLORER.legs;
   // An explorer made before the gear existed keeps empty hands.
@@ -14279,7 +14310,31 @@ function drawExplorer(e, { pose, blink, frame }) {
       s.dot(15, 14, "#11131c"); s.dot(16, 14, "#11131c"); s.dot(17, 14, "#11131c"); s.dot(11, 14, "#5a6a9a"); s.dot(12, 15, "#3a4470"); s.dot(19, 14, "#5a6a9a");
     }
     if (fx === "moustache") [[12, 18], [13, 17], [14, 17], [15, 17], [17, 17], [18, 17], [19, 17], [20, 18], [16, 17]].forEach(([x, y]) => s.dot(x, y, e.hairColor));
-    if (fx === "beard") {
+    if (fx === "beard" && e._atlas) {
+      // Atlas (26 November 2026, the team: he looked too much like the default explorer): an
+      // old man's big white beard, from the cheeks down over his chest to a point, with a
+      // curled moustache, bushy brows that stick out, and crow's feet by his eyes.
+      const tone = e.hairColor, deep = shade(tone, 0.22), soft = light(tone, 0.4);
+      for (let y = 15; y <= 32; y++) {
+        // Half width: full at the jaw, then tapering to a point at the bottom.
+        const half = y <= 22 ? 8.4 : 8.4 - (y - 22) * 0.78;
+        for (let x = 7; x <= 25; x++) {
+          const dx = Math.abs(x + 0.5 - 16);
+          if (dx > half) continue;
+          if (y < 18 && dx < 6.2) continue; // the cheeks stay free above the moustache
+          if (y >= 18 && y <= 19 && dx < 2.2) continue; // the mouth
+          s.dot(x, y, (x * 3 + y * 5) % 7 === 0 ? deep : (x + y) % 5 === 0 ? soft : tone);
+        }
+      }
+      // The moustache, curling up at the ends.
+      [[11, 17], [12, 18], [13, 17], [14, 17], [15, 17], [16, 17], [17, 17], [18, 17], [19, 17], [20, 18], [21, 17], [10, 16], [22, 16]].forEach(([x, y]) => s.dot(x, y, tone));
+      [[13, 18], [19, 18]].forEach(([x, y]) => s.dot(x, y, deep));
+      [[15, 19], [16, 19], [17, 19]].forEach(([x, y]) => s.dot(x, y, "#9a3f34"));
+      // Bushy brows and crow's feet.
+      [[10, 12], [11, 12], [12, 12], [20, 12], [21, 12], [22, 12], [10, 13], [22, 13]].forEach(([x, y]) => s.dot(x, y, tone));
+      const line = shade(e.skin, 0.3);
+      [[10, 15], [10, 16], [23, 15], [23, 16]].forEach(([x, y]) => s.dot(x, y, line));
+    } else if (fx === "beard") {
       for (let y = 16; y <= 22; y++) for (let x = 8; x <= 24; x++) {
         const dx = (x + 0.5 - 16) / 7.8, dy = (y + 0.5 - 15) / 7.4;
         if (dx * dx + dy * dy <= 1 && y >= 16 && !(y >= 18 && y <= 19 && x >= 14 && x <= 18) && !(y < 18 && x > 10 && x < 22)) s.dot(x, y, (x + y) % 3 ? e.hairColor : shade(e.hairColor, 0.25));
@@ -14743,9 +14798,13 @@ function createHeadshot(look, size = 40, className = "camp-headshot") {
 // The tent with the explorer in front of it and the companion beside them, cropped to what's
 // drawn. `compact`: one real pixel per design pixel (Crew's scene, the menu); `withPet` false
 // leaves the companion out where room is short (Crew's scene on a phone).
-function createLoadout(look, { compact = false, withPet = true, className = "camp-loadout" } = {}) {
+// `height`: drawn at whatever density makes it that many real pixels tall (the pins on the
+// menu globe, at the screen's own pixels: crisp, never scaled).
+function createLoadout(look, { compact = false, withPet = true, className = "camp-loadout", height: fit = 0 } = {}) {
   const L = fullLook(look);
-  return atDensity(compact ? DENSITY_SMALL : DENSITY, () => {
+  let density = compact ? DENSITY_SMALL : DENSITY;
+  if (fit) density = fit / createLoadout(look, { withPet, compact: true }).height;
+  return atDensity(density, () => {
     const k = HD.K;
     const tent = tentSprite(L, 0), ex = explorerSprite(L.explorer), pet = withPet && L.pet !== "none" && L.pet !== "parrot" ? petSprite(L.pet, 0) : null;
     const exX = tent.w - Math.round(20 * k), petX = exX + ex.w - Math.round(8 * k);
@@ -14762,9 +14821,9 @@ function createLoadout(look, { compact = false, withPet = true, className = "cam
 }
 
 // ---------- Atlas, the old explorer (atlas.js), in the camp's style ----------
-// Square jaw, white beard and bushy brows, his red bobble hat with ear flaps and goggles, a
+// An old man (26 November 2026): a big white beard to his chest, bushy brows, kind eyes, his red bobble hat with ear flaps and goggles, a
 // gold scarf and the teal parka of the 8-bit Atlas of before.
-const ATLAS_LOOK = { base: "man", shape: "square", eyes: "round", brows: "bold", mouth: "smile", skin: "#f0b48a", hair: "bald", hairColor: "#f4f1e8", face: "beard",
+const ATLAS_LOOK = { base: "man", shape: "square", eyes: "happy", brows: "bold", mouth: "smile", skin: "#e8a97e", hair: "bald", hairColor: "#eef0f4", face: "beard",
   hat: "bobble", hatColor: "#e0484f", outfit: "parka", outfitColor: "#2bb3a3", legs: "#5c3a1f", gear: "scarf", gearColor: "#ffd45c", _atlas: true };
 // Atlas in a square canvas of `size` pixels: poses idle, wave (two frames), cheer, think and
 // point (the last two as idle and wave). Small sizes at one real pixel per design pixel.
@@ -19766,8 +19825,10 @@ class PixelGlobe {
     const startZ = this.camera.position.z;
     const startX = this.globeGroup.rotation.x;
     const startY = this.globeGroup.rotation.y;
-    const targetX = BASE_CAMP.lat * Math.PI / 180;
-    let targetY = -(BASE_CAMP.lon * Math.PI / 180) - Math.PI / 2;
+    // Since 26 November 2026 Crew is your own tent (engine.js sets campPlace).
+    const place = this.campPlace || BASE_CAMP;
+    const targetX = place.lat * Math.PI / 180;
+    let targetY = -(place.lon * Math.PI / 180) - Math.PI / 2;
     // The short way round (at most half a turn), so it never whirls.
     targetY += Math.round((startY - targetY) / (Math.PI * 2)) * Math.PI * 2;
     const lerp = (from, to, amount) => from + (to - from) * amount;
@@ -45071,72 +45132,97 @@ const AUTO_CONTINUE_WRONG_MS = 2000;
 const today = toUtcDateKey(new Date());
 
 // DAILY's icon (24 November 2026, team choice from mockups/menu-icons, option G): a calendar
-// page with today's date (the puzzle day, which changes at midnight UTC). The same 16×16
+// page with today's date (the puzzle day, which changes at midnight UTC). The same
 // pixels in the menu bar, on DAILY's card and on its pin on the globe (26 November 2026,
 // team request: those still showed Highs & Lows' bars).
-function calendarPixels() {
-  const DIGITS = { 0: "111101101101111", 1: "010110010010111", 2: "111001111100111", 3: "111001111001111", 4: "101101111001001", 5: "111100111001111", 6: "111100111101111", 7: "111001010010010", 8: "111101111101111", 9: "111101111001111" };
-  const px = [];
-  const box = (x, y, w, h, fill) => px.push([x, y, w, h, fill]);
-  box(1, 3, 14, 13, "#0b1020"); // outline
-  box(2, 4, 12, 2, "#ff6b9d");
-  box(2, 6, 12, 1, "#c94677");
-  box(2, 7, 12, 7, "#f4f6ff");
-  box(2, 14, 12, 1, "#b9c2dd");
-  const digits = String(Number(today.slice(8, 10))).split("");
-  const left = 8 - Math.ceil((digits.length * 4 - 1) / 2);
-  digits.forEach((digit, i) => [...DIGITS[digit]].forEach((on, n) => { if (on === "1") box(left + i * 4 + (n % 3), 8 + Math.floor(n / 3), 1, 1, "#0b1020"); }));
-  [4, 11].forEach(x => { box(x, 2, 1, 2, "#dfe6f2"); box(x, 4, 1, 1, "#8a96b0"); });
-  return px;
+// Since 26 November 2026 (team request: more detail, still 8-bit) both menu icons are drawn
+// on 32 × 32 pixels instead of 16: a grid of colours, with a dark outline added round
+// everything (pixelGrid), shown as SVG in the bar and on the cards and as a canvas on the pins.
+const ICON_INK = "#0b1020";
+function pixelGrid(size, paint) {
+  const g = Array.from({ length: size }, () => Array(size).fill(null));
+  const dot = (x, y, c) => { if (x >= 0 && y >= 0 && x < size && y < size) g[y][x] = c; };
+  paint(dot);
+  const copy = g.map(row => [...row]);
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    if (copy[y][x]) continue;
+    if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => copy[y + dy]?.[x + dx] && copy[y + dy][x + dx] !== ICON_INK)) g[y][x] = ICON_INK;
+  }
+  return g;
 }
-function calendarSvg() {
-  return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges">${calendarPixels().map(([x, y, w, h, fill]) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}"/>`).join("")}</svg>`;
-}
-function calendarCanvas() {
-  const canvas = Object.assign(document.createElement("canvas"), { width: 16, height: 16 });
+const gridSvg = g => `<svg viewBox="0 0 ${g.length} ${g.length}" shape-rendering="crispEdges">${g.flatMap((row, y) => row.map((c, x) => (c ? `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${c}"/>` : ""))).join("")}</svg>`;
+// On the pins: drawn at whole device pixels (scale), so drawMenuPin puts it down one to one.
+function gridCanvas(g, scale = 1) {
+  const canvas = Object.assign(document.createElement("canvas"), { width: g.length * scale, height: g.length * scale });
   const ctx = canvas.getContext("2d");
-  calendarPixels().forEach(([x, y, w, h, fill]) => { ctx.fillStyle = fill; ctx.fillRect(x, y, w, h); });
-  return canvas;
+  g.forEach((row, y) => row.forEach((c, x) => { if (c) { ctx.fillStyle = c; ctx.fillRect(x * scale, y * scale, scale, scale); } }));
+  return Object.assign(canvas, { native: true });
 }
+// DAILY: a calendar page with today's date (the puzzle day, which changes at midnight UTC),
+// with binder rings, a pink header and a curled corner.
+function calendarGrid() {
+  const DIGITS = { 0: "111101101101111", 1: "010110010010111", 2: "111001111100111", 3: "111001111001111", 4: "101101111001001", 5: "111100111001111", 6: "111100111101111", 7: "111001010010010", 8: "111101111101111", 9: "111101111001111" };
+  return pixelGrid(32, dot => {
+    const box = (x0, y0, x1, y1, c) => { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) dot(x, y, c); };
+    // The page, with a shaded right edge and the pages underneath.
+    box(3, 7, 28, 28, "#f4f6ff");
+    box(27, 13, 28, 28, "#dfe4f2");
+    box(4, 29, 28, 29, "#b9c2dd"); box(5, 30, 27, 30, "#8a96b0");
+    // The curled corner, bottom right.
+    box(25, 26, 28, 28, null); dot(25, 26, "#dfe4f2"); box(25, 27, 26, 28, "#dfe4f2"); dot(27, 27, "#b9c2dd"); box(25, 28, 27, 28, "#b9c2dd"); dot(26, 26, "#c9d0e2");
+    for (let i = 0; i < 3; i++) dot(28 - i, 26 + i, ICON_INK);
+    // The header.
+    box(3, 7, 28, 12, "#ff6b9d"); box(3, 7, 28, 7, "#ff9bbd"); box(3, 13, 28, 13, "#c94677");
+    // Binder rings through the header.
+    [8, 22].forEach(x => {
+      box(x, 3, x + 1, 9, "#dfe6f2"); dot(x, 3, "#ffffff"); box(x + 1, 6, x + 1, 9, "#8a96b0");
+      box(x - 1, 9, x + 2, 10, "#c94677"); box(x, 10, x + 1, 10, "#7a2a4a");
+    });
+    // The date in big 3 × 5 digits at ×2.
+    const digits = String(Number(today.slice(8, 10))).split("");
+    const width = digits.length * 6 + (digits.length - 1) * 2;
+    const left = 16 - Math.ceil(width / 2);
+    digits.forEach((digit, i) => [...DIGITS[digit]].forEach((on, n) => {
+      if (on !== "1") return;
+      const x = left + i * 8 + (n % 3) * 2, y = 16 + Math.floor(n / 3) * 2;
+      box(x, y, x + 1, y + 1, "#1b2340");
+    }));
+  });
+}
+function calendarSvg() { return gridSvg(calendarGrid()); }
+function calendarCanvas(scale = 1) { return gridCanvas(calendarGrid(), scale); }
 function drawDailyIcon() {
   const art = document.getElementById("dailyDockArt");
   if (art) art.innerHTML = calendarSvg();
 }
 drawDailyIcon();
 // VERSUS's icon (25 November 2026, the team's pick from mockups/menu-icons: crossed swords),
-// in the bar, on its card and on its pin on the globe. 16×16 pixels with an outline, like the calendar.
-const SWORD_COLORS = { k: "#0b1020", s: "#dfe6f2", S: "#8a96b0", y: "#ffd45c", Y: "#d9a531", r: "#9a6a44", R: "#6b4428" };
+// in the bar, on its card and on its pin on the globe: steel blades with a light and a dark
+// edge, gold crossguards and pommels, leather-wrapped grips.
 function swordsGrid() {
-  const g = Array.from({ length: 16 }, () => Array(16).fill("."));
-  const dot = (x, y, ch) => { if (x >= 0 && y >= 0 && x < 16 && y < 16) g[y][x] = ch; };
-  const sword = mirror => {
-    const X = x => (mirror ? 15 - x : x);
-    for (let i = 1; i <= 9; i++) { dot(X(i), i, "s"); dot(X(i + 1), i, "S"); }
-    [[8, 12], [9, 11], [11, 9], [12, 8]].forEach(([x, y]) => dot(X(x), y, "y"));
-    dot(X(10), 10, "Y");
-    dot(X(11), 11, "r"); dot(X(12), 12, "R");
-    dot(X(13), 13, "y"); dot(X(14), 14, "y"); dot(X(13), 14, "Y"); dot(X(14), 13, "Y");
-  };
-  sword(false); sword(true);
-  const copy = g.map(row => [...row]);
-  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
-    if (copy[y][x] !== ".") continue;
-    if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => copy[y + dy]?.[x + dx] && !".k".includes(copy[y + dy][x + dx]))) g[y][x] = "k";
-  }
-  return g;
+  return pixelGrid(32, dot => {
+    const sword = mirror => {
+      const at = (x, y, c) => dot(mirror ? 31 - x : x, y, c);
+      // The blade, from the tip down to the guard.
+      for (let t = 3; t <= 19; t++) {
+        at(t, t, "#ffffff"); at(t + 1, t, "#c9d3e6"); at(t, t + 1, "#8a96b0");
+        if (t > 5) { at(t + 1, t - 1, "#dfe6f2"); at(t - 1, t + 1, "#6a7488"); }
+      }
+      at(2, 2, "#ffffff");
+      // The crossguard, across the blade.
+      for (let k = -5; k <= 5; k++) { at(20 + k, 20 - k, Math.abs(k) === 5 ? "#d9a531" : "#ffd45c"); at(21 + k, 20 - k, "#d9a531"); }
+      at(15, 25, "#fff1a8"); at(25, 15, "#fff1a8");
+      // The grip, wrapped.
+      for (let i = 1; i <= 4; i++) { const c = i % 2 ? "#9a6a44" : "#6b4428"; at(21 + i, 21 + i, c); at(22 + i, 21 + i, i % 2 ? "#6b4428" : "#4a2a14"); at(21 + i, 22 + i, c); }
+      // The pommel.
+      for (let y = 26; y <= 28; y++) for (let x = 26; x <= 28; x++) at(x, y, "#ffd45c");
+      at(26, 26, "#fff1a8"); at(28, 28, "#d9a531"); at(27, 28, "#d9a531"); at(28, 27, "#d9a531");
+    };
+    sword(false); sword(true);
+  });
 }
-function versusIconSvg() {
-  const px = [];
-  swordsGrid().forEach((row, y) => row.forEach((ch, x) => { if (SWORD_COLORS[ch]) px.push(`<rect x="${x}" y="${y}" width="1" height="1" fill="${SWORD_COLORS[ch]}"/>`); }));
-  return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges">${px.join("")}</svg>`;
-}
-// The same on a 16×16 canvas: the pin on the globe.
-function versusIconCanvas() {
-  const canvas = Object.assign(document.createElement("canvas"), { width: 16, height: 16 });
-  const ctx = canvas.getContext("2d");
-  swordsGrid().forEach((row, y) => row.forEach((ch, x) => { if (SWORD_COLORS[ch]) { ctx.fillStyle = SWORD_COLORS[ch]; ctx.fillRect(x, y, 1, 1); } }));
-  return canvas;
-}
+function versusIconSvg() { return gridSvg(swordsGrid()); }
+function versusIconCanvas(scale = 1) { return gridCanvas(swordsGrid(), scale); }
 const versusDockArt = document.getElementById("versusDockArt");
 if (versusDockArt) versusDockArt.innerHTML = versusIconSvg();
 // The day being played: today, or an unplayed past day opened from the archive, in one
@@ -48150,16 +48236,21 @@ function showFinalModal() {
   }));
 }
 
-// Spoiler-free share text: the score and one square per round.
+// Spoiler-free share text (26 November 2026, written with the team): the day and its name,
+// one dry line about how far you got on that day's journey (share.<journey>, in the game's
+// language), your top % today, one square per round, and the link.
+const SHARE_URL = "https://wolfje47.github.io/expedition-play/";
 function getResultText() {
   const dayScore = getDayScore(plan, day.rounds);
   const squares = dayScore.rounds.map(round => round.isPerfect ? "🟩" : round.score > 0 ? "🟨" : "🟥").join("");
   const dayInfo = getDayInfo(activeDate, activeMode);
-  const journey = JOURNEYS[getJourney(activeDate, activeMode)];
+  const journey = getJourney(activeDate, activeMode);
+  const top = formatTopPercent(getTopPercent(getDayStats(activeDate, activeMode), dayScore.total));
   return [
-    `Expedition #${getPuzzleNumber(activeDate)} · ${MODE_INFO[activeMode].name}${dayInfo ? `: ${dayInfo.name}` : ""}`,
-    `${journey.emoji} ${dayScore.total.toLocaleString(locale())} / ${getMaxScore(activeMode).toLocaleString(locale())} ${journey.unit}`,
-    squares
+    `Expedition #${getPuzzleNumber(activeDate)}${dayInfo ? ` · ${dayInfo.name}` : ""}`,
+    `${t(`share.${journey}`, { score: num(dayScore.total) })} ${t("share.top", { top })}`,
+    squares,
+    SHARE_URL
   ].join("\n");
 }
 
@@ -48416,15 +48507,6 @@ startAmbient(menuTravel, {
       drawLantern(layer.ctx, box.right - 3, box.bottom - 18, person.played);
       menuMarks.push({ x, y: spot.y, kind: "crew", person, box });
     });
-    const base = getBase();
-    if (base) {
-      const here = globe.projectLonLat(tentLonLat());
-      // Your tent: a pin like the others, framed in the colour you picked (My account).
-      if (here.visible) {
-        const box = drawMenuPin(layer.ctx, here.x, here.y, tentPinIcon(), getTentColor(), false);
-        menuMarks.push({ x: here.x, y: here.y, kind: "base", box });
-      }
-    }
     // The places as pins with their own logo (no words): Highs & Lows' bars, Casual's
     // coffee cup, Base Camp's tent. The one in focus is bigger. A click on a pin tells you
     // what it is (pinInfo); the games are played from the hero card and the Expedition menu.
@@ -48437,8 +48519,11 @@ startAmbient(menuTravel, {
       menuMarks.push({ x: spot.x + 4, y: spot.y - 8, kind: "pole", pole });
     });
     // With a Daily day, one pin for it instead of Highs & Lows and Casual.
+    const [campLon, campLat] = crewLonLat();
+    globe.campPlace = { lat: campLat, lon: campLon }; // where opening Crew goes (diveToBaseCamp)
     const pins = [
-      { kind: "camp", lonLat: BASE_CAMP_LONLAT },
+      // Crew is your own tent (26 November 2026, team request; was Base Camp on Everest).
+      { kind: "camp", lonLat: crewLonLat() },
       { kind: "duel", lonLat: VERSUS_LONLAT },
       ...(hasDailyDay(today) ? [{ kind: "daily", lonLat: startLonLat("daily"), country: todayPlace("daily") }] : [
         { kind: "casual", lonLat: startLonLat("casual"), country: todayPlace("casual") },
@@ -48449,9 +48534,12 @@ startAmbient(menuTravel, {
     pins.sort((a, b) => (a.kind === menuFocus) - (b.kind === menuFocus)).forEach(pin => {
       const spot = globe.projectLonLat(pin.lonLat);
       if (!spot.visible) return;
-      const box = drawMenuPin(layer.ctx, spot.x, spot.y, SIGN_ICONS[pin.kind], PIN_COLORS[pin.kind], pin.kind === menuFocus || pin.kind === hero.key);
-      // Done today: a green tick on the pin's corner.
-      if (pin.kind !== "camp" && pin.kind !== "duel" && cachedModeState(pin.kind) === "done") drawPinTick(layer.ctx, box.right - 6, box.top + 2);
+      const camp = pin.kind === "camp";
+      // Done today: the pin turns green (like its card) with a tick on its corner.
+      const done = !camp && pin.kind !== "duel" && cachedModeState(pin.kind) === "done";
+      const big = pin.kind === menuFocus || pin.kind === hero.key;
+      const box = drawMenuPin(layer.ctx, spot.x, spot.y, camp ? tentPinIcon(big) : signIcon(pin.kind, big), camp ? getTentColor() : done ? "#5cf28a" : PIN_COLORS[pin.kind], pin.kind === menuFocus || pin.kind === hero.key);
+      if (done) drawPinTick(layer.ctx, box.right - 6, box.top + 2);
       menuMarks.push({ x: spot.x, y: spot.y, kind: pin.kind, country: pin.country, box });
     });
     layer.placeLabels();
@@ -48462,7 +48550,14 @@ startAmbient(menuTravel, {
 // The menu globe: places, a tour between them, and taps
 // ---------------------------------------------------------------------------
 
-const BASE_CAMP_LONLAT = [86.85, 28.0];
+// Crew's place on the globe: your tent, or without one the capital of the country of your
+// browser's language (where SKIP NOW would put it), else India.
+function crewLonLat() {
+  const tent = tentLonLat();
+  if (tent) return tent;
+  const capital = CAPITALS[defaultBaseIso("IN")];
+  return capital ? [capital.lon, capital.lat] : [78.96, 20.59];
+}
 // VERSUS has its own place too (20 November 2026, team request): the Colosseum in Rome, an
 // arena for live matches. Its pin is the purple VS logo.
 const VERSUS_LONLAT = [12.4922, 41.8902];
@@ -48500,27 +48595,41 @@ function artIcon(rows, colors) {
   return canvas;
 }
 const SIGN_ICONS = {
-  daily: calendarCanvas(),
   extremes: artIcon(PLAY_ART.extremes, PLAY_ART_COLORS),
   casual: artIcon(PLAY_ART.casual, PLAY_ART_COLORS),
-  camp: spriteCanvas("tent"),
-  duel: versusIconCanvas()
+  camp: spriteCanvas("tent")
 };
+// DAILY's and VERSUS's 32-pixel icons at whole device pixels: 32 points on a pin, 48 in
+// focus where the screen has the pixels for it.
+const signIcons = {};
+function signIcon(kind, big) {
+  if (kind !== "daily" && kind !== "duel") return SIGN_ICONS[kind];
+  const ratio = Math.min(2, window.devicePixelRatio || 1);
+  const scale = Math.max(1, Math.round((big ? 46 : 32) * ratio / 32));
+  const key = `${kind}|${scale}|${today}`;
+  return (signIcons[key] ||= kind === "daily" ? calendarCanvas(scale) : versusIconCanvas(scale));
+}
 const PIN_COLORS = { daily: "#ff4d5e", extremes: "#ff6b9d", casual: "#ffd45c", camp: "#45e3ff", duel: "#c58cff" };
 // A pin: a framed pixel badge with the logo, on a short stem down to its spot. Returns the
 // box a click counts in.
 function drawMenuPin(ctx, x, y, icon, color, big) {
-  // Whole pixels only: the 16-pixel logos at ×3 (in focus) or ×2.
+  // Whole pixels only: the 16-pixel logos at ×3 (in focus) or ×2; a camp (not square,
+  // campPinIcon) is already drawn at the screen's pixels and goes down one to one, in a
+  // pin as wide as it needs.
+  const ratio = ctx.getTransform().a || 1;
   const size = big ? 52 : 36;
-  const iconSize = big ? 48 : 32;
+  const native = Boolean(icon.native);
+  const iconW = native ? icon.width / ratio : big ? 48 : 32;
+  const iconH = native ? icon.height / ratio : iconW;
+  const width = native ? Math.max(size, Math.ceil(iconW) + 8) : size;
   x = Math.round(x);
   y = Math.round(y);
   const top = y - 10 - size;
-  const left = x - size / 2;
+  const left = x - Math.round(width / 2);
   ctx.imageSmoothingEnabled = false;
   if (big) {
     ctx.fillStyle = `${color}55`;
-    ctx.fillRect(left - 4, top - 4, size + 8, size + 8);
+    ctx.fillRect(left - 4, top - 4, width + 8, size + 8);
   }
   ctx.fillStyle = "#0b1020";
   ctx.fillRect(x - 3, y - 12, 6, 12);
@@ -48528,11 +48637,17 @@ function drawMenuPin(ctx, x, y, icon, color, big) {
   ctx.fillStyle = color;
   ctx.fillRect(x - 1, y - 12, 2, 11);
   ctx.fillRect(x - 3, y - 1, 6, 2);
-  ctx.fillRect(left - 2, top - 2, size + 4, size + 4);
+  ctx.fillRect(left - 2, top - 2, width + 4, size + 4);
   ctx.fillStyle = "#0b1020";
-  ctx.fillRect(left, top, size, size);
-  ctx.drawImage(icon, x - iconSize / 2, top + (size - iconSize) / 2, iconSize, iconSize);
-  return { left: left - 4, right: left + size + 4, top: top - 4, bottom: y + 4 };
+  ctx.fillRect(left, top, width, size);
+  if (native) {
+    // On the device pixel grid: a camp sits on the bottom of the box like on the ground, a
+    // square logo in the middle.
+    const snap = v => Math.round(v * ratio) / ratio;
+    const iconTop = icon.width === icon.height ? top + (size - iconH) / 2 : top + size - 3 - iconH;
+    ctx.drawImage(icon, snap(x - iconW / 2), snap(iconTop), iconW, iconH);
+  } else ctx.drawImage(icon, x - iconW / 2, top + (size - iconW) / 2, iconW, iconW);
+  return { left: left - 4, right: left + width + 4, top: top - 4, bottom: y + 4 };
 }
 const bigScreen = () => window.matchMedia("(min-width: 761px)").matches;
 // A game's name as players see it (Highs & Lows keeps its English name in every language).
@@ -48562,7 +48677,7 @@ function drawPinTick(ctx, x, y) {
 const featuredMode = () => (hasDailyDay(today) ? "daily" : hasExtremeDay(today) ? "extremes" : "casual");
 let menuFocus = "extremes";
 function stopOf(key) {
-  if (key === "camp") return { lat: BASE_CAMP_LONLAT[1], lon: BASE_CAMP_LONLAT[0] };
+  if (key === "camp") { const [lon, lat] = crewLonLat(); return { lat, lon }; }
   if (key === "duel") return { lat: VERSUS_LONLAT[1], lon: VERSUS_LONLAT[0] };
   // My Tent: your tent, or without one where you'd start (the capital of today's country).
   if (key === "tent") { const [lon, lat] = homeOrigin().lonLat; return { lat, lon }; }
@@ -48605,7 +48720,8 @@ function heroArtFor(key) {
   if (key === "duel") return Object.assign(document.createElement("span"), { className: "hero-art-sprite is-swords", innerHTML: versusIconSvg() });
   if (key === "daily") return Object.assign(document.createElement("span"), { className: "hero-art-sprite is-calendar", innerHTML: calendarSvg() });
   if (key !== "camp") return createPixelArt(PLAY_ART[key] || PLAY_ART.extremes, PLAY_ART_COLORS);
-  return crewArt(64, 30, 30, "hero-art-sprite is-crew");
+  // Crew: your own explorer's head (26 November 2026, team request).
+  return createHeadshot(getTentLook(), 56, "hero-art-sprite is-head");
 }
 // How a game stands on a day: none (no game that day), done, started or new.
 function dayState(key, dateKey) {
@@ -48624,6 +48740,9 @@ function renderHero() {
     item.classList.toggle("is-active", item.dataset.select === hero.key);
     item.setAttribute("aria-pressed", String(item.dataset.select === hero.key));
   });
+  // DAILY turns green once today's is played, like its card (26 November 2026, team request).
+  const dailyButton = document.getElementById("menuDailyButton");
+  if (dailyButton) dailyButton.dataset.state = hasDailyDay(today) ? dayState("daily", today) : "none";
   const info = HERO_INFO[key];
   const camp = key === "camp" || key === "tent"; // places, not games: no day, no archive
   const state = camp || key === "duel" ? "new" : dayState(key, date || today);
@@ -49164,14 +49283,12 @@ function menuHit(event, { countries = false } = {}) {
   const inBox = item => item.box && x >= item.box.left && x <= item.box.right && y >= item.box.top && y <= item.box.bottom;
   const mark = [...menuMarks].reverse().find(inBox) || menuMarks.find(item => !item.box && Math.hypot(item.x - x, item.y - y) < 26);
   if (mark) {
-    const base = getBase();
     if (mark.kind === "pole") return { kind: "pole", title: t(`menu.${mark.pole}Pole`), hint: mark.pole === "north" ? "90°N" : "90°S" };
     if (mark.kind === "crew") {
       const { person } = mark;
       if (person.played) return { kind: "crew", title: person.name, hint: t("community.playedToday", { name: person.name }), color: "#5cf28a" };
       return { kind: "crew", title: person.name, hint: community?.hasNudged(person.id) ? t("community.nudgedHint", { name: person.name }) : t("community.tapToNudge", { name: person.name }), action: () => community?.nudge(person) };
     }
-    if (mark.kind === "base") return { kind: "base", title: `${t("base.label")} · ${countryName(base)}`, hint: t("menu.tipBase"), iso: base.iso, action: () => pickBase() };
     // The pins tell you what they are; the games start from the hero card or the menu.
     return { kind: mark.kind, pin: true, box: mark.box };
   }
@@ -49846,7 +49963,7 @@ function tentWhere() {
 function renderTentTile() {
   const spot = getTent();
   document.getElementById("menuTentIcon").replaceChildren(createHeadshot(getTentLook(), 32, "menu-tent-canvas"));
-  document.querySelector("#menuCommunityButton .dock-art")?.replaceChildren(createHeadshot(getTentLook(), 40, "dock-head"));
+  document.querySelector("#menuCommunityButton .dock-art")?.replaceChildren(createHeadshot(getTentLook(), Math.round((window.matchMedia("(min-width: 761px)").matches ? 44 : 34) * Math.min(2, window.devicePixelRatio || 1)), "dock-head"));
   renderProfileChip();
   const where = spot ? (spot.city ? t("hud.capital", { city: spot.city, country: countryName(getCountry(spot.iso)) }) : countryName(getCountry(spot.iso))) : t("menu.tentNone");
   setText("menuTentWhere", where);
@@ -50266,7 +50383,12 @@ const tentLookKey = () => JSON.stringify(getTentLook());
 const tentPinIcons = {};
 // A crewmate's tent on the menu globe (their look, or a plain tent), and its lantern.
 const crewPinIcons = {};
-const crewPinIcon = look => (crewPinIcons[JSON.stringify(look || {})] ||= createTentCanvas(look || {}, 1, "tent-pin-icon"));
+// A camp on a pin (26 November 2026, team request: the 16-pixel tent was blurry): the whole
+// tent with its explorer, drawn at the screen's own pixels (createLoadout with a height), so
+// drawMenuPin puts it down one to one.
+const pinRatio = () => Math.min(2, window.devicePixelRatio || 1);
+const campPinIcon = (look, big) => Object.assign(createLoadout(look || {}, { withPet: false, height: Math.round((big ? 46 : 30) * pinRatio()), className: "tent-pin-icon" }), { native: true });
+const crewPinIcon = look => (crewPinIcons[`${pinRatio()}|${JSON.stringify(look || {})}`] ||= campPinIcon(look, false));
 function drawLantern(ctx, x, y, lit) {
   x = Math.round(x);
   y = Math.round(y);
@@ -50279,7 +50401,7 @@ function drawLantern(ctx, x, y, lit) {
   ctx.fillStyle = lit ? "#ffd45c" : "#3a3f5c";
   ctx.fillRect(x, y, 6, 8);
 }
-const tentPinIcon = () => (tentPinIcons[tentLookKey()] ||= createTentCanvas(getTentLook(), 1, "tent-pin-icon"));
+const tentPinIcon = (big = false) => (tentPinIcons[`${big}|${pinRatio()}|${tentLookKey()}`] ||= campPinIcon(getTentLook(), big));
 setTentLevelSource(() => currentTentLevel());
 renderTentTile();
 
