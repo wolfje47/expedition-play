@@ -5634,6 +5634,27 @@ h1, h2, h3 { font-weight: normal; }
   .hero-join-field::placeholder { font-size: 11px; }
 }
 
+/* ---------- The menu bar without boxes (26 November 2026, the team's pick B from
+   mockups/menu-dock) ----------
+   The icons straight on the bar and a bit bigger, CREW your own headshot in a round frame
+   (engine.js renderTentTile), the selected tab a soft tint with a bar underneath, and BETA
+   up against VERSUS's icon instead of in the corner. */
+.menu-dock .dock-item { gap: 5px; align-content: center; min-height: 76px; padding: 10px 2px; }
+.menu-dock .dock-art { width: 36px; height: 36px; border-radius: 0; background: none; box-shadow: none; }
+.menu-dock .dock-art svg { width: 32px; height: 32px; }
+.menu-dock .dock-art.is-head { overflow: hidden; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--tile) 25%, #04121a), #04121a 80%); box-shadow: 0 0 0 2px color-mix(in srgb, var(--tile) 60%, transparent); }
+.menu-dock .dock-art.is-head canvas { width: 36px; height: 36px; image-rendering: pixelated; }
+.menu-dock .dock-item::after { content: ""; position: absolute; left: 28%; right: 28%; bottom: 3px; height: 3px; border-radius: 2px; background: transparent; transition: background 0.15s ease; }
+.menu-dock .dock-item.is-active { background: color-mix(in srgb, var(--tile) 10%, transparent); box-shadow: none; }
+.menu-dock .dock-item.is-active::after { background: var(--tile); }
+.menu-dock .dock-soon { top: 6px; right: auto; left: calc(50% + 14px); }
+@media (max-width: 760px) {
+  .menu-dock .dock-item { min-height: 68px; padding: 8px 1px; }
+  .menu-dock .dock-art { width: 32px; height: 32px; }
+  .menu-dock .dock-art svg { width: 28px; height: 28px; }
+  .menu-dock .dock-art.is-head canvas { width: 32px; height: 32px; }
+}
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -5746,9 +5767,7 @@ h1, h2, h3 { font-weight: normal; }
             <small class="dock-soon" data-i18n="menu.beta">BETA</small>
           </button>
           <button class="dock-item" id="menuCommunityButton" data-select="camp" type="button" style="--tile: var(--cyan)">
-            <span class="dock-art" aria-hidden="true">
-              <svg viewBox="0 0 32 32" shape-rendering="crispEdges"><path d="M8 5h6v6H8zm10 0h6v6h-6zM5 13h12v3H5zm12 0h10v3H17zM5 16h3v11H5zm9 0h3v11h-3zm10 0h3v11h-3zM8 22h6v3H8zm9 0h7v3h-7z" fill="currentColor"/></svg>
-            </span>
+            <span class="dock-art is-head" aria-hidden="true"></span>
             <span class="dock-label" data-i18n="menu.community">CREW</span>
             <small class="dock-sub" data-i18n="menu.crewSub">your friends</small>
             <small class="menu-option-note" hidden></small>
@@ -48990,8 +49009,8 @@ function crewArt(width, height, size, className) {
   [[heads[0], 0], [heads[2], 2 * step], [heads[1], step]].forEach(([head, x]) => ctx.drawImage(head, x, height - size));
   return canvas;
 }
-// The CREW button in the menu's bar shows the crew too (it was a drawn icon of two people).
-document.querySelector("#menuCommunityButton .dock-art")?.replaceChildren(crewArt(40, 24, 24, "dock-crew"));
+// The CREW button in the menu's bar: your own headshot in a round frame (26 November 2026,
+// the team's pick B from mockups/menu-dock), drawn with the profile in renderTentTile.
 function versusModeTile(button, n) {
   const pips = Object.assign(document.createElement("span"), { className: "mode-pips" });
   for (let i = 0; i < n; i++) pips.append(playerHead(VERSUS_PIPS[i], i));
@@ -49827,6 +49846,7 @@ function tentWhere() {
 function renderTentTile() {
   const spot = getTent();
   document.getElementById("menuTentIcon").replaceChildren(createHeadshot(getTentLook(), 32, "menu-tent-canvas"));
+  document.querySelector("#menuCommunityButton .dock-art")?.replaceChildren(createHeadshot(getTentLook(), 40, "dock-head"));
   renderProfileChip();
   const where = spot ? (spot.city ? t("hud.capital", { city: spot.city, country: countryName(getCountry(spot.iso)) }) : countryName(getCountry(spot.iso))) : t("menu.tentNone");
   setText("menuTentWhere", where);
