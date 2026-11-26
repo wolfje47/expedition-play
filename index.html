@@ -5668,6 +5668,28 @@ h1, h2, h3 { font-weight: normal; }
   .menu-dock .dock-art { width: 34px; height: 34px; }
 }
 
+/* Edit your camp (26 November 2026, team request): on a computer the categories and cards on
+   the left and your camp on the right; Atlas's welcome over the camp (camp-creator.js). */
+@media (min-width: 861px) {
+  .camp-box { grid-template-columns: 470px minmax(0, 1fr); }
+  .camp-box > .camp-panel { grid-column: 1; grid-row: 2; }
+  .camp-box > .camp-stage { grid-column: 2; grid-row: 2; }
+}
+.camp-welcome { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 3; display: flex; align-items: flex-end; gap: 10px; }
+.camp-welcome[hidden] { display: none !important; }
+.camp-welcome-atlas { flex: none; width: 96px; height: 96px; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5)); }
+.camp-welcome-bubble { position: relative; flex: 1; display: grid; gap: 8px; max-width: 520px; margin-bottom: 30px; padding: 12px 14px; border: 2px solid #f4f1e8; border-radius: 6px; background: rgba(5, 7, 13, 0.94); cursor: pointer; }
+.camp-welcome-bubble::before { content: ""; position: absolute; left: -10px; bottom: 14px; border: 6px solid transparent; border-right: 6px solid #f4f1e8; }
+.camp-welcome-name { color: var(--gold); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.camp-welcome-bubble p { margin: 0; color: var(--text); font: 14px/1.45 var(--font-body, "Space Grotesk", sans-serif); min-height: 4.35em; }
+.camp-welcome-go { justify-self: end; padding: 8px 12px; border-radius: 8px; background: var(--gold); color: #04121a; font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+@media (max-width: 860px) {
+  .camp-welcome { left: 6px; right: 6px; bottom: 6px; gap: 4px; }
+  .camp-welcome-atlas { width: 64px; height: 64px; }
+  .camp-welcome-bubble { margin-bottom: 16px; padding: 8px 10px; gap: 6px; }
+  .camp-welcome-bubble p { font-size: 12px; min-height: 0; }
+}
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -6901,9 +6923,11 @@ const EN = {
   "versus.party": "PARTY",
   "versus.players": "{n} PLAYERS",
   // Create your camp (camp-creator.js)
-  "creator.open": "✎ CREATE YOUR CAMP",
+  "creator.open": "✎ EDIT YOUR CAMP",
+  "creator.welcome": "I got you a basic outfit and a tent, so you can at least survive out here. Change your explorer and your camp however you like. Keep playing and you'll unlock cool new gear and companions.",
+  "creator.welcomeGo": "GOT IT",
   "creator.kicker": "MY TENT",
-  "creator.title": "CREATE YOUR CAMP",
+  "creator.title": "EDIT YOUR CAMP",
   "creator.dice": "🎲 SURPRISE ME",
   "creator.save": "✓ SAVE MY CAMP",
   "creator.cancel": "CANCEL",
@@ -7596,6 +7620,7 @@ const EN = {
   "share.sled": "🛷 I made it {score} km towards the Pole.",
   "share.beat": "Can you beat me? 👉 {url}",
   "share.top": "{top} today.",
+  "hero.enterTent": "GO TO CAMP",
   "common.topPercent": "Top {n}%",
 
   // Problems and notes
@@ -8645,9 +8670,11 @@ const NL = {
   "versus.party": "PARTY",
   "versus.players": "{n} SPELERS",
   // Maak je kamp (camp-creator.js)
-  "creator.open": "✎ MAAK JE KAMP",
+  "creator.open": "✎ PAS JE KAMP AAN",
+  "creator.welcome": "Ik heb je een basisuitrusting en een tent gegeven, zodat je het hier in elk geval overleeft. Pas je ontdekker en je kamp aan zoals je wilt. Blijf spelen en je speelt coole nieuwe spullen en maatjes vrij.",
+  "creator.welcomeGo": "BEGREPEN",
   "creator.kicker": "MIJN TENT",
-  "creator.title": "MAAK JE KAMP",
+  "creator.title": "PAS JE KAMP AAN",
   "creator.dice": "🎲 VERRAS ME",
   "creator.save": "✓ BEWAAR MIJN KAMP",
   "creator.cancel": "ANNULEER",
@@ -9363,6 +9390,7 @@ const NL = {
   "share.sled": "🛷 Ik kwam {score} km richting de Pool.",
   "share.beat": "Kun jij beter? 👉 {url}",
   "share.top": "{top} vandaag.",
+  "hero.enterTent": "NAAR JE KAMP",
   "common.topPercent": "Top {n}%",
 
   // Problemen en meldingen
@@ -42579,6 +42607,7 @@ const { CATEGORIES, CAT, RARITY, itemKey, progressOf, refreshUnlocks, ruleParams
 const { LOOK_PARTS } = __modules["look-parts.js"];
 const { getTentLook, setTentColor, setTentLook } = __modules["base.js"];
 const { num, t } = __modules["i18n.js"];
+const { createAtlasSprite } = __modules["atlas.js"];
 
 const el = (tag, className, text) => Object.assign(document.createElement(tag), { className: className || "", textContent: text ?? "" });
 const clone = value => structuredClone(value);
@@ -42639,7 +42668,8 @@ function createFlagEditor(getLook, { onStart = () => {}, onDone = () => {}, onPr
   return [wrap, presetRow, el("p", "camp-note", t("camp.flag.note"))];
 }
 
-function createCampCreator({ getStats = () => null, openLocker = null } = {}) {
+const WELCOME_KEY = "daily-geography:camp-welcome:v1";
+function createCampCreator({ getStats = () => null, openLocker = null, isGuest = () => false } = {}) {
   let look = null, owned = new Set(), stats = null, cat = "hat", hover = null, history = [];
   let pose = "idle", poseUntil = 0, frame = 0, boxes = [], onClose = null, lockedNote = null;
   const overlay = el("div", "camp-creator hidden");
@@ -42817,7 +42847,8 @@ function createCampCreator({ getStats = () => null, openLocker = null } = {}) {
   // The locker may change your title: take it over when it closes.
   lockerButton.addEventListener("click", () => { sounds.playClick(); openLocker?.({ then: () => { look.title = getTentLook().title; stats = getStats(); renderPanel(); } }); });
   lockerButton.hidden = !openLocker;
-  head.append(el("span", "camp-kicker", t("creator.kicker")), el("h2", "", t("creator.title")), lockerButton, close_);
+  // Just the title (26 November 2026, team request: no MY TENT above it).
+  head.append(el("h2", "", t("creator.title")), lockerButton, close_);
   const stage = Object.assign(document.createElement("canvas"), { className: "camp-stage-canvas", width: W, height: H });
   const hint = el("div", "camp-hint", t("camp.hint"));
   lockedNote = el("div", "camp-locked");
@@ -42825,7 +42856,38 @@ function createCampCreator({ getStats = () => null, openLocker = null } = {}) {
   const okButton = el("button", "", "OK"); okButton.type = "button"; okButton.addEventListener("click", hideLocked);
   lockedNote.append(el("i", "camp-locked-tag", t("camp.locked")), el("b"), el("span"), okButton);
   const frameBox = el("div", "camp-stage-frame");
-  frameBox.append(stage, hint, lockedNote);
+  // Atlas's welcome (26 November 2026, team request): for a guest, and the first time in this
+  // browser, he says he got you a basic outfit and tent, and that playing unlocks more.
+  const welcome = el("div", "camp-welcome");
+  welcome.hidden = true;
+  const welcomeText = el("p");
+  const welcomeGo = el("button", "camp-welcome-go", t("creator.welcomeGo"));
+  welcomeGo.type = "button";
+  const welcomeBubble = el("div", "camp-welcome-bubble");
+  welcomeBubble.append(el("span", "camp-welcome-name", "ATLAS"), welcomeText, welcomeGo);
+  let welcomeSprite = null, welcomeTyper = 0;
+  const hideWelcome = () => { clearInterval(welcomeTyper); welcome.hidden = true; welcomeSprite?.remove(); welcomeSprite = null; };
+  welcomeGo.addEventListener("click", () => { sounds.playClick(); hideWelcome(); });
+  welcomeBubble.addEventListener("click", event => { if (event.target !== welcomeGo) { clearInterval(welcomeTyper); welcomeText.textContent = t("creator.welcome"); } });
+  welcome.append(welcomeBubble);
+  function showWelcome() {
+    try { localStorage.setItem(WELCOME_KEY, "1"); } catch { /* storage off */ }
+    welcomeSprite = createAtlasSprite(96, "wave");
+    welcomeSprite.classList.add("camp-welcome-atlas");
+    welcome.prepend(welcomeSprite);
+    welcome.hidden = false;
+    const line = t("creator.welcome");
+    let i = 0;
+    welcomeText.textContent = "";
+    clearInterval(welcomeTyper);
+    welcomeTyper = setInterval(() => {
+      i += 1;
+      welcomeText.textContent = line.slice(0, i);
+      if (i % 4 === 1 && /\S/.test(line[i - 1])) sounds.playMurmur?.();
+      if (i >= line.length) { clearInterval(welcomeTyper); welcomeSprite?.setPose("idle"); }
+    }, 22);
+  }
+  frameBox.append(stage, hint, lockedNote, welcome);
   const ownedCount = el("b");
   const plate = el("div", "camp-plate");
   const plateStat = el("div", "camp-plate-stat"); plateStat.append(ownedCount, el("span", "", t("camp.items")));
@@ -42886,8 +42948,12 @@ function createCampCreator({ getStats = () => null, openLocker = null } = {}) {
     hideLocked();
     renderPanel();
     if (!raf) raf = requestAnimationFrame(loop);
+    hideWelcome();
+    const seen = (() => { try { return localStorage.getItem(WELCOME_KEY) === "1"; } catch { return true; } })();
+    if (isGuest() || !seen) showWelcome();
   }
   function close() {
+    hideWelcome();
     overlay.classList.add("hidden");
     onClose?.();
   }
@@ -48811,7 +48877,9 @@ function renderHero() {
   go.hidden = state === "none" && !date && !daily;
   // ARCHIVE next to it (not for Base Camp); on a past day, the way home.
   const side = document.getElementById("heroSide");
-  side.hidden = camp;
+  // On CREW: GO TO CAMP, straight into Edit your camp (26 November 2026, team request).
+  const crewCard = key === "camp";
+  side.hidden = camp && !crewCard;
   side.disabled = false;
   // On VERSUS three buttons: DUEL 1V1 (heroGo), PARTY · 3 (heroSide) and PARTY · 4 (heroSide2).
   const versus = key === "duel";
@@ -48820,7 +48888,7 @@ function renderHero() {
   card.querySelector(".hero-actions").classList.toggle("is-three", versus);
   // DAILY's archive says how many earlier days of the main game are still open.
   const unplayed = daily ? getAllPuzzleDays().filter(day => day < today && (record => !record.completed && !record.noGame)(getDayRecord(day, key))).length : 0;
-  side.textContent = versus ? t("menu.party3") : date ? `⌂ ${t(getTent() ? "hero.myTent" : "hero.home")}` : `▤ ${t("menu.archive")}`;
+  side.textContent = crewCard ? t("hero.enterTent") : versus ? t("menu.party3") : date ? `⌂ ${t(getTent() ? "hero.myTent" : "hero.home")}` : `▤ ${t("menu.archive")}`;
   // VERSUS: three mode tiles, each with a block per player in the match's colours.
   if (versus) [[go, 2], [side, 3], [document.getElementById("heroSide2"), 4]].forEach(([button, n]) => versusModeTile(button, n));
   side.title = unplayed ? t("menu.archiveOpen", { n: unplayed }) : "";
@@ -49188,6 +49256,7 @@ document.getElementById("heroGo").addEventListener("click", () => {
 document.getElementById("heroSide").addEventListener("click", () => {
   sounds.playClick();
   if (hero.key === "duel") { if (duel.inLobby()) leaveLobby(); else createVersus(3); return; }
+  if (hero.key === "camp") { document.dispatchEvent(new Event("open-tent-creator")); return; }
   archive.openArchive(null, hero.key === "daily" ? dailyGame() : hero.key);
 });
 document.getElementById("heroSide2").addEventListener("click", () => {
@@ -50300,7 +50369,7 @@ initLiveInvites({
 // The camp creator reads your stats (your days, your Versus record) to know what you've earned.
 const campStats = () => collectStats(mode => archive.loadDays(mode), { today, versusRows: versusHistory?.rows || [], userId: getUser()?.id || null });
 const locker = createLocker({ getStats: campStats });
-const tentCreator = createCampCreator({ getStats: campStats, openLocker: options => locker.open(options) });
+const tentCreator = createCampCreator({ getStats: campStats, openLocker: options => locker.open(options), isGuest: () => !getUser() });
 // Your Versus matches count for the camp's unlocks: loaded first when signed in.
 document.addEventListener("open-tent-creator", () => (getUser() ? loadVersusHistory().catch(() => {}) : Promise.resolve()).then(() => tentCreator.open()));
 // The lobby lives on the VERSUS card: every change redraws it (and the pill, the dot).
