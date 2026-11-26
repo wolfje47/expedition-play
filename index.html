@@ -3886,10 +3886,10 @@ h1, h2, h3 { font-weight: normal; }
   .score-burst-card.is-extreme #scoreBurstNext { margin-top: auto; }
   .score-burst-card.is-extreme .burst-info { display: flex; flex-direction: column; flex: 0 1 auto; min-height: 0; overflow-y: auto; cursor: default; }
   .score-burst-card.is-extreme .burst-info .info-text { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
-  .score-burst-card.is-extreme .burst-info .info-text > * { flex-shrink: 0; }
+  .score-burst-card.is-extreme .burst-info :is(.info-text, .info-body) > * { flex-shrink: 0; }
   .score-burst-card.is-extreme .burst-info h3,
   .score-burst-card.is-extreme .burst-info .info-facts { display: none; }
-  .score-burst-card.is-extreme .burst-info .info-text > .ladder-pinned { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+  .score-burst-card.is-extreme .burst-info .info-body > .ladder-pinned { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
   .score-burst-card.is-extreme .ladder-pinned > .ladder { flex-shrink: 0; }
   .score-burst-card.is-extreme .ladder-pinned > .ladder.is-full { flex: 1 1 auto; min-height: 112px; max-height: 300px; }
 }
@@ -5378,6 +5378,261 @@ h1, h2, h3 { font-weight: normal; }
 #versusDockArt svg { width: 32px; height: 32px; }
 .hero-art-sprite.is-swords { display: grid; place-items: center; }
 .hero-art-sprite.is-swords svg { width: 48px; height: 48px; }
+.hero-art-sprite.is-calendar { display: grid; place-items: center; }
+.hero-art-sprite.is-calendar svg { width: 48px; height: 48px; }
+
+/* Drop a Pin's reveal (playPinReveal): a small card over the globe, under both pins, with the
+   distance counting up; the globe stays free to zoom in. In the middle of the globe's space
+   (right of the left column) on a computer, across the bottom on a phone. */
+.pin-reveal {
+  position: fixed;
+  left: calc(50% + 170px);
+  bottom: 32px;
+  z-index: 260;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.pin-reveal-card {
+  pointer-events: auto;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  min-width: 300px;
+  padding: 16px 24px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 16px;
+  background: rgba(6, 10, 24, 0.92);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  text-align: center;
+  cursor: pointer;
+  animation: pin-reveal-in 260ms ease-out;
+}
+.pin-reveal-kicker { font-family: "Press Start 2P", monospace; font-size: 9px; letter-spacing: var(--ls-pixel); color: var(--muted); }
+.pin-reveal-place { font-family: "Space Grotesk", sans-serif; font-size: 16px; color: #fff; }
+.pin-reveal-away { font-family: "Space Mono", monospace; font-size: 28px; color: #ffd45c; }
+.pin-reveal.is-spot-on .pin-reveal-away { color: #5cd26a; }
+.pin-reveal-go { visibility: hidden; }
+.pin-reveal.is-landed .pin-reveal-go { visibility: visible; }
+@keyframes pin-reveal-in { from { opacity: 0; transform: translateY(12px); } }
+@media (max-width: 760px) {
+  .pin-reveal {
+    left: 16px;
+    right: 16px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    transform: none;
+  }
+  .pin-reveal-card { min-width: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .pin-reveal-card { animation: none; } }
+.pin-reveal-where { max-width: 360px; white-space: pre-line; font-family: "Space Grotesk", sans-serif; font-size: 14px; line-height: 1.35; color: var(--muted); }
+.pin-reveal-where:empty, .pin-result-where:empty { display: none; }
+.pin-result-where { margin: 2px 0 6px; white-space: pre-line; font: 400 14px/1.4 var(--font-body); color: var(--muted); }
+
+/* A finished round takes the colour of its points (scoreColor in journeys.js): red for
+   nothing to green for a full 1,000, on its tint, its underline and its number. */
+#gameView .round-row.is-scored { background: color-mix(in srgb, var(--round-color) 16%, transparent); }
+#gameView .round-row.is-scored .round-row-status { color: var(--round-color); }
+#gameView .round-row.is-scored { box-shadow: inset 0 -3px 0 var(--round-color); }
+#gameView .round-row.is-scored.is-viewing { box-shadow: inset 0 -3px 0 var(--round-color), inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); }
+
+/* The info card's text box (renderInfoCard): no box of its own, except on a computer's
+   score card (below). */
+.info-body { display: contents; }
+
+/* ---------- The score card on a computer: B1 (26 November 2026, the team's pick from
+   mockups/score-desktop) ----------
+   The round, how it went and the five rounds (coloured by their points) centred on top;
+   under it two halves of the same width that mirror each other row by row (subgrid): the
+   place on the left (the answer, its text, the picture or Drop a Pin's map, the facts) and
+   your journey on the right (the points, the day so far, the journey, three tiles); NEXT
+   under both. On a phone none of this shows (the two pages there are unchanged). */
+.burst-head, .burst-j-label, .burst-j-tiles, .burst-map, .burst-tabs { display: none; }
+.burst-j-top, .burst-j-sub { display: contents; }
+@media (min-width: 761px) {
+  #scoreBurst .score-burst-card.is-paged {
+    --burst-grade: var(--gold);
+    /* A fixed height (26 November 2026, team request: the gap above the card changed with
+       the answer): the header, the pictures, the tiles and NEXT sit in the same place after
+       every round; only the text row between title and picture takes up the difference. */
+    grid-template-rows: auto auto auto; align-content: center; gap: 20px;
+    width: 100%; max-width: 1640px; height: 100%; margin: 0 auto; padding: 28px 48px;
+  }
+  #scoreBurst .is-paged .burst-head { display: grid; justify-items: center; gap: 10px; }
+  #scoreBurst .is-paged .burst-head-row { display: flex; align-items: center; gap: 14px; }
+  #scoreBurst .is-paged .burst-head-round { font: 12px var(--font-display); letter-spacing: var(--ls-pixel); color: var(--text); }
+  #scoreBurst .is-paged .burst-head-pill { padding: 5px 8px; border-radius: 6px; font: 9px var(--font-display); letter-spacing: var(--ls-pixel); color: var(--burst-grade); background: color-mix(in srgb, var(--burst-grade) 12%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--burst-grade) 50%, transparent); }
+  #scoreBurst .is-paged .burst-chips { display: flex; gap: 6px; }
+  #scoreBurst .is-paged .burst-chip { width: 50px; padding: 6px 0 5px; border-radius: 8px; text-align: center; font: 700 12px var(--font-mono); background: rgba(255, 255, 255, 0.04); color: var(--faint); }
+  #scoreBurst .is-paged .burst-chip b { display: block; margin-bottom: 3px; font: 8px var(--font-display); color: var(--muted); }
+  #scoreBurst .is-paged .burst-chip.is-done { background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); box-shadow: inset 0 -3px 0 var(--c); }
+  #scoreBurst .is-paged .burst-chip.is-this { outline: 1px solid color-mix(in srgb, var(--c, var(--accent)) 70%, transparent); outline-offset: 1px; }
+
+  /* The two halves: four shared rows. */
+  #scoreBurst .is-paged .burst-pages { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: calc(76px + 21px) 72px var(--visual-h) calc(52px + 21px); /* the halves' padding and border sit inside the first and last row (subgrid) */ gap: 14px 24px; min-height: 0; overflow: visible; }
+  #scoreBurst .is-paged .burst-page > *,
+  #scoreBurst .is-paged .burst-page :is(#scoreBurstInfo, .info-text) > * { grid-column: 1; }
+  #scoreBurst .is-paged .burst-page { display: grid; grid-row: 1 / span 4; grid-template-rows: subgrid; grid-template-columns: minmax(0, 1fr); justify-items: stretch; text-align: left; gap: 14px; min-height: 0; padding: 20px; border: 1px solid var(--glass-line); border-radius: 18px; background: #0b1124; overflow: hidden; }
+  #scoreBurst .is-paged .burst-page-answer { grid-column: 1; }
+  #scoreBurst .is-paged .burst-page-journey { grid-column: 2; justify-content: stretch; }
+
+  /* The place. */
+  #scoreBurst .is-paged #scoreBurstAnswer { grid-row: 1; align-self: start; max-height: 36dvh; overflow-y: auto; padding: 0; border: 0; }
+  #scoreBurst .is-paged #scoreBurstInfo:not(.hidden),
+  #scoreBurst .is-paged #scoreBurstInfo .info-text { display: contents; }
+  #scoreBurst .is-paged .burst-page-answer .info-body { display: block; grid-row: 2; min-height: 0; overflow-y: auto; color: var(--muted); }
+  #scoreBurst .is-paged .burst-page-answer .info-body h3 { font-size: 14px; }
+  #scoreBurst .is-paged .burst-page-answer .info-picture { grid-row: 3; position: relative; width: 100%; max-height: 34dvh; aspect-ratio: 480 / 218; margin: 0; border-radius: 14px; overflow: hidden; justify-self: center; }
+  #scoreBurst .is-paged .burst-page-answer .info-picture img { width: 100%; height: 100%; max-height: none; object-fit: cover; }
+  #scoreBurst .is-paged .burst-page-answer .info-picture.is-flag img { object-fit: contain; background: #070b17; }
+  #scoreBurst .is-paged .burst-page-answer .info-facts { grid-row: 4; margin: 0; }
+  /* No picture (Highs & Lows' ladder): the text takes its row too. */
+  #scoreBurst .is-paged .burst-page-answer:not(:has(.info-picture)):not(:has(.burst-map:not([hidden]))) .info-body { grid-row: 2 / 4; }
+
+  /* Drop a Pin: the map in the picture's place, the photo behind a tab. */
+  #scoreBurst .is-paged .burst-map:not([hidden]) { display: block; grid-row: 3; position: relative; width: 100%; max-height: 34dvh; aspect-ratio: 480 / 218; justify-self: center; border-radius: 14px; overflow: hidden; border: 1px solid var(--glass-line); background: #0a1a3a; }
+  #scoreBurst .is-paged .burst-map canvas { display: block; width: 100%; height: 100%; }
+  #scoreBurst .is-paged .burst-map-away { position: absolute; left: 12px; bottom: 10px; padding: 5px 9px; border-radius: 8px; background: rgba(4, 6, 13, 0.8); font: 700 15px var(--font-mono); color: var(--gold); }
+  #scoreBurst .is-paged .burst-tabs:not([hidden]) { display: flex; grid-row: 3; grid-column: 1; z-index: 2; align-self: start; justify-self: end; margin: 10px; border: 1px solid var(--glass-line); border-radius: 8px; overflow: hidden; background: rgba(4, 6, 13, 0.8); }
+  #scoreBurst .is-paged .burst-tabs button { padding: 7px 9px; border: 0; background: none; color: var(--muted); font: 8px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
+  #scoreBurst .is-paged .burst-tabs button[aria-pressed="true"] { background: var(--gold); color: #1a1405; }
+  #scoreBurst .is-paged.has-map:not(.is-photo-tab) .burst-page-answer .info-picture,
+  #scoreBurst .is-paged.has-map.is-photo-tab .burst-map { visibility: hidden; }
+  #scoreBurst .is-paged.has-map .burst-page-answer .info-picture { grid-column: 1; }
+  /* The map's place says the name already: no second title over its text. */
+  #scoreBurst .is-paged.has-map .burst-page-answer .info-body h3 { display: none; }
+
+  /* Your journey. */
+  #scoreBurst .is-paged #scoreBurstRound,
+  #scoreBurst .is-paged #scoreBurstLabel,
+  #scoreBurst .is-paged .burst-swipe { display: none; }
+  #scoreBurst .is-paged .burst-j-top { display: grid; grid-row: 1; align-content: start; gap: 4px; }
+  #scoreBurst .is-paged .burst-j-label { display: block; font: 9px var(--font-display); letter-spacing: var(--ls-pixel); color: var(--muted); }
+  #scoreBurst .is-paged .burst-j-top .score-burst-points { font-size: 44px; color: var(--burst-grade); }
+  #scoreBurst .is-paged .burst-j-sub { display: grid; grid-row: 2; align-content: start; gap: 6px; min-height: 0; overflow-y: auto; }
+  #scoreBurst .is-paged .burst-j-sub .score-burst-total { text-align: left; color: var(--muted); }
+  #scoreBurst .is-paged .score-burst-climb { grid-row: 3; width: 100%; max-height: 34dvh; aspect-ratio: 480 / 218; margin: 0; justify-self: center; border-radius: 14px; }
+  #scoreBurst .is-paged .burst-j-tiles { display: grid; grid-row: 4; margin: 0; }
+  #scoreBurst .is-paged .burst-dots { display: none; }
+  #scoreBurst .score-burst-card.is-paged #scoreBurstNext { grid-column: auto; width: 100%; }
+  /* Everything in the halves starts on the left (the phone's pages centre some of it). */
+  #scoreBurst .is-paged :is(.burst-j-top, .burst-j-sub) { justify-self: stretch; justify-items: start; }
+  #scoreBurst .is-paged :is(.burst-j-top, .burst-j-sub) { grid-template-columns: minmax(0, 1fr); }
+  #scoreBurst .is-paged :is(.burst-j-top, .burst-j-sub) > * { grid-column: 1; grid-row: auto; justify-self: start; align-self: start; margin: 0; }
+  /* The two pictures (picture or map, journey) are exactly the same size: the journey's
+     shape, as wide as the half allows, at most 34% of the screen's height. */
+  /* (Not a container query: layout containment would stop the halves from sharing rows.)
+     A half is (card width − 2 × 48 px padding − 24 px gap) / 2, less its own 2 × 21 px. */
+  #scoreBurst .is-paged :is(.burst-pages, .burst-page) { --visual-h: min(32dvh, calc(((min(100vw, 1640px) - 120px) / 2 - 42px) * 218 / 480)); }
+  #scoreBurst .is-paged :is(.burst-page-answer .info-picture, .burst-map:not([hidden]), .score-burst-climb) { height: var(--visual-h); width: auto; max-width: 100%; max-height: none; aspect-ratio: 480 / 218; flex: none; }
+  /* What scrolls gets what the screen has left after the header, NEXT, the pictures and
+     the tiles (about 450 px), and scrolls inside that. */
+  /* Fixed rows, the same after every round (26 November 2026, team request: no hole, no
+     scrolling): the title row is 76 px, the text row 72 px; text that's longer is cut off
+     after three lines. Only Highs & Lows' full ranking scrolls (it's a list by design). */
+  #scoreBurst .is-paged :is(#scoreBurstAnswer, .burst-page-answer .info-body, .burst-j-top, .burst-j-sub) { min-height: 0; max-height: none; align-self: stretch; overflow: hidden; }
+  #scoreBurst .is-paged .burst-page-answer .info-body > p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; margin: 0; font-size: 13px; line-height: 1.45; }
+  #scoreBurst .is-paged.is-extreme .burst-page-answer .info-body { overflow-y: auto; }
+  #scoreBurst .is-paged .burst-j-sub:has(.crew-card:not([hidden])) { overflow-y: auto; }
+  /* Iceberg: the answers by points take the top two rows (they're the result). */
+  /* Iceberg and Paint the Map: the answers are the result, so they take both rows (and the
+     info card's text, which they replace, is left out here); packed to fit. */
+  #scoreBurst .is-paged:is(.is-deepcut, .is-paint) #scoreBurstAnswer { grid-row: 1 / 3; align-content: start; gap: 6px; }
+  #scoreBurst .is-paged:is(.is-deepcut, .is-paint) .burst-page-answer .info-body { display: none; }
+  #scoreBurst .is-paged .burst-answer-list { gap: 4px; margin: 0; }
+  #scoreBurst .is-paged.is-deepcut .burst-answer-list { gap: 2px; }
+  #scoreBurst .is-paged.is-deepcut .burst-answer-list li.burst-tier { display: grid; grid-template-columns: 58px minmax(0, 1fr); align-items: center; gap: 8px; min-height: 0; height: 23px; padding: 0 6px; }
+  #scoreBurst .is-paged.is-deepcut .burst-tier-label { font-size: 0; line-height: 1; }
+  #scoreBurst .is-paged.is-deepcut .burst-tier-label strong { font-size: 13px; }
+  #scoreBurst .is-paged.is-deepcut .burst-tier-answers { display: flex; flex-wrap: nowrap; gap: 4px; overflow: hidden; }
+  #scoreBurst .is-paged.is-deepcut .burst-tier-answers > span { padding: 1px 7px; font-size: 12px; line-height: 1.4; white-space: nowrap; }
+  /* Paint the Map (up to 10 countries, with labels like "Japan · Mount Fuji"): the question
+     on at most two lines, the countries in a tight grid, a name too long for its cell cut. */
+  #scoreBurst .is-paged.is-paint .burst-answer-note { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font-size: 13px; line-height: 1.35; }
+  #scoreBurst .is-paged.is-paint #scoreBurstAnswerNote { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; height: auto; min-height: calc(2 * 1.35em); }
+  #scoreBurst .is-paged.is-paint #scoreBurstAnswer { grid-template-rows: none; grid-auto-rows: max-content; }
+  #scoreBurst .is-paged.is-paint .burst-answer-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px 6px; width: 100%; }
+  #scoreBurst .is-paged.is-paint .burst-answer-list:has(li:nth-child(9)) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #scoreBurst .is-paged.is-paint .burst-answer-list li { display: flex; align-items: center; gap: 6px; min-width: 0; height: 21px; padding: 0 8px; font-size: 11px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #scoreBurst .is-paged.is-paint .burst-answer-list li img { flex: none; width: 18px; height: 12px; }
+  #scoreBurst .is-paged.is-paint .burst-answer-list li span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  #scoreBurst .is-paged .burst-answer-flag:empty { display: none; }
+  /* The tiles: one line each, so their row never grows. */
+  #scoreBurst .is-paged :is(.burst-page-answer .info-facts, .burst-j-tiles) { align-self: stretch; }
+  #scoreBurst .is-paged :is(.burst-page-answer .info-facts, .burst-j-tiles) :is(dt, dd) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #scoreBurst .is-paged .burst-page-answer .info-body h3.is-repeat { display: none; }
+  #scoreBurst .is-paged .burst-answer-main { gap: 12px; }
+  /* Drop a Pin: the text under the map's place already says where it is. */
+  #scoreBurst .is-paged.has-map .burst-answer-note { display: none; }
+}
+
+/* ---------- The menu card: one size on every tab (26 November 2026, team request) ----------
+   DAILY, VERSUS and CREW used to be as tall as their content (180 / 330 / 175 px on a
+   computer), so the card jumped when you switched. Now the card has one fixed height per
+   screen size (--hero-h); its rows (the header, the middle, the buttons) spread over it, so
+   the buttons are always at the bottom. The middle: DAILY today's rounds, VERSUS the mode
+   tiles, CREW your crew's week. A Versus lobby and a past day keep their own height. */
+.main-menu .menu-hero { --hero-h: 244px; }
+/* (Not overflow: hidden: the ribbon sits above the card's top edge on purpose.) */
+.main-menu .menu-hero .hero-card:not(.is-lobby):not(.is-archive) { height: var(--hero-h); align-content: space-between; }
+@media (max-width: 760px) { .main-menu .menu-hero { --hero-h: 244px; } }
+
+.hero-body { grid-column: 1 / -1; min-width: 0; }
+.hero-body[hidden], .hero-body > [hidden] { display: none; }
+/* DAILY: today's five rounds; a finished one shows its points in their colour. */
+.hero-rounds { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin: 0; padding: 0; list-style: none; }
+.hero-rounds li { display: grid; justify-items: center; align-content: center; gap: 3px; min-width: 0; min-height: 46px; padding: 5px 4px; border: 1px solid transparent; border-radius: 8px; background: rgba(255, 255, 255, 0.05); }
+.hero-rounds b { color: var(--faint); font: 700 12px var(--font-mono); }
+.hero-rounds span { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; max-width: 100%; color: var(--muted); font: 11px/1.2 var(--font-body); text-align: center; }
+.hero-rounds li.is-done { background: color-mix(in srgb, var(--c) 14%, transparent); box-shadow: inset 0 -3px 0 var(--c); }
+.hero-rounds li.is-done b { color: var(--c); }
+.hero-rounds li.is-now { border-color: var(--tile); }
+.hero-rounds li.is-now b { color: var(--tile); }
+/* CREW: the week's top of your crew on one line, or a line and a button. */
+.hero-crew { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px 10px; }
+.hero-crew-title { grid-column: 1 / -1; color: var(--muted); font: 8px var(--font-display); letter-spacing: var(--ls-pixel); }
+.hero-crew-text { margin: 0; color: var(--muted); font: 13px/1.35 var(--font-body); }
+.hero-crew-board { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 0; padding: 0; list-style: none; }
+.hero-crew-board li { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 7px 8px; border-radius: 8px; background: rgba(255, 255, 255, 0.05); }
+.hero-crew-board li.is-you { box-shadow: inset 0 0 0 1px var(--tile); }
+.hero-crew-name { flex: 1; min-width: 0; overflow: hidden; color: var(--text); font: 12px var(--font-body); white-space: nowrap; text-overflow: ellipsis; }
+.hero-crew-board b { color: var(--gold); font: 700 12px var(--font-mono); }
+/* VERSUS: INVITE FRIENDS and the code on one row, under the mode tiles. */
+.hero-versus-row { grid-column: 1 / -1; order: 1; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; }
+.hero-versus-row[hidden] { display: none; }
+.hero-versus-row:has(.hero-invite[hidden]) { grid-template-columns: minmax(0, 1fr); }
+.hero-versus-row .hero-invite { grid-column: auto; width: auto; }
+.hero-invite-short { display: none; }
+@media (max-width: 760px) { .hero-invite-short { display: inline; } }
+/* Room for everything inside the fixed height: a smaller logo box, closer rows, lower tiles. */
+.main-menu .menu-hero .hero-card:not(.is-lobby):not(.is-archive) { row-gap: 10px; }
+.main-menu .menu-hero .hero-card:not(.is-lobby):not(.is-archive) .play-tile-art { height: 72px; }
+.main-menu .menu-hero .hero-card:not(.is-lobby) .hero-actions.is-three > button { gap: 4px; padding-top: 8px; padding-bottom: 7px; }
+.hero-versus-row .hero-join { grid-column: auto; order: 0; }
+@media (max-width: 760px) {
+  /* A phone: the logo box as before (56 px), the text at most two lines and the status one,
+     so the card's content fits its height on the smallest phones too (iPhone SE). */
+  .main-menu .menu-hero .hero-card:not(.is-lobby):not(.is-archive) .play-tile-art { height: 56px; }
+  .main-menu .menu-hero .hero-card:not(.is-lobby) #heroText { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  .main-menu .menu-hero .hero-card:not(.is-lobby) #heroStatus { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .hero-rounds { gap: 4px; }
+  .hero-rounds li { padding: 4px 2px; }
+  .hero-rounds span { font-size: 10px; }
+  .hero-versus-row .hero-invite { padding-left: 10px; padding-right: 10px; }
+  .hero-invite-long { display: none; }
+  .hero-crew-board li { padding: 6px; }
+  .hero-crew-board b { font-size: 11px; }
+}
+/* The smallest phones (iPhone SE 1st gen, 320 px): smaller heads on the Versus tiles, the card
+   text a size down, and INVITE as just its envelope, so the code field has room. */
+@media (max-width: 360px) {
+  .mode-pips { gap: 0; }
+  .mode-head { width: 14px; height: 13px; }
+  .main-menu .menu-hero .hero-card:not(.is-lobby) #heroText { font-size: 13px; }
+  .hero-versus-row .hero-invite { padding-left: 12px; padding-right: 12px; }
+  .hero-versus-row .hero-invite > span { display: none; }
+  .hero-versus-row .hero-invite::before { content: "✉"; font: 14px var(--font-body); }
+  .hero-join-field::placeholder { font-size: 11px; }
+}
 
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -5436,12 +5691,21 @@ h1, h2, h3 { font-weight: normal; }
             </div>
             <!-- VERSUS: join with a code; and, in a match you made or joined, the lobby (engine.js
                  renderLobby, mockups/versus-lobby): the seats, the code and the link. -->
-            <div class="hero-join" id="heroJoin" hidden>
-              <input class="hero-join-field" id="heroJoinField" maxlength="6" autocapitalize="characters" autocomplete="off" spellcheck="false" data-i18n-attr="placeholder:lobby.codePlaceholder;aria-label:lobby.codePlaceholder">
-              <button class="hero-side" id="heroJoinGo" type="button" data-i18n="duel.join">JOIN</button>
+            <!-- DAILY: today's five rounds and how far you got; CREW: your crew's week (social.js).
+                 The middle row of the card, which has one fixed size on every tab. -->
+            <div class="hero-body" id="heroBody" hidden>
+              <ol class="hero-rounds" id="heroRounds" hidden></ol>
+              <div class="hero-crew" id="heroCrew" hidden></div>
             </div>
-            <!-- VERSUS: invite friends or crewmates straight into a match (live-invite.js). -->
-            <button class="hero-side hero-invite" id="heroInvite" type="button" hidden data-i18n="live.button">✉ INVITE FRIENDS</button>
+            <!-- VERSUS: invite friends or crewmates straight into a match (live-invite.js), and
+                 join with a code, on one row under the mode tiles. -->
+            <div class="hero-versus-row" id="heroVersusRow">
+              <button class="hero-side hero-invite" id="heroInvite" type="button" hidden data-i18n-attr="aria-label:live.button"><span class="hero-invite-long" data-i18n="live.button">✉ INVITE FRIENDS</span><span class="hero-invite-short" data-i18n="live.buttonShort">✉ INVITE</span></button>
+              <div class="hero-join" id="heroJoin" hidden>
+                <input class="hero-join-field" id="heroJoinField" maxlength="6" autocapitalize="characters" autocomplete="off" spellcheck="false" data-i18n-attr="placeholder:lobby.codePlaceholder;aria-label:lobby.codePlaceholder">
+                <button class="hero-side" id="heroJoinGo" type="button" data-i18n="duel.join">JOIN</button>
+              </div>
+            </div>
             <div class="hero-lobby" id="heroLobby" hidden>
               <div class="lobby-seats" id="lobbySeats"></div>
               <div class="lobby-invite">
@@ -5840,6 +6104,7 @@ h1, h2, h3 { font-weight: normal; }
           <section class="panel pin-result hidden" id="pinResult">
             <span class="field-label" data-i18n="pin.result">THE PLACE</span>
             <p class="pin-result-place" id="pinResultPlace"></p>
+            <p class="pin-result-where" id="pinResultWhere"></p>
             <p class="pin-result-away" id="pinResultAway"></p>
             <p class="pin-result-rule" id="pinResultRule"></p>
           </section>
@@ -5873,6 +6138,17 @@ h1, h2, h3 { font-weight: normal; }
     </main>
 
     <!-- The round's score, big over the globe, the moment a round ends. -->
+    <!-- Drop a Pin: after LOCK IN, how far off your pin was, over the globe (playPinReveal). -->
+    <div id="pinReveal" class="pin-reveal hidden" role="status" aria-live="polite">
+      <div class="pin-reveal-card">
+        <span class="pin-reveal-kicker" data-i18n="pin.result">THE PLACE</span>
+        <span class="pin-reveal-place" id="pinRevealPlace"></span>
+        <span class="pin-reveal-where" id="pinRevealWhere"></span>
+        <strong class="pin-reveal-away" id="pinRevealAway"></strong>
+        <button class="btn btn-primary pin-reveal-go" id="pinRevealGo" type="button" data-i18n="pin.revealGo">SEE YOUR SCORE ›</button>
+      </div>
+    </div>
+
     <!-- Highs & Lows: the ranking climbs from last place to your pick. -->
     <div id="extremeClimb" class="extreme-climb hidden" role="status" aria-live="polite">
       <div class="climb-card">
@@ -6546,7 +6822,7 @@ const EN = {
   "menu.extremesTag": "6 QUESTIONS · RANKED",
   "menu.casualTag": "5 ROUNDS · RANKED",
   "menu.archiveOpen": "ARCHIVE · {n} DAYS STILL OPEN",
-  "menu.versusText": "Live against friends, on the same questions and the same clock.",
+  "menu.versusText": "Live against friends: same questions, same clock.",
   "menu.versusRibbon": "BETA",
   "menu.duelGoShort": "▶ DUEL 1V1",
   "menu.partySoon": "PARTY · 3–4 · SOON",
@@ -6855,7 +7131,7 @@ const EN = {
   // Daily (25 November 2026)
   "mode.daily": "Daily",
   "mode.daily.short": "DAILY",
-  "menu.dailyText": "Five rounds a day: Highs & Lows, Drop a Pin, Paint the Map, Mystery Country and Iceberg.",
+  "menu.dailyText": "Five rounds a day, the same for everyone in the world.",
   "round.pin": "Drop a Pin",
   "round.pin.task": "Drop a pin as close to the place as you can.",
   "game.yourPin": "YOUR PIN",
@@ -6872,6 +7148,16 @@ const EN = {
   "pin.infoZero": "No points from",
   "pin.burstSpotOn": "SPOT ON · {n} {unit}",
   "pin.burstAway": "YOUR PIN WAS {n} {unit} AWAY",
+  "pin.revealGo": "SEE YOUR SCORE ›",
+  "pin.inCity": "In {city}",
+  "pin.fromCity": "{n} {unit} {dir} of {city}",
+  "pin.dir.n": "north", "pin.dir.ne": "north-east", "pin.dir.e": "east", "pin.dir.se": "south-east",
+  "pin.dir.s": "south", "pin.dir.sw": "south-west", "pin.dir.w": "west", "pin.dir.nw": "north-west",
+  "burst.thisRound": "THIS ROUND", "burst.today": "TODAY", "burst.toGo": "STILL TO GO",
+  "burst.tab.map": "MAP", "burst.tab.photo": "PHOTO",
+  "end.rankMark": "TOP {n}%", "end.rankYou": "YOU · {n}", "end.rankSample": "TOP % · SAMPLE",
+  "end.rankYouShort": "YOU {n}%",
+  "live.buttonShort": "✉ INVITE",
   "pin.result": "THE PLACE",
   "hint.pin": "Click to drop your pin · drag to rotate",
   "stage.pin": "PIN",
@@ -7333,7 +7619,7 @@ const EN = {
   "end.yourStats": "Your stats",
   "end.statsLink": "STATS ›",
   "end.archiveCount": "ARCHIVE · {n}",
-  "end.nextDay": "Next day in {h}h {m}m",
+  "end.nextDay": "Next expedition in {h}h {m}m",
   "end.yourResult": "Your result",
   "end.vsWorld": "YOU VS THE WORLD TODAY",
   "end.roundsNext": "ROUNDS ›",
@@ -8272,7 +8558,7 @@ const NL = {
   "menu.extremesTag": "6 VRAGEN · RANGLIJST",
   "menu.casualTag": "5 RONDES · RANGLIJST",
   "menu.archiveOpen": "ARCHIEF · NOG {n} DAGEN OPEN",
-  "menu.versusText": "Live tegen vrienden, met dezelfde vragen en dezelfde klok.",
+  "menu.versusText": "Live tegen vrienden: dezelfde vragen, dezelfde klok.",
   "menu.versusRibbon": "BETA",
   "menu.duelGoShort": "▶ DUEL 1V1",
   "menu.partySoon": "PARTY · 3–4 · BINNENKORT",
@@ -8581,7 +8867,7 @@ const NL = {
   // Daily (25 november 2026)
   "mode.daily": "Daily",
   "mode.daily.short": "DAILY",
-  "menu.dailyText": "Vijf rondes per dag: Highs & Lows, Prik een speld, Kleur de kaart, Mysterieland en IJsberg.",
+  "menu.dailyText": "Vijf rondes per dag, voor iedereen ter wereld dezelfde.",
   "round.pin": "Prik een speld",
   "round.pin.task": "Prik een speld zo dicht mogelijk bij de plek.",
   "game.yourPin": "JOUW SPELD",
@@ -8598,6 +8884,16 @@ const NL = {
   "pin.infoZero": "Geen punten vanaf",
   "pin.burstSpotOn": "RAAK · {n} {unit}",
   "pin.burstAway": "JOUW SPELD STOND {n} {unit} ERNAAST",
+  "pin.revealGo": "NAAR JE SCORE ›",
+  "pin.inCity": "In {city}",
+  "pin.fromCity": "{n} {unit} {dir} van {city}",
+  "pin.dir.n": "ten noorden", "pin.dir.ne": "ten noordoosten", "pin.dir.e": "ten oosten", "pin.dir.se": "ten zuidoosten",
+  "pin.dir.s": "ten zuiden", "pin.dir.sw": "ten zuidwesten", "pin.dir.w": "ten westen", "pin.dir.nw": "ten noordwesten",
+  "burst.thisRound": "DEZE RONDE", "burst.today": "VANDAAG", "burst.toGo": "NOG TE GAAN",
+  "burst.tab.map": "KAART", "burst.tab.photo": "FOTO",
+  "end.rankMark": "TOP {n}%", "end.rankYou": "JIJ · {n}", "end.rankSample": "TOP % · VOORBEELD",
+  "end.rankYouShort": "JIJ {n}%",
+  "live.buttonShort": "✉ NODIG UIT",
   "pin.result": "DE PLEK",
   "hint.pin": "Klik om je speld te prikken · sleep om te draaien",
   "stage.pin": "SPELD",
@@ -9082,7 +9378,7 @@ const NL = {
   "end.yourStats": "Jouw stats",
   "end.statsLink": "STATS ›",
   "end.archiveCount": "ARCHIEF · {n}",
-  "end.nextDay": "Volgende dag over {h} u {m} min",
+  "end.nextDay": "Volgende expeditie over {h} u {m} min",
   "end.yourResult": "Je uitslag",
   "end.vsWorld": "JIJ TEGEN DE WERELD VANDAAG",
   "end.roundsNext": "RONDES ›",
@@ -19689,6 +19985,15 @@ class PixelGlobe {
     this.tooltip.classList.add("hidden");
   }
 
+  // The other way round (any length of vector).
+  vectorToLatLon(vector) {
+    const v = vector.clone().normalize();
+    const lat = 90 - THREE.MathUtils.radToDeg(Math.acos(THREE.MathUtils.clamp(v.y, -1, 1)));
+    let lon = THREE.MathUtils.radToDeg(Math.atan2(v.z, -v.x)) - 180;
+    if (lon < -180) lon += 360;
+    return { lat, lon };
+  }
+
   latLonToVector3(lat, lon, radius = MARKER_RADIUS) {
     const phi = (90 - lat) * (Math.PI / 180);
     const theta = (lon + 180) * (Math.PI / 180);
@@ -19787,16 +20092,86 @@ class PixelGlobe {
     return best;
   }
 
-  addMarker(lat, lon, colorHex = "#22c55e", name = "", number = this.markers.length + 1) {
+  // `pin: true` draws a map pin whose tip sits exactly on lat/lon (Drop a Pin), instead of a
+  // number centred on it; `number` is then the mark in its head ("✓", a digit, or "" for a dot).
+  addMarker(lat, lon, colorHex = "#22c55e", name = "", number = this.markers.length + 1, { pin = false } = {}) {
     const pos = this.latLonToVector3(lat, lon);
     const hitTarget = new THREE.Mesh(new THREE.SphereGeometry(3.5, 8, 6), new THREE.MeshBasicMaterial({ visible: false }));
     hitTarget.position.copy(pos);
     this.globeGroup.add(hitTarget);
-    const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: this.createNumberTexture(number, colorHex), depthWrite: false }));
+    const texture = pin ? this.createPinTexture(colorHex, number) : this.createNumberTexture(number, colorHex);
+    const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, depthWrite: false }));
+    if (pin) label.center.set(0.5, texture.tipY);
     label.renderOrder = 4;
     this.globeGroup.add(label);
-    this.markers.push({ mesh: hitTarget, label, index: this.markers.length, number, name, baseColor: colorHex });
+    this.markers.push({ mesh: hitTarget, label, index: this.markers.length, number, name, baseColor: colorHex, pin: pin ? texture.aspect : 0,
+      // A pin stands on the ground itself (the number markers float a little above it), so
+      // its tip doesn't drift off the spot when the globe is seen at an angle.
+      ground: pin ? this.latLonToVector3(lat, lon, GLOBE_RADIUS + 0.8) : null });
     this.scaleMarker(this.markers.at(-1));
+  }
+
+  // A pixel map pin (11 x 17 art pixels plus a dark outline), in the marker's colour with a
+  // light edge top left and a shade bottom right. Its tip is one pixel: the exact spot.
+  createPinTexture(color, mark = "") {
+    const W = 13, H = 19, S = 4;
+    const cx = 6, cy = 6;
+    const inside = (x, y) => {
+      if (x < 0 || y < 0 || x >= W || y >= H) return false;
+      if (Math.hypot(x - cx, y - cy) <= 4.7) return true;
+      return y > cy && y <= 17 && Math.abs(x - cx) <= (17 - y) * 0.45;
+    };
+    const mix = (hex, to, share) => {
+      const n = parseInt(hex.slice(1), 16);
+      const c = [n >> 16, (n >> 8) & 255, n & 255].map(v => Math.round(v + (to - v) * share));
+      return `rgb(${c.join(",")})`;
+    };
+    const canvas = document.createElement("canvas");
+    canvas.width = W * S;
+    canvas.height = H * S;
+    const context = canvas.getContext("2d");
+    const dot = (x, y, fill) => { context.fillStyle = fill; context.fillRect(x * S, y * S, S, S); };
+    const light = mix(color, 255, 0.45);
+    const shade = mix(color, 0, 0.3);
+    for (let y = 0; y < H; y += 1) {
+      for (let x = 0; x < W; x += 1) {
+        if (inside(x, y)) {
+          const edge = !inside(x - 1, y) || !inside(x, y - 1);
+          const back = !inside(x + 1, y) || !inside(x, y + 1);
+          dot(x, y, edge && x + y < cx + cy ? light : back && x + y > cx + cy ? shade : color);
+        } else if (inside(x - 1, y) || inside(x + 1, y) || inside(x, y - 1) || inside(x, y + 1)) {
+          dot(x, y, "rgba(4, 6, 13, 0.9)");
+        }
+      }
+    }
+    // The head: a white dot, a pixel tick, or a number.
+    const ink = "rgba(4, 6, 13, 0.95)";
+    if (mark === "✓") {
+      [[3, 6], [4, 7], [5, 8], [6, 7], [7, 6], [8, 5], [9, 4], [4, 6], [5, 7], [6, 6], [7, 5], [8, 4]].forEach(([x, y]) => dot(x, y, ink));
+    } else if (mark && mark !== "?") {
+      context.font = `bold ${5 * S}px 'Space Mono', monospace`;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillStyle = ink;
+      context.fillText(String(mark), (cx + 0.5) * S, (cy + 0.7) * S);
+    } else {
+      for (let y = cy - 2; y <= cy + 2; y += 1) {
+        for (let x = cx - 2; x <= cx + 2; x += 1) if (Math.hypot(x - cx, y - cy) <= 1.8) dot(x, y, ink);
+      }
+      dot(cx, cy, "#ffffff");
+      dot(cx - 1, cy, "#ffffff");
+      dot(cx, cy - 1, "#ffffff");
+      dot(cx - 1, cy - 1, "#ffffff");
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.encoding = THREE.sRGBEncoding;
+    texture.magFilter = THREE.NearestFilter;
+    texture.minFilter = THREE.LinearFilter;
+    texture.generateMipmaps = false;
+    // The sprite's anchor: the middle of the tip pixel (row 17 of 19, from the bottom).
+    texture.tipY = 1.5 / H;
+    texture.aspect = H / W;
+    return texture;
   }
 
   createNumberTexture(number, color) {
@@ -19828,13 +20203,49 @@ class PixelGlobe {
   scaleMarker(marker) {
     const zoom = Math.max(0.3, this.getZoomFactor());
     marker.mesh.scale.setScalar(zoom);
+    if (marker.pin) {
+      // Standing on its spot, just above the ground (and the detail tiles).
+      const width = (marker.isHighlighted ? 12 : 9) * zoom;
+      marker.label.scale.set(width, width * marker.pin, 1);
+      marker.label.position.copy(marker.ground);
+      this.requestRender();
+      return;
+    }
     const labelSize = (marker.isHighlighted ? 11 : 7) * zoom;
     marker.label.scale.set(labelSize, labelSize, 1);
     marker.label.position.copy(marker.mesh.position).multiplyScalar(1 + 0.03 * zoom);
     this.requestRender();
   }
 
-  setGuessPath(points) {
+  // Turn and zoom so both points are in view, with some room around them (Drop a Pin's
+  // reveal: your pin and the place). Never closer than the usual close-up limit.
+  showBoth(a, b, duration = 900) {
+    const va = this.latLonToVector3(a.lat, a.lon).normalize();
+    const vb = this.latLonToVector3(b.lat, b.lon).normalize();
+    const angle = Math.acos(THREE.MathUtils.clamp(va.dot(vb), -1, 1));
+    const mid = angle > 3.1 ? va.clone() : va.clone().add(vb).normalize();
+    const { lat, lon } = this.vectorToLatLon(mid);
+    // How far the camera must be for a point `half` radians off-centre to sit at ~45% of the
+    // smaller half of the view.
+    const half = Math.min(angle / 2, 1.2);
+    const aspect = this.camera.aspect || 1;
+    const halfFov = Math.atan(Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)) * Math.min(1, aspect));
+    const room = Math.tan(halfFov * 0.45);
+    const distance = GLOBE_RADIUS * Math.cos(half) + GLOBE_RADIUS * Math.sin(half) / room;
+    this.targetCameraDistance = THREE.MathUtils.clamp(distance, MIN_CAMERA_DISTANCE, MAX_CAMERA_DISTANCE);
+    this.rotateTo(lat, lon, duration);
+    this.requestRender();
+  }
+
+  // `upTo` (0–1) draws only the first part of the line, for drawing it in.
+  setGuessPath(points, { upTo = 1 } = {}) {
+    if (upTo < 1 && points.length === 2) {
+      const a = this.latLonToVector3(points[0].lat, points[0].lon).normalize();
+      const b = this.latLonToVector3(points[1].lat, points[1].lon).normalize();
+      const angle = Math.acos(THREE.MathUtils.clamp(a.dot(b), -1, 1));
+      const end = angle < 1e-4 ? b : a.clone().multiplyScalar(Math.sin((1 - upTo) * angle) / Math.sin(angle)).addScaledVector(b, Math.sin(upTo * angle) / Math.sin(angle));
+      points = [points[0], this.vectorToLatLon(end)];
+    }
     this.guessPathPoints = points;
     this.guessPathZoom = this.getZoomFactor();
     if (this.guessPath) {
@@ -24670,7 +25081,22 @@ const DAILY_PINS = {
   "article": "Oxford",
   "url": "https://en.wikipedia.org/wiki/Oxford",
   "wikidata": "Q34217",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "city in Oxfordshire, England",
+    "nl": "plaats in Engeland, Verenigd Koninkrijk"
+   },
+   "admin": {
+    "en": "Oxford",
+    "nl": "Oxford"
+   },
+   "country": {
+    "en": "United Kingdom",
+    "nl": "Verenigd Koninkrijk",
+    "iso": "GB"
+   }
+  }
  },
  "2026-11-02": {
   "lat": 40.8358,
@@ -24680,7 +25106,22 @@ const DAILY_PINS = {
   "article": "Naples",
   "url": "https://en.wikipedia.org/wiki/Naples",
   "wikidata": "Q2634",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "capital city of Campania, Italy",
+    "nl": "Italiaanse stad"
+   },
+   "admin": {
+    "en": "Metropolitan City of Naples",
+    "nl": "Napels"
+   },
+   "country": {
+    "en": "Italy",
+    "nl": "Italië",
+    "iso": "IT"
+   }
+  }
  },
  "2026-11-03": {
   "lat": 41.3808,
@@ -24690,7 +25131,22 @@ const DAILY_PINS = {
   "article": "Camp Nou",
   "url": "https://en.wikipedia.org/wiki/Camp_Nou",
   "wikidata": "Q159848",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "football stadium in Barcelona, Catalonia, Spain",
+    "nl": "voetbalstadion in Barcelona en tevens grootste stadion in Europa"
+   },
+   "admin": {
+    "en": "La Maternitat i Sant Ramon",
+    "nl": "La Maternitat i Sant Ramon"
+   },
+   "country": {
+    "en": "Spain",
+    "nl": "Spanje",
+    "iso": "ES"
+   }
+  }
  },
  "2026-11-04": {
   "lat": 62.03,
@@ -24700,7 +25156,22 @@ const DAILY_PINS = {
   "article": "Yakutsk",
   "url": "https://en.wikipedia.org/wiki/Yakutsk",
   "wikidata": "Q6610",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "city in eastern Russia, capital of the Republic of Sakha (Yakutia)",
+    "nl": "stad in Rusland"
+   },
+   "admin": {
+    "en": "Yakutsk Urban Okrug",
+    "nl": "Yakutsk Urban Okrug"
+   },
+   "country": {
+    "en": "Russia",
+    "nl": "Rusland",
+    "iso": "RU"
+   }
+  }
  },
  "2026-11-05": {
   "lat": -37.115,
@@ -24710,7 +25181,22 @@ const DAILY_PINS = {
   "article": "Tristan da Cunha",
   "url": "https://en.wikipedia.org/wiki/Tristan_da_Cunha",
   "wikidata": "Q220982",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "South Atlantic island group",
+    "nl": "eilandengroep van het Verenigd Koninkrijk"
+   },
+   "admin": {
+    "en": "Tristan da Cunha",
+    "nl": "Tristan da Cunha"
+   },
+   "country": {
+    "en": "realm of the United Kingdom",
+    "nl": "realm of the United Kingdom",
+    "iso": null
+   }
+  }
  },
  "2026-11-06": {
   "lat": 45.4375,
@@ -24720,7 +25206,22 @@ const DAILY_PINS = {
   "article": "Venice",
   "url": "https://en.wikipedia.org/wiki/Venice",
   "wikidata": "Q641",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "capital city of Veneto, Italy",
+    "nl": "stad en gemeente in Italië"
+   },
+   "admin": {
+    "en": "Metropolitan City of Venice",
+    "nl": "città metropolitana van Venetië"
+   },
+   "country": {
+    "en": "Italy",
+    "nl": "Italië",
+    "iso": "IT"
+   }
+  }
  },
  "2026-11-07": {
   "lat": 39.91583333,
@@ -24730,7 +25231,22 @@ const DAILY_PINS = {
   "article": "Forbidden City",
   "url": "https://en.wikipedia.org/wiki/Forbidden_City",
   "wikidata": "Q80290",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "Chinese imperial palace in Beijing",
+    "nl": "bouwwerk in Peking"
+   },
+   "admin": {
+    "en": "Donghuamen Subdistrict",
+    "nl": "Donghuamen Subdistrict"
+   },
+   "country": {
+    "en": "People's Republic of China",
+    "nl": "Volksrepubliek China",
+    "iso": "CN"
+   }
+  }
  },
  "2026-11-08": {
   "lat": 43.5513,
@@ -24740,7 +25256,22 @@ const DAILY_PINS = {
   "article": "Cannes",
   "url": "https://en.wikipedia.org/wiki/Cannes",
   "wikidata": "Q39984",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "French commune and city in Alpes-Maritimes, Provence-Alpes-Côte d'Azur",
+    "nl": "gemeente in Alpes-Maritimes, Frankrijk"
+   },
+   "admin": {
+    "en": "arrondissement of Grasse",
+    "nl": "arrondissement Grasse"
+   },
+   "country": {
+    "en": "France",
+    "nl": "Frankrijk",
+    "iso": "FR"
+   }
+  }
  },
  "2026-11-09": {
   "lat": 29.6539,
@@ -24750,7 +25281,22 @@ const DAILY_PINS = {
   "article": "Lhasa",
   "url": "https://en.wikipedia.org/wiki/Lhasa",
   "wikidata": "Q1026100",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "district in Lhasa, Tibet, China",
+    "nl": "Lhasa"
+   },
+   "admin": {
+    "en": "Lhasa",
+    "nl": "Lhasa"
+   },
+   "country": {
+    "en": "People's Republic of China",
+    "nl": "Volksrepubliek China",
+    "iso": "CN"
+   }
+  }
  },
  "2026-11-10": {
   "lat": 40.75,
@@ -24760,7 +25306,22 @@ const DAILY_PINS = {
   "article": "Pompeii",
   "url": "https://en.wikipedia.org/wiki/Pompeii",
   "wikidata": "Q43332",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "ancient Roman city near modern Naples, Italy",
+    "nl": "antieke stad bij Napels, Italië"
+   },
+   "admin": {
+    "en": "Pompei",
+    "nl": "Pompei"
+   },
+   "country": {
+    "en": "Italy",
+    "nl": "Italië",
+    "iso": "IT"
+   }
+  }
  },
  "2026-11-11": {
   "lat": 55.75166667,
@@ -24770,7 +25331,22 @@ const DAILY_PINS = {
   "article": "Kremlin",
   "url": "https://en.wikipedia.org/wiki/Kremlin",
   "wikidata": "Q133274",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "fortified complex in Moscow, Russia",
+    "nl": "Kremlin in Rusland"
+   },
+   "admin": {
+    "en": "Tverskoy District",
+    "nl": "Tverskoj"
+   },
+   "country": {
+    "en": "Russia",
+    "nl": "Rusland",
+    "iso": "RU"
+   }
+  }
  },
  "2026-11-12": {
   "lat": 0,
@@ -24780,7 +25356,19 @@ const DAILY_PINS = {
   "article": "Borneo",
   "url": "https://en.wikipedia.org/wiki/Borneo",
   "wikidata": "Q36117",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "third largest island in the world by area, located in south-east Asia",
+    "nl": "eiland in Azië"
+   },
+   "admin": null,
+   "country": {
+    "en": "Indonesia",
+    "nl": "Indonesië",
+    "iso": "ID"
+   }
+  }
  },
  "2026-11-13": {
   "lat": 41.90083333,
@@ -24790,7 +25378,22 @@ const DAILY_PINS = {
   "article": "Trevi Fountain",
   "url": "https://en.wikipedia.org/wiki/Trevi_Fountain",
   "wikidata": "Q185382",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "Baroque fountain in Rome, Italy",
+    "nl": "fontein in Rome, Italië"
+   },
+   "admin": {
+    "en": "Rome",
+    "nl": "Rome"
+   },
+   "country": {
+    "en": "Italy",
+    "nl": "Italië",
+    "iso": "IT"
+   }
+  }
  },
  "2026-11-14": {
   "lat": 19.89,
@@ -24800,7 +25403,22 @@ const DAILY_PINS = {
   "article": "Luang Prabang",
   "url": "https://en.wikipedia.org/wiki/Luang_Prabang",
   "wikidata": "Q190165",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "The municipality is located in north-central Laos",
+    "nl": "stad"
+   },
+   "admin": {
+    "en": "Luang Prabang Province",
+    "nl": "Luang Prabang"
+   },
+   "country": {
+    "en": "Laos",
+    "nl": "Laos",
+    "iso": "LA"
+   }
+  }
  },
  "2026-11-15": {
   "lat": 54.3475,
@@ -24810,7 +25428,22 @@ const DAILY_PINS = {
   "article": "Gdańsk",
   "url": "https://en.wikipedia.org/wiki/Gda%C5%84sk",
   "wikidata": "Q1792",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "city and capital of the Pomeranian Voivodeship on the Baltic coast of northern Poland",
+    "nl": "stad in Polen"
+   },
+   "admin": {
+    "en": "Pomeranian Voivodeship",
+    "nl": "Woiwodschap Pommeren"
+   },
+   "country": {
+    "en": "Poland",
+    "nl": "Polen",
+    "iso": "PL"
+   }
+  }
  },
  "2026-11-16": {
   "lat": 51.477,
@@ -24820,7 +25453,22 @@ const DAILY_PINS = {
   "article": "Royal Observatory, Greenwich",
   "url": "https://en.wikipedia.org/wiki/Royal_Observatory,_Greenwich",
   "wikidata": "Q192988",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "observatory in Greenwich, London, UK",
+    "nl": "bouwwerk in Londen"
+   },
+   "admin": {
+    "en": "Royal Borough of Greenwich",
+    "nl": "London Borough of Greenwich"
+   },
+   "country": {
+    "en": "United Kingdom",
+    "nl": "Verenigd Koninkrijk",
+    "iso": "GB"
+   }
+  }
  },
  "2026-11-17": {
   "lat": 36.16222222,
@@ -24830,7 +25478,22 @@ const DAILY_PINS = {
   "article": "Nashville, Tennessee",
   "url": "https://en.wikipedia.org/wiki/Nashville,_Tennessee",
   "wikidata": "Q23197",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "capital city of the U.S. state of Tennessee and seat of Davidson County",
+    "nl": "hoofdstad van de Amerikaanse staat Tennessee"
+   },
+   "admin": {
+    "en": "Davidson County",
+    "nl": "Davidson County"
+   },
+   "country": {
+    "en": "United States",
+    "nl": "Verenigde Staten",
+    "iso": "US"
+   }
+  }
  },
  "2026-11-18": {
   "lat": -27.12,
@@ -24840,7 +25503,22 @@ const DAILY_PINS = {
   "article": "Easter Island",
   "url": "https://en.wikipedia.org/wiki/Easter_Island",
   "wikidata": "Q14452",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "Polynesian island and special territory of Chile",
+    "nl": "eiland van Chili"
+   },
+   "admin": {
+    "en": "Isla de Pascua",
+    "nl": "Isla de Pascua"
+   },
+   "country": {
+    "en": "Chile",
+    "nl": "Chili",
+    "iso": "CL"
+   }
+  }
  },
  "2026-11-19": {
   "lat": 16.77583333,
@@ -24850,7 +25528,22 @@ const DAILY_PINS = {
   "article": "Timbuktu",
   "url": "https://en.wikipedia.org/wiki/Timbuktu",
   "wikidata": "Q9427",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "city in Mali",
+    "nl": "stad in Mali"
+   },
+   "admin": {
+    "en": "Timbuktu Region",
+    "nl": "Regio Timboektoe"
+   },
+   "country": {
+    "en": "Mali",
+    "nl": "Mali",
+    "iso": "ML"
+   }
+  }
  },
  "2026-11-20": {
   "lat": 52.413431,
@@ -24860,7 +25553,22 @@ const DAILY_PINS = {
   "article": "Glienicke Bridge",
   "url": "https://en.wikipedia.org/wiki/Glienicke_Bridge",
   "wikidata": "Q694708",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "bridge over the Havel river near Potsdam",
+    "nl": "brug in Berlijn"
+   },
+   "admin": {
+    "en": "Nördliche Vorstädte",
+    "nl": "Berliner Vorstadt"
+   },
+   "country": {
+    "en": "Germany",
+    "nl": "Duitsland",
+    "iso": "DE"
+   }
+  }
  },
  "2026-11-21": {
   "lat": 37.755,
@@ -24870,7 +25578,22 @@ const DAILY_PINS = {
   "article": "Mount Etna",
   "url": "https://en.wikipedia.org/wiki/Mount_Etna",
   "wikidata": "Q16990",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "active stratovolcano on the east coast of Sicily, Italy",
+    "nl": "vulkaan"
+   },
+   "admin": {
+    "en": "Metropolitan City of Catania",
+    "nl": "Metropolitane stad Catanië"
+   },
+   "country": {
+    "en": "Italy",
+    "nl": "Italië",
+    "iso": "IT"
+   }
+  }
  },
  "2026-11-22": {
   "lat": -22.91111111,
@@ -24880,7 +25603,22 @@ const DAILY_PINS = {
   "article": "Rio de Janeiro",
   "url": "https://en.wikipedia.org/wiki/Rio_de_Janeiro",
   "wikidata": "Q8678",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "city of Rio de Janeiro state, Brazil",
+    "nl": "voormalige hoofdstad van Brazilië"
+   },
+   "admin": {
+    "en": "Rio de Janeiro",
+    "nl": "Rio de Janeiro"
+   },
+   "country": {
+    "en": "Brazil",
+    "nl": "Brazilië",
+    "iso": "BR"
+   }
+  }
  },
  "2026-11-23": {
   "lat": 42.36027778,
@@ -24890,7 +25628,22 @@ const DAILY_PINS = {
   "article": "Boston",
   "url": "https://en.wikipedia.org/wiki/Boston",
   "wikidata": "Q100",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "capital city of the U.S. state of Massachusetts and seat of Suffolk County",
+    "nl": "hoofdstad van de Amerikaanse staat Massachusetts"
+   },
+   "admin": {
+    "en": "Suffolk County",
+    "nl": "Suffolk County"
+   },
+   "country": {
+    "en": "United States",
+    "nl": "Verenigde Staten",
+    "iso": "US"
+   }
+  }
  },
  "2026-11-24": {
   "lat": 31.40444444,
@@ -24900,7 +25653,22 @@ const DAILY_PINS = {
   "article": "Rosetta",
   "url": "https://en.wikipedia.org/wiki/Rosetta",
   "wikidata": "Q243699",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "city in Egypt",
+    "nl": "Egypte"
+   },
+   "admin": {
+    "en": "Beheira Governorate",
+    "nl": "Al Buhayrah"
+   },
+   "country": {
+    "en": "Egypt",
+    "nl": "Egypte",
+    "iso": "EG"
+   }
+  }
  },
  "2026-11-25": {
   "lat": 42.64027778,
@@ -24910,7 +25678,22 @@ const DAILY_PINS = {
   "article": "Dubrovnik",
   "url": "https://en.wikipedia.org/wiki/Dubrovnik",
   "wikidata": "Q1722",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "city and settlement in Dubrovnik-Neretva County, Croatia",
+    "nl": "stad in de Kroatische regio Dalmatië"
+   },
+   "admin": {
+    "en": "Dubrovnik-Neretva County",
+    "nl": "Dubrovnik-Neretva"
+   },
+   "country": {
+    "en": "Croatia",
+    "nl": "Kroatië",
+    "iso": "HR"
+   }
+  }
  },
  "2026-11-26": {
   "lat": 5.169,
@@ -24920,7 +25703,22 @@ const DAILY_PINS = {
   "article": "Guiana Space Centre",
   "url": "https://en.wikipedia.org/wiki/Guiana_Space_Centre",
   "wikidata": "Q308987",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "French and European spaceport near Kourou in French Guiana",
+    "nl": "ruimtehaven in Kanton Kourou, Frankrijk"
+   },
+   "admin": {
+    "en": "Kourou",
+    "nl": "Kourou"
+   },
+   "country": {
+    "en": "France",
+    "nl": "Frankrijk",
+    "iso": "FR"
+   }
+  }
  },
  "2026-11-27": {
   "lat": -0.5,
@@ -24930,7 +25728,22 @@ const DAILY_PINS = {
   "article": "Galápagos Islands",
   "url": "https://en.wikipedia.org/wiki/Gal%C3%A1pagos_Islands",
   "wikidata": "Q38095",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "Archipelago in the Pacific Ocean, part of Ecuador since 1832",
+    "nl": "archipel in Ecuador"
+   },
+   "admin": {
+    "en": "Galápagos Province",
+    "nl": "Galápagos"
+   },
+   "country": {
+    "en": "Ecuador",
+    "nl": "Ecuador",
+    "iso": "EC"
+   }
+  }
  },
  "2026-11-28": {
   "lat": 11.35,
@@ -24940,7 +25753,22 @@ const DAILY_PINS = {
   "article": "Mariana Trench",
   "url": "https://en.wikipedia.org/wiki/Mariana_Trench",
   "wikidata": "Q510",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "deepest oceanic trench on Earth",
+    "nl": "diepste trog op Aarde"
+   },
+   "admin": {
+    "en": "Northern Mariana Islands",
+    "nl": "Noordelijke Marianen"
+   },
+   "country": {
+    "en": "United States",
+    "nl": "Verenigde Staten",
+    "iso": "US"
+   }
+  }
  },
  "2026-11-29": {
   "lat": 50.335555555556,
@@ -24950,7 +25778,22 @@ const DAILY_PINS = {
   "article": "Nürburgring",
   "url": "https://en.wikipedia.org/wiki/N%C3%BCrburgring",
   "wikidata": "Q152207",
-  "from": "wikidata"
+  "from": "wikidata",
+  "where": {
+   "desc": {
+    "en": "race track in Nürburg, Rhineland-Palatinate, Germany",
+    "nl": "racecircuit in Duitsland"
+   },
+   "admin": {
+    "en": "Rhineland-Palatinate",
+    "nl": "Rijnland-Palts"
+   },
+   "country": {
+    "en": "Germany",
+    "nl": "Duitsland",
+    "iso": "DE"
+   }
+  }
  },
  "2026-11-30": {
   "lat": -15.825,
@@ -24960,7 +25803,22 @@ const DAILY_PINS = {
   "article": "Lake Titicaca",
   "url": "https://en.wikipedia.org/wiki/Lake_Titicaca",
   "wikidata": "Q35342",
-  "from": "wikipedia"
+  "from": "wikipedia",
+  "where": {
+   "desc": {
+    "en": "lake in the Andes on the border of Bolivia and Peru",
+    "nl": "meer in Peru"
+   },
+   "admin": {
+    "en": "Puno Department",
+    "nl": "Puno"
+   },
+   "country": {
+    "en": "Peru",
+    "nl": "Peru",
+    "iso": "PE"
+   }
+  }
  }
 };
 
@@ -30324,7 +31182,7 @@ function getDailyModePlan(dateKey) {
     extreme: () => ({ stat: entry.highs[0], find: entry.highs[1], question: tr(entry.highs[2]) }),
     pin: () => {
       const pin = DAILY_PINS[dateKey];
-      return pin ? { text: tr(entry.pin.text), lat: pin.lat, lon: pin.lon, exact: pin.exact, zero: pin.zero, article: pin.article, url: pin.url } : null;
+      return pin ? { text: tr(entry.pin.text), lat: pin.lat, lon: pin.lon, exact: pin.exact, zero: pin.zero, article: pin.article, url: pin.url, where: pin.where || null } : null;
     },
     paint: () => AUTHORED.paint(entry.paint),
     mystery: index => AUTHORED.mystery(entry.mystery, dateKey, index),
@@ -30704,6 +31562,18 @@ function getTopPercent(stats, score) {
   return Math.min(100, Math.max(0.1, better / stats.players * 100));
 }
 
+// The score where the top `percent` % of the day starts (the other way round from
+// getTopPercent): walk down from the top bucket until that many players are above.
+function scoreAtTopPercent(stats, percent) {
+  let need = stats.players * percent / 100;
+  for (let bucket = stats.distribution.length - 1; bucket >= 0; bucket -= 1) {
+    const count = stats.distribution[bucket];
+    if (count >= need) return Math.round((bucket + 1 - (count ? need / count : 0)) * stats.bucketSize);
+    need -= count;
+  }
+  return 0;
+}
+
 function formatTopPercent(percent) {
   return t("common.topPercent", { n: percent < 1 ? 1 : Math.ceil(percent) });
 }
@@ -30761,7 +31631,7 @@ function getRoundStats(dateKey, index, round) {
   }
 }
 
-return { SCORE_BUCKET_COUNT, RANK_TIERS, getDayStats, getScoreBucket, getTopPercent, formatTopPercent, getMonthBadge, getRoundStats };
+return { SCORE_BUCKET_COUNT, RANK_TIERS, getDayStats, getScoreBucket, getTopPercent, scoreAtTopPercent, formatTopPercent, getMonthBadge, getRoundStats };
 })();
 
 // ---- tents.js
@@ -31365,6 +32235,8 @@ function bigText(p, text, x, y, color, shadow = null) {
 }
 let queue = [];
 let blockers = [];
+// The plates and blockers (Atlas, vehicles) of the last frame, for the world signs (journeys.js).
+const PLATE_LOG = [];
 function beginFrame() { queue = []; blockers = []; }
 // Something a plate must not cover (Atlas adds himself; scenes add their vehicles).
 function avoid(l, t, r, b) { blockers.push({ l, t, r, b }); }
@@ -31376,6 +32248,7 @@ const hits = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
 // L, R, T, H: the edges of what the camera shows (a plate never sits half outside).
 function flushPlates(p, { L = 0, R = 200, H = 400, T = 0 } = {}) {
   const placed = [];
+  PLATE_LOG.push(...blockers);
   queue.forEach(item => {
     const w = plateWidth(item.text) + 6;
     const h = 11;
@@ -31388,6 +32261,7 @@ function flushPlates(p, { L = 0, R = 200, H = 400, T = 0 } = {}) {
     const free = c => inside(c) && !blockers.some(b => hits(c, b)) && !placed.some(o => hits(c, o));
     const spot = tries.find(free) || tries.find(c => inside(c) && !blockers.some(b => hits(c, b))) || tries[0];
     placed.push(spot);
+    PLATE_LOG.push(spot);
     p.rect(spot.l, spot.t, w, h, "#070b17");
     p.rect(spot.l + 1, spot.t + 1, w - 2, h - 2, "#1b2342");
     p.rect(spot.l + 1, spot.t + 1, w - 2, 1, "#ffd45c");
@@ -31411,7 +32285,7 @@ function bigStar(p, x, y, color, now = 0, lit = false) {
   }
 }
 
-return { INK, darker, lighter, P, sprite, blit, blitAt, atlasHead, atlas, eachMark, goalText, trail, planned, bigText, beginFrame, avoid, plate, flushPlates, stopMarks, bigStar };
+return { INK, darker, lighter, P, sprite, blit, blitAt, atlasHead, atlas, eachMark, goalText, trail, planned, bigText, PLATE_LOG, beginFrame, avoid, plate, flushPlates, stopMarks, bigStar };
 })();
 
 // ---- journey-scenes-hd.js
@@ -32543,6 +33417,9 @@ const hits = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
 // each frame, `avoid` adds what moves (the explorer, the vehicle). A plate goes to the free
 // spot nearest its point (above it counts a little nearer than below); when it had to move,
 // a thin dotted line points back.
+// What the plates of the last frame covered, and what they had to avoid (the vehicles), in
+// scene pixels: the end screen's world signs keep clear of both (journeys.js, drawRanks).
+const PLATE_LOG = [];
 function makePlates() {
   const occ = new Uint8Array(W * H);
   let placed = [];
@@ -32562,7 +33439,7 @@ function makePlates() {
     // `view`: the part of the scene the camera shows, so a plate is never cut off.
     // `small`: the score tile, too small to read a plate, so none are drawn.
     begin(view, small = false) { placed = []; soft = []; bounds = view || { x: 0, y: 0, w: W, h: H }; hidden = small; },
-    avoid(box) { soft.push(box); },
+    avoid(box) { soft.push(box); PLATE_LOG.push(box); },
     put(p, text, qx, qy, { lift = 6 } = {}) {
       if (hidden) return;
       const w = plateWidth(text) + 6;
@@ -32580,6 +33457,7 @@ function makePlates() {
       const ok = b => free(b) && !soft.some(o => hits(b, o)) && !placed.some(o => hits(b, o));
       const spot = boxes.find(ok) || boxes.find(b => !soft.some(o => hits(b, o)) && !placed.some(o => hits(b, o))) || boxes[0];
       placed.push(spot);
+      PLATE_LOG.push(spot);
       const cx = clamp(ax, spot.l, spot.r - 1);
       const cy = clamp(ay, spot.t, spot.b - 1);
       if (Math.hypot(cx - ax, cy - ay) > 5) p.line(ax, ay, cx, cy, "rgba(40,48,80,0.75)", 2);
@@ -32630,7 +33508,7 @@ function viewFor(scene, value, summit, { w: CW = W, h: CH = H, ox = 0 } = {}) {
   return { x, y, w, h };
 }
 
-return { distance, INK, P, bigStar, blit, darker, lighter, sprite, W, H, ASPECT, explorer, poseOf, spline, hairpins, makePlates, eachReached, REVEAL_MIN, REVEAL_AHEAD, viewFor };
+return { distance, INK, P, bigStar, blit, darker, lighter, sprite, W, H, ASPECT, explorer, poseOf, spline, hairpins, PLATE_LOG, makePlates, eachReached, REVEAL_MIN, REVEAL_AHEAD, viewFor };
 })();
 
 // ---- journey-wide-climb.js
@@ -33828,8 +34706,8 @@ return { sled };
 __modules["journeys.js"] = (() => {
 const { t } = __modules["i18n.js"];
 const { HD_SCENES, hdSize } = __modules["journey-scenes-hd.js"];
-const { P: hdPainter, beginFrame, flushPlates } = __modules["journey-hd.js"];
-const { H: WIDE_HD_H, W: WIDE_HD_W, viewFor } = __modules["journey-wide-kit.js"];
+const { P: hdPainter, PLATE_LOG: TALL_PLATES, beginFrame, flushPlates } = __modules["journey-hd.js"];
+const { H: WIDE_HD_H, PLATE_LOG: WIDE_PLATES, W: WIDE_HD_W, viewFor } = __modules["journey-wide-kit.js"];
 const { explorerHead, journeyLook, setJourneyLook } = __modules["journey-explorer.js"];
 const { climb: wideClimb } = __modules["journey-wide-climb.js"];
 const { balloon: wideBalloon } = __modules["journey-wide-balloon.js"];
@@ -33860,6 +34738,19 @@ const WIDE_SCENES = { climb: wideClimb, balloon: wideBalloon, mine: wideMine, tr
 // One colour per round, for its stretch of the route and its dot in the rounds list.
 // One colour per round; the sixth is for the globe mode, which has six rounds.
 const ROUND_COLORS = ["#45e3ff", "#ffd45c", "#ff8a3d", "#c58cff", "#5cf28a", "#ff6b9d"];
+
+// A round's colour from its points (26 November 2026, team request: a colour per round number
+// said nothing): red for nothing, through orange and gold, to green for a full 1,000.
+const GRADE_STOPS = [[0, [255, 77, 94]], [400, [255, 154, 61]], [750, [255, 212, 92]], [1000, [92, 210, 106]]];
+function scoreColor(points, full = 1000) {
+  const value = Math.max(0, Math.min(1000, (points / full) * 1000));
+  let index = 1;
+  while (index < GRADE_STOPS.length - 1 && value > GRADE_STOPS[index][0]) index += 1;
+  const [a, from] = GRADE_STOPS[index - 1];
+  const [b, to] = GRADE_STOPS[index];
+  const f = (value - a) / (b - a);
+  return `#${from.map((c, i) => Math.round(c + (to[i] - c) * f).toString(16).padStart(2, "0")).join("")}`;
+}
 
 // The words each journey uses for its score: "+800 m", "Depth 2,400 m · seabed 6,000 m".
 // The words are in the language on screen (i18n.js), read when shown.
@@ -33955,7 +34846,9 @@ function createJourney(type, container, { summit = 6000, tall = null, look = nul
     rounds: 0,
     unit: JOURNEYS[type]?.unit || "m",
     look: journeyLook(),
-    view: { x: 0, y: 0, w: W, h: H }
+    view: { x: 0, y: 0, w: W, h: H },
+    // The end screen's signs: where the day's top 50 / 20 / 5 / 1 % started, and you.
+    ranks: null
   };
   // The wide camera: where it is now and where it's gliding to.
   let view = null;
@@ -33997,6 +34890,8 @@ function createJourney(type, container, { summit = 6000, tall = null, look = nul
     artCtx.translate(ox, 0);
     state.labelBoxes = [];
     state.look = journeyLook();
+    WIDE_PLATES.length = 0;
+    TALL_PLATES.length = 0;
     if (tall) beginFrame();
     scene.frame(p, state);
     // The scale plates go on top of everything, clear of Atlas (journey-hd.js).
@@ -34027,7 +34922,121 @@ function createJourney(type, container, { summit = 6000, tall = null, look = nul
     const k = reducedMotion() ? 1 : 1 - Math.exp(-dt * 2.5);
     for (const key of ["x", "y", "w", "h"]) view[key] += (target[key] - view[key]) * k;
     ctx.drawImage(art, view.x, view.y, view.w, view.h, 0, 0, canvas.width, canvas.height);
+    // (Before anything else draws: the plate logs are shared by every journey on the page.)
+    if (state.ranks) drawRanks(view, [...(tall ? TALL_PLATES : WIDE_PLATES)]);
   };
+
+  // The world's marks on the route (setRanks, only on the end screen): a pole and a sign
+  // in device pixels over the scene, at the score where each top % started that day, and
+  // a badge over the explorer with yours. Signs the score hasn't reached are dimmer; signs
+  // that would overlap step up.
+  const RANK_COLORS = ["#45e3ff", "#ffd45c", "#ff8a3d", "#ff5fa2"];
+  function drawRanks(view, plates = []) {
+    const scale = canvas.width / view.w;
+    // One "unit" is a canvas pixel block that comes out about 1.8 px on screen, so the 5-unit
+    // letters read as ~9 px text whatever the size of the journey.
+    const unit = Math.max(1, Math.round(1.8 * canvas.width / Math.max(1, canvas.clientWidth || canvas.width)));
+    const at = point => [(point.x + ox - view.x) * scale, (point.y - view.y) * scale];
+    const font = `${5 * unit}px "Press Start 2P", monospace`;
+    ctx.save();
+    ctx.font = font;
+    ctx.textBaseline = "middle";
+    // `side`: where the sign hangs from its pole: centred (0), to the right (1) or left (-1).
+    const sign = (x, y, text, color, solid, lift, side = 0) => {
+      const pad = 3 * unit;
+      const w = Math.ceil(ctx.measureText(text).width) + pad * 2;
+      const h = 9 * unit;
+      const top = y - lift - h;
+      const want = side > 0 ? x - unit : side < 0 ? x - w + 2 * unit : x - w / 2;
+      const left = Math.max(unit, Math.min(canvas.width - w - unit, want));
+      ctx.globalAlpha = solid ? 1 : 0.6;
+      ctx.fillStyle = "rgba(4, 6, 13, 0.85)";
+      ctx.fillRect(left - unit, top - unit, w + unit * 2, h + unit * 2);
+      ctx.fillStyle = solid ? color : "#0b1124";
+      ctx.fillRect(left, top, w, h);
+      ctx.fillStyle = solid ? "#04060d" : color;
+      ctx.fillText(text, left + pad, top + h / 2 + unit / 2);
+      ctx.globalAlpha = 1;
+      return { left: left - unit, right: left + w + unit, top: top - unit, bottom: top + h + unit };
+    };
+    // Keep clear of the distance plates and the vehicles (in scene pixels → screen), and of
+    // the explorer: your own badge goes first, right over your head.
+    // A small journey (under 560 px on screen) gets the short labels: "50%", "YOU 10%".
+    const compact = (canvas.clientWidth || canvas.width) < 560;
+    const labelOf = item => (compact && item.short) || item.label;
+    const placed = plates.map(box => {
+      const [l, t] = at({ x: box.l, y: box.t });
+      const [r, b] = at({ x: box.r, y: box.b });
+      return { left: l, top: t, right: r, bottom: b };
+    });
+    const clear = box => box.top > 0 && !placed.some(other => box.left < other.right && box.right > other.left && box.top < other.bottom && box.bottom > other.top);
+    // The SAMPLE note, top right, first, so no sign covers it.
+    if (state.ranks.note) {
+      ctx.font = `${4 * unit}px "Press Start 2P", monospace`;
+      ctx.fillStyle = "rgba(4, 6, 13, 0.7)";
+      const w = ctx.measureText(state.ranks.note).width + 6 * unit;
+      ctx.fillRect(canvas.width - w - 2 * unit, 2 * unit, w, 8 * unit);
+      ctx.fillStyle = "#b9c2dd";
+      ctx.fillText(state.ranks.note, canvas.width - w + unit, 6 * unit + unit / 2);
+      placed.push({ left: canvas.width - w - 4 * unit, right: canvas.width, top: 0, bottom: 12 * unit });
+    }
+    const headAt = scene.head(state);
+    const [hx, hy] = at(headAt);
+    placed.push({ left: hx - 14 * scale, right: hx + 14 * scale, top: hy - 2 * scale, bottom: hy + 18 * scale });
+    let drawYou = null;
+    if (state.ranks.you) {
+      ctx.font = font;
+      const youText = (compact && state.ranks.youShort) || state.ranks.you;
+      const width = ctx.measureText(youText).width + 8 * unit;
+      const youLeft = Math.max(0, Math.min(canvas.width - width, hx - width / 2));
+      // Above the head if there's room, else under the explorer (the balloon at the top).
+      const fits = l => { const box = { left: youLeft, right: youLeft + width, top: hy - l - 11 * unit, bottom: hy - l + unit }; return box.bottom < canvas.height && clear(box); };
+      const ups = [];
+      for (let l = 4 * unit; l <= 40 * unit; l += 3 * unit) ups.push(l);
+      const below = -(18 * scale + 10 * unit);
+      const lift = ups.find(fits) ?? (fits(below) ? below : ups.find(l => hy - l - 11 * unit > 0) ?? below);
+      // Reserved now, drawn last (on top of any pole that has to pass it).
+      const youBox = { left: youLeft - unit, right: youLeft + width + unit, top: hy - lift - 10 * unit, bottom: hy - lift + unit };
+      placed.push(youBox);
+      drawYou = () => sign(hx, hy, youText, "#ffffff", true, lift);
+    }
+    state.ranks.marks.forEach((mark, index) => {
+      const [x, y] = at(route.at(Math.min(1, mark.value / summit)));
+      const color = RANK_COLORS[index % RANK_COLORS.length];
+      const reached = state.value >= mark.value;
+      // Where the sign goes: as low as possible, centred over its pole or hanging to one
+      // side like a flag, with neither the sign nor the pole crossing anything placed.
+      ctx.font = font;
+      const text = labelOf(mark);
+      const width = ctx.measureText(text).width + 6 * unit;
+      const boxFor = (lift, side) => {
+        const want = side > 0 ? x - 2 * unit : side < 0 ? x - width + 3 * unit : x - width / 2;
+        const left = Math.max(0, Math.min(canvas.width - width, want));
+        return { left, right: left + width, top: y - lift - 11 * unit, bottom: y - lift + unit };
+      };
+      const poleFor = lift => ({ left: x - unit, right: x + 2 * unit, top: y - lift, bottom: y - 2 * unit });
+      // The first free spot from the bottom up; if there's none, the one that covers least.
+      const overlap = box => placed.reduce((sum, o) => sum + Math.max(0, Math.min(box.right, o.right) - Math.max(box.left, o.left)) * Math.max(0, Math.min(box.bottom, o.bottom) - Math.max(box.top, o.top)), 0) + (box.top < 0 ? 1e9 : 0);
+      let best = null;
+      for (let up = 14 * unit; up <= 110 * unit && !(best && best.cost === 0); up += 3 * unit) {
+        for (const s of [0, 1, -1]) {
+          const cost = overlap(boxFor(up, s)) + overlap(poleFor(up));
+          if (!best || cost < best.cost) best = { cost, lift: up, side: s };
+          if (cost === 0) break;
+        }
+      }
+      const { lift, side } = best;
+      ctx.globalAlpha = reached ? 1 : 0.6;
+      ctx.fillStyle = "rgba(4, 6, 13, 0.85)";
+      ctx.fillRect(Math.round(x) - unit, y - lift, unit * 3, lift);
+      ctx.fillStyle = color;
+      ctx.fillRect(Math.round(x), y - lift, unit, lift);
+      ctx.fillRect(Math.round(x) - unit, y - unit, unit * 3, unit * 2);
+      placed.push(sign(x, y, text, color, reached, lift, side), poleFor(lift));
+    });
+    if (drawYou) { ctx.font = font; drawYou(); }
+    ctx.restore();
+  }
   // True while the camera is still on its way.
   const gliding = () => view && ["x", "y", "w", "h"].some(key => Math.abs(state.view[key] - view[key]) > 0.3);
 
@@ -34081,7 +35090,8 @@ function createJourney(type, container, { summit = 6000, tall = null, look = nul
       state.colorOf = new Map(stretches.map(part => [part.to, part.color]));
       state.stops = stops.map(stop => ({ f: Math.min(stop, summit) / summit, value: stop, color: state.colorOf.get(stop) || "#ffffff" }));
       state.rounds = stretches.filter(part => part.to <= clamped + 0.5).length;
-      state.view = viewFor(scene, clamped, summit, { w: W, h: H, ox });
+      // With the world's signs on it, the whole route is in view (they run to the end).
+      state.view = state.ranks ? { x: 0, y: 0, w: W, h: H } : viewFor(scene, clamped, summit, { w: W, h: H, ox });
       dirty = true;
       wake();
     },
@@ -34140,6 +35150,14 @@ function createJourney(type, container, { summit = 6000, tall = null, look = nul
       requestAnimationFrame(step);
       return time;
     },
+    // The end screen's world signs: { marks: [{ value, label, short }], you, youShort, note },
+    // or null (short labels for a small journey).
+    setRanks(ranks) {
+      state.ranks = ranks;
+      if (ranks) state.view = { x: 0, y: 0, w: W, h: H };
+      dirty = true;
+      wake();
+    },
     // Jumps a replay to its end (set by replay()).
     finish() {},
     stop() {
@@ -34164,7 +35182,7 @@ const BUBBLE = [
 const BUBBLE_COLORS = { K: "#0b1020", W: "#f4f1e8" };
 const drawBubble = (p, x, y) => p.sprite(BUBBLE, BUBBLE_COLORS, x - 3, y - BUBBLE.length);
 
-return { ROUND_COLORS, JOURNEYS, scoreTier, createJourney };
+return { ROUND_COLORS, scoreColor, JOURNEYS, scoreTier, createJourney };
 })();
 
 // ---- config.js
@@ -39339,7 +40357,41 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     open.appendChild(element("span", "glance-more", t("glance.open")));
     glanceCard.classList.toggle("is-quiet", quiet);
     glanceCard.replaceChildren(open, ...(extra.children.length ? [extra] : []));
+    renderHeroCrew(data, note);
     if (tileNote) tileNote.textContent = note;
+  }
+  // CREW's row on the menu card (26 November 2026: the card has one size on every tab): the
+  // week's top of your crew on one line, or one line and one button to get there.
+  function renderHeroCrew(data, note) {
+    const box = document.getElementById("heroCrew");
+    if (!box) return;
+    const parts = [];
+    if (signedIn() && data?.group && !data.error) {
+      const monday = mondayOf(today);
+      const ranked = withPlaces(standings(data.people, monday, addDays(monday, 6)));
+      const me = getUser().id;
+      const mine = ranked.find(entry => entry.person.id === me);
+      const shown = ranked.slice(0, 3);
+      if (mine && !shown.includes(mine)) shown.splice(2, 1, mine);
+      const row = element("ol", "hero-crew-board");
+      shown.forEach(entry => {
+        const item = element("li");
+        item.classList.toggle("is-you", entry.person.id === me);
+        const rank = element("span", "glance-rank");
+        const medal = getGroupMedal(entry.place);
+        if (medal) rank.appendChild(createMedal(medal, 16));
+        else rank.textContent = `#${entry.place}`;
+        item.append(rank, element("span", "hero-crew-name", entry.person.name), element("b", "", entry.score.toLocaleString(locale())));
+        row.appendChild(item);
+      });
+      parts.push(element("span", "hero-crew-title", `${data.group.name} · ${t("glance.week")}`));
+      parts.push(ranked.length ? row : element("p", "hero-crew-text", t("glance.nobodyYet")));
+    } else {
+      parts.push(element("p", "hero-crew-text", signedIn() ? note : t(isConfigured ? "glance.signedOut" : "glance.accountsOff")));
+      if (!signedIn() && isConfigured) parts.push(button("hero-side", t("account.signIn"), event => { event.stopPropagation(); document.getElementById("accountModal").classList.remove("hidden"); }));
+      else if (signedIn() && data && !data.error && !data.friends.length) parts.push(button("hero-side", t(navigator.share ? "camp.share" : "community.copyLink"), event => { event.stopPropagation(); shareInvite(inviteLink(data.profile.invite_code)); }));
+    }
+    box.replaceChildren(...parts);
   }
   const open_ = () => open();
 
@@ -40009,7 +41061,7 @@ function createDuel({ globe, onExit, onSignIn, onMatchStart = () => {}, notice =
     globe.setGuessPath([]);
     if (round.style === "pin") {
       globe.setHighlights([]);
-      if (local.pin) globe.addMarker(local.pin.lat, local.pin.lon, COLORS.you, t("duel.yourPin"), "?");
+      if (local.pin) globe.addMarker(local.pin.lat, local.pin.lon, COLORS.you, t("duel.yourPin"), "", { pin: true });
     } else if (round.style === "route") {
       const { start, end } = round.question;
       const path = (local.route || []).map(iso => ({ country: COUNTRY.get(iso), color: hex(COLORS.you), fill: true }));
@@ -40906,11 +41958,11 @@ function createDuel({ globe, onExit, onSignIn, onMatchStart = () => {}, notice =
     globe.setGuessPath([]);
     if (round.style === "pin") {
       globe.setHighlights([]);
-      globe.addMarker(r.answer.lat, r.answer.lon, COLORS.answer, t("duel.answer"), "✓");
-      if (you.pin) globe.addMarker(you.pin.lat, you.pin.lon, COLORS.you, nameOf(me()), "1");
-      others().forEach((who, index) => { const pin = r[who]?.pin; if (pin) globe.addMarker(pin.lat, pin.lon, colorOf(who), nameOf(who), String(index + 2)); });
+      globe.addMarker(r.answer.lat, r.answer.lon, COLORS.answer, t("duel.answer"), "✓", { pin: true });
+      if (you.pin) globe.addMarker(you.pin.lat, you.pin.lon, COLORS.you, nameOf(me()), "", { pin: true });
+      others().forEach((who, index) => { const pin = r[who]?.pin; if (pin) globe.addMarker(pin.lat, pin.lon, colorOf(who), nameOf(who), "", { pin: true }); });
       if (you.pin) globe.setGuessPath([you.pin, { lat: r.answer.lat, lon: r.answer.lon }]);
-      globe.rotateTo(r.answer.lat, r.answer.lon);
+      if (you.pin) globe.showBoth(you.pin, r.answer); else globe.rotateTo(r.answer.lat, r.answer.lon);
     } else if (round.style === "route") {
       const example = [round.question.start, ...(r.answer.example || [])];
       const mine = you.route || [];
@@ -42384,6 +43436,7 @@ function createWorldMap(canvas, colorOf, { view = null } = {}) {
   const lit = new Map();
   const colors = new Map();
   const pins = [];
+  const lines = [];
   const timers = [];
   let pick = null;
   let shapes = null;
@@ -42489,6 +43542,25 @@ function createWorldMap(canvas, colorOf, { view = null } = {}) {
       ctx.strokeStyle = "#04060d";
       ctx.stroke();
     }
+    // Lines between two places (Drop a Pin: your pin to the spot), along the great circle.
+    for (const { a, b, color } of lines) {
+      const rad = Math.PI / 180;
+      const v = ({ lat, lon }) => [Math.cos(lat * rad) * Math.cos(lon * rad), Math.cos(lat * rad) * Math.sin(lon * rad), Math.sin(lat * rad)];
+      const [p, q] = [v(a), v(b)];
+      const angle = Math.acos(Math.max(-1, Math.min(1, p[0] * q[0] + p[1] * q[1] + p[2] * q[2])));
+      ctx.beginPath();
+      for (let step = 0; step <= 48; step += 1) {
+        const f = step / 48;
+        const wa = angle < 1e-6 ? 1 - f : Math.sin((1 - f) * angle) / Math.sin(angle);
+        const wb = angle < 1e-6 ? f : Math.sin(f * angle) / Math.sin(angle);
+        const [x3, y3, z3] = [0, 1, 2].map(i => p[i] * wa + q[i] * wb);
+        const [x, y] = toScreen(project(Math.atan2(y3, x3) / rad, Math.atan2(z3, Math.hypot(x3, y3)) / rad));
+        if (step) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+      }
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = color;
+      ctx.stroke();
+    }
     for (const p of [...pins].sort((a, b) => (a.big ? 1 : 0) - (b.big ? 1 : 0))) {
       const [x, y] = toScreen(project(p.lon, p.lat));
       const r = p.big ? 6 : 4.5;
@@ -42537,6 +43609,7 @@ function createWorldMap(canvas, colorOf, { view = null } = {}) {
     setColor(iso, color) { colors.set(iso, color); redraw(); },
     setPick(iso) { pick = iso || null; redraw(); },
     pin(p) { pins.push(p); redraw(); },
+    line(a, b, color = "#ffd45c") { lines.push({ a, b, color }); redraw(); },
     stop() {
       cancelAnimationFrame(frame);
       frame = 0;
@@ -43827,12 +44900,82 @@ function createLiveTraffic({ isActive = () => true, isLand = () => false, thin =
 return { createLiveTraffic };
 })();
 
+// ---- pin-where.js
+__modules["pin-where.js"] = (() => {
+// Drop a Pin: where the place is, in words (the reveal card, the round's result and the score
+// card). No DOM, so the tools can check it too.
+const { CITIES } = __modules["place-data.js"];
+const { CAPITALS } = __modules["capital-data.js"];
+const { countryName, getLang, num, t } = __modules["i18n.js"];
+const { distance } = __modules["units.js"];
+const { getCountry } = __modules["daily.js"];
+
+// Where a Drop a Pin place is, in two short lines: Wikidata's description ("Bridge over the
+// Havel river near Potsdam", built into daily-pins.js) and where that is from a city people
+// know (Natural Earth's cities of 200,000+; "big" = 1 million+ or the capital), in the place's
+// own country (Wikidata P17): "83 km north-west of London, United Kingdom", "In Potsdam,
+// 25 km south-west of Berlin, Germany", "In Barcelona, Spain", or just the country. Nothing
+// typed by hand: it all comes from the sources and the coordinates.
+function pinWhere(round) {
+  const desc = round.where?.desc?.[getLang()] || round.where?.desc?.en || "";
+  const RAD = Math.PI / 180;
+  const iso = round.where?.country?.iso;
+  const capital = CAPITALS[iso]?.name;
+  const cities = CITIES.filter(city => !iso || city[1] === iso).map(([name, cityIso, , lat, lon, pop]) => {
+    const a = Math.sin((lat - round.lat) * RAD / 2) ** 2 + Math.cos(round.lat * RAD) * Math.cos(lat * RAD) * Math.sin((lon - round.lon) * RAD / 2) ** 2;
+    return { name, iso: cityIso, lat, lon, km: 2 * 6371 * Math.asin(Math.min(1, Math.sqrt(a))), big: pop >= 1e6 || name === capital };
+  });
+  const nearest = list => list.reduce((best, city) => (!best || city.km < best.km ? city : best), null);
+  const closest = nearest(cities);
+  const countryOf = code => { const country = getCountry(code); return country ? countryName(country) : ""; };
+  // Without a country from Wikidata (Tristan da Cunha: "realm of the United Kingdom"), a city
+  // only counts nearby, and so does its country (Cape Town is not where Tristan is).
+  const country = countryOf(iso || (closest?.km <= 300 ? closest.iso : null));
+  const from = city => {
+    const y = Math.sin((round.lon - city.lon) * RAD) * Math.cos(round.lat * RAD);
+    const x = Math.cos(city.lat * RAD) * Math.sin(round.lat * RAD) - Math.sin(city.lat * RAD) * Math.cos(round.lat * RAD) * Math.cos((round.lon - city.lon) * RAD);
+    const bearing = (Math.atan2(y, x) / RAD + 360) % 360;
+    const away = distance(city.km);
+    const n = away.value >= 20 ? Math.round(away.value / 5) * 5 : Math.round(away.value);
+    return t("pin.fromCity", { n: num(n), unit: away.unit, dir: t(`pin.dir.${["n", "ne", "e", "se", "s", "sw", "w", "nw"][Math.round(bearing / 45) % 8]}`), city: city.name });
+  };
+  const withCountry = text => (country ? `${text}, ${country}` : text);
+  let near = "";
+  const inTown = closest && closest.km < 10 ? closest : null;
+  // The town is already named (in the place's name, Venice, or in the description, "near
+  // Potsdam"): then the line doesn't say it again.
+  const named = inTown && [round.article, desc].some(text => text.toLowerCase().includes(inTown.name.toLowerCase()));
+  if (inTown && inTown.big) {
+    near = named ? country : withCountry(t("pin.inCity", { city: inTown.name }));
+  } else if (inTown) {
+    // A smaller town: also how far it is from a big city nearby.
+    // A town the place is named after (Venice, Gdańsk) only gets a big city close by.
+    const big = nearest(cities.filter(city => city.big && city.km <= (named ? 150 : 300)));
+    near = big ? withCountry(named ? from(big) : `${t("pin.inCity", { city: inTown.name })}, ${from(big)}`) : named ? country : withCountry(t("pin.inCity", { city: inTown.name }));
+  } else if (closest && closest.km <= 300) {
+    // Out of town: the big city if it isn't much further than the nearest one.
+    const big = nearest(cities.filter(city => city.big && city.km <= Math.min(300, closest.km * 3 + 50)));
+    near = withCountry(from(big || closest));
+  }
+  // Far from any city (an island, an ocean trench) the line stays empty: Wikidata's one
+  // country can mislead there (Borneo is shared by three).
+  // The country alone says nothing new when the description already names it.
+  const names = [country, round.where?.country?.[getLang()], round.where?.country?.en].filter(Boolean).map(name => name.toLowerCase());
+  if (near === country && names.some(name => desc.toLowerCase().includes(name))) near = "";
+  // A description that only repeats the name (Dutch "Lhasa") adds nothing.
+  const said = desc && desc.toLowerCase() !== round.article.toLowerCase() ? desc : "";
+  return { desc: said ? said.charAt(0).toUpperCase() + said.slice(1) : "", near };
+}
+
+return { pinWhere };
+})();
+
 // ---- engine.js
 __modules["engine.js"] = (() => {
 const { createJourneyStrip } = __modules["journey-strip.js"];
 const { COUNTRIES, LEGACY_COUNTRY_ISOS, TERRITORIES } = __modules["countries.js"];
 const { LIGHT_DEVICE, PixelGlobe } = __modules["globe.js"];
-const { JOURNEYS, ROUND_COLORS, createJourney, scoreTier } = __modules["journeys.js"];
+const { JOURNEYS, ROUND_COLORS, createJourney, scoreColor, scoreTier } = __modules["journeys.js"];
 const { setJourneyLook } = __modules["journey-explorer.js"];
 const { getAccountUnits, getDuelHistory, saveUnits } = __modules["auth.js"];
 const { DUEL_ROUNDS, PARTY_MIN_START, rematchHost, rematchIn, rematchReady, rematchSeats, seatsOf, standings } = __modules["duel-rules.js"];
@@ -43841,7 +44984,7 @@ const { ROUND_PICTURES } = __modules["round-pictures.js"];
 const { CLUES } = __modules["clues.js"];
 const { sounds } = __modules["audio.js"];
 const { createDistributionChart, initializeHistoryScreens } = __modules["screens.js"];
-const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getTopPercent } = __modules["community.js"];
+const { RANK_TIERS, formatTopPercent, getDayStats, getMonthBadge, getTopPercent, scoreAtTopPercent } = __modules["community.js"];
 const { initializeCommunity } = __modules["social.js"];
 const { initChallenges } = __modules["challenge.js"];
 const { createDuel } = __modules["duel-view.js"];
@@ -43863,6 +45006,7 @@ const { CAPITALS } = __modules["capital-data.js"];
 const { FIND_LABELS, askQuestion, formatValue, getStandings, getStat, missingReason, scorePick } = __modules["extremes.js"];
 const { createBadge } = __modules["badges.js"];
 const { area: areaIn, distance, getUnits } = __modules["units.js"];
+const { pinWhere } = __modules["pin-where.js"];
 const { setUnits } = __modules["i18n.js"];
 const { LANGUAGES, applyI18n, clueText, countryName, getLang, localNames, locale, num, onLangChange, placeName, setLang, t, tapWords, unitText } = __modules["i18n.js"];
 // Note: every module must import a given file with the same "?v=" tag, or the browser
@@ -43907,14 +45051,14 @@ const AUTO_CONTINUE_WRONG_MS = 2000;
 
 const today = toUtcDateKey(new Date());
 
-// DAILY's icon in the menu bar (24 November 2026, team choice from mockups/menu-icons, option
-// G): a calendar page with today's date (the puzzle day, which changes at midnight UTC).
-function drawDailyIcon() {
-  const art = document.getElementById("dailyDockArt");
-  if (!art) return;
+// DAILY's icon (24 November 2026, team choice from mockups/menu-icons, option G): a calendar
+// page with today's date (the puzzle day, which changes at midnight UTC). The same 16×16
+// pixels in the menu bar, on DAILY's card and on its pin on the globe (26 November 2026,
+// team request: those still showed Highs & Lows' bars).
+function calendarPixels() {
   const DIGITS = { 0: "111101101101111", 1: "010110010010111", 2: "111001111100111", 3: "111001111001111", 4: "101101111001001", 5: "111100111001111", 6: "111100111101111", 7: "111001010010010", 8: "111101111101111", 9: "111101111001111" };
   const px = [];
-  const box = (x, y, w, h, fill) => px.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}"/>`);
+  const box = (x, y, w, h, fill) => px.push([x, y, w, h, fill]);
   box(1, 3, 14, 13, "#0b1020"); // outline
   box(2, 4, 12, 2, "#ff6b9d");
   box(2, 6, 12, 1, "#c94677");
@@ -43924,7 +45068,20 @@ function drawDailyIcon() {
   const left = 8 - Math.ceil((digits.length * 4 - 1) / 2);
   digits.forEach((digit, i) => [...DIGITS[digit]].forEach((on, n) => { if (on === "1") box(left + i * 4 + (n % 3), 8 + Math.floor(n / 3), 1, 1, "#0b1020"); }));
   [4, 11].forEach(x => { box(x, 2, 1, 2, "#dfe6f2"); box(x, 4, 1, 1, "#8a96b0"); });
-  art.innerHTML = `<svg viewBox="0 0 16 16" shape-rendering="crispEdges">${px.join("")}</svg>`;
+  return px;
+}
+function calendarSvg() {
+  return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges">${calendarPixels().map(([x, y, w, h, fill]) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}"/>`).join("")}</svg>`;
+}
+function calendarCanvas() {
+  const canvas = Object.assign(document.createElement("canvas"), { width: 16, height: 16 });
+  const ctx = canvas.getContext("2d");
+  calendarPixels().forEach(([x, y, w, h, fill]) => { ctx.fillStyle = fill; ctx.fillRect(x, y, w, h); });
+  return canvas;
+}
+function drawDailyIcon() {
+  const art = document.getElementById("dailyDockArt");
+  if (art) art.innerHTML = calendarSvg();
 }
 drawDailyIcon();
 // VERSUS's icon (25 November 2026, the team's pick from mockups/menu-icons: crossed swords),
@@ -43990,6 +45147,10 @@ let extremeRevealPending = false;
 // The globe mode's round whose result is still being revealed: the score tile and the
 // round list show the day as it was before it, until the climb lands.
 let extremeHeldRound = null;
+// Drop a Pin: LOCK IN was just pressed, so the round's reveal plays (playPinReveal).
+let pinRevealPending = false;
+let pinFlightDone = null;
+let pinReveal = null;
 // Deep Cut's near miss: the wrong try it belongs to and the answer it was probably meant to be.
 let deepcutSuggestion = null;
 // Set once today's last round is finished, so stats are saved only once.
@@ -44360,8 +45521,11 @@ function commit({ animateGlobe = true } = {}) {
   const movesOn = progress.done && !isDayComplete() && index < plan.length - 1;
   // When the next round follows, the cards stay aside until its title has been shown.
   // The globe mode first tours the world's heat map.
-  const tour = plan[index].type === "extreme" && progress.done ? (extremeFlightDone || extremeTour?.done) : null;
+  const tour = !progress.done ? null
+    : plan[index].type === "extreme" ? (extremeFlightDone || extremeTour?.done)
+    : plan[index].type === "pin" ? pinFlightDone : null;
   extremeFlightDone = null;
+  pinFlightDone = null;
   const scoreShown = !progress.done ? null : tour
     ? tour.then(() => showScoreBurst(index, { keepCardsOut: movesOn }))
     : showScoreBurst(index, { keepCardsOut: movesOn });
@@ -44512,9 +45676,10 @@ function getRoundInfo(round) {
       const state = day.rounds[plan.indexOf(round)];
       const progress = state?.pick ? getRoundProgress(round, state) : null;
       const away = progress ? distance(progress.km) : null;
+      const where = pinWhere(round);
       return {
         title: round.article,
-        text: round.text,
+        text: [where.desc, where.near].filter(Boolean).map(line => line.endsWith(".") ? line : `${line}.`).join(" ") || round.text,
         facts: [
           [t("pin.infoAway"), away ? `${num(Math.round(away.value))} ${away.unit}` : "–"],
           [t("pin.infoFull"), `${num(Math.round(distance(round.exact).value))} ${distance(round.exact).unit}`],
@@ -44603,10 +45768,14 @@ function renderInfoCard(container, info) {
     parts.push(figure);
   }
   const text = Object.assign(document.createElement("div"), { className: "info-text" });
-  text.append(
+  // The title, text, bars and extras in one box, apart from the facts: on a computer's score
+  // card they fill different rows (display: contents everywhere else, so nothing changes).
+  const body = Object.assign(document.createElement("div"), { className: "info-body" });
+  body.append(
     Object.assign(document.createElement("h3"), { textContent: info.title }),
     info.textElement?.() || Object.assign(document.createElement("p"), { textContent: info.text })
   );
+  text.append(body);
   if (info.bars) {
     const highest = Math.max(...info.bars.map(bar => bar.value));
     const bars = Object.assign(document.createElement("ol"), { className: "info-bars" });
@@ -44621,9 +45790,9 @@ function renderInfoCard(container, info) {
       );
       bars.appendChild(row);
     });
-    text.appendChild(bars);
+    body.appendChild(bars);
   }
-  if (info.extra) text.append(...info.extra());
+  if (info.extra) body.append(...info.extra());
   const facts = Object.assign(document.createElement("dl"), { className: "info-facts" });
   info.facts.forEach(([label, value]) => {
     const fact = document.createElement("div");
@@ -44696,6 +45865,7 @@ function renderBurstAnswer(round, result) {
     const away = distance(result.km ?? 0);
     kicker = t(result.solved ? "pin.burstSpotOn" : "pin.burstAway", { n: num(Math.round(away.value)), unit: away.unit });
     name = round.article;
+    note = pinWhere(round).near;
   } else if (round.type === "extreme") {
     // Your pick up top (with its rank), then the answer, the runner-up and the other end,
     // each with its place in the pecking order.
@@ -44749,9 +45919,37 @@ function arrangeBurstPages(info, index) {
     const hint = Object.assign(document.createElement("button"), { type: "button", id: "scoreBurstSwipe", className: "burst-swipe" });
     hint.addEventListener("click", event => { event.stopPropagation(); pages.scrollTo({ left: pages.clientWidth, behavior: "smooth" }); });
     const crewBox = Object.assign(document.createElement("div"), { id: "scoreBurstCrew", className: "crew-card", hidden: true });
-    first.append(part("scoreBurstRound"), part("scoreBurstLabel"), part("scoreBurstPointsBox"), part("scoreBurstStreak"), crewBox, part("scoreBurstClimb"), part("scoreBurstTotalLine"), hint);
-    second.append(part("scoreBurstAnswer"), part("scoreBurstInfo"));
+    // On a computer (26 November 2026, the team's pick B1 from mockups/score-desktop): the
+    // two pages are two halves that mirror each other row by row (style.css, subgrid): the
+    // place on the left (answer, text, picture or map, facts), your journey on the right
+    // (points, the day so far, the journey, three tiles). The wrappers below have
+    // display: contents on a phone, so the pages there are as they were.
+    const make = (tag, props) => Object.assign(document.createElement(tag), props);
+    const top = make("div", { className: "burst-j-top" });
+    top.append(make("span", { id: "scoreBurstJourneyLabel", className: "burst-j-label" }), part("scoreBurstPointsBox"));
+    const sub = make("div", { className: "burst-j-sub" });
+    sub.append(part("scoreBurstTotalLine"), part("scoreBurstStreak"), crewBox);
+    const tiles = make("dl", { id: "scoreBurstTiles", className: "info-facts burst-j-tiles" });
+    first.append(part("scoreBurstRound"), part("scoreBurstLabel"), top, sub, part("scoreBurstClimb"), tiles, hint);
+    // Drop a Pin: a flat map with both pins, with a tab to see the photo instead.
+    const map = make("div", { id: "scoreBurstMap", className: "burst-map", hidden: true });
+    map.append(make("canvas", {}), make("span", { id: "scoreBurstMapAway", className: "burst-map-away" }));
+    const tabs = make("div", { id: "scoreBurstTabs", className: "burst-tabs", hidden: true });
+    ["map", "photo"].forEach(tab => {
+      const button = make("button", { type: "button", textContent: t(`burst.tab.${tab}`) });
+      button.dataset.tab = tab;
+      button.dataset.i18n = `burst.tab.${tab}`;
+      button.addEventListener("click", event => { event.stopPropagation(); showBurstTab(tab); });
+      tabs.append(button);
+    });
+    second.append(part("scoreBurstAnswer"), part("scoreBurstInfo"), map, tabs);
     pages.append(first, second);
+    // Above both halves on a computer: the round, how it went, and the five rounds.
+    const head = make("div", { id: "scoreBurstHead", className: "burst-head" });
+    const headRow = make("div", { className: "burst-head-row" });
+    headRow.append(make("span", { id: "scoreBurstHeadRound", className: "burst-head-round" }), make("span", { id: "scoreBurstHeadPill", className: "burst-head-pill" }));
+    head.append(headRow, make("div", { id: "scoreBurstChips", className: "burst-chips" }));
+    card.prepend(head);
     const dots = Object.assign(document.createElement("div"), { id: "scoreBurstDots", className: "burst-dots" });
     dots.setAttribute("aria-hidden", "true");
     dots.append(document.createElement("i"), document.createElement("i"));
@@ -44769,6 +45967,83 @@ function arrangeBurstPages(info, index) {
   setText("scoreBurstSwipe", answer ? t("burst.swipeFor", { name: answer.toUpperCase() }) : t(plan[index].type === "extreme" ? "burst.swipeRanking" : "burst.swipeAnswer"));
   document.getElementById("scoreBurstSwipe").classList.toggle("has-info", Boolean(info));
 }
+
+// Drop a Pin's map or its photo, in the same spot on the score card.
+function showBurstTab(tab) {
+  document.querySelectorAll("#scoreBurstTabs button").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.tab === tab)));
+  document.querySelector(".score-burst-card").classList.toggle("is-photo-tab", tab === "photo");
+}
+
+// The score card's top on a computer, the journey's tiles, and Drop a Pin's map.
+let burstMap = null;
+function fillBurstDesktop(index, result) {
+  const dayScore = getDayScore(plan, day.rounds);
+  const words = JOURNEYS[getJourney(activeDate, activeMode)];
+  const color = scoreColor(result.points);
+  const card = document.querySelector(".score-burst-card");
+  card.style.setProperty("--burst-grade", color);
+  setText("scoreBurstHeadRound", `${t("intro.roundOf", { n: index + 1, total: plan.length })} · ${roundName(plan[index]).toUpperCase()}`);
+  setText("scoreBurstHeadPill", t(result.isPerfect ? "result.perfect" : result.points ? "result.complete" : "result.zero"));
+  document.getElementById("scoreBurstChips").replaceChildren(...dayScore.rounds.map((round, i) => {
+    const chip = Object.assign(document.createElement("span"), { className: `burst-chip${round.done ? " is-done" : ""}${i === index ? " is-this" : ""}` });
+    if (round.done) chip.style.setProperty("--c", scoreColor(round.points));
+    chip.append(Object.assign(document.createElement("b"), { textContent: i + 1 }), document.createTextNode(round.done ? round.points.toLocaleString(locale()) : "·"));
+    return chip;
+  }));
+  setText("scoreBurstJourneyLabel", `${t("burst.yourJourney")} · ${t("burst.thisRound")}`);
+  const unit = ` ${words.unit}`;
+  const max = getMaxScore(activeMode);
+  const tile = (label, value) => {
+    const fact = document.createElement("div");
+    fact.append(Object.assign(document.createElement("dt"), { textContent: label }), Object.assign(document.createElement("dd"), { textContent: value }));
+    return fact;
+  };
+  document.getElementById("scoreBurstTiles").replaceChildren(
+    tile(t("burst.thisRound"), `${result.points.toLocaleString(locale())}${unit}`),
+    tile(t("burst.today"), `${dayScore.total.toLocaleString(locale())}${unit}`),
+    tile(t("burst.toGo"), `${Math.max(0, max - dayScore.total).toLocaleString(locale())}${unit}`)
+  );
+  // The map, only for Drop a Pin (with the photo behind a tab).
+  const round = plan[index];
+  const state = day.rounds[index];
+  const map = document.getElementById("scoreBurstMap");
+  const tabs = document.getElementById("scoreBurstTabs");
+  const isPin = round.type === "pin" && Boolean(state?.pick);
+  map.hidden = !isPin;
+  tabs.hidden = !isPin || !round.picture && !getRoundInfo(round)?.picture;
+  card.classList.toggle("has-map", isPin);
+  showBurstTab("map");
+  burstMap?.stop();
+  burstMap = null;
+  if (!isPin) return;
+  const away = distance(getRoundProgress(round, state).km);
+  setText("scoreBurstMapAway", `${num(Math.round(away.value))} ${away.unit}`);
+  const old = map.querySelector("canvas");
+  const canvas = document.createElement("canvas");
+  old.replaceWith(canvas);
+  const spanDeg = Math.max(Math.abs(round.lat - state.pick.lat), Math.abs(((round.lon - state.pick.lon + 540) % 360) - 180) * Math.cos(((round.lat + state.pick.lat) / 2) * Math.PI / 180));
+  const visible = Math.max(spanDeg * 5, 40);
+  burstMap = createWorldMap(canvas, () => "#30406e", { view: { lat: (round.lat + state.pick.lat) / 2, lon: state.pick.lon + (((round.lon - state.pick.lon + 540) % 360) - 180) / 2, scale: Math.max(1, 360 / visible) } });
+  burstMap.line(state.pick, { lat: round.lat, lon: round.lon }, "#ffd45c");
+  burstMap.pin({ lat: state.pick.lat, lon: state.pick.lon, color: "#ffd45c" });
+  burstMap.pin({ lat: round.lat, lon: round.lon, color: "#5cd26a", big: true });
+  burstMapSize = "";
+  burstMapObserver.observe(map);
+  fitBurstMap();
+  requestAnimationFrame(fitBurstMap);
+}
+// The map follows its box (the card lays out after it's shown, and on a window resize).
+let burstMapSize = "";
+function fitBurstMap() {
+  const map = document.getElementById("scoreBurstMap");
+  if (!burstMap || !map || map.hidden || !map.clientWidth) return;
+  const size = `${map.clientWidth}x${map.clientHeight}`;
+  if (size === burstMapSize) return;
+  burstMapSize = size;
+  burstMap.size(map.clientWidth, map.clientHeight);
+}
+const burstMapObserver = new ResizeObserver(() => fitBurstMap());
+burstMapObserver.observe(document.getElementById("scoreBurst"));
 
 // The score card's words and answer (again after a language switch).
 let burstIndex = 0;
@@ -44797,9 +46072,14 @@ function fillScoreBurst(index) {
   if (info) renderBurstMore(info);
   // Deep Cut's long answer list gets the left column; its journey moves under the info.
   document.querySelector(".score-burst-card").classList.toggle("is-deepcut", plan[index].type === "deepcut");
+  document.querySelector(".score-burst-card").classList.toggle("is-paint", plan[index].type === "paint");
   // Highs & Lows: the pecking order gets the room (see style.css).
   document.querySelector(".score-burst-card").classList.toggle("is-extreme", plan[index].type === "extreme");
   arrangeBurstPages(info, index);
+  fillBurstDesktop(index, result);
+  // On a computer the info card's title is left out when it only repeats the answer.
+  const infoTitle = infoCard.querySelector(".info-body h3");
+  infoTitle?.classList.toggle("is-repeat", infoTitle.textContent.trim().toLowerCase() === document.getElementById("scoreBurstAnswerName").textContent.trim().toLowerCase());
   // YOUR CREW: what your crewmates picked on this Highs & Lows round (crew-card.js).
   const crewBox = document.getElementById("scoreBurstCrew");
   if (plan[index].type === "extreme" && activeMode === MAIN_MODE) {
@@ -45193,7 +46473,9 @@ function render({ animateGlobe = true } = {}) {
     const result = dayScore.rounds[index];
     button.type = "button";
     button.className = "round-row";
-    button.style.setProperty("--round-color", ROUND_COLORS[index]);
+    // Coloured by how it went (red nothing, green a full 1,000), not by its number.
+    button.style.setProperty("--round-color", result.done ? scoreColor(result.points) : ROUND_COLORS[index]);
+    button.classList.toggle("is-scored", result.done);
     button.classList.toggle("is-viewing", index === viewIndex);
     button.classList.toggle("is-perfect", result.done && result.isPerfect);
     button.classList.toggle("is-partial", result.done && !result.isPerfect && result.score > 0);
@@ -45356,7 +46638,7 @@ function getStretches(dayScore, count = dayScore.rounds.length) {
   return dayScore.rounds.slice(0, count).map((round, index) => {
     const from = altitude;
     altitude += round.points;
-    return { from, to: altitude, color: ROUND_COLORS[index] };
+    return { from, to: altitude, color: scoreColor(round.points) };
   });
 }
 
@@ -45726,7 +47008,7 @@ const ROUND_RENDERERS = {
     result.classList.toggle("hidden", !progress.done);
     if (!progress.done) {
       selection.textContent = pin ? t("pin.placed") : tapWords(t("pin.clickGlobe"));
-      if (pin) globe.addMarker(pin.lat, pin.lon, "#ffd45c", t("pin.yourPin"), "?");
+      if (pin) globe.addMarker(pin.lat, pin.lon, "#ffd45c", t("pin.yourPin"), "", { pin: true });
       setStageChip(t("stage.pin"), null, pin ? t("pin.placedShort") : t("pin.onGlobe"));
       return;
     }
@@ -45734,13 +47016,24 @@ const ROUND_RENDERERS = {
     const awayText = t("pin.away", { n: num(Math.round(away.value)), unit: away.unit });
     selection.textContent = awayText;
     setText("pinResultPlace", round.article);
+    setText("pinResultWhere", pinWhereText(round));
     setText("pinResultAway", awayText);
     setText("pinResultRule", t("pin.rule", { full: `${num(Math.round(distance(round.exact).value))} ${away.unit}`, zero: `${num(Math.round(distance(round.zero).value))} ${away.unit}` }));
-    globe.addMarker(round.lat, round.lon, "#5cd26a", round.article, "✓");
-    globe.addMarker(state.pick.lat, state.pick.lon, "#ffd45c", t("pin.yourPin"), "1");
-    globe.setGuessPath([state.pick, { lat: round.lat, lon: round.lon }]);
     setStageChip(t("stage.answer"), null, round.article);
-    if (options.animateGlobe && !quietArrival) globe.rotateTo(round.lat, round.lon, 900);
+    // Right after LOCK IN: the reveal on the globe (your pin, the line, the place), before
+    // the score card (see commit). Revisiting the round shows the same end picture.
+    if (pinRevealPending) {
+      pinRevealPending = false;
+      const roundIndex = viewIndex;
+      const token = revealToken;
+      pinFlightDone = Promise.resolve().then(() => {
+        if (token !== revealToken || plan[roundIndex]?.type !== "pin" || viewIndex !== roundIndex || !isGameViewVisible || globe.mode !== "game") return null;
+        return playPinReveal(round, state, progress);
+      });
+      return;
+    }
+    showPinResult(round, state);
+    if (options.animateGlobe && !quietArrival) globe.showBoth(state.pick, round, 900);
   },
 
   extreme(round, state, progress, options) {
@@ -46195,6 +47488,9 @@ function cancelPendingReveal() {
   revealToken += 1;
   extremeFlightDone = null;
   extremeRevealPending = false;
+  pinFlightDone = null;
+  pinRevealPending = false;
+  pinReveal?.abort();
 }
 const legTracks = new Map();
 function legTrack(from, to) {
@@ -46225,7 +47521,103 @@ function confirmPinPick() {
   if (!isPlaying("pin") || !pinSelection) return;
   day.rounds[viewIndex].pick = { lat: Math.round(pinSelection.lat * 1e4) / 1e4, lon: Math.round(pinSelection.lon * 1e4) / 1e4 };
   pinSelection = null;
+  pinRevealPending = true;
+  // The score tile waits for the reveal, and the round's card goes aside so the globe shows.
+  extremeHeldRound = viewIndex;
+  document.getElementById("gameView").classList.add("is-revealing");
+  updatePhoneFrame(PHONE_SHIFT_MS);
+  verdictPlayed = true;
   commit();
+}
+
+// The two lines under the place's name (shown with white-space: pre-line).
+const pinWhereText = round => { const where = pinWhere(round); return [where.desc, where.near].filter(Boolean).join("\n"); };
+
+// Drop a Pin's end picture: your pin, the place's pin (✓) and the line between them.
+function showPinResult(round, state, { upTo = 1, answer = true } = {}) {
+  globe.clearMarkers();
+  if (answer) globe.addMarker(round.lat, round.lon, "#5cd26a", round.article, "✓", { pin: true });
+  globe.addMarker(state.pick.lat, state.pick.lon, "#ffd45c", t("pin.yourPin"), "", { pin: true });
+  globe.setGuessPath([state.pick, { lat: round.lat, lon: round.lon }], { upTo });
+}
+
+// The reveal after LOCK IN: the globe frames your pin and the place, a line runs from your
+// pin to it, the place's pin drops and the distance counts up. Then it waits for CONTINUE
+// (a click, Enter or space) before the score card. SKIP (or a click while it runs) jumps
+// to the end picture.
+function playPinReveal(round, state, progress) {
+  const card = document.getElementById("pinReveal");
+  const go = document.getElementById("pinRevealGo");
+  const away = distance(progress.km);
+  setText("pinRevealPlace", round.article);
+  setText("pinRevealWhere", pinWhereText(round));
+  const awayText = document.getElementById("pinRevealAway");
+  awayText.textContent = "";
+  card.classList.remove("is-landed", "is-spot-on");
+  const target = { lat: round.lat, lon: round.lon };
+  let frame = 0, timer = 0, landed = false, finish, hideSkip;
+  const done = new Promise(resolve => { finish = resolve; });
+  const end = () => {
+    cancelAnimationFrame(frame);
+    clearTimeout(timer);
+    hideSkip?.();
+    card.classList.add("hidden");
+    window.removeEventListener("keydown", onKey, true);
+    card.removeEventListener("click", onClick);
+    document.getElementById("gameView").classList.remove("is-revealing");
+    updatePhoneFrame(PHONE_SHIFT_MS);
+    releaseHeldScore();
+    if (pinReveal === reveal) pinReveal = null;
+  };
+  const land = () => {
+    if (landed) return;
+    landed = true;
+    cancelAnimationFrame(frame);
+    clearTimeout(timer);
+    hideSkip?.();
+    showPinResult(round, state);
+    globe.showBoth(state.pick, target, 300);
+    card.classList.add("is-landed");
+    card.classList.toggle("is-spot-on", progress.solved);
+    awayText.textContent = t(progress.solved ? "pin.burstSpotOn" : "pin.away", { n: num(Math.round(away.value)), unit: away.unit });
+    // The points get their own sound on the score card; this just marks the landing.
+    if (progress.solved) sounds.playVictory(); else sounds.playReveal("match", 1);
+    go.focus({ preventScroll: true });
+  };
+  const onKey = event => {
+    if (!["Enter", " "].includes(event.key)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (landed) { sounds.playClick(); end(); finish(true); } else land();
+  };
+  const onClick = event => {
+    event.stopPropagation();
+    if (landed) { sounds.playClick(); end(); finish(true); } else land();
+  };
+  const reveal = { abort: () => { end(); finish(null); } };
+  pinReveal = reveal;
+  window.addEventListener("keydown", onKey, true);
+  card.addEventListener("click", onClick);
+  card.classList.remove("hidden");
+  hideSkip = showSkip(land);
+  // Your pin alone first, framed with the place; then the line runs to it.
+  showPinResult(round, state, { upTo: 0, answer: false });
+  globe.showBoth(state.pick, target, 800);
+  const lineMs = 1100;
+  timer = setTimeout(() => {
+    const start = performance.now();
+    sounds.playFlyTo();
+    const step = now => {
+      const p = Math.min(1, (now - start) / lineMs);
+      const eased = 1 - (1 - p) ** 3;
+      globe.setGuessPath([state.pick, target], { upTo: eased });
+      awayText.textContent = t("pin.away", { n: num(Math.round(away.value * eased)), unit: away.unit });
+      if (p < 1) frame = requestAnimationFrame(step);
+      else land();
+    };
+    frame = requestAnimationFrame(step);
+  }, 850);
+  return done;
 }
 
 // The globe mode: the selected country is the round's one pick. The cards slide aside and
@@ -46665,6 +48057,15 @@ function showFinalModal() {
   endClimb = journeyIn(endClimb, "endClimb", { tall: onPhone ? { top: 0.05, bottom: 0.96 } : null });
   const stretches = getStretches(dayScore);
   // Played once, then it stays at the day's total.
+  // Where the world's top 50, 20, 5 and 1 % started today, as signs on the route, and
+  // your own top % over the explorer (sample numbers for now, and the sign says so).
+  const worldStats = getDayStats(activeDate, activeMode);
+  endClimb.setRanks?.({
+    marks: [50, 20, 5, 1].map(n => ({ value: scoreAtTopPercent(worldStats, n), label: t("end.rankMark", { n }), short: `${n}%` })),
+    you: t("end.rankYou", { n: formatTopPercent(getTopPercent(worldStats, dayScore.total)).toUpperCase() }),
+    youShort: t("end.rankYouShort", { n: Math.max(1, Math.ceil(getTopPercent(worldStats, dayScore.total))) }),
+    note: t("end.rankSample")
+  });
   endClimb.draw(0, { stretches });
   const replayMs = endClimb.replay({ stretches });
   const finishCount = countUp(document.getElementById("modalScore"), dayScore.total, { duration: 1800 });
@@ -46712,7 +48113,7 @@ function showFinalModal() {
     const row = document.createElement("button");
     row.type = "button";
     row.className = `breakdown-row ${result.isPerfect ? "is-perfect" : result.score > 0 ? "is-partial" : "is-failed"}`;
-    row.style.setProperty("--round-color", ROUND_COLORS[index]);
+    row.style.setProperty("--round-color", scoreColor(result.points));
     row.title = t("end.reviewRound", { n: index + 1 });
     row.append(
       Object.assign(document.createElement("span"), { className: "breakdown-name", textContent: `${index + 1}. ${roundName(round)}` }),
@@ -47080,7 +48481,7 @@ function artIcon(rows, colors) {
   return canvas;
 }
 const SIGN_ICONS = {
-  daily: artIcon(PLAY_ART.extremes, PLAY_ART_COLORS),
+  daily: calendarCanvas(),
   extremes: artIcon(PLAY_ART.extremes, PLAY_ART_COLORS),
   casual: artIcon(PLAY_ART.casual, PLAY_ART_COLORS),
   camp: spriteCanvas("tent"),
@@ -47183,7 +48584,7 @@ const HERO_INFO = {
 function heroArtFor(key) {
   if (key === "tent") return createLoadout(getTentLook(), { compact: true, className: "hero-art-sprite is-loadout" });
   if (key === "duel") return Object.assign(document.createElement("span"), { className: "hero-art-sprite is-swords", innerHTML: versusIconSvg() });
-  // Daily has no art of its own yet: Highs & Lows' bars (its first round).
+  if (key === "daily") return Object.assign(document.createElement("span"), { className: "hero-art-sprite is-calendar", innerHTML: calendarSvg() });
   if (key !== "camp") return createPixelArt(PLAY_ART[key] || PLAY_ART.extremes, PLAY_ART_COLORS);
   return crewArt(64, 30, 30, "hero-art-sprite is-crew");
 }
@@ -47222,7 +48623,8 @@ function renderHero() {
   // Under it: how today stands (or, on a past day, whether you played it).
   let status = "";
   if (key === "tent") status = tentWhere();
-  else if (daily) status = [describeMode(key) || t(key === MAIN_MODE ? "menu.mainGame" : "menu.casualTag"), t("end.nextDay", nextDayIn())].join(" · ");
+  // (No "MAIN GAME" any more, 26 November 2026, team request: Daily is the only daily game.)
+  else if (daily) status = [describeMode(key), t("end.nextDay", nextDayIn())].filter(Boolean).join(" · ");
   else if (!camp && key !== "duel" && !date) status = describeMode(key);
   else if (date) status = state === "none" ? t("hero.noGame") : state === "done" ? t("hero.played") : state === "started" ? t("hero.started") : t("hero.notPlayed");
   setText("heroStatus", status);
@@ -47287,6 +48689,31 @@ function renderHero() {
   document.getElementById("heroInvite").hidden = !versus || Boolean(duel?.inRematch());
   document.getElementById("heroLobby").hidden = true;
   card.classList.remove("is-lobby");
+  // The middle row (the card has one size on every tab): DAILY today's five rounds with how
+  // far you got (each in the colour of its points), CREW your crew's week (social.js).
+  const rounds = document.getElementById("heroRounds");
+  const showRounds = daily && !date && state !== "none";
+  rounds.hidden = !showRounds;
+  if (showRounds) {
+    const states = readDayState(today, key)?.rounds || roundTypesOf(today, key).map(createRoundState);
+    const dayPlan = resolvePlan(getDailyPlan(today, key), states);
+    const dayScore = getDayScore(dayPlan, states);
+    const now = dayScore.rounds.findIndex(round => !round.done);
+    rounds.replaceChildren(...dayPlan.map((planned, index) => {
+      const result = dayScore.rounds[index];
+      const item = Object.assign(document.createElement("li"), { className: result.done ? "is-done" : index === now && state === "started" ? "is-now" : "" });
+      if (result.done) item.style.setProperty("--c", scoreColor(result.points));
+      item.append(
+        Object.assign(document.createElement("b"), { textContent: result.done ? num(result.points) : index + 1 }),
+        // The round's type, never its question (that stays a surprise until you play it).
+        Object.assign(document.createElement("span"), { textContent: ROUND_INFO[planned.type].name })
+      );
+      return item;
+    }));
+  }
+  document.getElementById("heroCrew").hidden = key !== "camp";
+  document.getElementById("heroBody").hidden = !showRounds && key !== "camp";
+  document.getElementById("heroVersusRow").hidden = !versus;
   if (versus && duel?.inLobby()) renderLobby(card);
   renderLobbyAround();
 }
