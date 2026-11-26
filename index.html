@@ -5726,6 +5726,87 @@ h1, h2, h3 { font-weight: normal; }
   #victoryModal .end-more { display: none; }
 }
 
+/* The archive on a phone (26 November 2026, team request: the spacing was off). One game, so
+   no tab row (ARCHIVE, STATS and ✕ on one line, also on a computer); the calendar takes its
+   own height and the full width, with room under it for the START bar, and square-ish days. */
+#archiveModeTabs { display: none; }
+@media (max-width: 760px) {
+  #archiveModal .modal-head { align-items: center; margin-bottom: 10px; }
+  #archiveModal .archive-head { flex-wrap: nowrap; gap: 10px; }
+  #archiveModal .archive-stats-open { padding: 7px 12px; font-size: 13px; }
+  #archiveModal .archive-layout { display: block; }
+  #archiveModal .screen-column { width: 100%; display: grid; gap: 0; }
+  #archiveModal .archive-calendar { height: auto; max-height: none; overflow: visible; padding: 0 0 16px; }
+  #archiveModal .archive-stats { min-height: 0; gap: 6px; margin-bottom: 10px; }
+  #archiveModal .archive-stats-badge { padding: 10px 12px; }
+  #archiveModal .archive-stat { padding: 8px 6px; border-radius: 12px; }
+  #archiveModal .archive-calendar .calendar { gap: 5px; }
+  #archiveModal .archive-calendar .calendar-month { margin: 4px 0 2px; }
+  #archiveModal .archive-calendar .day-cell { height: auto; aspect-ratio: 1 / 1; min-height: 0; border-radius: 10px; }
+  #archiveModal:not(.is-day-open) #archivePlay { margin: 0 -14px; }
+  #archivePlay .overview-play:not(.is-played) { padding: 0; border: 0; background: none; box-shadow: none; }
+  /* A played day's rounds: the round on one line, what it asked and what you did under it. */
+  #archiveModal .overview-round-text { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  #archiveModal .overview-world .field-label, #archiveModal .overview-world small { white-space: nowrap; }
+}
+
+/* The end screen on a phone (26 November 2026, the team's pick A from mockups/end-phone): the
+   standing journey without signs, and the world's top % as a ruler under it (renderEndRuler). */
+.end-ruler { display: grid; gap: 6px; padding: 10px 12px 12px; border: 1px solid var(--glass-line); border-radius: 14px; background: rgba(255, 255, 255, 0.03); }
+.end-ruler[hidden] { display: none; }
+.end-ruler-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.end-ruler-head b { color: var(--text); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); white-space: nowrap; }
+.end-ruler-head b em { color: var(--gold); font-style: normal; }
+.end-ruler-head small { color: var(--faint); font: 6px var(--font-display); letter-spacing: var(--ls-pixel); white-space: nowrap; }
+.end-ruler-track { position: relative; height: 30px; }
+.end-ruler-bar { position: absolute; left: 0; right: 0; top: 13px; height: 4px; border-radius: 2px; background: linear-gradient(90deg, #2a3358, #45e3ff 50%, #ffd45c 80%, #ff6b9d 96%); }
+.end-ruler-tick { position: absolute; top: 2px; width: 2px; height: 26px; transform: translateX(-1px); background: #4a5378; }
+.end-ruler-tick.is-passed { background: var(--text); }
+.end-ruler-tick small { position: absolute; top: -2px; left: 4px; color: var(--muted); font: 6px var(--font-display); white-space: nowrap; }
+.end-ruler-tick.is-low small { top: auto; bottom: -3px; }
+.end-ruler-you { position: absolute; top: 7px; width: 16px; height: 16px; transform: translateX(-8px); border: 2px solid #070b17; border-radius: 4px; background: var(--gold); box-shadow: 0 0 10px rgba(255, 212, 92, 0.7); }
+.end-ruler-scale { display: flex; justify-content: space-between; color: var(--faint); font: 6px var(--font-display); }
+@media (min-width: 761px) { .end-ruler { display: none; } }
+
+/* Edit your camp on a phone (26 November 2026, the team's pick A from mockups/camp-phone):
+   a shorter camp with your title and items as chips on it (the note gone), the categories
+   as a row of small icons with their name, and the cards four in a row with a short name,
+   so two to three rows of options are in view. */
+@media (max-width: 860px) {
+  .camp-stage { position: relative; }
+  .camp-stage-frame { height: 170px; aspect-ratio: auto; }
+  .camp-stage-canvas { object-fit: cover; }
+  .camp-plate { position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 2; padding: 0; border: 0; background: none; gap: 8px; justify-content: space-between; pointer-events: none; }
+  .camp-plate-note { display: none; }
+  .camp-plate-title { padding: 3px 7px; border-radius: 6px; background: rgba(5, 7, 13, 0.82); font-size: 7px; }
+  .camp-plate-stat { display: flex; align-items: baseline; gap: 5px; padding: 3px 7px; border-radius: 6px; background: rgba(5, 7, 13, 0.82); }
+  .camp-plate-stat b { font-size: 9px; }
+  .camp-plate-stat span { font-size: 9px; }
+  .camp-panel { padding: 0 10px max(8px, env(safe-area-inset-bottom)); }
+  .camp-rail { gap: 6px; padding: 8px 0; }
+  .camp-rail button { flex: 0 0 auto; min-width: 54px; padding: 5px 6px 4px; gap: 2px; }
+  .camp-rail canvas { width: 30px; height: 30px; }
+  .camp-rail span { font-size: 6px; }
+  .camp-drawer { gap: 8px; padding: 8px 0 4px; }
+  .camp-drawer-head h3 { font-size: 9px; }
+  .camp-drawer-head span { font-size: 11px; }
+  .camp-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .camp-card { gap: 2px; padding: 4px 3px 5px; border-radius: 10px; text-align: center; }
+  .camp-card canvas { border-radius: 6px; }
+  .camp-card b { font-size: 10px; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .camp-card small { display: none; }
+  .camp-card-progress { top: 4px; left: 4px; right: 4px; padding: 1px 3px; overflow: hidden; font-size: 8px; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+  .camp-row > span { font-size: 7px; }
+  .camp-swatch { width: 26px; height: 26px; }
+  .camp-chip { padding: 5px 8px; font-size: 11px; }
+  .camp-actions { margin-top: 0; padding-top: 8px; gap: 6px; }
+  .camp-save { padding: 11px; font-size: 9px; }
+  .camp-undo { padding: 9px 10px; font-size: 8px; }
+  .camp-dice { padding: 6px 10px; font-size: 16px; }
+  /* Atlas's welcome over the whole editor, not cut off by the short camp. */
+  .camp-welcome { position: fixed; left: 8px; right: 8px; bottom: calc(80px + env(safe-area-inset-bottom)); z-index: 5; }
+}
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -6417,6 +6498,8 @@ h1, h2, h3 { font-weight: normal; }
           </div>
           <div class="end-squares" id="endSquares"></div>
           <div class="end-climb-chart" id="endClimb"></div>
+          <!-- On a phone: the world's top % as a ruler under the journey (showFinalModal). -->
+          <div class="end-ruler" id="endRuler" hidden></div>
           <div class="end-versus" id="endVersus" hidden></div>
           <div class="crew-invite" id="endCrew" hidden></div>
           <button class="btn btn-primary end-share" id="copyResultBtn" type="button">COPY RESULT</button>
@@ -48442,7 +48525,15 @@ function showFinalModal() {
   // Where the world's top 50, 20, 5 and 1 % started today, as signs on the route, and
   // your own top % over the explorer (sample numbers for now, and the sign says so).
   const worldStats = getDayStats(activeDate, activeMode);
-  endClimb.setRanks?.({
+  // On a phone the signs crowded the standing journey (26 November 2026, the team's pick A
+  // from mockups/end-phone): the journey stays clean and the world is a ruler under it.
+  renderEndRuler(onPhone ? worldStats : null, dayScore.total);
+  // PLAY WITH YOUR CREW goes to page 2 on a phone, so the journey gets the room.
+  const crewBox = document.getElementById("endCrew");
+  if (onPhone) document.querySelector("#victoryModal .end-more").prepend(crewBox);
+  else document.getElementById("endVersus").after(crewBox);
+  if (onPhone) endClimb.setRanks?.(null);
+  else endClimb.setRanks?.({
     marks: [50, 20, 5, 1].map(n => ({ value: scoreAtTopPercent(worldStats, n), label: t("end.rankMark", { n }), short: `${n}%` })),
     you: t("end.rankYou", { n: formatTopPercent(getTopPercent(worldStats, dayScore.total)).toUpperCase() }),
     youShort: t("end.rankYouShort", { n: Math.max(1, Math.ceil(getTopPercent(worldStats, dayScore.total))) }),
@@ -48518,6 +48609,37 @@ function showFinalModal() {
     item.appendChild(row);
     return item;
   }));
+}
+
+// The world's top % as one bar from 0 to the day's maximum: where the top 50, 20, 5 and 1%
+// started today, and you (sample numbers for now, and it says so). Hidden without stats.
+function renderEndRuler(stats, score) {
+  const ruler = document.getElementById("endRuler");
+  ruler.hidden = !stats;
+  if (!stats) return;
+  const max = getMaxScore(activeMode);
+  const at = value => `${Math.max(0, Math.min(100, value / max * 100)).toFixed(1)}%`;
+  const el = (tag, className, text) => Object.assign(document.createElement(tag), { className, textContent: text ?? "" });
+  const head = el("div", "end-ruler-head");
+  const [before, after] = t("end.rankYou", { n: "\u0000" }).split("\u0000");
+  const you = el("b", "", before);
+  you.append(el("em", "", formatTopPercent(getTopPercent(stats, score)).toUpperCase()), after);
+  head.append(you, el("small", "", t("end.rankSample")));
+  const track = el("div", "end-ruler-track");
+  track.append(el("i", "end-ruler-bar"));
+  [50, 20, 5, 1].forEach((n, index) => {
+    const value = scoreAtTopPercent(stats, n);
+    const tick = el("span", `end-ruler-tick${value <= score ? " is-passed" : ""}${index % 2 ? " is-low" : ""}`);
+    tick.style.left = at(value);
+    tick.append(el("small", "", `${n}%`));
+    track.append(tick);
+  });
+  const mark = el("i", "end-ruler-you");
+  mark.style.left = at(score);
+  track.append(mark);
+  const scale = el("div", "end-ruler-scale");
+  scale.append(el("span", "", "0"), el("span", "", num(max)));
+  ruler.replaceChildren(head, track, scale);
 }
 
 // A round seen again from the end screen: its score card as it was, then back to the results.
@@ -50996,6 +51118,7 @@ document.getElementById("accountBase").appendChild(createBaseLine());
     duel.openCode(code);
   }
 }
+
 
 
 
