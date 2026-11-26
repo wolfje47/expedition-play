@@ -7588,12 +7588,13 @@ const EN = {
   "common.pts": "{n} pts",
   "common.off": "{n}% off",
   "common.or": "{list} or {last}",
-  "share.balloon": "🎈 Floated up to {score} m.",
-  "share.climb": "🏔️ Climbed to {score} m.",
-  "share.mine": "⛏️ Dug {score} m down.",
-  "share.train": "🚂 Rode {score} km.",
-  "share.dive": "🌊 Sank to {score} m.",
-  "share.sled": "🛷 {score} km towards the Pole.",
+  "share.balloon": "🎈 I floated up to {score} m.",
+  "share.climb": "🏔️ I climbed to {score} m.",
+  "share.mine": "⛏️ I dug {score} m down.",
+  "share.train": "🚂 I rode {score} km.",
+  "share.dive": "🌊 I sank to {score} m.",
+  "share.sled": "🛷 I made it {score} km towards the Pole.",
+  "share.beat": "Can you beat me? 👉 {url}",
   "share.top": "{top} today.",
   "common.topPercent": "Top {n}%",
 
@@ -9354,12 +9355,13 @@ const NL = {
   "common.pts": "{n} ptn",
   "common.off": "{n}% ernaast",
   "common.or": "{list} of {last}",
-  "share.balloon": "🎈 Opgestegen tot {score} m.",
-  "share.climb": "🏔️ Geklommen tot {score} m.",
-  "share.mine": "⛏️ {score} m diep gegraven.",
-  "share.train": "🚂 {score} km gereden.",
-  "share.dive": "🌊 Gezakt tot {score} m.",
-  "share.sled": "🛷 {score} km richting de Pool.",
+  "share.balloon": "🎈 Ik steeg op tot {score} m.",
+  "share.climb": "🏔️ Ik klom tot {score} m.",
+  "share.mine": "⛏️ Ik groef {score} m diep.",
+  "share.train": "🚂 Ik reed {score} km.",
+  "share.dive": "🌊 Ik zakte tot {score} m.",
+  "share.sled": "🛷 Ik kwam {score} km richting de Pool.",
+  "share.beat": "Kun jij beter? 👉 {url}",
   "share.top": "{top} vandaag.",
   "common.topPercent": "Top {n}%",
 
@@ -48238,7 +48240,7 @@ function showFinalModal() {
 
 // Spoiler-free share text (26 November 2026, written with the team): the day and its name,
 // one dry line about how far you got on that day's journey (share.<journey>, in the game's
-// language), your top % today, one square per round, and the link.
+// language, "I …"), your top % today, one square per round, and a dare with the link.
 const SHARE_URL = "https://wolfje47.github.io/expedition-play/";
 function getResultText() {
   const dayScore = getDayScore(plan, day.rounds);
@@ -48250,7 +48252,7 @@ function getResultText() {
     `Expedition #${getPuzzleNumber(activeDate)}${dayInfo ? ` · ${dayInfo.name}` : ""}`,
     `${t(`share.${journey}`, { score: num(dayScore.total) })} ${t("share.top", { top })}`,
     squares,
-    SHARE_URL
+    t("share.beat", { url: SHARE_URL })
   ].join("\n");
 }
 
