@@ -4854,11 +4854,11 @@ h1, h2, h3 { font-weight: normal; }
 .lobby-code small { color: var(--muted); font: 7px var(--font-display); letter-spacing: var(--ls-pixel); }
 .lobby-code b { color: var(--tile); font: 16px var(--font-display); letter-spacing: 0.18em; }
 
-.lobby-stats { position: fixed; left: 20px; top: 50%; z-index: 2; width: 270px; padding: 14px; border: 1px solid color-mix(in srgb, #c58cff 40%, transparent); border-radius: 18px; background: rgba(10, 15, 30, 0.86); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45); transform: translateY(-50%); pointer-events: auto; }
+.lobby-stats { --panel-c: #c58cff; position: fixed; left: 20px; top: 50%; z-index: 2; width: 270px; padding: 14px; border: 1px solid color-mix(in srgb, var(--panel-c) 40%, transparent); border-radius: 18px; background: rgba(10, 15, 30, 0.86); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45); transform: translateY(-50%); pointer-events: auto; }
 .lobby-stats[hidden] { display: none; }
 .lobby-stats-head { display: none; }
 .lobby-stats-body { display: grid; gap: 10px; }
-.lobby-stats-body::before { content: attr(data-title); color: #c58cff; font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+.lobby-stats-body::before { content: attr(data-title); color: var(--panel-c); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
 .lobby-big { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .lobby-big div { display: grid; justify-items: center; gap: 4px; padding: 10px 4px; border-radius: 10px; background: rgba(255, 255, 255, 0.04); }
 .lobby-big b { color: var(--text); font: 700 20px var(--font-mono); }
@@ -4884,7 +4884,7 @@ h1, h2, h3 { font-weight: normal; }
 @media (max-width: 1199px) {
   .lobby-stats { position: relative; left: auto; top: auto; align-self: center; width: min(600px, 100%); margin: 10px 0 auto; padding: 0; transform: none; border-radius: 14px; }
   .lobby-stats-head { display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 12px; border: 0; background: none; color: var(--text); text-align: left; cursor: pointer; }
-  .lobby-stats-head .lobby-kicker { color: #c58cff; }
+  .lobby-stats-head .lobby-kicker { color: var(--panel-c); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .lobby-stats-mini { flex: 1; color: var(--muted); font: 7px var(--font-display); letter-spacing: var(--ls-pixel); text-align: right; }
   .lobby-stats-mini b { color: var(--text); font: 700 12px var(--font-mono); }
   .lobby-stats-chev { color: var(--muted); font-size: 12px; transition: transform 0.2s; }
@@ -5690,6 +5690,42 @@ h1, h2, h3 { font-weight: normal; }
   .camp-welcome-bubble p { font-size: 12px; min-height: 0; }
 }
 
+/* The side panel on DAILY and CREW too (26 November 2026, mockups/side-panels A): the
+   EXPEDITION LOG and your crew, in the tab's colour (--panel-c, engine.js setPanel). */
+.lobby-stats .lobby-line > span { flex: none; white-space: nowrap; }
+.lobby-stats .lobby-line > b { min-width: 0; overflow: hidden; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
+.lobby-stats .lobby-pips i { width: 16px; height: 16px; }
+.panel-link { padding: 0; border: 0; background: none; color: var(--panel-c); font: 700 13px var(--font-body); cursor: pointer; white-space: nowrap; }
+.lobby-line > b .panel-link { margin-left: 6px; font: 8px var(--font-display); letter-spacing: var(--ls-pixel); }
+.panel-link:hover, .panel-link:focus-visible { text-decoration: underline; outline: none; }
+.panel-cta { justify-self: start; padding: 9px 12px; border: 0; border-radius: 9px; background: var(--panel-c); color: #04121a; font: 8px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
+.lobby-stats.is-crews .lobby-stats-body::before { display: none; }
+.panel-crew-head { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.panel-crew-name { flex: 1; min-width: 0; overflow: hidden; color: var(--panel-c); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.panel-arrow { width: 22px; height: 22px; border: 1px solid color-mix(in srgb, var(--panel-c) 40%, transparent); border-radius: 6px; background: none; color: var(--panel-c); font: 8px var(--font-display); cursor: pointer; }
+.panel-dots { display: inline-flex; gap: 5px; vertical-align: middle; }
+.panel-dots button { width: 7px; height: 7px; padding: 0; border: 0; border-radius: 1px; background: rgba(255, 255, 255, 0.2); cursor: pointer; }
+.panel-dots button.is-on { background: var(--panel-c); }
+.panel-swipe { display: none; color: var(--faint); font: 6px var(--font-display); letter-spacing: var(--ls-pixel); text-align: center; }
+@media (max-width: 1199px) {
+  .lobby-stats .panel-crew-head { display: none; }
+  .panel-swipe { display: block; }
+  .lobby-stats-mini .panel-dots { margin-right: 6px; }
+}
+
+/* The end screen on a computer (26 November 2026, team request): one page over the whole
+   width (the rounds, you vs the world and your stats are gone there); the round squares
+   open each round's score card again (reviewRound in engine.js). The phone keeps its pages. */
+#victoryModal .end-squares button { flex: 1; display: grid; place-items: center; height: 24px; border: 0; border-radius: 6px; color: #04060d; font: 8px var(--font-display); cursor: pointer; transition: transform 0.12s ease, filter 0.12s ease; }
+#victoryModal .end-squares button:hover, #victoryModal .end-squares button:focus-visible { filter: brightness(1.15); transform: translateY(-2px); outline: none; }
+#victoryModal .end-squares .is-perfect { background: var(--t-correct); }
+#victoryModal .end-squares .is-partial { background: var(--gold); }
+#victoryModal .end-squares .is-zero { background: var(--danger); }
+@media (min-width: 761px) {
+  #victoryModal .end-grid { grid-template-columns: minmax(0, 1fr); }
+  #victoryModal .end-more { display: none; }
+}
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
@@ -6379,7 +6415,7 @@ h1, h2, h3 { font-weight: normal; }
             <strong class="score-display" id="modalScore">0</strong>
             <span id="modalSubtext"></span>
           </div>
-          <div class="end-squares" id="endSquares" aria-hidden="true"></div>
+          <div class="end-squares" id="endSquares"></div>
           <div class="end-climb-chart" id="endClimb"></div>
           <div class="end-versus" id="endVersus" hidden></div>
           <div class="crew-invite" id="endCrew" hidden></div>
@@ -7621,6 +7657,42 @@ const EN = {
   "share.beat": "Can you beat me? 👉 {url}",
   "share.top": "{top} today.",
   "hero.enterTent": "GO TO CAMP",
+  "log.title": "EXPEDITION LOG",
+  "log.days": "DAYS",
+  "log.avg": "AVERAGE",
+  "log.streak": "STREAK",
+  "log.lastFive": "Last five",
+  "log.bestDay": "Best day",
+  "log.bestRound": "Best round",
+  "log.hardest": "Hardest round",
+  "log.roundAvg": "{name} · {n}",
+  "log.spotOn": "Spot on",
+  "log.spotOnValue": "{n} of {total}",
+  "log.nextShield": "Next shield",
+  "log.shieldDays": p => `${p.name} · ${p.n} ${p.n === 1 ? "day" : "days"}`,
+  "log.shieldRange": "{name} · {range}",
+  "log.empty": "Play your first expedition to start your log.",
+  "log.open": "Today's expedition is still open.",
+  "crew.title": "YOUR CREW",
+  "crew.place": "THIS SEASON",
+  "crew.score": "SEASON SCORE",
+  "crew.days": "DAYS PLAYED",
+  "crew.duel": "Duel this week",
+  "crew.duelVs": "vs {name} · ",
+  "crew.record": "Duels this season",
+  "crew.recordValue": "W {w} · D {d} · L {l}",
+  "crew.season": "Season",
+  "crew.today": "Today",
+  "crew.todayValue": "{n} of {total} played",
+  "crew.nudge": "NUDGE ›",
+  "crew.reaction": "Last reaction",
+  "crew.reactionValue": "{sticker} from {name}",
+  "crew.none": "No crew yet. Join or start one now and battle your way to the top!",
+  "crew.out": "Sign in to join or start a crew, and battle your way to the top!",
+  "crew.start": "START A CREW",
+  "crew.error": "Your crew couldn't be loaded right now.",
+  "crew.swipe": "‹ SWIPE FOR YOUR OTHER CREWS ›",
+  "end.backToResults": "‹ BACK TO RESULTS",
   "common.topPercent": "Top {n}%",
 
   // Problems and notes
@@ -9391,6 +9463,42 @@ const NL = {
   "share.beat": "Kun jij beter? 👉 {url}",
   "share.top": "{top} vandaag.",
   "hero.enterTent": "NAAR JE KAMP",
+  "log.title": "LOGBOEK",
+  "log.days": "DAGEN",
+  "log.avg": "GEMIDDELD",
+  "log.streak": "REEKS",
+  "log.lastFive": "Laatste vijf",
+  "log.bestDay": "Beste dag",
+  "log.bestRound": "Beste ronde",
+  "log.hardest": "Moeilijkste ronde",
+  "log.roundAvg": "{name} · {n}",
+  "log.spotOn": "Precies goed",
+  "log.spotOnValue": "{n} van {total}",
+  "log.nextShield": "Volgend schild",
+  "log.shieldDays": p => `${p.name} · nog ${p.n} ${p.n === 1 ? "dag" : "dagen"}`,
+  "log.shieldRange": "{name} · {range}",
+  "log.empty": "Speel je eerste expeditie om je logboek te beginnen.",
+  "log.open": "De expeditie van vandaag staat nog open.",
+  "crew.title": "JOUW CREW",
+  "crew.place": "DIT SEIZOEN",
+  "crew.score": "SEIZOENSCORE",
+  "crew.days": "DAGEN GESPEELD",
+  "crew.duel": "Duel deze week",
+  "crew.duelVs": "tegen {name} · ",
+  "crew.record": "Duels dit seizoen",
+  "crew.recordValue": "W {w} · G {d} · V {l}",
+  "crew.season": "Seizoen",
+  "crew.today": "Vandaag",
+  "crew.todayValue": "{n} van {total} gespeeld",
+  "crew.nudge": "PORREN ›",
+  "crew.reaction": "Laatste reactie",
+  "crew.reactionValue": "{sticker} van {name}",
+  "crew.none": "Nog geen crew. Sluit je aan bij een crew of start er zelf een en vecht je naar de top!",
+  "crew.out": "Log in om je bij een crew aan te sluiten of er een te starten, en vecht je naar de top!",
+  "crew.start": "START EEN CREW",
+  "crew.error": "Je crew kon nu niet geladen worden.",
+  "crew.swipe": "‹ VEEG VOOR JE ANDERE CREWS ›",
+  "end.backToResults": "‹ TERUG NAAR DE UITSLAG",
   "common.topPercent": "Top {n}%",
 
   // Problemen en meldingen
@@ -37622,7 +37730,38 @@ function initializeHistoryScreens({ getDays, getDayRecord, onPlayDay }) {
   });
 
   initializePlayerStats({ getDays, getDayRecord, openArchive });
-  return { loadDays, openArchive };
+  // The EXPEDITION LOG next to the menu card (26 November 2026, the team's pick A from
+  // mockups/side-panels): your main game's days, worked out like Your stats, plus your
+  // last five days, your best and hardest round type and this month's next shield.
+  function logStats() {
+    const dates = everyDateUntilToday(getDays()[0]);
+    const records = [...new Set([...getDays(), ...dates])].map(dateKey => {
+      try { return withCommunity(getDayRecord(dateKey, MAIN_MODE)); } catch { return null; }
+    }).filter(Boolean);
+    const stats = computePlayerStats(records, dates);
+    const played = records.filter(day => day.completed).sort((a, b) => a.dateKey.localeCompare(b.dateKey));
+    // Average points per kind of round (each round as scored, out of 1,000).
+    const byType = new Map();
+    played.forEach(day => (day.rounds || []).forEach(round => {
+      if (!round.done || !Number.isFinite(round.points)) return;
+      const entry = byType.get(round.type) || { type: round.type, total: 0, n: 0 };
+      entry.total += round.points; entry.n += 1;
+      byType.set(round.type, entry);
+    }));
+    const types = [...byType.values()].map(entry => ({ type: entry.type, avg: Math.round(entry.total / entry.n) }));
+    const month = todayKey().slice(0, 7);
+    const badge = getMonthBadge(records, month);
+    const inMonth = played.filter(day => day.dateKey.startsWith(month)).length;
+    return {
+      stats,
+      lastFive: played.slice(-5),
+      best: types.length > 1 ? types.reduce((top, entry) => (entry.avg > top.avg ? entry : top)) : null,
+      hardest: types.length > 1 ? types.reduce((low, entry) => (entry.avg < low.avg ? entry : low)) : null,
+      nextShield: badge.next ? { name: badge.next.name, days: Math.max(0, badge.next.minDays - inMonth), range: badge.next.range } : null,
+      tier: badge.tier
+    };
+  }
+  return { loadDays, openArchive, logStats };
 }
 
 // ---------------------------------------------------------------------------
@@ -40505,6 +40644,56 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
   }
   const open_ = () => open();
 
+  // The CREW panel next to the menu card (26 November 2026, the team's pick A from
+  // mockups/side-panels): per crew you're in, your place and score this season, days played,
+  // this week's duel, your duel record, the gap to the one above (or your lead), who played
+  // today; and the last reaction you got today. Loaded at most once a minute.
+  let panelData = null, panelAt = 0;
+  async function crewPanel(force = false) {
+    if (!isConfigured || !signedIn()) return { kind: "out" };
+    if (!force && panelData && Date.now() - panelAt < 60000) return panelData;
+    try {
+      const groups = await getGroups();
+      if (!groups.length) { panelData = { kind: "none" }; panelAt = Date.now(); return panelData; }
+      const firstDay = getDays()[0]?.dateKey || today;
+      const me = getUser().id;
+      const month = today.slice(0, 7);
+      await loadReactions();
+      const got = reactionsTo(me).at(-1);
+      const crews = await Promise.all(groups.map(async group => {
+        const people = membersOf(await getGroupBoard(group.id, firstDay, today));
+        const options = leagueOptions(group);
+        const season = seasonTable(people, month, today, firstDay, options);
+        const index = season.findIndex(row => row.person.id === me);
+        const you = season[index] || null;
+        const other = you ? (index > 0 ? season[index - 1] : season[1]) : null;
+        const week = weekDuels(people, group.id, mondayOf(today), today, options);
+        const duel = week.duels.find(item => item.a.id === me || item.b.id === me);
+        const mine = duel && (duel.a.id === me ? { rival: duel.b.name, won: duel.winsA, lost: duel.winsB } : { rival: duel.a.name, won: duel.winsB, lost: duel.winsA });
+        const record = duelTable(people, group.id, month, today, firstDay, options).table.find(row => row.person.id === me);
+        const weekend = options.weekdays && isWeekend(today);
+        return {
+          id: group.id,
+          name: group.name,
+          place: you?.place || null,
+          score: you?.score ?? null,
+          days: you?.played || 0,
+          gap: other ? { ahead: index === 0, n: Math.abs(you.score - other.score), name: other.person.name } : null,
+          duel: mine || null,
+          record: record ? { w: record.won, d: record.drawn, l: record.lost } : null,
+          today: weekend ? null : { played: people.filter(person => person.days.has(today)).length, total: people.length, waiting: people.filter(person => person.id !== me && !person.days.has(today)) },
+          daysLeft: daysLeft(month, today, options),
+          work: options.weekdays
+        };
+      }));
+      panelData = { kind: "crews", crews, reaction: got ? { sticker: got.sticker ? STICKERS[got.sticker] : "", name: got.from_name || got.display_name || "" } : null };
+    } catch (error) {
+      panelData = { kind: "error" };
+    }
+    panelAt = Date.now();
+    return panelData;
+  }
+
   document.querySelectorAll(".community-open-button").forEach(openButton => openButton.addEventListener("click", () => {
     sounds.playClick();
     open();
@@ -40543,6 +40732,7 @@ function initializeCommunity({ globe, getDays, today, dayLabel, getOrigin = null
     nudge: person => nudge(person),
     hasNudged: id => nudged.has(id),
     refreshGlance,
+    crewPanel,
     // After signing in or out: refresh the screen if it's open, use a waiting invite, and
     // take Atlas's setting from the account.
     onAccountChange(account) {
@@ -46150,7 +46340,10 @@ function showBurstTab(tab) {
 // The score card's top on a computer, the journey's tiles, and Drop a Pin's map.
 let burstMap = null;
 function fillBurstDesktop(index, result) {
-  const dayScore = getDayScore(plan, day.rounds);
+  // The day as it stood after this round (the same as the total in a game; a review from the
+  // end screen shows that round's moment, not the whole day).
+  const fullScore = getDayScore(plan, day.rounds);
+  const dayScore = { ...fullScore, total: fullScore.rounds.slice(0, index + 1).reduce((sum, round) => sum + round.points, 0) };
   const words = JOURNEYS[getJourney(activeDate, activeMode)];
   const color = scoreColor(result.points);
   const card = document.querySelector(".score-burst-card");
@@ -46268,12 +46461,17 @@ function fillScoreBurst(index) {
   applyJourneyWords();
 }
 
-function showScoreBurst(index, { keepCardsOut = false } = {}) {
+// `review`: a round seen again from the end screen (26 November 2026, team request): the card
+// as it was when that round ended, without counting up, and NEXT goes back to the results.
+function showScoreBurst(index, { keepCardsOut = false, review = false } = {}) {
   const key = `${dayRef()}:${index}`;
-  if (celebratedRounds.has(key) || !isGameViewVisible) return Promise.resolve(false);
+  if (!review && (celebratedRounds.has(key) || !isGameViewVisible)) return Promise.resolve(false);
   celebratedRounds.add(key);
-  const dayScore = getDayScore(plan, day.rounds);
-  const result = dayScore.rounds[index];
+  const fullScore = getDayScore(plan, day.rounds);
+  const result = fullScore.rounds[index];
+  // In a review the day stands where it stood after this round.
+  const reached = fullScore.rounds.slice(0, index + 1).reduce((sum, round) => sum + round.points, 0);
+  const dayScore = review ? { ...fullScore, total: reached } : fullScore;
   const overlay = document.getElementById("scoreBurst");
   burstIndex = index;
   fillScoreBurst(index);
@@ -46284,7 +46482,7 @@ function showScoreBurst(index, { keepCardsOut = false } = {}) {
   document.getElementById("scoreBurstMore").setAttribute("aria-expanded", String(openInfo));
   const before = dayScore.total - result.points;
   setText("scoreBurstTotal", before.toLocaleString(locale()));
-  setText("dailyTotalScore", before.toLocaleString(locale())); // counts up below, after the points
+  if (!review) setText("dailyTotalScore", before.toLocaleString(locale())); // counts up below, after the points
   setText("scoreBurstPoints", "0");
   overlay.classList.toggle("is-zero", !result.points);
   overlay.classList.remove("hidden", "is-leaving");
@@ -46330,7 +46528,7 @@ function showScoreBurst(index, { keepCardsOut = false } = {}) {
     if (progress < 1) requestAnimationFrame(rise);
   };
   let counters = [];
-  const startTimer = setTimeout(() => {
+  const startTimer = review ? 0 : setTimeout(() => {
     climbStart = performance.now();
     requestAnimationFrame(rise);
     counters = [
@@ -46351,19 +46549,28 @@ function showScoreBurst(index, { keepCardsOut = false } = {}) {
     counters.forEach(finish => finish());
     setText("scoreBurstPoints", result.points.toLocaleString(locale()));
     setText("scoreBurstTotal", dayScore.total.toLocaleString(locale()));
-    setText("dailyTotalScore", dayScore.total.toLocaleString(locale()));
-    land();
+    if (!review) setText("dailyTotalScore", dayScore.total.toLocaleString(locale()));
+    if (!review) land();
+    else landed = true;
   };
   // Nothing counts up without points, so no SKIP then.
-  const hideSkip = result.points ? showSkip(settle) : () => {};
-  const settleTimer = setTimeout(() => { hideSkip(); settled = true; land(); }, result.points ? 1700 : 500);
+  const hideSkip = result.points && !review ? showSkip(settle) : () => {};
+  const settleTimer = review ? 0 : setTimeout(() => { hideSkip(); settled = true; land(); }, result.points ? 1700 : 500);
+  if (review) settle();
+  const next = document.getElementById("scoreBurstNext");
+  const nextLabel = next.innerHTML;
+  if (review) {
+    setText("scoreBurstNextKicker", "");
+    setText("scoreBurstNextName", t("end.backToResults"));
+  }
 
   return new Promise(resolve => {
     endScoreBurst = () => {
       endScoreBurst = null;
       settle();
+      if (review) next.innerHTML = nextLabel;
       overlay.classList.add("is-leaving");
-      setText("dailyTotalScore", dayScore.total.toLocaleString(locale()));
+      setText("dailyTotalScore", fullScore.total.toLocaleString(locale()));
       if (!keepCardsOut) slideCardsIn();
       setTimeout(() => {
         overlay.classList.add("hidden");
@@ -48266,10 +48473,17 @@ function showFinalModal() {
   const unplayed = getAllPuzzleDays().filter(date => date <= today && date !== activeDate && (record => !record.completed && !record.noGame)(getDayRecord(date, activeMode))).length;
   setText("endArchiveButton", unplayed ? t("end.archiveCount", { n: unplayed }) : t("menu.archive"));
   // The squares SHARE sends, one per round: green perfect, gold some points, red none.
-  document.getElementById("endSquares").replaceChildren(...dayScore.rounds.map((round, index) => Object.assign(document.createElement("span"), {
-    className: round.isPerfect ? "is-perfect" : round.score > 0 ? "is-partial" : "is-zero",
-    textContent: String(index + 1)
-  })));
+  // A click on one opens that round's score card again (26 November 2026, team request).
+  document.getElementById("endSquares").replaceChildren(...dayScore.rounds.map((round, index) => {
+    const square = Object.assign(document.createElement("button"), {
+      type: "button",
+      className: round.isPerfect ? "is-perfect" : round.score > 0 ? "is-partial" : "is-zero",
+      textContent: String(index + 1),
+      title: t("end.reviewRound", { n: index + 1 })
+    });
+    square.addEventListener("click", () => { sounds.playClick(); reviewRound(index); });
+    return square;
+  }));
   // When the next day opens (today's game only; days change at midnight UTC, like `today`).
   const nextDay = document.getElementById("endNextDay");
   nextDay.hidden = activeDate !== today;
@@ -48302,6 +48516,14 @@ function showFinalModal() {
     item.appendChild(row);
     return item;
   }));
+}
+
+// A round seen again from the end screen: its score card as it was, then back to the results.
+function reviewRound(index) {
+  const victory = document.getElementById("victoryModal");
+  endSkip();
+  victory.classList.add("hidden");
+  showScoreBurst(index, { keepCardsOut: true, review: true }).then(() => victory.classList.remove("hidden"));
 }
 
 // Spoiler-free share text (26 November 2026, written with the team): the day and its name,
@@ -49061,7 +49283,7 @@ function renderLobbyAround() {
     setText("lobbyPillMode", seats.length > 2 ? t("duel.party.label", { n: seats.length }) : "1V1");
     setText("lobbyPillCount", t("lobby.count", { have: seats.filter(seat => lobby.state.players[seat]).length, n: seats.length }));
   }
-  renderVersusStats();
+  renderSidePanel();
 }
 // Lobby buttons.
 document.getElementById("lobbyPill").addEventListener("click", () => { sounds.playClick(); selectHero("duel"); });
@@ -49098,7 +49320,7 @@ async function loadVersusHistory(force = false) {
   if (!getUser()) { versusHistory = null; return; }
   if (!force && versusHistory && Date.now() - versusHistory.at < 60000) return;
   versusHistory = { at: Date.now(), rows: await getDuelHistory() };
-  renderVersusStats();
+  renderSidePanel();
 }
 function versusRecord(rows, userId) {
   const results = [];
@@ -49125,7 +49347,8 @@ function versusRecord(rows, userId) {
   }
   const byStyle = {};
   results.forEach(result => result.rounds.forEach(({ style, points }) => { if (points != null) (byStyle[style] ||= []).push(points); }));
-  const bestStyle = Object.entries(byStyle).filter(([, list]) => list.length >= 2).map(([style, list]) => ({ style, avg: list.reduce((sum, n) => sum + n, 0) / list.length })).sort((x, y) => y.avg - x.avg)[0]?.style || null;
+  // Only rounds still played (26 November 2026: old matches had Border Run and Blind Paint).
+  const bestStyle = Object.entries(byStyle).filter(([style, list]) => list.length >= 2 && DUEL_ROUNDS.includes(style)).map(([style, list]) => ({ style, avg: list.reduce((sum, n) => sum + n, 0) / list.length })).sort((x, y) => y.avg - x.avg)[0]?.style || null;
   const parties = results.filter(result => result.size > 2);
   return {
     matches: results.length,
@@ -49139,11 +49362,170 @@ function versusRecord(rows, userId) {
     partyWins: parties.filter(result => result.won).length
   };
 }
-function renderVersusStats() {
+// The panel next to the menu card (on a phone a strip that taps open): YOUR VERSUS on
+// VERSUS, the EXPEDITION LOG on DAILY and your crew on CREW (26 November 2026, the team's
+// pick A from mockups/side-panels). One element (#versusStats), in the tab's colour.
+const PANEL_COLORS = { duel: "#c58cff", daily: "#ff4d5e", camp: "#45e3ff" };
+const panelEl = (tag, className, text) => Object.assign(document.createElement(tag), { className, textContent: text ?? "" });
+const panelLine = (label, value) => {
+  const row = panelEl("div", "lobby-line");
+  row.append(panelEl("span", "", label), typeof value === "string" ? panelEl("b", "", value) : value);
+  return row;
+};
+const panelBig = cells => {
+  const big = panelEl("div", "lobby-big");
+  cells.forEach(([value, label, className]) => { const cell = panelEl("div"); cell.append(panelEl("b", className || "", value), panelEl("small", "", label)); big.append(cell); });
+  return big;
+};
+const panelMini = parts => parts.flatMap(([value, label], i) => [...(i ? [" · "] : []), panelEl("b", "", value), ...(label ? [` ${label}`] : [])]);
+function setPanel(key, title) {
   const panel = document.getElementById("versusStats");
-  const show = hero.key === "duel" && Boolean(getUser());
+  panel.style.setProperty("--panel-c", PANEL_COLORS[key]);
+  panel.dataset.panel = key;
+  panel.classList.remove("is-crews");
+  document.getElementById("versusStatsBody").dataset.title = title;
+  panel.querySelector(".lobby-kicker").textContent = title;
+}
+function renderSidePanel() {
+  const panel = document.getElementById("versusStats");
+  const key = hero.key;
+  const show = !hero.date && (key === "daily" || key === "camp" || (key === "duel" && Boolean(getUser())));
   panel.hidden = !show;
   if (!show) return;
+  if (key === "daily") renderLogPanel();
+  else if (key === "camp") renderCrewPanel();
+  else renderVersusStats();
+}
+// DAILY: your expedition log.
+function renderLogPanel() {
+  setPanel("daily", t("log.title"));
+  const log = archive.logStats();
+  const { stats } = log;
+  const mini = document.getElementById("versusStatsMini");
+  const body = document.getElementById("versusStatsBody");
+  if (!stats.played) {
+    mini.textContent = "";
+    body.replaceChildren(panelEl("p", "lobby-note", t("log.empty")));
+    return;
+  }
+  mini.replaceChildren(...panelMini([[num(stats.played), t("log.days")], [num(stats.average)], [num(stats.current), t("log.streak")]]));
+  const max = getMaxScore(MAIN_MODE);
+  const pips = panelEl("span", "lobby-pips");
+  log.lastFive.forEach(day => { const pip = panelEl("i", ""); pip.style.background = scoreColor(day.score, max); pip.title = `${t("common.day", { n: day.puzzleNumber })} · ${num(day.score)}`; pips.append(pip); });
+  const bestLink = panelEl("button", "panel-link", `${t("common.day", { n: stats.best.puzzleNumber })} · ${num(stats.best.score)} ›`);
+  bestLink.type = "button";
+  bestLink.addEventListener("click", () => { sounds.playClick(); archive.openArchive(stats.best.dateKey, MAIN_MODE); });
+  const roundText = entry => t("log.roundAvg", { name: ROUND_INFO[entry.type]?.name || entry.type, n: num(entry.avg) });
+  const shield = log.nextShield;
+  const playedToday = modeState(MAIN_MODE) === "done";
+  body.replaceChildren(
+    panelBig([[num(stats.played), t("log.days")], [num(stats.average), t("log.avg")], [num(stats.current), t("log.streak"), stats.current ? "is-win" : ""]]),
+    panelLine(t("log.lastFive"), pips),
+    panelLine(t("log.bestDay"), bestLink),
+    ...(log.best ? [panelLine(t("log.bestRound"), roundText(log.best)), panelLine(t("log.hardest"), roundText(log.hardest))] : []),
+    ...(stats.rounds ? [panelLine(t("log.spotOn"), t("log.spotOnValue", { n: num(stats.spotOn), total: num(stats.rounds) }))] : []),
+    ...(shield ? [panelLine(t("log.nextShield"), shield.days ? t("log.shieldDays", { name: shield.name, n: shield.days }) : t("log.shieldRange", { name: shield.name, range: shield.range }))] : []),
+    panelEl("p", "lobby-note", playedToday ? t("end.nextDay", nextDayIn()) + "." : t("log.open"))
+  );
+}
+// CREW: your crews, one at a time (‹ › and a dot each; a swipe on a phone).
+let crewPanelAt = 0;
+let crewPanelLoading = false;
+let crewPanelData = null;
+let crewPanelFetched = 0;
+let crewPanelUser = null;
+function renderCrewPanel() {
+  setPanel("camp", t("crew.title"));
+  const mini = document.getElementById("versusStatsMini");
+  const body = document.getElementById("versusStatsBody");
+  // Loaded when CREW is picked (social.js keeps it a minute), and again after signing in or out.
+  const signedIn = Boolean(getUser());
+  if (community && !crewPanelLoading && (!crewPanelData || Date.now() - crewPanelFetched > 60000 || crewPanelUser !== signedIn)) {
+    crewPanelLoading = true;
+    community.crewPanel().then(data => {
+      crewPanelData = data; crewPanelLoading = false; crewPanelFetched = Date.now(); crewPanelUser = signedIn;
+      if (hero.key === "camp") renderCrewPanel();
+    });
+  }
+  const data = crewPanelData;
+  if (!data) { mini.textContent = "…"; body.replaceChildren(panelEl("p", "lobby-note", "…")); return; }
+  const cta = (label, action) => { const button = panelEl("button", "panel-cta", label); button.type = "button"; button.addEventListener("click", () => { sounds.playClick(); action(); }); return button; };
+  if (data.kind === "out") {
+    mini.textContent = "";
+    body.replaceChildren(panelEl("p", "lobby-note", t("crew.out")), cta(t("account.signIn"), () => document.getElementById("accountModal").classList.remove("hidden")));
+    return;
+  }
+  if (data.kind !== "crews") {
+    mini.textContent = "";
+    body.replaceChildren(panelEl("p", "lobby-note", data.kind === "none" ? t("crew.none") : t("crew.error")), ...(data.kind === "none" ? [cta(t("crew.start"), () => community?.open())] : []));
+    return;
+  }
+  const crews = data.crews;
+  crewPanelAt = Math.min(crewPanelAt, crews.length - 1);
+  const crew = crews[crewPanelAt];
+  setPanel("camp", crew.name.toUpperCase());
+  document.getElementById("versusStats").classList.add("is-crews");
+  const step = by => { crewPanelAt = (crewPanelAt + by + crews.length) % crews.length; renderCrewPanel(); };
+  // The crews: ‹ a dot each › (on a phone in the strip's head, on a computer at the top).
+  const switcher = () => {
+    const box = panelEl("span", "panel-dots");
+    crews.forEach((item, i) => {
+      const dot = panelEl("button", i === crewPanelAt ? "is-on" : "");
+      dot.type = "button";
+      dot.setAttribute("aria-label", item.name);
+      dot.addEventListener("click", event => { event.stopPropagation(); sounds.playClick(); crewPanelAt = i; renderCrewPanel(); });
+      box.append(dot);
+    });
+    return box;
+  };
+  const many = crews.length > 1;
+  const head = panelEl("div", "panel-crew-head");
+  head.append(panelEl("span", "panel-crew-name", crew.name));
+  if (many) {
+    const arrow = (text, by) => { const button = panelEl("button", "panel-arrow", text); button.type = "button"; button.addEventListener("click", () => { sounds.playClick(); step(by); }); return button; };
+    head.append(arrow("‹", -1), switcher(), arrow("›", 1));
+  }
+  mini.replaceChildren(...(many ? [switcher(), " "] : []), ...panelMini([[crew.place ? t("community.ordinal", { n: crew.place }) : "–"], [crew.score === null ? "–" : num(crew.score)], [num(crew.days), t("log.days")]]));
+  const todayValue = () => {
+    const value = panelEl("b", "", t("crew.todayValue", { n: crew.today.played, total: crew.today.total }));
+    if (crew.today.waiting.length) {
+      const nudge = panelEl("button", "panel-link", ` ${t("crew.nudge")}`);
+      nudge.type = "button";
+      nudge.addEventListener("click", () => { sounds.playClick(); community?.open(); });
+      value.append(nudge);
+    }
+    return value;
+  };
+  const month = new Date(`${today}T12:00:00Z`).toLocaleDateString(locale(), { month: "long", timeZone: "UTC" });
+  const duel = crew.duel ? (() => { const value = panelEl("b", "", t("crew.duelVs", { name: crew.duel.rival })); value.append(panelEl("span", crew.duel.won > crew.duel.lost ? "is-win" : "", `${crew.duel.won}–${crew.duel.lost}`)); return value; })() : null;
+  body.replaceChildren(
+    head,
+    panelBig([[crew.place ? t("community.ordinal", { n: crew.place }) : "–", t("crew.place")], [crew.score === null ? "–" : num(crew.score), t("crew.score")], [num(crew.days), t("crew.days")]]),
+    ...(duel ? [panelLine(t("crew.duel"), duel)] : []),
+    ...(crew.record ? [panelLine(t("crew.record"), t("crew.recordValue", crew.record))] : []),
+    ...(crew.gap ? [panelLine(t("crew.season"), t(crew.gap.ahead ? "community.ahead" : "community.behind", { n: num(crew.gap.n), name: crew.gap.name }))] : []),
+    ...(crew.today ? [panelLine(t("crew.today"), todayValue())] : []),
+    ...(data.reaction ? [panelLine(t("crew.reaction"), t("crew.reactionValue", data.reaction))] : []),
+    panelEl("p", "lobby-note", t(crew.work ? "community.seasonLineWork" : "community.seasonLine", { month, n: crew.daysLeft })),
+    ...(many ? [panelEl("span", "panel-swipe", t("crew.swipe"))] : [])
+  );
+  // A swipe on a phone flips to the next crew.
+  if (many && !panel_swipeBound) {
+    panel_swipeBound = true;
+    let startX = null;
+    const panel = document.getElementById("versusStats");
+    panel.addEventListener("touchstart", event => { startX = event.touches[0].clientX; }, { passive: true });
+    panel.addEventListener("touchend", event => {
+      if (startX === null || panel.dataset.panel !== "camp" || (crewPanelData?.crews?.length || 0) < 2) return;
+      const dx = event.changedTouches[0].clientX - startX;
+      startX = null;
+      if (Math.abs(dx) > 40) { crewPanelAt = (crewPanelAt + (dx < 0 ? 1 : -1) + crewPanelData.crews.length) % crewPanelData.crews.length; renderCrewPanel(); }
+    });
+  }
+}
+let panel_swipeBound = false;
+function renderVersusStats() {
+  setPanel("duel", t("lobby.yourVersus"));
   if (!versusHistory) { loadVersusHistory(); }
   const record = versusHistory ? versusRecord(versusHistory.rows, getUser().id) : null;
   const mini = document.getElementById("versusStatsMini");
@@ -50612,6 +50994,7 @@ document.getElementById("accountBase").appendChild(createBaseLine());
     duel.openCode(code);
   }
 }
+
 
 return { getPuzzleNumber, getAllPuzzleDays, getAnswerText };
 })();
