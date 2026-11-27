@@ -5378,6 +5378,160 @@ h1, h2, h3 { font-weight: normal; }
 #versusDockArt svg { width: 32px; height: 32px; }
 .hero-art-sprite.is-swords { display: grid; place-items: center; }
 .hero-art-sprite.is-swords svg { width: 48px; height: 48px; }
+
+/* ===== The playtest (26 November 2026, playtest.js; only with ?playtest) =====
+   A welcome screen (language, how a Daily day works, START), PLAY ANOTHER DAY or GIVE
+   FEEDBACK under each day's end screen, and the feedback form, designed in
+   mockups/playtest-feedback/. In Daily red. */
+.playtest-screen {
+  --accent: #ff4d5e; --accent-hover: #ff7a86; --accent-soft: rgba(255, 77, 94, 0.14);
+  position: fixed; inset: 0; z-index: 600; overflow-y: auto; overscroll-behavior: contain;
+  background: radial-gradient(1200px 600px at 50% -10%, rgba(255, 77, 94, 0.16), transparent 60%), #0a0f1d;
+  color: var(--text); font: 400 16px/1.5 var(--font-body);
+}
+.playtest-brand { display: block; font: 12px var(--font-display); letter-spacing: var(--ls-pixel); }
+.playtest-badge { display: block; margin-top: 6px; color: var(--accent); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); }
+
+/* the welcome screen */
+#playtestWelcome { display: grid; place-items: start center; padding: calc(env(safe-area-inset-top, 0px) + 24px) 16px calc(env(safe-area-inset-bottom, 0px) + 24px); }
+.playtest-card {
+  width: min(640px, 100%); display: grid; gap: 16px; padding: 24px;
+  background: var(--glass); border: 1px solid var(--glass-line); border-radius: 18px; box-shadow: var(--glass-shine), var(--glass-shadow);
+}
+.playtest-head { display: flex; align-items: center; gap: 12px; }
+.playtest-langs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.playtest-langs button {
+  display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 12px;
+  border: 1px solid var(--line-strong); border-radius: 12px; background: var(--glass-fill); color: var(--muted);
+  font: 600 16px var(--font-body); cursor: pointer;
+}
+.playtest-langs button img { width: 28px; height: 20px; border-radius: 3px; object-fit: cover; }
+.playtest-langs button:hover { border-color: var(--muted); color: var(--text); }
+.playtest-langs button[aria-checked="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--text); }
+.playtest-card h1 { margin: 4px 0 0; font: 16px/1.5 var(--font-display); letter-spacing: var(--ls-pixel); color: var(--gold); }
+.playtest-intro { margin: 0; color: var(--muted); }
+.playtest-rules { display: grid; gap: 10px; padding: 16px; border: 1px solid var(--glass-line); border-radius: 14px; background: rgba(0, 0, 0, 0.18); }
+.playtest-rules h2 { margin: 0; color: var(--muted); font: 9px/1.6 var(--font-display); letter-spacing: var(--ls-pixel); }
+.playtest-rules ol { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.playtest-rules li { display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: start; }
+.playtest-rules li > b {
+  display: grid; place-items: center; width: 28px; height: 28px; border-radius: 6px;
+  background: color-mix(in srgb, var(--round-color) 18%, transparent); border: 1px solid color-mix(in srgb, var(--round-color) 55%, transparent);
+  color: var(--round-color); font: 9px var(--font-display);
+}
+.playtest-rules li strong { display: block; font-weight: 600; }
+.playtest-rules li span { display: block; color: var(--muted); font-size: 14px; }
+.playtest-foot { margin: 0; color: var(--muted); font-size: 14px; }
+.playtest-actions, .pt-actions { display: grid; gap: 10px; }
+.playtest-actions .btn, .pt-actions .btn, .playtest-end .btn { min-height: 50px; font-size: 10px; }
+
+/* after a day: above HOME */
+.playtest-end { display: grid; gap: 10px; width: min(560px, 100%); justify-self: center; }
+.playtest-end[hidden] { display: none; }
+.playtest-end p { margin: 0; text-align: center; color: var(--muted); font-size: 14px; }
+.playtest-end p strong { color: var(--text); }
+.playtest-end-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+[data-playtest="on"] #victoryModal[data-mode="daily"] #endArchiveButton { display: none; }
+[data-playtest="on"] #victoryModal[data-mode="daily"] .end-actions { grid-template-columns: 1fr; }
+@media (max-width: 760px) {
+  .playtest-end { width: auto; justify-self: stretch; padding: 0 16px; }
+  .playtest-end-buttons { grid-template-columns: 1fr; gap: 8px; }
+  .playtest-end p { display: none; }
+}
+
+/* the form */
+.pt-top {
+  position: sticky; top: 0; z-index: 2; padding: calc(env(safe-area-inset-top, 0px) + 10px) 16px 0;
+  background: rgba(10, 15, 29, 0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--glass-line);
+}
+.pt-top-row { max-width: 760px; margin: 0 auto; display: flex; align-items: center; gap: 12px; padding-bottom: 10px; }
+.pt-langs { margin-left: auto; display: flex; gap: 4px; }
+.pt-langs button { padding: 9px 10px; border: 1px solid var(--line-strong); border-radius: 6px; background: transparent; color: var(--muted); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; }
+.pt-langs button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.pt-top .modal-close { flex: none; }
+.pt-progress { max-width: 760px; margin: 0 auto; height: 4px; background: var(--line); border-radius: 2px 2px 0 0; overflow: hidden; }
+.pt-progress span { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.3s; }
+.pt-wrap { max-width: 760px; margin: 0 auto; padding: 24px 16px calc(env(safe-area-inset-bottom, 0px) + 40px); }
+.pt-card { margin-bottom: 16px; padding: 20px; background: var(--glass); border: 1px solid var(--glass-line); border-radius: 16px; box-shadow: var(--glass-shine), var(--glass-shadow); }
+.pt-hero h1, .pt-thanks h1 { margin: 0 0 14px; font: 16px/1.5 var(--font-display); letter-spacing: var(--ls-pixel); }
+.pt-hero p { margin: 0 0 10px; color: var(--muted); }
+.pt-hero p strong { color: var(--text); }
+.pt-tip { margin-top: 14px; padding: 12px 14px; border-left: 3px solid var(--gold); border-radius: 0 8px 8px 0; background: rgba(255, 212, 92, 0.07); color: var(--muted); font-size: 14px; }
+.pt-tip b { color: var(--gold); font-weight: 600; }
+.pt-played { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.pt-chip { padding: 4px 8px; border: 1px solid var(--line-strong); border-radius: 6px; color: var(--muted); font: 12px var(--font-mono); }
+.pt-chip b { color: var(--text); }
+.pt-sec-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 6px; }
+.pt-num {
+  flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 6px;
+  background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); color: var(--accent); font: 9px var(--font-display);
+}
+.pt-card.is-done .pt-num { background: rgba(92, 242, 138, 0.14); border-color: rgba(92, 242, 138, 0.45); color: var(--t-correct); }
+.pt-sec-head h2 { margin: 4px 0 0; font: 12px/1.6 var(--font-display); letter-spacing: var(--ls-pixel); text-transform: uppercase; }
+.pt-desc { margin: 0 0 16px 40px; color: var(--muted); font-size: 14px; }
+.pt-label { display: block; margin-bottom: 8px; color: var(--muted); font: 9px/1.6 var(--font-display); letter-spacing: var(--ls-pixel); text-transform: uppercase; }
+.pt-opt { margin-left: 6px; color: var(--faint); font: 400 12px var(--font-body); letter-spacing: 0; text-transform: none; }
+.pt-field { display: block; margin-bottom: 14px; }
+.playtest-form input[type="text"], .playtest-form input[type="email"], .playtest-form textarea {
+  width: 100%; padding: 12px 14px; border: 1px solid var(--line-strong); border-radius: 10px; outline: none;
+  background: var(--glass-fill); color: var(--text); font: 16px/1.5 var(--font-body);
+}
+.playtest-form input:focus, .playtest-form textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.playtest-form textarea { min-height: 96px; resize: vertical; }
+.playtest-form textarea.pt-review { min-height: 150px; }
+.playtest-form ::placeholder { color: var(--faint); }
+.pt-email { margin: 16px 0 0; }
+.pt-q { margin-bottom: 18px; }
+.pt-q:last-child { margin-bottom: 0; }
+.pt-q-text { margin-bottom: 10px; font-weight: 600; }
+.pt-grade { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+.pt-grade button {
+  aspect-ratio: 1; min-height: 40px; border: 2px solid var(--line-strong); border-radius: 6px; background: var(--glass-fill);
+  color: var(--muted); font: 700 16px var(--font-mono); cursor: pointer; transition: transform 0.1s;
+}
+.pt-grade button:hover { transform: translateY(-2px); border-color: var(--muted); }
+.pt-grade button.is-on { border-color: transparent; color: #0a0f1d; }
+.pt-grade-scale { display: flex; justify-content: space-between; margin-top: 8px; color: var(--faint); font-size: 12px; }
+.pt-grade-big { min-height: 44px; margin: 8px 0 4px; text-align: center; font: 700 44px/1 var(--font-mono); }
+.pt-grade-word { min-height: 21px; margin-bottom: 10px; text-align: center; color: var(--muted); font-size: 14px; }
+.pt-rate { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.pt-rate button {
+  display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px 8px; cursor: pointer;
+  border: 1px solid var(--line-strong); border-radius: 8px; background: var(--glass-fill); color: var(--muted); font: 12px/1.2 var(--font-body);
+}
+.pt-rate button:hover { border-color: var(--muted); }
+.pt-rate .n { color: var(--text); font: 700 16px var(--font-mono); }
+.pt-rate .pips { display: flex; gap: 2px; }
+.pt-rate .pips i { width: 6px; height: 10px; background: var(--line-strong); }
+.pt-rate button.is-on { border-color: var(--accent); background: var(--accent-soft); color: var(--text); }
+.pt-rate button.is-on .pips i.f { background: var(--accent); }
+.pt-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.pt-pills button { padding: 8px 14px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--glass-fill); color: var(--muted); font: 14px var(--font-body); cursor: pointer; }
+.pt-pills button:hover { border-color: var(--muted); }
+.pt-pills button.is-on { border-color: var(--accent); background: var(--accent-soft); color: var(--text); }
+.pt-pills.is-gold button.is-on { border-color: var(--gold); background: rgba(255, 212, 92, 0.12); }
+.pt-note { margin-top: 16px; }
+.pt-prompts { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.pt-prompts button { padding: 5px 9px; border: 1px dashed var(--line-strong); border-radius: 6px; background: transparent; color: var(--faint); font: 12px var(--font-body); text-align: left; cursor: pointer; }
+.pt-prompts button:hover { border-color: var(--muted); color: var(--text); }
+.pt-meta { margin-top: 6px; color: var(--faint); font-size: 12px; }
+.pt-nudge.is-good { color: var(--t-correct); }
+.pt-check { display: flex; align-items: center; gap: 10px; margin-top: 12px; color: var(--muted); font-size: 14px; cursor: pointer; }
+.pt-check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.pt-bug-note[hidden] { display: none; }
+.pt-missing { min-height: 21px; margin: 0; text-align: center; color: var(--accent); font-size: 14px; }
+.pt-small { margin: 4px 0 0; text-align: center; color: var(--faint); font-size: 12px; }
+.pt-thanks { display: grid; justify-items: center; gap: 4px; padding: 32px 20px; text-align: center; }
+.pt-thanks p { margin: 0 0 16px; color: var(--muted); }
+.pt-thanks .pt-actions { width: min(360px, 100%); }
+.brand-mark.is-big { width: 64px; height: 64px; }
+@media (max-width: 520px) {
+  .playtest-card { padding: 18px; gap: 14px; }
+  .pt-card { padding: 16px; }
+  .pt-desc { margin-left: 0; }
+  .pt-grade { grid-template-columns: repeat(5, 1fr); }
+  .pt-grade button { aspect-ratio: auto; height: 44px; }
+  .pt-rate button { padding: 8px 2px; font-size: 11px; }
 .hero-art-sprite.is-calendar { display: grid; place-items: center; }
 .hero-art-sprite.is-calendar svg { width: 48px; height: 48px; }
 
@@ -8743,7 +8897,136 @@ const EN = {
   "duel.place.4": "4TH",
   "duel.nameHint": "Type a country or click it on the globe. One wrong name ends your turn.",
   "duel.paintReveal": "Here come the countries…",
-  "duel.paintedCountries": "countries painted"
+  "duel.paintedCountries": "countries painted",
+  // Playtest (26 November 2026, playtest.js): the welcome screen, the choice after each day
+  // and the feedback form. Only with ?playtest in the address.
+  "playtest.badge": "PLAYTEST",
+  "playtest.langTitle": "Pick your language",
+  "playtest.welcome": "Welcome, explorer!",
+  "playtest.welcomeBack": "Welcome back, explorer!",
+  "playtest.intro": "Thanks for helping us test Expedition, a daily geography game. Play one day (five rounds, about 10 minutes), then tell us what you think.",
+  "playtest.introBack": "Play another day from the archive, or tell us what you think. Your feedback is what this test is for.",
+  "playtest.howTitle": "HOW A DAY WORKS",
+  "playtest.rule.extreme": "One question about a statistic. Click the country with the highest (or lowest) value. The closer it ranks to #1, the more points.",
+  "playtest.rule.pin": "Drop a pin where the place is. The closer you get, the more points.",
+  "playtest.rule.paint": "Click every country that fits the question. A wrong one costs 200; five wrong and the round ends.",
+  "playtest.rule.mystery": "Guess the country from its clues. Every wrong guess opens a new clue and costs 200.",
+  "playtest.rule.iceberg": "Name one answer to the question. The more niche your answer, the more points. Answers that aren't on the list cost nothing.",
+  "playtest.rulesFoot": "Every round is worth up to 1,000 points. There's no clock: take your time.",
+  "playtest.start": "▶ START THE DAY",
+  "playtest.continue": "▶ CONTINUE THE DAY",
+  "playtest.results": "✓ SEE MY RESULT",
+  "playtest.anotherDay": "▶ PLAY ANOTHER DAY",
+  "playtest.giveFeedback": "✎ GIVE FEEDBACK",
+  "playtest.feedbackSent": "✓ FEEDBACK SENT · ADD MORE",
+  "playtest.endTitle": "Thanks for playing!",
+  "playtest.endText": "Play another day, or tell us what you think. You can do both.",
+  // The form
+  "playtest.title": "How was your expedition?",
+  "playtest.formIntro": "Tycho and Sky read <strong>every</strong> answer. It takes about 5 minutes.",
+  "playtest.tip": "<b>Specific beats general.</b> \"The volcano question in Paint the Map was impossible\" helps us far more than \"too hard\". Name the round, the question, the moment.",
+  "playtest.played": "You played",
+  "playtest.playedDay": "Day {n}",
+  "playtest.unfinished": "unfinished",
+  "playtest.close": "Close",
+  "playtest.s.you": "About you",
+  "playtest.s.you.d": "So we know who said what, and how you played.",
+  "playtest.name": "Your name",
+  "playtest.name.ph": "First name or nickname",
+  "playtest.device": "What did you play on?",
+  "playtest.device.phone": "Phone",
+  "playtest.device.tablet": "Tablet",
+  "playtest.device.computer": "Computer",
+  "playtest.habit": "How often do you play daily puzzle games (Wordle, Connections…)?",
+  "playtest.habit.never": "Never",
+  "playtest.habit.sometimes": "Sometimes",
+  "playtest.habit.weekly": "Every week",
+  "playtest.habit.daily": "Every day",
+  "playtest.geo": "How would you rate your own geography knowledge?",
+  "playtest.geo.1": "Lost without a map",
+  "playtest.geo.2": "Average",
+  "playtest.geo.3": "Pretty good",
+  "playtest.geo.4": "Geography nerd",
+  "playtest.s.overall": "Overall grade",
+  "playtest.s.overall.d": "If Expedition were a school report, what would it get?",
+  "playtest.grade.lo": "1 · not for me",
+  "playtest.grade.hi": "10 · I'm hooked",
+  "playtest.grade.1": "Not for me",
+  "playtest.grade.2": "Not for me",
+  "playtest.grade.3": "Needs a lot of work",
+  "playtest.grade.4": "Needs work",
+  "playtest.grade.5": "Fine",
+  "playtest.grade.6": "Decent",
+  "playtest.grade.7": "Good",
+  "playtest.grade.8": "Really good",
+  "playtest.grade.9": "Great",
+  "playtest.grade.10": "I'm hooked",
+  "playtest.rating": "Your rating",
+  "playtest.notes": "Your notes",
+  "playtest.nudge": "A sentence or two makes this 10× more useful",
+  "playtest.nudgeGood": "Thank you, that's gold",
+  "playtest.noSound": "I played with the sound off",
+  "playtest.q.questions": "Questions",
+  "playtest.q.questions.d": "Quality and appeal: were they interesting, fair and fun to think about?",
+  "playtest.q.questions.r": "Boring|Meh|OK|Good|Loved them",
+  "playtest.q.questions.p": "Which question was the best, and why?|Which one felt unfair or confusing?|Did any answer surprise you?|Was any question worded unclearly?",
+  "playtest.q.questions.ph": "Name the day and round if you can, e.g. 'Day 1 Iceberg: great, I learned something'.",
+  "playtest.q.ux": "User experience",
+  "playtest.q.ux.d": "Did you always know what to do, where to tap, and what happened?",
+  "playtest.q.ux.r": "Lost|Clunky|OK|Smooth|Effortless",
+  "playtest.q.ux.p": "Was anything unclear at the start?|Where did you get stuck?|Was something hard to tap or click?|What did you expect that didn't happen?",
+  "playtest.q.ux.ph": "e.g. 'I didn't see the LOCK IN button on my phone', 'Spinning the globe was fiddly'.",
+  "playtest.q.vibe": "Animations, sound & vibe",
+  "playtest.q.vibe.d": "The look, the sounds, the climb, the journey: did it feel like a world?",
+  "playtest.q.vibe.r": "Flat|Meh|OK|Charming|Love the vibe",
+  "playtest.q.vibe.p": "Which moment felt best?|Was any animation too slow or too long?|Were the sounds nice or annoying?|Did the journey (balloon, mine, …) mean anything to you?",
+  "playtest.q.vibe.ph": "e.g. 'The climb in Highs & Lows is great but I skipped it by day 2'.",
+  "playtest.q.difficulty": "Difficulty & accessibility",
+  "playtest.q.difficulty.d": "Was it the right challenge? Could anyone pick it up?",
+  "playtest.q.difficulty.r": "Way too hard|A bit hard|Just right|A bit easy|Way too easy",
+  "playtest.q.difficulty.p": "Which round was hardest?|Did you feel stupid at any point?|Was text readable (size, contrast)?|Was the language clear for you?",
+  "playtest.q.difficulty.ph": "e.g. 'Mystery Country was perfect, Paint the Map needed a hint'. Mention colour blindness or anything else that got in the way.",
+  "playtest.s.rounds": "The five rounds",
+  "playtest.s.rounds.d": "Pick one of each. Tell us why below.",
+  "playtest.fav": "Favourite round",
+  "playtest.least": "Least favourite round",
+  "playtest.why": "Why?",
+  "playtest.rounds.ph": "What made it fun, or what made it annoying?",
+  "playtest.s.again": "Coming back",
+  "playtest.s.again.d": "The honest answer helps most.",
+  "playtest.tomorrow": "Would you play again tomorrow?",
+  "playtest.friend": "Would you send it to a friend?",
+  "playtest.yes": "Yes",
+  "playtest.maybe": "Maybe",
+  "playtest.no": "No",
+  "playtest.again.n": "What would make you come back every day?",
+  "playtest.again.ph": "Playing with friends, a streak, shorter days, different questions…",
+  "playtest.s.bugs": "Bugs & broken bits",
+  "playtest.s.bugs.d": "Anything that froze, looked wrong, or didn't do what you expected.",
+  "playtest.bugs.none": "Nothing went wrong",
+  "playtest.bugs.some": "Something went wrong",
+  "playtest.bugs.n": "What happened?",
+  "playtest.bugs.ph": "Which day and round, what you did, what you saw.",
+  "playtest.facts": "Did you spot a wrong fact or answer?",
+  "playtest.optional": "optional",
+  "playtest.facts.ph": "e.g. Day 3, Highs & Lows: I'm sure Chile is higher than Peru because…",
+  "playtest.s.review": "Write a mini review :)",
+  "playtest.s.review.d": "Anything at all. Pretend it's an app store review, a text to a friend, or a letter to us.",
+  "playtest.review.ph": "★★★★☆ Would globe again…",
+  "playtest.email": "Email for follow-up questions",
+  "playtest.email.ph": "Only if we may ask you more",
+  "playtest.send": "SEND FEEDBACK",
+  "playtest.sending": "SENDING…",
+  "playtest.later": "KEEP PLAYING FIRST",
+  "playtest.auto": "We also send the days you played, your scores, your device and language.",
+  "playtest.need": "Still needed: {list}",
+  "playtest.needName": "your name",
+  "playtest.needGrade": "an overall grade",
+  "playtest.failed": "Couldn't send it just now. Your answers are kept here: try again in a moment.",
+  "playtest.thanks": "Feedback received!",
+  "playtest.thanksText": "Thank you, that really helps. Want to keep exploring? Every day in the archive is open.",
+  "playtest.edit": "CHANGE MY ANSWERS",
+  "playtest.backToGame": "BACK TO THE GAME"
 };
 
 return { EN };
@@ -10579,7 +10862,134 @@ const NL = {
   "duel.place.4": "4E",
   "duel.nameHint": "Typ een land of klik het aan op de globe. Eén foute naam en je beurt is voorbij.",
   "duel.paintReveal": "Daar komen de landen…",
-  "duel.paintedCountries": "landen gekleurd"
+  "duel.paintedCountries": "landen gekleurd",
+  // Testversie (playtest.js)
+  "playtest.badge": "TESTVERSIE",
+  "playtest.langTitle": "Kies je taal",
+  "playtest.welcome": "Welkom, ontdekker!",
+  "playtest.welcomeBack": "Welkom terug, ontdekker!",
+  "playtest.intro": "Bedankt dat je Expedition wilt testen, een dagelijks aardrijkskundespel. Speel één dag (vijf rondes, zo'n 10 minuten) en vertel ons daarna wat je ervan vindt.",
+  "playtest.introBack": "Speel nog een dag uit het archief, of vertel ons wat je ervan vindt. Om je feedback draait deze test.",
+  "playtest.howTitle": "ZO WERKT EEN DAG",
+  "playtest.rule.extreme": "Eén vraag over een statistiek. Klik het land met de hoogste (of laagste) waarde. Hoe dichter het bij #1 staat, hoe meer punten.",
+  "playtest.rule.pin": "Zet een speld waar de plek ligt. Hoe dichterbij, hoe meer punten.",
+  "playtest.rule.paint": "Klik elk land aan dat bij de vraag past. Een fout kost 200; vijf fouten en de ronde is voorbij.",
+  "playtest.rule.mystery": "Raad het land aan de hand van aanwijzingen. Elke foute gok opent een nieuwe aanwijzing en kost 200.",
+  "playtest.rule.iceberg": "Noem één antwoord op de vraag. Hoe onbekender je antwoord, hoe meer punten. Antwoorden die niet op de lijst staan kosten niets.",
+  "playtest.rulesFoot": "Elke ronde is tot 1.000 punten waard. Er is geen klok: neem je tijd.",
+  "playtest.start": "▶ BEGIN DE DAG",
+  "playtest.continue": "▶ GA VERDER MET DE DAG",
+  "playtest.results": "✓ BEKIJK MIJN UITSLAG",
+  "playtest.anotherDay": "▶ SPEEL NOG EEN DAG",
+  "playtest.giveFeedback": "✎ GEEF FEEDBACK",
+  "playtest.feedbackSent": "✓ FEEDBACK VERSTUURD · MEER TOEVOEGEN",
+  "playtest.endTitle": "Bedankt voor het spelen!",
+  "playtest.endText": "Speel nog een dag, of vertel ons wat je ervan vindt. Allebei mag ook.",
+  "playtest.title": "Hoe was je expeditie?",
+  "playtest.formIntro": "Tycho en Sky lezen <strong>elk</strong> antwoord. Het duurt zo'n 5 minuten.",
+  "playtest.tip": "<b>Hoe specifieker, hoe beter.</b> \"De vulkaanvraag bij Kleur de kaart was onmogelijk\" helpt ons veel meer dan \"te moeilijk\". Noem de ronde, de vraag, het moment.",
+  "playtest.played": "Je speelde",
+  "playtest.playedDay": "Dag {n}",
+  "playtest.unfinished": "niet af",
+  "playtest.close": "Sluiten",
+  "playtest.s.you": "Over jou",
+  "playtest.s.you.d": "Zodat we weten wie wat zei, en hoe je speelde.",
+  "playtest.name": "Je naam",
+  "playtest.name.ph": "Voornaam of bijnaam",
+  "playtest.device": "Waarop speelde je?",
+  "playtest.device.phone": "Telefoon",
+  "playtest.device.tablet": "Tablet",
+  "playtest.device.computer": "Computer",
+  "playtest.habit": "Hoe vaak speel je dagelijkse puzzelspellen (Wordle, Connections…)?",
+  "playtest.habit.never": "Nooit",
+  "playtest.habit.sometimes": "Soms",
+  "playtest.habit.weekly": "Elke week",
+  "playtest.habit.daily": "Elke dag",
+  "playtest.geo": "Hoe goed is je eigen aardrijkskundekennis?",
+  "playtest.geo.1": "Verdwaald zonder kaart",
+  "playtest.geo.2": "Gemiddeld",
+  "playtest.geo.3": "Best goed",
+  "playtest.geo.4": "Aardrijkskundenerd",
+  "playtest.s.overall": "Eindcijfer",
+  "playtest.s.overall.d": "Als Expedition een rapport kreeg, welk cijfer zou het halen?",
+  "playtest.grade.lo": "1 · niks voor mij",
+  "playtest.grade.hi": "10 · verslaafd",
+  "playtest.grade.1": "Niks voor mij",
+  "playtest.grade.2": "Niks voor mij",
+  "playtest.grade.3": "Moet veel beter",
+  "playtest.grade.4": "Moet beter",
+  "playtest.grade.5": "Prima",
+  "playtest.grade.6": "Redelijk",
+  "playtest.grade.7": "Goed",
+  "playtest.grade.8": "Echt goed",
+  "playtest.grade.9": "Top",
+  "playtest.grade.10": "Verslaafd",
+  "playtest.rating": "Jouw oordeel",
+  "playtest.notes": "Jouw notities",
+  "playtest.nudge": "Een zin of twee maakt dit 10× nuttiger",
+  "playtest.nudgeGood": "Dank je, dit is goud",
+  "playtest.noSound": "Ik speelde zonder geluid",
+  "playtest.q.questions": "Vragen",
+  "playtest.q.questions.d": "Kwaliteit en aantrekkingskracht: waren ze interessant, eerlijk en leuk om over na te denken?",
+  "playtest.q.questions.r": "Saai|Matig|Oké|Goed|Geweldig",
+  "playtest.q.questions.p": "Welke vraag was de beste, en waarom?|Welke voelde oneerlijk of verwarrend?|Verraste een antwoord je?|Was een vraag onduidelijk?",
+  "playtest.q.questions.ph": "Noem de dag en ronde als je kunt, bv. 'Dag 1 IJsberg: top, ik leerde iets'.",
+  "playtest.q.ux": "Gebruiksgemak",
+  "playtest.q.ux.d": "Wist je steeds wat je moest doen, waar je moest tikken en wat er gebeurde?",
+  "playtest.q.ux.r": "Verdwaald|Stroef|Oké|Soepel|Moeiteloos",
+  "playtest.q.ux.p": "Was iets onduidelijk in het begin?|Waar liep je vast?|Was iets lastig aan te tikken?|Wat verwachtte je dat niet gebeurde?",
+  "playtest.q.ux.ph": "bv. 'Ik zag de LOCK IN-knop niet op mijn telefoon', 'De globe draaien was priegelig'.",
+  "playtest.q.vibe": "Animaties, geluid & sfeer",
+  "playtest.q.vibe.d": "De look, de geluiden, de klim, de tocht: voelde het als een wereld?",
+  "playtest.q.vibe.r": "Vlak|Matig|Oké|Charmant|Geweldige sfeer",
+  "playtest.q.vibe.p": "Welk moment voelde het best?|Was een animatie te traag of te lang?|Waren de geluiden fijn of irritant?|Zei de tocht (ballon, mijn, …) je iets?",
+  "playtest.q.vibe.ph": "bv. 'De klim in Highs & Lows is gaaf, maar op dag 2 sloeg ik hem over'.",
+  "playtest.q.difficulty": "Moeilijkheid & toegankelijkheid",
+  "playtest.q.difficulty.d": "Was het de juiste uitdaging? Kan iedereen het oppakken?",
+  "playtest.q.difficulty.r": "Veel te moeilijk|Wat moeilijk|Precies goed|Wat makkelijk|Veel te makkelijk",
+  "playtest.q.difficulty.p": "Welke ronde was het moeilijkst?|Voelde je je ergens dom?|Was de tekst goed leesbaar (grootte, contrast)?|Was de taal duidelijk voor je?",
+  "playtest.q.difficulty.ph": "bv. 'Mysterieland was perfect, Kleur de kaart had een hint nodig'. Noem ook kleurenblindheid of iets anders dat in de weg zat.",
+  "playtest.s.rounds": "De vijf rondes",
+  "playtest.s.rounds.d": "Kies er van elk één. Vertel hieronder waarom.",
+  "playtest.fav": "Favoriete ronde",
+  "playtest.least": "Minst favoriete ronde",
+  "playtest.why": "Waarom?",
+  "playtest.rounds.ph": "Wat maakte het leuk, of wat maakte het irritant?",
+  "playtest.s.again": "Terugkomen",
+  "playtest.s.again.d": "Het eerlijke antwoord helpt het meest.",
+  "playtest.tomorrow": "Zou je morgen weer spelen?",
+  "playtest.friend": "Zou je het naar een vriend sturen?",
+  "playtest.yes": "Ja",
+  "playtest.maybe": "Misschien",
+  "playtest.no": "Nee",
+  "playtest.again.n": "Waardoor zou je elke dag terugkomen?",
+  "playtest.again.ph": "Met vrienden spelen, een reeks, kortere dagen, andere vragen…",
+  "playtest.s.bugs": "Bugs & kapotte stukjes",
+  "playtest.s.bugs.d": "Alles wat vastliep, er raar uitzag of niet deed wat je verwachtte.",
+  "playtest.bugs.none": "Er ging niets mis",
+  "playtest.bugs.some": "Er ging iets mis",
+  "playtest.bugs.n": "Wat gebeurde er?",
+  "playtest.bugs.ph": "Welke dag en ronde, wat je deed, wat je zag.",
+  "playtest.facts": "Zag je een fout feit of antwoord?",
+  "playtest.optional": "optioneel",
+  "playtest.facts.ph": "bv. Dag 3, Highs & Lows: Chili is volgens mij hoger dan Peru omdat…",
+  "playtest.s.review": "Schrijf een mini-recensie :)",
+  "playtest.s.review.d": "Wat je maar wilt. Doe alsof het een recensie in de app store is, een appje aan een vriend, of een brief aan ons.",
+  "playtest.review.ph": "★★★★☆ Zou weer globen…",
+  "playtest.email": "E-mail voor vervolgvragen",
+  "playtest.email.ph": "Alleen als we je meer mogen vragen",
+  "playtest.send": "FEEDBACK VERSTUREN",
+  "playtest.sending": "VERSTUREN…",
+  "playtest.later": "EERST VERDER SPELEN",
+  "playtest.auto": "We sturen ook mee welke dagen je speelde, je scores, je apparaat en taal.",
+  "playtest.need": "Nog nodig: {list}",
+  "playtest.needName": "je naam",
+  "playtest.needGrade": "een eindcijfer",
+  "playtest.failed": "Versturen lukte nu niet. Je antwoorden blijven hier staan: probeer het zo nog eens.",
+  "playtest.thanks": "Feedback ontvangen!",
+  "playtest.thanksText": "Dank je wel, dit helpt echt. Nog verder ontdekken? Elke dag in het archief staat open.",
+  "playtest.edit": "MIJN ANTWOORDEN AANPASSEN",
+  "playtest.backToGame": "TERUG NAAR HET SPEL"
 };
 
 return { NL };
@@ -35851,7 +36261,411 @@ const getLiveContacts = () => call("live_contacts");
 const sendMatchInvites = (ids, code) => call("send_match_invites", { targets: ids, match_code: code });
 const takeMatchInvites = () => call("take_match_invites");
 
-return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, getAccountUnits, saveUnits, saveBase, saveCampPitched, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, setGroupKind, setGroupAdmin, addToGroup, leaveGroup, getGroups, createChallenge, getChallenge, setPublicTent, getCrewTents, getCrewPicks, sendNudge, takeNudges, setGroupWebhook, getGroupWebhook, testGroupPost, setPublicLook, joinGroup, renameGroup, newJoinCode, removeFromGroup, getGroupBoard, callDuel, watchDuel, getDuelHistory, findOpenDuel, sendReaction, getDayReactions, takeReactions, getLiveContacts, sendMatchInvites, takeMatchInvites };
+// The playtest form (playtest.js) goes to its own table (supabase/playtest.sql): anyone may
+// send one, signed in or not; only the team reads them. Throws when it didn't arrive.
+async function sendPlaytestFeedback(row) {
+  const supabase = await getClient();
+  if (!supabase) throw new Error("Accounts aren't set up.");
+  const { error } = await supabase.from("playtest_feedback").insert({ ...row, user_id: user?.id || null });
+  if (error) throw new Error(error.message);
+}
+
+return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, getAccountUnits, saveUnits, saveBase, saveCampPitched, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, setGroupKind, setGroupAdmin, addToGroup, leaveGroup, getGroups, createChallenge, getChallenge, setPublicTent, getCrewTents, getCrewPicks, sendNudge, takeNudges, setGroupWebhook, getGroupWebhook, testGroupPost, setPublicLook, joinGroup, renameGroup, newJoinCode, removeFromGroup, getGroupBoard, callDuel, watchDuel, getDuelHistory, findOpenDuel, sendReaction, getDayReactions, takeReactions, getLiveContacts, sendMatchInvites, takeMatchInvites, sendPlaytestFeedback };
+})();
+
+// ---- playtest.js
+__modules["playtest.js"] = (() => {
+// The playtest (26 November 2026, request from the team): one link for testers.
+// https://…/?playtest turns it on for this browser (?playtest=off turns it off again):
+//   1. a welcome screen: pick English or Dutch, read how a Daily day works, START;
+//   2. after every finished day, on the end screen: PLAY ANOTHER DAY (the archive) or
+//      GIVE FEEDBACK;
+//   3. the feedback form (mockups/playtest-feedback/ is where it was designed), sent to the
+//      table playtest_feedback in Supabase (supabase/playtest.sql); the team reads it on the
+//      playtest dashboard. The answers wait in this browser as a draft until sent.
+const { LANGUAGES, getLang, num, onLangChange, setLang, t } = __modules["i18n.js"];
+const { MODE_NAME } = __modules["extremes.js"];
+const { ROUND_COLORS } = __modules["journeys.js"];
+const { sounds } = __modules["audio.js"];
+
+const FLAG_KEY = "daily-geography:playtest:v1";
+const DRAFT_KEY = "daily-geography:playtest-draft:v1";
+
+// Daily's five rounds, in their order (daily-days.js).
+const ROUNDS = [
+  { id: "extreme", name: () => MODE_NAME },
+  { id: "pin", name: () => t("round.pin") },
+  { id: "paint", name: () => t("round.paint") },
+  { id: "mystery", name: () => t("round.mystery") },
+  { id: "iceberg", name: () => t("round.deepcut") }
+];
+// The rated sections of the form; difficulty's middle (3) is "just right".
+const RATED = ["questions", "ux", "vibe", "difficulty"];
+
+function readFlag() {
+  const param = new URLSearchParams(location.search).get("playtest");
+  try {
+    if (param === "off") { localStorage.removeItem(FLAG_KEY); return false; }
+    if (param !== null) { localStorage.setItem(FLAG_KEY, "1"); return true; }
+    return localStorage.getItem(FLAG_KEY) === "1";
+  } catch {
+    return param !== null && param !== "off";
+  }
+}
+
+const el = (tag, props = {}, ...children) => {
+  const node = Object.assign(document.createElement(tag), props);
+  node.append(...children.filter(child => child != null && child !== false));
+  return node;
+};
+const esc = text => String(text ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// getDays(): the Daily days this browser has played ({ dateKey, puzzleNumber, completed, score }).
+// firstDay(): the day a tester starts on (today, or the latest Daily day before it).
+// dayState(dateKey): "new", "started" or "done". play(dateKey) starts that day; openArchive()
+// opens Daily's archive over the end screen; send(row) sends the form (throws on failure).
+function initPlaytest({ getDays, firstDay, dayState, play, openArchive, send }) {
+  const active = readFlag();
+  if (!active) return { active, renderEnd() {} };
+  document.documentElement.dataset.playtest = "on";
+
+  let draft = { name: "", email: "", review: "", grade: 0, choice: {}, rate: {}, notes: {}, noSound: false, sentAt: null };
+  try { Object.assign(draft, JSON.parse(localStorage.getItem(DRAFT_KEY) || "null") || {}); } catch { /* a fresh form */ }
+  const saveDraft = () => { try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); } catch { /* kept for this visit */ } };
+  // Guess the device for them; they can change it.
+  if (!draft.choice.device) {
+    const coarse = matchMedia("(pointer: coarse)").matches;
+    draft.choice.device = !coarse ? "computer" : Math.min(screen.width, screen.height) >= 700 ? "tablet" : "phone";
+  }
+
+  /* ---------- 1. the welcome screen ---------- */
+  const welcome = el("div", { className: "playtest-screen", id: "playtestWelcome", role: "dialog" });
+  welcome.setAttribute("aria-modal", "true");
+  document.body.appendChild(welcome);
+
+  function renderWelcome() {
+    const start = firstDay();
+    const state = dayState(start);
+    const back = state !== "new" || getDays().some(day => day.started);
+    welcome.innerHTML = `
+      <div class="playtest-card">
+        <header class="playtest-head">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div><strong class="playtest-brand">EXPEDITION</strong><span class="playtest-badge">${t("playtest.badge")}</span></div>
+        </header>
+        <div class="playtest-langs" role="radiogroup" aria-label="${esc(t("playtest.langTitle"))}">
+          ${LANGUAGES.map(language => `<button type="button" role="radio" aria-checked="${language.code === getLang()}" data-lang="${language.code}">
+            <img src="https://flagcdn.com/w40/${language.flag}.png" alt="" width="28" height="20"><span>${language.name}</span></button>`).join("")}
+        </div>
+        <h1>${t(back ? "playtest.welcomeBack" : "playtest.welcome")}</h1>
+        <p class="playtest-intro">${t(back ? "playtest.introBack" : "playtest.intro")}</p>
+        <section class="playtest-rules">
+          <h2>${t("playtest.howTitle")}</h2>
+          <ol>${ROUNDS.map((round, index) => `<li style="--round-color:${ROUND_COLORS[index]}"><b>${index + 1}</b><div><strong>${esc(round.name())}</strong><span>${t(`playtest.rule.${round.id}`)}</span></div></li>`).join("")}</ol>
+          <p class="playtest-foot">${t("playtest.rulesFoot")}</p>
+        </section>
+        <div class="playtest-actions">
+          ${state === "done"
+            ? `<button class="btn btn-primary" type="button" data-act="another">${t("playtest.anotherDay")}</button>
+               <button class="btn btn-secondary" type="button" data-act="feedback">${t(draft.sentAt ? "playtest.feedbackSent" : "playtest.giveFeedback")}</button>
+               <button class="btn btn-secondary" type="button" data-act="play">${t("playtest.results")}</button>`
+            : `<button class="btn btn-primary" type="button" data-act="play">${t(state === "started" ? "playtest.continue" : "playtest.start")}</button>
+               ${back ? `<button class="btn btn-secondary" type="button" data-act="feedback">${t(draft.sentAt ? "playtest.feedbackSent" : "playtest.giveFeedback")}</button>` : ""}`}
+        </div>
+      </div>`;
+  }
+  welcome.addEventListener("click", event => {
+    const lang = event.target.closest("[data-lang]");
+    if (lang) { sounds.playClick(); setLang(lang.dataset.lang); return; }
+    const act = event.target.closest("[data-act]")?.dataset.act;
+    if (!act) return;
+    sounds.playClick();
+    if (act === "play") { welcome.classList.add("hidden"); play(firstDay()); }
+    if (act === "another") { welcome.classList.add("hidden"); openArchive(); }
+    if (act === "feedback") openForm();
+  });
+  renderWelcome();
+  welcome.querySelector("[data-act]")?.focus();
+
+  /* ---------- 2. after each day ---------- */
+  // Under the end screen's pages, above HOME: the two ways on.
+  const endBox = el("div", { className: "playtest-end", id: "playtestEnd", hidden: true });
+  document.querySelector("#victoryModal .end-actions")?.before(endBox);
+  function renderEnd(mode) {
+    endBox.hidden = mode !== "daily";
+    if (endBox.hidden) return;
+    endBox.innerHTML = `
+      <p><strong>${t("playtest.endTitle")}</strong> ${t("playtest.endText")}</p>
+      <div class="playtest-end-buttons">
+        <button class="btn btn-primary" type="button" data-act="another">${t("playtest.anotherDay")}</button>
+        <button class="btn btn-secondary" type="button" data-act="feedback">${t(draft.sentAt ? "playtest.feedbackSent" : "playtest.giveFeedback")}</button>
+      </div>`;
+  }
+  endBox.addEventListener("click", event => {
+    const act = event.target.closest("[data-act]")?.dataset.act;
+    if (!act) return;
+    sounds.playClick();
+    if (act === "another") openArchive();
+    if (act === "feedback") openForm();
+  });
+
+  /* ---------- 3. the feedback form ---------- */
+  const form = el("div", { className: "playtest-screen playtest-form hidden", id: "playtestForm", role: "dialog" });
+  form.setAttribute("aria-modal", "true");
+  document.body.appendChild(form);
+  let sentView = false;
+
+  const pills = (key, options, cls = "") => `<div class="pt-pills ${cls}" data-choice="${key}">${options.map(([value, label]) =>
+    `<button type="button" data-v="${value}" class="${draft.choice[key] === value ? "is-on" : ""}">${esc(label)}</button>`).join("")}</div>`;
+  const yesNo = key => pills(key, ["yes", "maybe", "no"].map(v => [v, t(`playtest.${v}`)]));
+  const note = (key, placeholder, { label = t("playtest.notes"), prompts = null, meta = true } = {}) => `
+    <div class="pt-note">
+      <span class="pt-label">${label}</span>
+      ${prompts ? `<div class="pt-prompts">${prompts.map(p => `<button type="button">${esc(p)}</button>`).join("")}</div>` : ""}
+      <textarea data-note="${key}" placeholder="${esc(placeholder)}">${esc(draft.notes[key] || "")}</textarea>
+      ${meta ? `<div class="pt-meta"><span class="pt-nudge"></span></div>` : ""}
+    </div>`;
+  const section = (key, title, desc, body) => `
+    <section class="pt-card" data-sec="${key}">
+      <div class="pt-sec-head"><span class="pt-num"></span><h2>${title}</h2></div>
+      ${desc ? `<p class="pt-desc">${desc}</p>` : ""}
+      ${body}
+    </section>`;
+
+  function renderForm() {
+    const days = getDays().filter(day => day.started);
+    if (sentView) {
+      form.innerHTML = `<div class="pt-wrap"><section class="pt-card pt-thanks">
+        <span class="brand-mark is-big" aria-hidden="true"></span>
+        <h1>${t("playtest.thanks")}</h1>
+        <p>${t("playtest.thanksText")}</p>
+        <div class="pt-actions">
+          <button class="btn btn-primary" type="button" data-act="another">${t("playtest.anotherDay")}</button>
+          <button class="btn btn-secondary" type="button" data-act="close">${t("playtest.backToGame")}</button>
+          <button class="btn btn-secondary" type="button" data-act="edit">${t("playtest.edit")}</button>
+        </div></section></div>`;
+      return;
+    }
+    const rated = RATED.map(id => {
+      const labels = t(`playtest.q.${id}.r`).split("|");
+      return section(id, t(`playtest.q.${id}`), t(`playtest.q.${id}.d`), `
+        <div class="pt-q"><div class="pt-q-text">${t("playtest.rating")}</div>
+          <div class="pt-rate" data-rate="${id}">${labels.map((label, i) => {
+            const n = i + 1;
+            const pips = [1, 2, 3, 4, 5].map(p => `<i class="${(id === "difficulty" ? p === n : p <= n) ? "f" : ""}"></i>`).join("");
+            return `<button type="button" data-v="${n}" class="${draft.rate[id] === n ? "is-on" : ""}"><span class="n">${n}</span><span class="pips">${pips}</span><span>${esc(label)}</span></button>`;
+          }).join("")}</div>
+          ${id === "vibe" ? `<label class="pt-check"><input type="checkbox" data-nosound ${draft.noSound ? "checked" : ""}><span>${t("playtest.noSound")}</span></label>` : ""}
+        </div>
+        ${note(id, t(`playtest.q.${id}.ph`), { prompts: t(`playtest.q.${id}.p`).split("|") })}`);
+    }).join("");
+    const roundPills = ROUNDS.map(round => [round.id, round.name()]);
+    form.innerHTML = `
+      <header class="pt-top">
+        <div class="pt-top-row">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div><strong class="playtest-brand">EXPEDITION</strong><span class="playtest-badge">${t("playtest.badge")}</span></div>
+          <div class="pt-langs">${LANGUAGES.map(language => `<button type="button" data-lang="${language.code}" aria-pressed="${language.code === getLang()}">${language.code.toUpperCase()}</button>`).join("")}</div>
+          <button class="modal-close" type="button" data-act="close" aria-label="${esc(t("playtest.close"))}">×</button>
+        </div>
+        <div class="pt-progress"><span></span></div>
+      </header>
+      <div class="pt-wrap">
+        <section class="pt-card pt-hero">
+          <h1>${t("playtest.title")}</h1>
+          <p>${t("playtest.formIntro")}</p>
+          ${days.length ? `<div class="pt-played"><span class="pt-chip">${t("playtest.played")}</span>${days.map(day =>
+            `<span class="pt-chip"><b>${t("playtest.playedDay", { n: day.puzzleNumber })}</b> · ${day.completed ? num(day.score) : t("playtest.unfinished")}</span>`).join("")}</div>` : ""}
+          <div class="pt-tip">${t("playtest.tip")}</div>
+        </section>
+        ${section("you", t("playtest.s.you"), t("playtest.s.you.d"), `
+          <label class="pt-field"><span class="pt-label">${t("playtest.name")}</span>
+            <input type="text" data-field="name" autocomplete="given-name" maxlength="80" placeholder="${esc(t("playtest.name.ph"))}" value="${esc(draft.name)}"></label>
+          <div class="pt-q"><div class="pt-q-text">${t("playtest.device")}</div>${pills("device", ["phone", "tablet", "computer"].map(v => [v, t(`playtest.device.${v}`)]))}</div>
+          <div class="pt-q"><div class="pt-q-text">${t("playtest.habit")}</div>${pills("habit", ["never", "sometimes", "weekly", "daily"].map(v => [v, t(`playtest.habit.${v}`)]))}</div>
+          <div class="pt-q"><div class="pt-q-text">${t("playtest.geo")}</div>${pills("geo", ["1", "2", "3", "4"].map(v => [v, t(`playtest.geo.${v}`)]))}</div>`)}
+        ${section("overall", t("playtest.s.overall"), t("playtest.s.overall.d"), `
+          <div class="pt-grade-big"></div><div class="pt-grade-word"></div>
+          <div class="pt-grade">${Array.from({ length: 10 }, (_, i) => `<button type="button" data-grade="${i + 1}">${i + 1}</button>`).join("")}</div>
+          <div class="pt-grade-scale"><span>${t("playtest.grade.lo")}</span><span>${t("playtest.grade.hi")}</span></div>`)}
+        ${rated}
+        ${section("rounds", t("playtest.s.rounds"), t("playtest.s.rounds.d"), `
+          <div class="pt-q"><div class="pt-q-text">${t("playtest.fav")}</div>${pills("fav", roundPills)}</div>
+          <div class="pt-q"><div class="pt-q-text">${t("playtest.least")}</div>${pills("least", roundPills, "is-gold")}</div>
+          ${note("rounds", t("playtest.rounds.ph"), { label: t("playtest.why"), meta: false })}`)}
+        ${section("again", t("playtest.s.again"), t("playtest.s.again.d"), `
+          <div class="pt-q"><div class="pt-q-text">${t("playtest.tomorrow")}</div>${yesNo("tomorrow")}</div>
+          <div class="pt-q"><div class="pt-q-text">${t("playtest.friend")}</div>${yesNo("friend")}</div>
+          ${note("again", t("playtest.again.ph"), { label: t("playtest.again.n"), meta: false })}`)}
+        ${section("bugs", t("playtest.s.bugs"), t("playtest.s.bugs.d"), `
+          ${pills("bugs", [["none", t("playtest.bugs.none")], ["some", t("playtest.bugs.some")]])}
+          <div class="pt-bug-note" ${draft.choice.bugs === "some" ? "" : "hidden"}>${note("bugs", t("playtest.bugs.ph"), { label: t("playtest.bugs.n"), meta: false })}</div>
+          ${note("facts", t("playtest.facts.ph"), { label: `${t("playtest.facts")}<span class="pt-opt">${t("playtest.optional")}</span>`, meta: false })}`)}
+        ${section("review", t("playtest.s.review"), t("playtest.s.review.d"), `
+          <textarea class="pt-review" data-field="review" placeholder="${esc(t("playtest.review.ph"))}">${esc(draft.review)}</textarea>
+          <label class="pt-field pt-email"><span class="pt-label">${t("playtest.email")}<span class="pt-opt">${t("playtest.optional")}</span></span>
+            <input type="email" data-field="email" autocomplete="email" maxlength="160" placeholder="${esc(t("playtest.email.ph"))}" value="${esc(draft.email)}"></label>`)}
+        <div class="pt-actions">
+          <p class="pt-missing" role="status"></p>
+          <button class="btn btn-primary" type="button" data-act="send">${t("playtest.send")}</button>
+          <button class="btn btn-secondary" type="button" data-act="close">${t("playtest.later")}</button>
+          <p class="pt-small">${t("playtest.auto")}</p>
+        </div>
+      </div>`;
+    form.querySelectorAll(".pt-num").forEach((num, index) => { num.textContent = index + 1; });
+    refresh();
+  }
+
+  const gradeColour = v => ["#ff5a4f", "#ff5a4f", "#ff6f45", "#ff8a3d", "#ffa843", "#ffc94a", "#d9d85a", "#a8e46a", "#7aec78", "#5cf28a"][v - 1];
+  function refresh() {
+    if (sentView) return;
+    form.querySelectorAll("[data-grade]").forEach(button => {
+      const on = draft.grade > 0 && +button.dataset.grade <= draft.grade;
+      button.classList.toggle("is-on", on);
+      button.style.background = on ? gradeColour(draft.grade) : "";
+    });
+    const big = form.querySelector(".pt-grade-big");
+    big.textContent = draft.grade || "";
+    big.style.color = draft.grade ? gradeColour(draft.grade) : "";
+    form.querySelector(".pt-grade-word").textContent = draft.grade ? t(`playtest.grade.${draft.grade}`) : "";
+    const done = {
+      you: Boolean(draft.name.trim()), overall: draft.grade > 0,
+      rounds: Boolean(draft.choice.fav || draft.choice.least), again: Boolean(draft.choice.tomorrow || draft.choice.friend),
+      bugs: Boolean(draft.choice.bugs), review: Boolean(draft.review.trim())
+    };
+    RATED.forEach(id => { done[id] = Boolean(draft.rate[id]); });
+    form.querySelectorAll("[data-sec]").forEach(sec => sec.classList.toggle("is-done", Boolean(done[sec.dataset.sec])));
+    const values = Object.values(done);
+    form.querySelector(".pt-progress span").style.width = `${Math.round(100 * values.filter(Boolean).length / values.length)}%`;
+    form.querySelectorAll(".pt-note").forEach(box => {
+      const nudge = box.querySelector(".pt-nudge");
+      if (!nudge) return;
+      const long = box.querySelector("textarea").value.trim().length >= 40;
+      nudge.textContent = t(long ? "playtest.nudgeGood" : "playtest.nudge");
+      nudge.classList.toggle("is-good", long);
+    });
+    form.querySelector(".pt-bug-note").hidden = draft.choice.bugs !== "some";
+  }
+
+  form.addEventListener("click", event => {
+    const lang = event.target.closest("[data-lang]");
+    if (lang) { sounds.playClick(); setLang(lang.dataset.lang); return; }
+    const grade = event.target.closest("[data-grade]");
+    if (grade) { draft.grade = +grade.dataset.grade; refresh(); saveDraft(); return; }
+    const rate = event.target.closest("[data-rate] button");
+    if (rate) {
+      draft.rate[rate.parentElement.dataset.rate] = +rate.dataset.v;
+      rate.parentElement.querySelectorAll("button").forEach(button => button.classList.toggle("is-on", button === rate));
+      refresh(); saveDraft(); return;
+    }
+    const choice = event.target.closest("[data-choice] button");
+    if (choice) {
+      const key = choice.parentElement.dataset.choice;
+      draft.choice[key] = draft.choice[key] === choice.dataset.v ? undefined : choice.dataset.v;
+      choice.parentElement.querySelectorAll("button").forEach(button => button.classList.toggle("is-on", button.dataset.v === draft.choice[key]));
+      refresh(); saveDraft(); return;
+    }
+    const prompt = event.target.closest(".pt-prompts button");
+    if (prompt) {
+      const area = prompt.closest(".pt-note").querySelector("textarea");
+      area.value = area.value ? `${area.value.trimEnd()}\n${prompt.textContent} ` : `${prompt.textContent} `;
+      area.focus();
+      area.setSelectionRange(area.value.length, area.value.length);
+      draft.notes[area.dataset.note] = area.value;
+      refresh(); saveDraft(); return;
+    }
+    const act = event.target.closest("[data-act]")?.dataset.act;
+    if (!act) return;
+    sounds.playClick();
+    if (act === "close") closeForm();
+    if (act === "send") submit(event.target.closest("[data-act]"));
+    if (act === "edit") { sentView = false; renderForm(); form.scrollTop = 0; }
+    if (act === "another") { closeForm(); welcome.classList.add("hidden"); openArchive(); }
+  });
+  form.addEventListener("input", event => {
+    const target = event.target;
+    if (target.dataset.field) draft[target.dataset.field] = target.value;
+    else if (target.dataset.note) draft.notes[target.dataset.note] = target.value;
+    else if (target.matches("[data-nosound]")) draft.noSound = target.checked;
+    refresh(); saveDraft();
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && !form.classList.contains("hidden")) closeForm();
+  });
+
+  async function submit(button) {
+    const missing = [];
+    if (!draft.name.trim()) missing.push(t("playtest.needName"));
+    if (!draft.grade) missing.push(t("playtest.needGrade"));
+    const status = form.querySelector(".pt-missing");
+    if (missing.length) {
+      status.textContent = t("playtest.need", { list: missing.join(", ") });
+      const first = form.querySelector(!draft.name.trim() ? '[data-field="name"]' : ".pt-grade");
+      first.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (first.matches("input")) first.focus({ preventScroll: true });
+      return;
+    }
+    status.textContent = "";
+    button.disabled = true;
+    button.textContent = t("playtest.sending");
+    const clean = obj => Object.fromEntries(Object.entries(obj).filter(([, v]) => v != null && String(v).trim() !== ""));
+    try {
+      await send({
+        tester: draft.name.trim().slice(0, 80),
+        email: draft.email.trim().slice(0, 160) || null,
+        lang: getLang(),
+        device: draft.choice.device || null,
+        overall: draft.grade,
+        answers: {
+          ratings: Object.fromEntries(RATED.map(id => [id, draft.rate[id] ?? null])),
+          notes: clean(draft.notes),
+          choices: clean(draft.choice),
+          noSound: draft.noSound,
+          review: draft.review.trim()
+        },
+        played: getDays().filter(day => day.started).map(day => ({ date: day.dateKey, day: day.puzzleNumber, completed: day.completed, score: day.score })),
+        client: { width: innerWidth, height: innerHeight, touch: matchMedia("(pointer: coarse)").matches, agent: navigator.userAgent.slice(0, 200) }
+      });
+      draft.sentAt = new Date().toISOString();
+      saveDraft();
+      sentView = true;
+      renderForm();
+      form.scrollTop = 0;
+      renderEnd(document.getElementById("victoryModal")?.dataset.mode);
+    } catch (error) {
+      console.warn("Playtest feedback wasn't sent.", error);
+      status.textContent = t("playtest.failed");
+      button.disabled = false;
+      button.textContent = t("playtest.send");
+    }
+  }
+
+  function openForm() {
+    sentView = false;
+    renderForm();
+    form.classList.remove("hidden");
+    form.scrollTop = 0;
+  }
+  function closeForm() {
+    form.classList.add("hidden");
+    renderWelcome();
+    renderEnd(document.getElementById("victoryModal")?.dataset.mode);
+  }
+
+  onLangChange(() => {
+    if (!welcome.classList.contains("hidden")) renderWelcome();
+    if (!form.classList.contains("hidden")) {
+      const scroll = form.scrollTop;
+      renderForm();
+      form.scrollTop = scroll;
+    }
+    if (!endBox.hidden) renderEnd("daily");
+  });
+
+  return { active, renderEnd };
+}
+
+return { initPlaytest };
 })();
 
 // ---- round-pictures.js
@@ -45402,7 +46216,8 @@ const { JOURNEYS, ROUND_COLORS, createJourney, scoreColor, scoreTier } = __modul
 const { setJourneyLook } = __modules["journey-explorer.js"];
 const { getAccountUnits, getDuelHistory, saveUnits } = __modules["auth.js"];
 const { DUEL_ROUNDS, PARTY_MIN_START, rematchHost, rematchIn, rematchReady, rematchSeats, seatsOf, standings } = __modules["duel-rules.js"];
-const { getAccountLanguage, getProfile, getUser, initAuth, isConfigured: isAuthConfigured, pullDays, pushDay, saveLanguage, sendEmailLink, signIn, signOut, takeAuthRedirectError, verifyEmailCode } = __modules["auth.js"];
+const { getAccountLanguage, getProfile, getUser, initAuth, isConfigured: isAuthConfigured, pullDays, pushDay, saveLanguage, sendEmailLink, sendPlaytestFeedback, signIn, signOut, takeAuthRedirectError, verifyEmailCode } = __modules["auth.js"];
+const { initPlaytest } = __modules["playtest.js"];
 const { ROUND_PICTURES } = __modules["round-pictures.js"];
 const { CLUES } = __modules["clues.js"];
 const { sounds } = __modules["audio.js"];
@@ -45473,6 +46288,8 @@ const AUTO_CONTINUE_CLUE_MS = 3500;
 const AUTO_CONTINUE_WRONG_MS = 2000;
 
 const today = toUtcDateKey(new Date());
+// The playtest (playtest.js), set up once the menu and archive exist; null when it's off.
+let playtest = null;
 
 // DAILY's icon (24 November 2026, team choice from mockups/menu-icons, option G): a calendar
 // page with today's date (the puzzle day, which changes at midnight UTC). The same
@@ -48554,6 +49371,8 @@ function showFinalModal() {
   // A challenge you took for this day, and CHALLENGE A FRIEND (challenge.js).
   challenges?.renderEnd(activeDate, activeMode, dayScore.total, dayScore.completed);
   crewCard?.renderEnd(document.getElementById("endCrew"), { show: activeMode === MAIN_MODE && dayScore.completed });
+  // Playtest: PLAY ANOTHER DAY or GIVE FEEDBACK under the pages.
+  playtest?.renderEnd(activeMode);
 
   // You against everyone who played today (sample numbers for now).
   const stats = getDayStats(activeDate, activeMode);
@@ -50840,6 +51659,25 @@ const archive = initializeHistoryScreens({
   getDayRecord,
   onPlayDay: (...args) => { if (!lobbyBlocks()) enterGameView(...args); },
 });
+
+// The playtest: ?playtest in the address (playtest.js). Testers play Daily: today, or the
+// latest Daily day before it once the calendar runs out.
+{
+  const dailyDates = () => getAllPuzzleDays().filter(date => date <= today && hasDailyDay(date));
+  playtest = initPlaytest({
+    getDays: () => dailyDates().map(date => getDayRecord(date, "daily")),
+    firstDay: () => hasDailyDay(today) ? today : dailyDates().at(-1) || today,
+    dayState: date => (record => record.completed ? "done" : record.started ? "started" : "new")(getDayRecord(date, "daily")),
+    play: date => { if (!lobbyBlocks()) mainMenu.showGame("daily", date); },
+    openArchive: () => {
+      endSkip();
+      document.getElementById("victoryModal").classList.add("hidden");
+      archive.openArchive(null, "daily");
+    },
+    send: sendPlaytestFeedback
+  });
+  if (!playtest.active) playtest = null;
+}
 duel = createDuel({
   globe,
   onExit: () => {
