@@ -33105,9 +33105,12 @@ const PLATE_LOG = [];
 function beginFrame() { queue = []; blockers = []; }
 // Something a plate must not cover (Atlas adds himself; scenes add their vehicles).
 function avoid(l, t, r, b) { blockers.push({ l, t, r, b }); }
-function plate(p, text, x, y, reached, { align = "left", color = null } = {}) {
+// `post`: the ground's height under the plate; it then stands on a post down to there,
+// wherever it ends up (a signpost, not a label in the air). `within(box)`: where the plate
+// may go (on the mountain). `fixed`: it stays where it is (hung on the summit's flagpole).
+function plate(p, text, x, y, reached, { align = "left", color = null, post = null, within = null, fixed = false } = {}) {
   if (!reached) return;
-  queue.push({ text: String(text), x, y, reached, align, color });
+  queue.push({ text: String(text), x, y, reached, align, color, post, within, fixed });
 }
 const hits = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
 // L, R, T, H: the edges of what the camera shows (a plate never sits half outside).
@@ -33121,12 +33124,21 @@ function flushPlates(p, { L = 0, R = 200, H = 400, T = 0 } = {}) {
     const y0 = Math.round(item.y - 3);
     const box = (l, t) => ({ l, t, r: l + w, b: t + h });
     const tries = [box(x0, y0)];
-    blockers.forEach(b => { tries.push(box(b.l - w - 2, y0), box(b.r + 2, y0), box(x0, b.t - h - 2), box(x0, b.b + 2)); });
-    const inside = c => c.l >= L + 1 && c.r <= R - 1 && c.t >= T + 1 && c.b <= H - 1;
+    if (!item.fixed) {
+      // The other side of its point too, then around whatever is in the way.
+      tries.push(box(item.align === "right" ? Math.round(item.x + 2) : Math.round(item.x - w + 2), y0));
+      blockers.forEach(b => { tries.push(box(b.l - w - 2, y0), box(b.r + 2, y0), box(x0, b.t - h - 2), box(x0, b.b + 2)); });
+    }
+    const inside = c => c.l >= L + 1 && c.r <= R - 1 && c.t >= T + 1 && c.b <= H - 1 && (!item.within || item.within(c));
     const free = c => inside(c) && !blockers.some(b => hits(c, b)) && !placed.some(o => hits(c, o));
-    const spot = tries.find(free) || tries.find(c => inside(c) && !blockers.some(b => hits(c, b))) || tries[0];
+    const spot = tries.find(free) || tries.find(c => inside(c) && !blockers.some(b => hits(c, b))) || tries.find(inside) || tries[0];
     placed.push(spot);
     PLATE_LOG.push(spot);
+    if (item.post != null && item.post > spot.b) {
+      const px = Math.round(Math.max(spot.l + 2, Math.min(spot.r - 3, item.x)));
+      p.rect(px - 1, spot.b, 3, item.post - spot.b, "#070b17");
+      p.rect(px, spot.b, 1, item.post - spot.b, "#8f9bbd");
+    }
     p.rect(spot.l, spot.t, w, h, "#070b17");
     p.rect(spot.l + 1, spot.t + 1, w - 2, h - 2, "#1b2342");
     p.rect(spot.l + 1, spot.t + 1, w - 2, 1, "#ffd45c");
@@ -33454,6 +33466,39 @@ function climb(summit, { h: H, w: CW = HD_W }) {
   const rnd = random(21);
   const starList = Array.from({ length: 50 }, () => [Math.floor(L + rnd() * (R - L)), Math.floor(rnd() * 50), rnd()]);
   const ridge = y => lerp(4, 96, clamp((y - T + 6) / (B - T + 26), 0, 1));
+  // The mountain is a triangle from the summit (100, T - 6) to the bottom corners: how far it
+  // reaches either side of the middle at height y. Everything on it is placed inside this,
+  // clear of the road, whatever the height of the phone (27 November 2026, from the playtest:
+  // at fixed spots the yeti, the avalanche sign, the hut and some pines and rocks stood off
+  // the mountain's edge on some screens).
+  const baseHalf = ridge(H) + 20;
+  const half = y => baseHalf * clamp((y - (T - 6)) / (H - (T - 6)), 0, 1);
+  const road = route.samples(0, 1);
+  const onMountain = (l, t, r, m = 1) => l >= 100 - half(t) + m && r <= 100 + half(t) - m;
+  const clearOfRoad = (l, t, r, b, m = 3) => !road.some(q => q.x > l - m && q.x < r + m && q.y > t - m && q.y < b + m);
+  // A spot for a w×h thing near height y on one side of the mountain (side -1 left, 1 right):
+  // from the outside in, a little higher or lower if the road is in the way. { x, y } or null.
+  const spotFor = (w, h, y, side) => {
+    for (const dy of [0, -4, 4, -8, 8, -12, 12, -16, 16, -20, 20, -24, 24, -28, 28]) {
+      const top = y + dy;
+      const edge = side < 0 ? Math.ceil(100 - half(top)) + 2 : Math.floor(100 + half(top)) - 2 - w;
+      for (let k = 0; k < 60; k += 1) {
+        const x = edge - side * k;
+        if (side < 0 ? x + w > 98 : x < 102) break;
+        if (onMountain(x, top, x + w, 2) && clearOfRoad(x, top, x + w, top + h)) return { x, y: top };
+      }
+    }
+    return null;
+  };
+  const hut = spotFor(24, 20, Math.round(lerp(B, T, 0.3)) - 26, 1);
+  const sign = spotFor(13, 16, Math.round(lerp(B, T, 0.62)) - 18, 1);
+  // The yeti, his arm and his boulder: 24 across, from the yeti's head down to the boulder.
+  const yeti = spotFor(24, 20, Math.round(lerp(B, T + 8, 3 / 8)) - 20, -1);
+  const pines = [[14, B - 14, 5], [26, B - 30, 4], [172, B - 18, 6], [186, B - 40, 5], [160, B - 44, 4], [8, B - 52, 4]].map(([x, y, sz]) => {
+    const at = spotFor(sz * 2 + 1, Math.round(sz * 2.6) + 3, y, x < 100 ? -1 : 1);
+    return at && [at.x, at.y, sz];
+  }).filter(Boolean);
+  const plateOnMountain = c => onMountain(c.l, c.t, c.r, 2);
   return {
     ox,
     route,
@@ -33475,6 +33520,8 @@ function climb(summit, { h: H, w: CW = HD_W }) {
         const x = Math.round(100 + (r2() * 2 - 1) * spread);
         const w = 5 + Math.floor(r2() * 8);
         const h = 3 + Math.floor(r2() * 4);
+        // Only on the mountain itself, not sticking out past its edge.
+        if (!onMountain(x - w / 2, y, x + w / 2, 1)) continue;
         const shade = x > 100 ? 0.25 : 0;
         p.poly([[x - w / 2, y + h], [x - 1, y], [x + 1, y], [x + w / 2, y + h]], darker("#6a7a9a", shade));
         p.poly([[x + 1, y], [x + w / 2, y + h], [x + 1, y + h]], darker("#4a5778", shade));
@@ -33485,31 +33532,36 @@ function climb(summit, { h: H, w: CW = HD_W }) {
       route.samples(0, 1).forEach(q => { p.rect(q.x - 3, q.y - 1, 7, 4, "#c9d6ef"); });
       route.samples(0, 1).forEach(q => { p.rect(q.x - 2, q.y, 5, 2, "#f4f7ff"); });
       // Pines on the lower slopes, rocks, the hut and base camp.
-      [[14, B - 14, 5], [26, B - 30, 4], [172, B - 18, 6], [186, B - 40, 5], [160, B - 44, 4], [8, B - 52, 4]].forEach(([x, y, sz]) => blit(p, pine(sz, { snow: "#f4f7ff", leaf: "#1d5b4a", light: "#2a7a5e" }), x, y));
-      blit(p, HUT, 150, lerp(B, T, 0.3) - 26);
-      blit(p, SIGN, 150, lerp(B, T, 0.62) - 18);
+      pines.forEach(([x, y, sz]) => blit(p, pine(sz, { snow: "#f4f7ff", leaf: "#1d5b4a", light: "#2a7a5e" }), x, y));
+      if (hut) blit(p, HUT, hut.x, hut.y);
+      if (sign) blit(p, SIGN, sign.x, sign.y);
       blit(p, TENT("#45e3ff"), 2, B + 4);
       blit(p, TENT("#ffd45c"), 16, B + 6);
       p.rect(L, H - 6, R - L, 6, "#e9eefb");
     },
     frame(p, s) {
       stars(p, starList.slice(0, 10), s.now, T);
-      smoke(p, 169, lerp(B, T, 0.3) - 26, s.now, { color: "#e9eefb" });
+      if (hut) smoke(p, hut.x + 19, hut.y, s.now, { color: "#e9eefb" });
+      // The signposts keep clear of the hut, the avalanche sign and the yeti.
+      if (hut) avoid(hut.x, hut.y - 8, hut.x + 24, hut.y + 20);
+      if (sign) avoid(sign.x, sign.y, sign.x + 13, sign.y + 16);
+      if (yeti) avoid(yeti.x, yeti.y, yeti.x + 24, yeti.y + 20);
       // The yeti peeks out from behind the boulder and waves as Atlas passes.
       // Outside the third bend on the left, clear of the road.
-      const yetiY = Math.round(lerp(B, T + 8, 3 / 8)) - 6;
-      const near = Math.abs(s.route.at(s.f).y - yetiY) < 26;
-      blit(p, YETI, 22, yetiY - 14);
-      blit(p, YETI_ARM[near && Math.floor(s.now * 4) % 2 ? 1 : 0], 36, yetiY - 10);
-      blit(p, BOULDER(18), 26, yetiY - 6);
+      if (yeti) {
+        const near = Math.abs(s.route.at(s.f).y - yeti.y - 14) < 26;
+        blit(p, YETI, yeti.x, yeti.y);
+        blit(p, YETI_ARM[near && Math.floor(s.now * 4) % 2 ? 1 : 0], yeti.x + 14, yeti.y + 4);
+        blit(p, BOULDER(18), yeti.x + 4, yeti.y + 8);
+      }
+      // Each 1,000 a signpost in the snow beside the road, on the mountain.
       eachMark(s, (f, text, reached) => {
         const q = s.route.at(f);
-        p.rect(q.x, q.y - 6, 1, 6, "#4a5778");
-        p.rect(q.x - 1, q.y - 7, 3, 2, reached ? "#ffd45c" : "#8f9bbd");
-        plate(p, text, q.x > 100 ? q.x + 4 : q.x - 4, q.y - 12, reached, { align: q.x > 100 ? "left" : "right" });
+        plate(p, text, q.x > 100 ? q.x - 6 : q.x + 6, q.y - 16, reached, { align: q.x > 100 ? "right" : "left", post: q.y + 2, within: plateOnMountain });
       });
+      // The goal's plate hangs from the summit flagpole.
       blit(p, FLAG(s.goal ? "#ffd45c" : "#8f9bbd", Math.floor(s.now * 3) % 2), 100, T - 22);
-      plate(p, goalText(s), 114, T - 18, s.goal, { color: "#ffd45c" });
+      plate(p, goalText(s), 100, T - 19, s.goal, { color: "#ffd45c", align: "right", fixed: true });
       if (s.goal) bigStar(p, 106, T - 26, "#ffd45c", s.now, true);
       // Snowmobile tracks where it has been, and a marker wand where each round ended.
       s.route.samples(0, s.f).forEach(q => { p.px(q.x, q.y - 1, "#b8c5e2"); p.px(q.x, q.y + 1, "#b8c5e2"); });
@@ -33962,11 +34014,12 @@ function dive(summit, { h: H, w: CW = HD_W }) {
       const swim = (speed, off) => L + ((s.now * speed + off) % (R - L + 60)) - 30;
       const lamp = q => Math.hypot(q[0] - s.route.at(s.f).x, q[1] - s.route.at(s.f).y) < 34;
       const school = FISH("#ffd45c", "#fff3b0", 8);
-      for (let k = 0; k < 7; k += 1) blit(p, school, swim(14, k * 9) , yOf(0.05) + (k % 3) * 5 + Math.round(Math.sin(s.now * 2 + k)));
-      blit(p, TURTLE, R + L - swim(6, 40), yOf(0.16), { flip: true });
-      blit(p, FISH("#ff8a3d", "#ffd0a0", 11), swim(9, 120), yOf(0.24));
+      // (FISH, TURTLE and WHALE are drawn facing left: flipped when they swim right.)
+      for (let k = 0; k < 7; k += 1) blit(p, school, swim(14, k * 9), yOf(0.05) + (k % 3) * 5 + Math.round(Math.sin(s.now * 2 + k)), { flip: true });
+      blit(p, TURTLE, R + L - swim(6, 40), yOf(0.16));
+      blit(p, FISH("#ff8a3d", "#ffd0a0", 11), swim(9, 120), yOf(0.24), { flip: true });
       blit(p, JELLY(Math.floor(s.now * 2) % 2), 34, yOf(0.32) + Math.round(Math.sin(s.now) * 3));
-      blit(p, WHALE, R + L - swim(4, 10) - 30, yOf(0.42), { flip: true });
+      blit(p, WHALE, R + L - swim(4, 10) - 30, yOf(0.42));
       const deep = (item, x, y, glow) => {
         const visible = glow || lamp([x, y]);
         p.ctx.globalAlpha = visible ? 1 : 0.18;
@@ -34126,8 +34179,10 @@ function sled(summit, { h: H, w: CW = HD_W }) {
       stars(p, starList.slice(0, 12), s.now, horizon);
       // The station's light, the bear and the narwhal.
       if (s.now % 1.2 < 0.6) p.px(186, lerp(B, horizon, 0.3) - 24, "#e0484f");
-      const bx = ((s.now * 3) % 80) + 10;
-      blit(p, BEAR(Math.floor(s.now * 3) % 2), bx, lerp(B, horizon, 0.62) - 14);
+      // To and fro, turning round at each end (it used to jump back to the start).
+      const walk = (s.now * 3) % 160;
+      const bx = 10 + (walk < 80 ? walk : 160 - walk);
+      blit(p, BEAR(Math.floor(s.now * 3) % 2), bx, lerp(B, horizon, 0.62) - 14, { flip: walk >= 80 });
       const up = (s.now % 5) / 5;
       if (up < 0.4) blit(p, NARWHAL, 140, lead - 6 + Math.round(Math.abs(Math.sin(up / 0.4 * Math.PI)) * -5), { alpha: 1 });
       blit(p, POLE, 97, horizon - 22);
@@ -34305,14 +34360,22 @@ function makePlates() {
     // `small`: the score tile, too small to read a plate, so none are drawn.
     begin(view, small = false) { placed = []; soft = []; bounds = view || { x: 0, y: 0, w: W, h: H }; hidden = small; },
     avoid(box) { soft.push(box); PLATE_LOG.push(box); },
-    put(p, text, qx, qy, { lift = 6 } = {}) {
+    // `post`: a signpost standing on the ground at (qx, qy): the plate goes above its point
+    // and a post runs down from it to the ground, wherever the plate ends up (27 November
+    // 2026, from the playtest: plates floated beside a tiny post, linked by a thin line).
+    // Without it, a label near its point (depths, altitudes).
+    put(p, text, qx, qy, { lift = 6, post = false } = {}) {
       if (hidden) return;
       const w = plateWidth(text) + 6;
       const h = 11;
       const ax = Math.round(qx);
       const ay = Math.round(qy - lift);
       const tries = [];
-      for (const d of [4, 8, 12, 18, 24, 32, 44, 56, 72]) {
+      if (post) {
+        for (const d of [0, 4, 8, 12, 16, 22, 28, 36, 46]) {
+          tries.push([ax - w / 2, ay - h - d], [ax - 4, ay - h - d], [ax - w + 4, ay - h - d], [ax + 8, ay - h - d], [ax - w - 8, ay - h - d]);
+        }
+      } else for (const d of [4, 8, 12, 18, 24, 32, 44, 56, 72]) {
         tries.push([ax + d, ay - h + 3], [ax - d - w, ay - h + 3], [ax + d, ay - h - d], [ax - d - w, ay - h - d],
           [ax - w / 2, ay - h - d], [ax + d, ay + 6], [ax - d - w, ay + 6], [ax - w / 2, ay + 4 + d]);
       }
@@ -34323,9 +34386,33 @@ function makePlates() {
       const spot = boxes.find(ok) || boxes.find(b => !soft.some(o => hits(b, o)) && !placed.some(o => hits(b, o))) || boxes[0];
       placed.push(spot);
       PLATE_LOG.push(spot);
-      const cx = clamp(ax, spot.l, spot.r - 1);
-      const cy = clamp(ay, spot.t, spot.b - 1);
-      if (Math.hypot(cx - ax, cy - ay) > 5) p.line(ax, ay, cx, cy, "rgba(40,48,80,0.75)", 2);
+      if (post) {
+        // The post: from under the plate down to the ground at its own spot.
+        const px = clamp(ax, spot.l + 2, spot.r - 3);
+        const ground = Math.round(qy);
+        if (ground > spot.b) {
+          p.rect(px - 1, spot.b, 3, ground - spot.b, "#070b17");
+          p.rect(px, spot.b, 1, ground - spot.b, "#8f9bbd");
+        }
+      } else {
+        const cx = clamp(ax, spot.l, spot.r - 1);
+        const cy = clamp(ay, spot.t, spot.b - 1);
+        if (Math.hypot(cx - ax, cy - ay) > 5) p.line(ax, ay, cx, cy, "rgba(40,48,80,0.75)", 2);
+      }
+      this.draw(p, text, spot);
+    },
+    // A plate at a fixed place (the goal's, hung from the summit flagpole).
+    hang(p, text, right, top) {
+      if (hidden) return;
+      const w = plateWidth(text) + 6;
+      const spot = { l: Math.round(right - w), t: Math.round(top), r: Math.round(right), b: Math.round(top) + 11 };
+      placed.push(spot);
+      PLATE_LOG.push(spot);
+      this.draw(p, text, spot);
+    },
+    draw(p, text, spot) {
+      const w = spot.r - spot.l;
+      const h = 11;
       p.rect(spot.l, spot.t, w, h, "#070b17");
       p.rect(spot.l + 1, spot.t + 1, w - 2, h - 2, "#1b2342");
       p.rect(spot.l + 1, spot.t + 1, w - 2, 1, "#ffd45c");
@@ -34517,6 +34604,8 @@ function climb(summit = 6000) {
   plates.block(yeti.x - 2, yeti.y - 28, yeti.x + 28, yeti.y + 2);
   plates.block(hut.x - 1, hut.y - 1, hut.x + 32, hut.y + 26);
   plates.block(PEAK.x - 6, 0, PEAK.x + 22, PEAK.y + 10);
+  // Signposts stand on the mountain, not in the sky above its skyline.
+  for (let x = 0; x < W; x += 1) plates.block(x, 0, x + 1, skyline(x) + 2);
   plates.block(305, 95, 323, 116); // the avalanche sign
   plates.block(0, 196, 56, H);
 
@@ -34673,13 +34762,10 @@ function climb(summit = 6000) {
       if (s.goal) bigStar(p, PEAK.x + 7, PEAK.y - 26, "#ffd45c", s.now, true);
       // A post and its plate at every 1,000 reached (the rest stay hidden).
       eachReached(s, (f, v, top) => {
-        if (top) { plates.put(p, distance(v), PEAK.x + 6, PEAK.y + 18); return; }
+        // The goal's plate hangs from the summit flagpole; the others are signposts.
+        if (top) { plates.hang(p, distance(v), PEAK.x - 1, PEAK.y - 18); return; }
         const q = s.route.at(f);
-        const qx = Math.round(q.x);
-        const qy = Math.round(q.y);
-        p.rect(qx, qy - 7, 1, 7, "#4a5778");
-        p.rect(qx - 1, qy - 8, 3, 2, "#ffd45c");
-        plates.put(p, distance(v), qx, qy);
+        plates.put(p, distance(v), Math.round(q.x), Math.round(q.y) + 1, { post: true });
       });
     }
   };
@@ -35222,9 +35308,7 @@ function train(summit = 6000) {
         const q = s.route.at(f);
         const qx = Math.round(q.x);
         const qy = Math.round(q.y);
-        p.rect(qx + 6, qy - 8, 1, 8, "#f4f1e8");
-        p.rect(qx + 4, qy - 11, 5, 4, "#f4f1e8"); p.rect(qx + 5, qy - 10, 3, 2, INK);
-        plates.put(p, distance(v, "km"), qx + 6, qy - 4, { lift: 6 });
+        plates.put(p, distance(v, "km"), qx + 6, qy + 1, { post: true });
       });
     }
   };
@@ -35353,10 +35437,11 @@ function dive(summit = 6000) {
       const swim = (speed, off) => ((s.now * speed + off) % (W + 80)) - 40;
       const lamp = (qx, qy) => Math.hypot(qx - x, qy - y) < 40;
       const school = FISH("#c8ccd4", "#eef0f4", 7);
-      for (let k = 0; k < 9; k += 1) blit(p, school, swim(14, k * 8), SEA + 10 + (k % 3) * 4 + Math.round(Math.sin(s.now * 2 + k)));
-      blit(p, TURTLE, W - swim(6, 40), SEA + 26, { flip: true });
+      // (FISH, TURTLE and WHALE are drawn facing left: flipped when they swim right.)
+      for (let k = 0; k < 9; k += 1) blit(p, school, swim(14, k * 8), SEA + 10 + (k % 3) * 4 + Math.round(Math.sin(s.now * 2 + k)), { flip: true });
+      blit(p, TURTLE, W - swim(6, 40), SEA + 26);
       blit(p, JELLY(Math.floor(s.now * 2) % 2), 40, yOf(0.12) + Math.round(Math.sin(s.now) * 3));
-      blit(p, WHALE, W - swim(4, 10) - 30, yOf(0.18), { flip: true });
+      blit(p, WHALE, W - swim(4, 10) - 30, yOf(0.18));
       const deep = (item, qx, qy) => { p.ctx.globalAlpha = lamp(qx, qy) ? 1 : 0.14; blit(p, item, qx, qy); p.ctx.globalAlpha = 1; };
       deep(SQUID(Math.floor(s.now * 3) % 2), 40, yOf(0.4));
       deep(ANGLER, 400, yOf(0.62));
@@ -35518,7 +35603,9 @@ function sled(summit = 6000) {
       }
       p.ctx.globalAlpha = 1;
       // A bear wandering far out, a narwhal surfacing in the lead.
-      blit(p, BEAR(Math.floor(s.now * 3) % 2), ((s.now * 3) % 120) + 300, 168);
+      // To and fro, turning round at each end (it used to jump back to the start).
+      const walk = (s.now * 3) % 240;
+      blit(p, BEAR(Math.floor(s.now * 3) % 2), 300 + (walk < 120 ? walk : 240 - walk), 168, { flip: walk >= 120 });
       const up = (s.now % 6) / 6;
       if (up < 0.35) blit(p, NARWHAL, 120, LEAD - 7 + Math.round(Math.abs(Math.sin(up / 0.35 * Math.PI)) * -4));
       // The Pole.
@@ -35556,9 +35643,7 @@ function sled(summit = 6000) {
         const q = s.route.at(f);
         const qx = Math.round(q.x);
         const qy = Math.round(q.y);
-        p.rect(qx, qy - 8, 1, 8, "#5c3a1f");
-        p.rect(qx + 1, qy - 8, 4, 3, "#c8402e");
-        plates.put(p, distance(v, "km"), qx, qy - 2);
+        plates.put(p, distance(v, "km"), qx, qy + 1, { post: true });
       });
     }
   };
