@@ -5431,8 +5431,8 @@ h1, h2, h3 { font-weight: normal; }
 .playtest-end p { margin: 0; text-align: center; color: var(--muted); font-size: 14px; }
 .playtest-end p strong { color: var(--text); }
 .playtest-end-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-[data-playtest="on"] #victoryModal[data-mode="daily"] #endArchiveButton { display: none; }
-[data-playtest="on"] #victoryModal[data-mode="daily"] .end-actions { grid-template-columns: 1fr; }
+.playtest-link { justify-self: center; padding: 6px 4px; border: 0; background: none; color: var(--muted); font: 14px var(--font-body); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.playtest-link:hover { color: var(--text); }
 @media (max-width: 760px) {
   .playtest-end { width: auto; justify-self: stretch; padding: 0 16px; }
   .playtest-end-buttons { grid-template-columns: 1fr; gap: 8px; }
@@ -5959,6 +5959,136 @@ h1, h2, h3 { font-weight: normal; }
   .camp-dice { padding: 6px 10px; font-size: 16px; }
   /* Atlas's welcome over the whole editor, not cut off by the short camp. */
   .camp-welcome { position: fixed; left: 8px; right: 8px; bottom: calc(80px + env(safe-area-inset-bottom)); z-index: 5; }
+}
+
+/* ===== The playtest dashboard (27 November 2026, playtest-dashboard.js; ?dashboard) =====
+   For the team: every answer of the playtest form. Chart colours checked with the dataviz
+   validator on #111830: favourite/least #f0404f/#2a9fc0, too hard/too easy #d9682f/#4a8fe0. */
+#playtestDashboard {
+  --ptd-bar: #f0404f; --ptd-fav: #f0404f; --ptd-least: #2a9fc0; --ptd-hard: #d9682f; --ptd-easy: #4a8fe0; --ptd-mid: #5d6890;
+  --accent: #ff4d5e; --accent-soft: rgba(255, 77, 94, 0.14);
+  position: fixed; inset: 0; z-index: 700; overflow-y: auto; overscroll-behavior: contain;
+  background: radial-gradient(1200px 600px at 50% -10%, rgba(255, 77, 94, 0.12), transparent 60%), #0a0f1d;
+  color: var(--text); font: 400 14px/1.5 var(--font-body);
+}
+#playtestDashboard .mono { font-family: var(--font-mono); }
+#playtestDashboard .dim { color: var(--faint); }
+.ptd-top { position: sticky; top: 0; z-index: 3; padding: calc(env(safe-area-inset-top, 0px) + 10px) 16px 10px; background: rgba(10, 15, 29, 0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--glass-line); }
+.ptd-top-in { max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.ptd-brand { display: flex; align-items: center; gap: 10px; font: 12px var(--font-display); letter-spacing: var(--ls-pixel); }
+.ptd-brand small { display: block; margin-top: 6px; color: var(--accent); font-size: 9px; }
+.ptd-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ptd-seg { display: flex; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 8px; }
+.ptd-seg button { padding: 7px 10px; border: 0; background: transparent; color: var(--muted); font: 12px var(--font-body); cursor: pointer; }
+.ptd-seg button + button { border-left: 1px solid var(--line-strong); }
+.ptd-seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--text); }
+.ptd-search { width: 170px; padding: 7px 10px; border: 1px solid var(--line-strong); border-radius: 8px; outline: none; background: rgba(0, 0, 0, 0.24); color: var(--text); font: 12px var(--font-body); }
+.ptd-search:focus { border-color: var(--accent); }
+.ptd-account { margin-left: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--faint); font-size: 12px; }
+.ptd-btn { padding: 7px 10px; border: 1px solid var(--line-strong); border-radius: 8px; background: transparent; color: var(--muted); font: 12px var(--font-body); cursor: pointer; }
+.ptd-btn:hover:not(:disabled) { border-color: var(--muted); color: var(--text); }
+.ptd-btn:disabled { opacity: 0.4; cursor: default; }
+.ptd-main { max-width: 1240px; margin: 0 auto; padding: 20px 16px calc(env(safe-area-inset-bottom, 0px) + 40px); }
+.ptd-card { min-width: 0; padding: 18px; background: var(--glass); border: 1px solid var(--glass-line); border-radius: 14px; box-shadow: var(--glass-shine), var(--glass-shadow); }
+.ptd-card h2 { display: flex; justify-content: space-between; gap: 8px; margin: 0 0 14px; color: var(--muted); font: 9px/1.6 var(--font-display); letter-spacing: var(--ls-pixel); text-transform: uppercase; }
+.ptd-card h2 span { color: var(--faint); font: 12px var(--font-body); letter-spacing: 0; text-transform: none; }
+.ptd-gap { margin-bottom: 14px; }
+.ptd-message { max-width: 560px; margin: 40px auto; display: grid; gap: 10px; text-align: center; }
+.ptd-message h2 { justify-content: center; color: var(--gold); font-size: 12px; }
+.ptd-message p { margin: 0 0 6px; color: var(--muted); }
+.ptd-message p b { color: var(--text); word-break: break-all; }
+.ptd-message .btn { min-height: 46px; font-size: 10px; }
+.ptd-grid { display: grid; gap: 14px; margin-bottom: 14px; }
+.ptd-kpis { grid-template-columns: repeat(5, 1fr); }
+.ptd-g2 { grid-template-columns: 1.3fr 1fr; }
+.ptd-g4 { grid-template-columns: repeat(4, 1fr); }
+.ptd-kpi .l { color: var(--muted); font: 9px/1.6 var(--font-display); letter-spacing: var(--ls-pixel); text-transform: uppercase; }
+.ptd-kpi .v { margin: 10px 0 4px; font: 700 32px/1.1 var(--font-mono); }
+.ptd-kpi .v small { color: var(--faint); font-size: 16px; font-weight: 400; }
+.ptd-kpi .s { color: var(--faint); font-size: 12px; }
+.ptd-metric { display: grid; grid-template-columns: 150px 1fr 64px; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.ptd-metric:first-child { border-top: 0; }
+.ptd-metric .name { font-weight: 600; }
+.ptd-metric .name small { display: block; color: var(--faint); font-size: 12px; font-weight: 400; }
+.ptd-metric .avg { text-align: right; font: 700 20px var(--font-mono); }
+.ptd-metric .avg small { color: var(--faint); font-size: 12px; font-weight: 400; }
+.ptd-track { position: relative; height: 12px; border-radius: 4px; background: rgba(255, 255, 255, 0.05); }
+.ptd-fill { position: absolute; inset: 0 auto 0 0; border-radius: 0 4px 4px 0; background: var(--ptd-bar); }
+.ptd-dist { display: flex; gap: 2px; height: 12px; overflow: hidden; border-radius: 4px; }
+.ptd-dist span { display: block; height: 100%; }
+.ptd-ticks { display: flex; justify-content: space-between; margin-top: 4px; color: var(--faint); font: 11px var(--font-mono); }
+.ptd-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; color: var(--muted); font-size: 12px; }
+.ptd-legend i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 2px; vertical-align: -1px; }
+.ptd-hist { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; align-items: end; height: 150px; }
+.ptd-hist .col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+.ptd-hist .n { min-height: 18px; margin-bottom: 4px; color: var(--muted); font: 12px var(--font-mono); }
+.ptd-hist .b { width: 100%; max-width: 28px; border-radius: 4px 4px 0 0; background: var(--ptd-bar); }
+.ptd-hist-axis { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; padding-top: 4px; border-top: 1px solid var(--line-strong); color: var(--faint); font: 12px var(--font-mono); text-align: center; }
+.ptd-round { display: grid; grid-template-columns: 110px 1fr; gap: 10px; align-items: center; padding: 6px 0; }
+.ptd-round .bars { display: flex; flex-direction: column; gap: 2px; }
+.ptd-round .bars div { display: flex; align-items: center; gap: 6px; height: 12px; color: var(--muted); font: 12px var(--font-mono); }
+.ptd-round .bars span { display: block; height: 10px; min-width: 2px; border-radius: 0 4px 4px 0; }
+.ptd-days { max-height: 260px; overflow-y: auto; }
+.ptd-mini h3 { margin: 0 0 8px; color: var(--muted); font-size: 12px; font-weight: 600; }
+.ptd-mini + .ptd-mini { margin-top: 16px; }
+.ptd-mini-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 3px 0; }
+.ptd-mini-row .mono { color: var(--muted); }
+.ptd-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.ptd-tabs button { padding: 6px 12px; border: 1px solid var(--line-strong); border-radius: 999px; background: rgba(0, 0, 0, 0.24); color: var(--muted); font: 12px var(--font-body); cursor: pointer; }
+.ptd-tabs button .c { margin-left: 4px; color: var(--faint); font-family: var(--font-mono); }
+.ptd-tabs button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--text); }
+.ptd-notes { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+.ptd-note { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(0, 0, 0, 0.24); }
+.ptd-note .head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; color: var(--faint); font-size: 12px; }
+.ptd-note .head button { padding: 0; border: 0; background: none; color: var(--text); font: 600 14px var(--font-body); cursor: pointer; }
+.ptd-note .head button:hover { text-decoration: underline; }
+.ptd-note .pill, #playtestDashboard .pill { margin-left: auto; padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: 4px; color: var(--muted); font: 12px var(--font-mono); white-space: nowrap; }
+.ptd-note p { margin: 0; white-space: pre-wrap; }
+.ptd-empty { margin: 0; padding: 12px 0; color: var(--faint); }
+.ptd-table-wrap { margin: 0 -18px; padding: 0 18px; overflow-x: auto; }
+#playtestDashboard table { width: 100%; min-width: 760px; border-collapse: collapse; }
+#playtestDashboard th, #playtestDashboard td { padding: 9px 8px; border-top: 1px solid var(--line); text-align: left; white-space: nowrap; }
+#playtestDashboard th { border-top: 0; color: var(--muted); font: 9px var(--font-display); letter-spacing: var(--ls-pixel); cursor: pointer; user-select: none; }
+#playtestDashboard th[aria-sort="ascending"]::after { content: " ▲"; color: var(--accent); }
+#playtestDashboard th[aria-sort="descending"]::after { content: " ▼"; color: var(--accent); }
+#playtestDashboard .n { text-align: right; font-family: var(--font-mono); }
+#playtestDashboard tbody tr { cursor: pointer; }
+#playtestDashboard tbody tr:hover td { background: rgba(255, 255, 255, 0.04); }
+#playtestDashboard .score { display: inline-block; min-width: 30px; padding: 1px 6px; border-radius: 4px; color: #0a0f1d; font-weight: 700; text-align: center; }
+#playtestDashboard .bug { color: var(--gold); }
+.ptd-scrim { position: fixed; inset: 0; z-index: 4; background: rgba(4, 6, 13, 0.6); }
+.ptd-drawer { position: fixed; top: 0; right: 0; bottom: 0; z-index: 5; width: min(560px, 100%); overflow-y: auto; padding: calc(env(safe-area-inset-top, 0px) + 18px) 20px calc(env(safe-area-inset-bottom, 0px) + 30px); background: #0d1326; border-left: 1px solid var(--glass-line); }
+.ptd-scrim[hidden], .ptd-drawer[hidden], .ptd-tip[hidden] { display: none; }
+.ptd-drawer .head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+.ptd-drawer .head > .ptd-btn { margin-left: auto; flex: none; }
+.ptd-drawer h3 { margin: 0; font-size: 20px; }
+.ptd-drawer .meta { margin-top: 2px; color: var(--faint); font-size: 12px; word-break: break-word; }
+.ptd-drawer .nav { display: flex; align-items: center; gap: 6px; margin-bottom: 16px; font-size: 12px; }
+.ptd-drawer .grade { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+.ptd-drawer .grade .big { font: 700 44px/1 var(--font-mono); }
+.ptd-drawer .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.ptd-drawer .chips span { padding: 3px 8px; border: 1px solid var(--line-strong); border-radius: 6px; color: var(--muted); font-size: 12px; }
+.ptd-drawer .chips b { color: var(--text); font-weight: 600; }
+.ptd-drawer .sec { padding: 14px 0; border-top: 1px solid var(--line); }
+.ptd-drawer .sec h4 { display: flex; justify-content: space-between; margin: 0 0 8px; color: var(--muted); font: 9px/1.6 var(--font-display); letter-spacing: var(--ls-pixel); text-transform: uppercase; }
+.ptd-drawer .sec h4 .mono { color: var(--text); font-size: 14px; letter-spacing: 0; text-transform: none; }
+.ptd-drawer .sec p { margin: 0; white-space: pre-wrap; }
+.ptd-drawer .sec .none { color: var(--faint); font-style: italic; }
+.ptd-tip { position: fixed; z-index: 6; max-width: 260px; padding: 8px 10px; pointer-events: none; border: 1px solid var(--line-strong); border-radius: 8px; background: #050811; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); font-size: 12px; }
+@media (max-width: 1100px) { .ptd-g4 { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 1000px) {
+  .ptd-kpis { grid-template-columns: repeat(3, 1fr); }
+  .ptd-g2 { grid-template-columns: 1fr; }
+}
+@media (max-width: 620px) {
+  .ptd-kpis { grid-template-columns: 1fr 1fr; }
+  .ptd-kpis .ptd-kpi:first-child { grid-column: 1 / -1; }
+  .ptd-kpi .v { font-size: 26px; }
+  .ptd-g4 { grid-template-columns: 1fr; }
+  .ptd-metric { grid-template-columns: 1fr 56px; }
+  .ptd-metric .viz { grid-column: 1 / -1; grid-row: 2; }
+  .ptd-account { margin-left: 0; }
+  .ptd-search { flex: 1; width: auto; }
 }
 
 </style>
@@ -8915,6 +9045,8 @@ const EN = {
   "playtest.rulesFoot": "Every round is worth up to 1,000 points. There's no clock: take your time.",
   "playtest.start": "▶ START THE DAY",
   "playtest.continue": "▶ CONTINUE THE DAY",
+  "playtest.continueDay": "▶ CONTINUE DAY {n}",
+  "playtest.pickDay": "or pick a day from the archive",
   "playtest.results": "✓ SEE MY RESULT",
   "playtest.anotherDay": "▶ PLAY ANOTHER DAY",
   "playtest.giveFeedback": "✎ GIVE FEEDBACK",
@@ -10879,6 +11011,8 @@ const NL = {
   "playtest.rulesFoot": "Elke ronde is tot 1.000 punten waard. Er is geen klok: neem je tijd.",
   "playtest.start": "▶ BEGIN DE DAG",
   "playtest.continue": "▶ GA VERDER MET DE DAG",
+  "playtest.continueDay": "▶ GA VERDER MET DAG {n}",
+  "playtest.pickDay": "of kies zelf een dag in het archief",
   "playtest.results": "✓ BEKIJK MIJN UITSLAG",
   "playtest.anotherDay": "▶ SPEEL NOG EEN DAG",
   "playtest.giveFeedback": "✎ GEEF FEEDBACK",
@@ -36270,7 +36404,32 @@ async function sendPlaytestFeedback(row) {
   if (error) throw new Error(error.message);
 }
 
-return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, getAccountUnits, saveUnits, saveBase, saveCampPitched, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, setGroupKind, setGroupAdmin, addToGroup, leaveGroup, getGroups, createChallenge, getChallenge, setPublicTent, getCrewTents, getCrewPicks, sendNudge, takeNudges, setGroupWebhook, getGroupWebhook, testGroupPost, setPublicLook, joinGroup, renameGroup, newJoinCode, removeFromGroup, getGroupBoard, callDuel, watchDuel, getDuelHistory, findOpenDuel, sendReaction, getDayReactions, takeReactions, getLiveContacts, sendMatchInvites, takeMatchInvites, sendPlaytestFeedback };
+// The playtest dashboard (playtest-dashboard.js): who is signed in (waits for the session, so it
+// works straight after the page loads), whether they're on the team (playtest_team), and every
+// answer, newest first. The table only gives rows to the team.
+async function currentUser() {
+  const supabase = await getClient();
+  if (!supabase) return null;
+  const { data } = await supabase.auth.getSession();
+  return data.session?.user || null;
+}
+async function isPlaytestTeam() {
+  const supabase = await getClient();
+  if (!supabase) return false;
+  const { data, error } = await supabase.rpc("is_playtest_team");
+  if (error) throw new Error(error.message);
+  return data === true;
+}
+async function getPlaytestFeedback() {
+  const supabase = await getClient();
+  if (!supabase) throw new Error("Accounts aren't set up.");
+  const { data, error } = await supabase.from("playtest_feedback").select("*").order("created_at", { ascending: false }).limit(2000);
+  if (error) throw new Error(error.message);
+  return data || [];
+}
+
+
+return { PROVIDERS, isConfigured, initAuth, getUser, getProfile, signIn, sendEmailLink, verifyEmailCode, takeAuthRedirectError, getAccountLanguage, saveLanguage, getAccountUnits, saveUnits, saveBase, saveCampPitched, saveTent, saveTentColor, saveTentLook, saveAtlasQuiet, signOut, pullDays, pushDay, getMyProfile, setDisplayName, addFriend, removeFriend, getFriends, createGroup, setGroupKind, setGroupAdmin, addToGroup, leaveGroup, getGroups, createChallenge, getChallenge, setPublicTent, getCrewTents, getCrewPicks, sendNudge, takeNudges, setGroupWebhook, getGroupWebhook, testGroupPost, setPublicLook, joinGroup, renameGroup, newJoinCode, removeFromGroup, getGroupBoard, callDuel, watchDuel, getDuelHistory, findOpenDuel, sendReaction, getDayReactions, takeReactions, getLiveContacts, sendMatchInvites, takeMatchInvites, sendPlaytestFeedback, currentUser, isPlaytestTeam, getPlaytestFeedback };
 })();
 
 // ---- playtest.js
@@ -36320,11 +36479,10 @@ const el = (tag, props = {}, ...children) => {
 };
 const esc = text => String(text ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-// getDays(): the Daily days this browser has played ({ dateKey, puzzleNumber, completed, score }).
-// firstDay(): the day a tester starts on (today, or the latest Daily day before it).
-// dayState(dateKey): "new", "started" or "done". play(dateKey) starts that day; openArchive()
-// opens Daily's archive over the end screen; send(row) sends the form (throws on failure).
-function initPlaytest({ getDays, firstDay, dayState, play, openArchive, send }) {
+// getDays(): every Daily day a tester may play, up to today ({ dateKey, puzzleNumber, started,
+// completed, score }). play(dateKey) starts that day; openArchive() opens Daily's archive;
+// send(row) sends the form (throws on failure).
+function initPlaytest({ getDays, play, openArchive, send }) {
   const active = readFlag();
   if (!active) return { active, renderEnd() {} };
   document.documentElement.dataset.playtest = "on";
@@ -36338,15 +36496,29 @@ function initPlaytest({ getDays, firstDay, dayState, play, openArchive, send }) 
     draft.choice.device = !coarse ? "computer" : Math.min(screen.width, screen.height) >= 700 ? "tablet" : "phone";
   }
 
+  // Which day PLAY starts (27 November 2026, request from the team: a random day every time,
+  // so the testers between them cover the whole calendar): a day left halfway is finished
+  // first; otherwise a random day this tester hasn't started, or any day once all are played.
+  const openDay = () => getDays().find(day => day.started && !day.completed) || null;
+  function nextDay() {
+    const days = getDays();
+    const open = days.find(day => day.started && !day.completed);
+    if (open) return open.dateKey;
+    const fresh = days.filter(day => !day.started);
+    const pool = fresh.length ? fresh : days;
+    return pool[Math.floor(Math.random() * pool.length)]?.dateKey || null;
+  }
+  const playNext = () => { const date = nextDay(); if (date) play(date); };
+
   /* ---------- 1. the welcome screen ---------- */
   const welcome = el("div", { className: "playtest-screen", id: "playtestWelcome", role: "dialog" });
   welcome.setAttribute("aria-modal", "true");
   document.body.appendChild(welcome);
 
   function renderWelcome() {
-    const start = firstDay();
-    const state = dayState(start);
-    const back = state !== "new" || getDays().some(day => day.started);
+    const open = openDay();
+    const back = getDays().some(day => day.started);
+    const played = getDays().some(day => day.completed);
     welcome.innerHTML = `
       <div class="playtest-card">
         <header class="playtest-head">
@@ -36365,12 +36537,9 @@ function initPlaytest({ getDays, firstDay, dayState, play, openArchive, send }) 
           <p class="playtest-foot">${t("playtest.rulesFoot")}</p>
         </section>
         <div class="playtest-actions">
-          ${state === "done"
-            ? `<button class="btn btn-primary" type="button" data-act="another">${t("playtest.anotherDay")}</button>
-               <button class="btn btn-secondary" type="button" data-act="feedback">${t(draft.sentAt ? "playtest.feedbackSent" : "playtest.giveFeedback")}</button>
-               <button class="btn btn-secondary" type="button" data-act="play">${t("playtest.results")}</button>`
-            : `<button class="btn btn-primary" type="button" data-act="play">${t(state === "started" ? "playtest.continue" : "playtest.start")}</button>
-               ${back ? `<button class="btn btn-secondary" type="button" data-act="feedback">${t(draft.sentAt ? "playtest.feedbackSent" : "playtest.giveFeedback")}</button>` : ""}`}
+          <button class="btn btn-primary" type="button" data-act="play">${open ? t("playtest.continueDay", { n: open.puzzleNumber }) : t(played ? "playtest.anotherDay" : "playtest.start")}</button>
+          ${back ? `<button class="btn btn-secondary" type="button" data-act="feedback">${t(draft.sentAt ? "playtest.feedbackSent" : "playtest.giveFeedback")}</button>` : ""}
+          ${played ? `<button class="playtest-link" type="button" data-act="archive">${t("playtest.pickDay")}</button>` : ""}
         </div>
       </div>`;
   }
@@ -36380,8 +36549,8 @@ function initPlaytest({ getDays, firstDay, dayState, play, openArchive, send }) 
     const act = event.target.closest("[data-act]")?.dataset.act;
     if (!act) return;
     sounds.playClick();
-    if (act === "play") { welcome.classList.add("hidden"); play(firstDay()); }
-    if (act === "another") { welcome.classList.add("hidden"); openArchive(); }
+    if (act === "play") { welcome.classList.add("hidden"); playNext(); }
+    if (act === "archive") { welcome.classList.add("hidden"); openArchive(); }
     if (act === "feedback") openForm();
   });
   renderWelcome();
@@ -36405,7 +36574,7 @@ function initPlaytest({ getDays, firstDay, dayState, play, openArchive, send }) 
     const act = event.target.closest("[data-act]")?.dataset.act;
     if (!act) return;
     sounds.playClick();
-    if (act === "another") openArchive();
+    if (act === "another") playNext();
     if (act === "feedback") openForm();
   });
 
@@ -36580,7 +36749,7 @@ function initPlaytest({ getDays, firstDay, dayState, play, openArchive, send }) 
     if (act === "close") closeForm();
     if (act === "send") submit(event.target.closest("[data-act]"));
     if (act === "edit") { sentView = false; renderForm(); form.scrollTop = 0; }
-    if (act === "another") { closeForm(); welcome.classList.add("hidden"); openArchive(); }
+    if (act === "another") { closeForm(); welcome.classList.add("hidden"); playNext(); }
   });
   form.addEventListener("input", event => {
     const target = event.target;
@@ -36666,6 +36835,418 @@ function initPlaytest({ getDays, firstDay, dayState, play, openArchive, send }) 
 }
 
 return { initPlaytest };
+})();
+
+// ---- playtest-dashboard.js
+__modules["playtest-dashboard.js"] = (() => {
+// The team's playtest dashboard (27 November 2026, request from the team): …/?dashboard.
+// Every answer from the playtest form (playtest.js → playtest_feedback in Supabase), with
+// averages per metric, the grades, the rounds, who tested, the days played, every note by
+// section, and each tester's whole form. Only people in playtest_team can read the rows (sign
+// in with Google first). Designed in mockups/playtest-feedback/dashboard.html. English only:
+// it's a tool for the team, not part of the game.
+const { currentUser, getPlaytestFeedback, getProfile, isPlaytestTeam, signIn, signOut } = __modules["auth.js"];
+const { MODE_NAME } = __modules["extremes.js"];
+
+// Google sends you back without the ?dashboard, so the wish to open it waits here.
+const RETURN_KEY = "daily-geography:dashboard-return:v1";
+
+const METRICS = [
+  { id: "questions", name: "Questions", sub: "quality & appeal" },
+  { id: "ux", name: "User experience", sub: "clear, easy to use" },
+  { id: "vibe", name: "Animations, sound & vibe", sub: "" },
+  { id: "difficulty", name: "Difficulty & accessibility", sub: "3 = just right", balance: true }
+];
+const BALANCE = ["Way too hard", "A bit hard", "Just right", "A bit easy", "Way too easy"];
+const DIFF_COLOURS = ["var(--ptd-hard)", "color-mix(in srgb, var(--ptd-hard) 55%, var(--ptd-mid))", "var(--ptd-mid)", "color-mix(in srgb, var(--ptd-easy) 55%, var(--ptd-mid))", "var(--ptd-easy)"];
+const ROUNDS = { extreme: MODE_NAME, pin: "Drop a Pin", paint: "Paint the Map", mystery: "Mystery Country", iceberg: "Iceberg" };
+const LABELS = {
+  device: { phone: "Phone", tablet: "Tablet", computer: "Computer" },
+  habit: { never: "Never", sometimes: "Sometimes", weekly: "Every week", daily: "Every day" },
+  geo: { 1: "Lost without a map", 2: "Average", 3: "Pretty good", 4: "Geography nerd" },
+  yn: { yes: "Yes", maybe: "Maybe", no: "No" }
+};
+const NOTE_TABS = [
+  ["questions", "Questions"], ["ux", "User experience"], ["vibe", "Vibe"], ["difficulty", "Difficulty"],
+  ["rounds", "Rounds"], ["again", "Coming back"], ["bugs", "Bugs"], ["facts", "Wrong facts"], ["review", "Mini reviews"]
+];
+
+const esc = text => String(text ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const avg = list => list.length ? list.reduce((a, b) => a + b, 0) / list.length : null;
+const f1 = v => v == null ? "–" : v.toFixed(1);
+const pct = (n, d) => d ? Math.round((100 * n) / d) : 0;
+const when = iso => new Date(iso).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+const gradeColour = v => ["#ff5a4f", "#ff5a4f", "#ff6f45", "#ff8a3d", "#ffa843", "#ffc94a", "#d9d85a", "#a8e46a", "#7aec78", "#5cf28a"][Math.max(1, Math.min(10, v)) - 1];
+const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+// A row of the table → what the dashboard reads.
+function toResponse(row, index) {
+  const answers = row.answers || {};
+  const choices = answers.choices || {};
+  return {
+    i: index, id: row.id, name: row.tester || "?", email: row.email, at: row.created_at,
+    lang: row.lang || "en", device: row.device || choices.device || null, overall: row.overall,
+    habit: choices.habit, geo: choices.geo, fav: choices.fav, least: choices.least,
+    tomorrow: choices.tomorrow, friend: choices.friend, bugs: choices.bugs,
+    ratings: answers.ratings || {}, notes: answers.notes || {}, noSound: Boolean(answers.noSound),
+    review: answers.review || "", played: Array.isArray(row.played) ? row.played : [], client: row.client || null
+  };
+}
+
+// ?dashboard=sample on this computer (localhost, 127.0.0.1) shows made-up rows without signing
+// in, to check the layout; it never runs on the live site.
+const LOCAL = ["localhost", "127.0.0.1"].includes(location.hostname);
+const SAMPLE_ROWS = [
+  { id: "s1", tester: "Sample Lotte", lang: "nl", device: "phone", overall: 8, created_at: "2026-11-27T19:12:00Z", email: null,
+    answers: { ratings: { questions: 4, ux: 3, vibe: 5, difficulty: 2 }, noSound: false, review: "Superleuk, iets te moeilijk soms.",
+      choices: { habit: "daily", geo: "3", fav: "mystery", least: "paint", tomorrow: "yes", friend: "yes", bugs: "some" },
+      notes: { ux: "Op mijn telefoon zag ik de LOCK IN-knop eerst niet.", difficulty: "Kleur de kaart was te moeilijk.", bugs: "De globe draaide vanzelf weg." } },
+    played: [{ date: "2026-11-04", day: 4, completed: true, score: 3840 }, { date: "2026-11-12", day: 12, completed: false, score: null }],
+    client: { width: 390, height: 844, touch: true, agent: "Sample" } },
+  { id: "s2", tester: "Sample James", lang: "en", device: "computer", overall: 7, created_at: "2026-11-27T20:40:00Z", email: "sample@example.com",
+    answers: { ratings: { questions: 4, ux: 4, vibe: 4, difficulty: 4 }, noSound: true, review: "Polished and clever, a bit easy.",
+      choices: { habit: "weekly", geo: "4", fav: "extreme", least: "pin", tomorrow: "maybe", friend: "yes", bugs: "none" },
+      notes: { questions: "Highs & Lows questions are the best part.", again: "A streak and my friends' scores." } },
+    played: [{ date: "2026-11-09", day: 9, completed: true, score: 4410 }], client: null },
+  { id: "s3", tester: "Sample Tom", lang: "en", device: "phone", overall: 5, created_at: "2026-11-28T09:02:00Z", email: null,
+    answers: { ratings: { questions: 3, ux: 2, vibe: 3, difficulty: 1 }, noSound: false, review: "",
+      choices: { habit: "never", geo: "1", fav: "pin", least: "iceberg", tomorrow: "no", friend: "maybe", bugs: "some" },
+      notes: { ux: "Didn't know I had to press LOCK IN.", bugs: "Text overlapped on the end screen.", facts: "Day 4: I think the answer was wrong." } },
+    played: [{ date: "2026-11-04", day: 4, completed: true, score: 1420 }], client: null }
+];
+
+function initPlaytestDashboard() {
+  const params = new URLSearchParams(location.search);
+  let wanted = params.has("dashboard");
+  try {
+    if (sessionStorage.getItem(RETURN_KEY)) { wanted = true; sessionStorage.removeItem(RETURN_KEY); }
+  } catch { /* storage blocked */ }
+  if (!wanted) return;
+  if (!params.has("dashboard")) history.replaceState(null, "", `${location.pathname}?dashboard${location.hash}`);
+
+  const root = document.createElement("div");
+  root.id = "playtestDashboard";
+  root.setAttribute("role", "dialog");
+  root.setAttribute("aria-modal", "true");
+  root.setAttribute("aria-label", "Playtest dashboard");
+  document.body.appendChild(root);
+  const $ = selector => root.querySelector(selector);
+
+  let all = [];
+  const S = { lang: "", device: "", latest: true, q: "", tab: "questions", sort: ["at", -1], open: -1 };
+
+  function shell(body, { filters = false, account = null } = {}) {
+    root.innerHTML = `
+      <header class="ptd-top"><div class="ptd-top-in">
+        <div class="ptd-brand"><span class="brand-mark" aria-hidden="true"></span><div>EXPEDITION<small>Playtest dashboard</small></div></div>
+        ${filters ? `<div class="ptd-filters">
+          <div class="ptd-seg" data-filter="latest"><button data-v="1" aria-pressed="${S.latest}" title="One form per tester: their newest">Latest per tester</button><button data-v="" aria-pressed="${!S.latest}">Every send</button></div>
+          <div class="ptd-seg" data-filter="lang"><button data-v="" aria-pressed="${S.lang === ""}">All</button><button data-v="en" aria-pressed="${S.lang === "en"}">EN</button><button data-v="nl" aria-pressed="${S.lang === "nl"}">NL</button></div>
+          <div class="ptd-seg" data-filter="device"><button data-v="" aria-pressed="${S.device === ""}">All</button><button data-v="phone" aria-pressed="${S.device === "phone"}">Phone</button><button data-v="tablet" aria-pressed="${S.device === "tablet"}">Tablet</button><button data-v="computer" aria-pressed="${S.device === "computer"}">Computer</button></div>
+          <input class="ptd-search" type="search" placeholder="Search notes or names" value="${esc(S.q)}">
+        </div>` : ""}
+        <div class="ptd-account">${account ? `<span>${esc(account)}</span>` : ""}
+          ${filters ? `<button class="ptd-btn" data-act="reload" title="Load the newest answers">↻ Refresh</button>` : ""}
+          <button class="ptd-btn" data-act="close">✕ Back to the game</button></div>
+      </div></header>
+      <main class="ptd-main">${body}</main>
+      <div class="ptd-scrim" hidden></div><aside class="ptd-drawer" hidden role="dialog" aria-modal="true"></aside><div class="ptd-tip" hidden></div>`;
+  }
+  const message = (title, text, buttons = "") => `<section class="ptd-card ptd-message"><h2>${title}</h2><p>${text}</p>${buttons}</section>`;
+
+  const sample = LOCAL && params.get("dashboard") === "sample";
+  async function load() {
+    shell(message("Loading…", "Fetching the answers."));
+    if (sample) {
+      all = SAMPLE_ROWS.map(toResponse);
+      showData("SAMPLE DATA (this computer only)");
+      return;
+    }
+    let user = null;
+    try { user = await currentUser(); } catch { /* signed out */ }
+    if (!user) {
+      shell(message("Sign in to see the answers", "Only the team can read the playtest feedback. Sign in with the Google account that's on the team list.",
+        `<button class="btn btn-primary" data-act="signin">Sign in with Google</button>`));
+      return;
+    }
+    const who = user.email || getProfile(user).name;
+    try {
+      if (!(await isPlaytestTeam())) {
+        shell(message("Not on the team list", `You're signed in as <b>${esc(who)}</b>, which isn't on the playtest team list (playtest_team in Supabase).`,
+          `<button class="btn btn-secondary" data-act="signout">Sign out and use another account</button>`), { account: who });
+        return;
+      }
+      all = (await getPlaytestFeedback()).map(toResponse);
+    } catch (error) {
+      shell(message("Couldn't load the answers", esc(error.message), `<button class="btn btn-primary" data-act="reload">Try again</button>`), { account: who });
+      return;
+    }
+    showData(who);
+  }
+  function showData(who) {
+    shell(`
+      <div class="ptd-grid ptd-kpis" data-part="kpis"></div>
+      <div class="ptd-grid ptd-g2">
+        <section class="ptd-card"><h2>Scores per metric <span>average out of 5 · hover for the spread</span></h2><div data-part="metrics"></div></section>
+        <section class="ptd-card"><h2>Overall grade <span>how many testers gave each grade</span></h2><div data-part="hist"></div></section>
+      </div>
+      <div class="ptd-grid ptd-g4">
+        <section class="ptd-card"><h2>Rounds <span>favourite vs least favourite</span></h2><div data-part="rounds"></div></section>
+        <section class="ptd-card"><h2>Days played <span>testers · avg score</span></h2><div data-part="days"></div></section>
+        <section class="ptd-card"><h2>Who tested</h2><div data-part="who"></div></section>
+        <section class="ptd-card"><h2>By group <span>avg overall grade</span></h2><div data-part="groups"></div></section>
+      </div>
+      <section class="ptd-card ptd-gap"><h2>What they wrote <span>click a name to open their whole form</span></h2><div class="ptd-tabs" data-part="tabs"></div><div class="ptd-notes" data-part="notes"></div></section>
+      <section class="ptd-card"><h2>All responses <span>click a row for everything they answered</span></h2><div class="ptd-table-wrap"><table data-part="table"></table></div></section>`,
+    { filters: true, account: who });
+    render();
+  }
+
+  function rows() {
+    const q = S.q.trim().toLowerCase();
+    let list = all.filter(r => (!S.lang || r.lang === S.lang) && (!S.device || r.device === S.device));
+    // Resending the form makes a new row: keep each tester's newest (by name).
+    if (S.latest) {
+      const seen = new Set();
+      list = list.filter(r => { const key = r.name.trim().toLowerCase(); if (seen.has(key)) return false; seen.add(key); return true; });
+    }
+    if (q) list = list.filter(r => [r.name, r.review, ...Object.values(r.notes)].join(" ").toLowerCase().includes(q));
+    return list;
+  }
+  const part = name => $(`[data-part="${name}"]`);
+
+  function render() {
+    if (!part("kpis")) return;
+    const rs = rows();
+    if (!all.length) {
+      part("kpis").outerHTML = message("No feedback yet", `Send testers the link: <b>${esc(location.origin + location.pathname)}?playtest</b>. Their answers show up here (↻ Refresh).`);
+    }
+    kpis(rs); metrics(rs); hist(rs); rounds(rs); days(rs); who(rs); groups(rs); notes(rs); table(rs);
+  }
+
+  function kpis(rs) {
+    const el = part("kpis");
+    if (!el) return;
+    const n = rs.length;
+    const yes = key => rs.filter(r => r[key] === "yes").length;
+    const maybe = key => rs.filter(r => r[key] === "maybe").length;
+    const bugs = rs.filter(r => r.bugs === "some").length;
+    const facts = rs.filter(r => r.notes.facts).length;
+    const daysPlayed = rs.reduce((sum, r) => sum + r.played.filter(p => p.completed).length, 0);
+    const grades = rs.map(r => r.overall);
+    el.innerHTML = [
+      ["Responses", `${n}`, `${plural(daysPlayed, "day")} played in total`],
+      ["Overall grade", `${f1(avg(grades))}<small>/10</small>`, n ? `from ${Math.min(...grades)} to ${Math.max(...grades)}` : ""],
+      ["Play again tomorrow", `${pct(yes("tomorrow"), n)}<small>%</small>`, `${yes("tomorrow")} yes · ${maybe("tomorrow")} maybe`],
+      ["Would send to a friend", `${pct(yes("friend"), n)}<small>%</small>`, `${yes("friend")} yes · ${maybe("friend")} maybe`],
+      ["Bug reports", `${bugs}`, plural(facts, "wrong-fact report")]
+    ].map(([label, value, sub]) => `<div class="ptd-card ptd-kpi"><div class="l">${label}</div><div class="v">${value}</div><div class="s">${sub}</div></div>`).join("");
+  }
+
+  function metrics(rs) {
+    part("metrics").innerHTML = METRICS.map(m => {
+      const vals = rs.map(r => r.ratings[m.id]).filter(Boolean);
+      const a = avg(vals);
+      const counts = [1, 2, 3, 4, 5].map(v => vals.filter(x => x === v).length);
+      const spread = esc(counts.map((c, i) => `${m.balance ? BALANCE[i] : i + 1}: <b>${c}</b>`).join("<br>"));
+      const muted = m.id === "vibe" ? rs.filter(r => r.noSound).length : 0;
+      const sub = [m.sub, muted ? `${muted} played muted` : ""].filter(Boolean).join(" · ");
+      const total = vals.length || 1;
+      const viz = m.balance
+        ? `<div class="ptd-dist" data-tip="<b>${m.name}</b><br>${spread}">${counts.map((c, i) => c ? `<span style="width:${(100 * c) / total}%;background:${DIFF_COLOURS[i]}"></span>` : "").join("")}</div>
+           <div class="ptd-ticks"><span>too hard</span><span>just right</span><span>too easy</span></div>`
+        : `<div class="ptd-track" data-tip="<b>${m.name}</b><br>${spread}"><div class="ptd-fill" style="width:${a ? (a / 5) * 100 : 0}%"></div></div>
+           <div class="ptd-ticks"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>`;
+      const avgText = m.balance && a ? `${f1(a)}<small><br>${a < 2.6 ? "on the hard side" : a > 3.4 ? "on the easy side" : "about right"}</small>` : `${f1(a)}<small>/5</small>`;
+      return `<div class="ptd-metric"><div class="name">${m.name}<small>${sub ? `${sub} · ` : ""}n=${vals.length}</small></div><div class="viz">${viz}</div><div class="avg">${avgText}</div></div>`;
+    }).join("") + `<div class="ptd-legend"><span><i style="background:var(--ptd-hard)"></i>Too hard</span><span><i style="background:var(--ptd-mid)"></i>Just right</span><span><i style="background:var(--ptd-easy)"></i>Too easy</span></div>`;
+  }
+
+  function hist(rs) {
+    const counts = Array.from({ length: 10 }, (_, i) => rs.filter(r => r.overall === i + 1));
+    const max = Math.max(1, ...counts.map(list => list.length));
+    part("hist").innerHTML = `<div class="ptd-hist">${counts.map((list, i) => `<div class="col" data-tip="Grade <b>${i + 1}</b>: ${plural(list.length, "tester")}${list.length ? `<br>${esc(list.map(r => r.name).join(", "))}` : ""}">
+      <span class="n">${list.length || ""}</span><span class="b" style="height:${(list.length / max) * 110}px"></span></div>`).join("")}</div>
+      <div class="ptd-hist-axis">${counts.map((_, i) => `<span>${i + 1}</span>`).join("")}</div>`;
+  }
+
+  function rounds(rs) {
+    const fav = key => rs.filter(r => r.fav === key).length;
+    const least = key => rs.filter(r => r.least === key).length;
+    const keys = Object.keys(ROUNDS);
+    const max = Math.max(1, ...keys.flatMap(key => [fav(key), least(key)]));
+    part("rounds").innerHTML = [...keys].sort((a, b) => (fav(b) - least(b)) - (fav(a) - least(a))).map(key => `<div class="ptd-round"><div>${ROUNDS[key]}</div><div class="bars">
+        <div data-tip="<b>${ROUNDS[key]}</b><br>favourite of ${fav(key)}"><span style="width:${(fav(key) / max) * 80}%;background:var(--ptd-fav)"></span>${fav(key)}</div>
+        <div data-tip="<b>${ROUNDS[key]}</b><br>least favourite of ${least(key)}"><span style="width:${(least(key) / max) * 80}%;background:var(--ptd-least)"></span>${least(key)}</div>
+      </div></div>`).join("") +
+      `<div class="ptd-legend"><span><i style="background:var(--ptd-fav)"></i>Favourite</span><span><i style="background:var(--ptd-least)"></i>Least favourite</span></div>`;
+  }
+
+  // Which Daily days the testers played (they get a random one), so a bad day stands out.
+  function days(rs) {
+    const byDay = new Map();
+    rs.forEach(r => r.played.forEach(p => {
+      if (!byDay.has(p.day)) byDay.set(p.day, { day: p.day, testers: 0, scores: [] });
+      const entry = byDay.get(p.day);
+      entry.testers += 1;
+      if (p.completed && p.score != null) entry.scores.push(p.score);
+    }));
+    const list = [...byDay.values()].sort((a, b) => a.day - b.day);
+    part("days").innerHTML = list.length
+      ? `<div class="ptd-days">${list.map(d => `<div class="ptd-mini-row"><span>Day ${d.day}</span><span class="mono">${d.testers} · ${d.scores.length ? Math.round(avg(d.scores)).toLocaleString("en-GB") : "–"}</span></div>`).join("")}</div>`
+      : `<p class="ptd-empty">No days yet.</p>`;
+  }
+
+  function who(rs) {
+    const block = (title, key) => `<div class="ptd-mini"><h3>${title}</h3>${Object.entries(LABELS[key]).map(([v, l]) =>
+      `<div class="ptd-mini-row"><span>${l}</span><span class="mono">${rs.filter(r => String(r[key]) === v).length}</span></div>`).join("")}</div>`;
+    part("who").innerHTML = block("Played on", "device") + block("Plays daily puzzles", "habit") + block("Own geography", "geo") +
+      `<div class="ptd-mini"><h3>Language</h3><div class="ptd-mini-row"><span>English</span><span class="mono">${rs.filter(r => r.lang === "en").length}</span></div><div class="ptd-mini-row"><span>Dutch</span><span class="mono">${rs.filter(r => r.lang === "nl").length}</span></div></div>`;
+  }
+
+  function groups(rs) {
+    const line = (label, list) => {
+      const a = avg(list.map(r => r.overall));
+      return `<div class="ptd-mini-row"><span>${label} <span class="dim">· ${list.length}</span></span><span class="mono" style="color:${a ? gradeColour(Math.round(a)) : "var(--faint)"}">${f1(a)}</span></div>`;
+    };
+    const by = key => Object.entries(LABELS[key]).map(([v, l]) => line(l, rs.filter(r => String(r[key]) === v))).join("");
+    part("groups").innerHTML = `<div class="ptd-mini"><h3>By device</h3>${by("device")}</div><div class="ptd-mini"><h3>By own geography</h3>${by("geo")}</div>` +
+      `<div class="ptd-mini"><h3>By language</h3>${line("English", rs.filter(r => r.lang === "en"))}${line("Dutch", rs.filter(r => r.lang === "nl"))}</div>`;
+  }
+
+  const noteOf = (r, tab) => tab === "review" ? r.review : r.notes[tab];
+  function notes(rs) {
+    part("tabs").innerHTML = NOTE_TABS.map(([key, label]) => `<button data-tab="${key}" aria-pressed="${S.tab === key}">${label}<span class="c">${rs.filter(r => noteOf(r, key)).length}</span></button>`).join("");
+    const list = rs.filter(r => noteOf(r, S.tab));
+    const context = r => {
+      const metric = METRICS.find(m => m.id === S.tab);
+      if (metric) { const v = r.ratings[S.tab]; return v ? `<span class="pill">${metric.balance ? BALANCE[v - 1] : `${v}/5`}</span>` : ""; }
+      if (S.tab === "rounds") return `<span class="pill">♥ ${ROUNDS[r.fav] || "–"} · ✕ ${ROUNDS[r.least] || "–"}</span>`;
+      if (S.tab === "again") return `<span class="pill">tomorrow: ${LABELS.yn[r.tomorrow] || "–"}</span>`;
+      return `<span class="pill">${r.overall}/10</span>`;
+    };
+    part("notes").innerHTML = list.length
+      ? list.map(r => `<div class="ptd-note"><div class="head"><button data-open="${r.i}">${esc(r.name)}</button><span>${r.lang.toUpperCase()}${r.device ? ` · ${LABELS.device[r.device]}` : ""}</span>${context(r)}</div><p>${esc(noteOf(r, S.tab))}</p></div>`).join("")
+      : `<p class="ptd-empty">No notes here${S.q ? " for this search" : ""}.</p>`;
+  }
+
+  const COLS = [
+    ["name", "Name", r => esc(r.name)], ["at", "Sent", r => when(r.at)], ["lang", "Lang", r => r.lang.toUpperCase()],
+    ["device", "Device", r => LABELS.device[r.device] || "–"], ["days", "Days", r => r.played.filter(p => p.completed).length, "n"],
+    ["overall", "Overall", r => `<span class="score" style="background:${gradeColour(r.overall)}">${r.overall}</span>`, "n"],
+    ["questions", "Quest.", r => r.ratings.questions ?? "–", "n"], ["ux", "UX", r => r.ratings.ux ?? "–", "n"],
+    ["vibe", "Vibe", r => r.ratings.vibe ?? "–", "n"], ["difficulty", "Diff.", r => r.ratings.difficulty ? BALANCE[r.ratings.difficulty - 1] : "–"],
+    ["tomorrow", "Again?", r => LABELS.yn[r.tomorrow] || "–"],
+    ["bugs", "Bug", r => r.bugs === "some" ? `<span class="bug">● yes</span>` : `<span class="dim">–</span>`]
+  ];
+  const sortValue = (r, key) => key === "days" ? r.played.filter(p => p.completed).length : key in METRICS.reduce((o, m) => ({ ...o, [m.id]: 1 }), {}) ? r.ratings[key] ?? 0 : r[key] ?? "";
+  function table(rs) {
+    const [key, dir] = S.sort;
+    const list = [...rs].sort((a, b) => { const x = sortValue(a, key), y = sortValue(b, key); return (x > y ? 1 : x < y ? -1 : 0) * dir; });
+    part("table").innerHTML = `<thead><tr>${COLS.map(([id, label, , cls]) => `<th class="${cls || ""}" data-sort="${id}" aria-sort="${key === id ? (dir > 0 ? "ascending" : "descending") : "none"}">${label}</th>`).join("")}</tr></thead>
+      <tbody>${list.map(r => `<tr data-open="${r.i}">${COLS.map(([, , fn, cls]) => `<td class="${cls || ""}">${fn(r)}</td>`).join("")}</tr>`).join("") || `<tr><td colspan="${COLS.length}" class="dim">No responses match.</td></tr>`}</tbody>`;
+  }
+
+  function openDrawer(i) {
+    const r = all[i];
+    if (!r) return;
+    S.open = i;
+    const rs = rows();
+    const pos = rs.findIndex(x => x.i === i);
+    const prev = rs[pos - 1], next = rs[pos + 1];
+    const text = v => v ? `<p>${esc(v)}</p>` : `<p class="none">No note</p>`;
+    const sec = (title, right, body) => `<div class="sec"><h4><span>${title}</span>${right ? `<span class="mono">${right}</span>` : ""}</h4>${body}</div>`;
+    const drawer = $(".ptd-drawer");
+    drawer.innerHTML = `
+      <div class="head"><div><h3>${esc(r.name)}</h3><div class="meta">${when(r.at)} · ${r.lang === "nl" ? "Dutch" : "English"}${r.device ? ` · ${LABELS.device[r.device]}` : ""}${r.email ? ` · ${esc(r.email)}` : ""}</div></div>
+        <button class="ptd-btn" data-close aria-label="Close">✕</button></div>
+      <div class="nav"><button class="ptd-btn" data-open="${prev ? prev.i : ""}" ${prev ? "" : "disabled"}>‹ Previous</button><button class="ptd-btn" data-open="${next ? next.i : ""}" ${next ? "" : "disabled"}>Next ›</button><span class="dim">${pos + 1} of ${rs.length}</span></div>
+      <div class="grade"><span class="big" style="color:${gradeColour(r.overall)}">${r.overall}</span><span class="dim">/10 overall</span></div>
+      <div class="chips">
+        ${r.played.map(p => `<span>Day ${p.day} · <b>${p.completed && p.score != null ? p.score.toLocaleString("en-GB") : "unfinished"}</b></span>`).join("")}
+        <span>Puzzles: <b>${LABELS.habit[r.habit] || "–"}</b></span><span>Geography: <b>${LABELS.geo[r.geo] || "–"}</b></span>
+      </div>
+      ${METRICS.map(m => sec(m.name, r.ratings[m.id] ? (m.balance ? BALANCE[r.ratings[m.id] - 1] : `${r.ratings[m.id]}/5`) : "–",
+        (m.id === "vibe" && r.noSound ? `<p class="dim">Played with the sound off</p>` : "") + text(r.notes[m.id]))).join("")}
+      ${sec("Rounds", "", `<div class="chips"><span>Favourite: <b>${ROUNDS[r.fav] || "–"}</b></span><span>Least: <b>${ROUNDS[r.least] || "–"}</b></span></div>${text(r.notes.rounds)}`)}
+      ${sec("Coming back", "", `<div class="chips"><span>Tomorrow: <b>${LABELS.yn[r.tomorrow] || "–"}</b></span><span>Send to a friend: <b>${LABELS.yn[r.friend] || "–"}</b></span></div>${text(r.notes.again)}`)}
+      ${sec("Bugs", r.bugs === "some" ? "something went wrong" : r.bugs === "none" ? "nothing went wrong" : "–", r.bugs === "some" ? text(r.notes.bugs) : "")}
+      ${sec("Wrong facts", "", text(r.notes.facts))}
+      ${sec("Mini review", "", r.review ? `<p>${esc(r.review)}</p>` : `<p class="none">No review</p>`)}
+      ${r.client ? sec("Device", "", `<p class="dim">${r.client.width}×${r.client.height}${r.client.touch ? " · touch" : ""}<br>${esc(r.client.agent || "")}</p>`) : ""}`;
+    drawer.hidden = false;
+    $(".ptd-scrim").hidden = false;
+    drawer.scrollTop = 0;
+  }
+  function closeDrawer() {
+    S.open = -1;
+    const drawer = $(".ptd-drawer");
+    if (drawer) drawer.hidden = true;
+    const scrim = $(".ptd-scrim");
+    if (scrim) scrim.hidden = true;
+  }
+
+  root.addEventListener("click", async event => {
+    const act = event.target.closest("[data-act]")?.dataset.act;
+    if (act === "close") {
+      root.remove();
+      history.replaceState(null, "", `${location.pathname}${location.hash}`);
+      return;
+    }
+    if (act === "reload") { load(); return; }
+    if (act === "signin") {
+      try { sessionStorage.setItem(RETURN_KEY, "1"); } catch { /* reopen it by hand */ }
+      signIn("google").catch(error => { shell(message("Couldn't sign in", esc(error.message))); });
+      return;
+    }
+    if (act === "signout") { await signOut(); load(); return; }
+    const filter = event.target.closest("[data-filter] button");
+    if (filter) {
+      const key = filter.parentElement.dataset.filter;
+      S[key] = key === "latest" ? filter.dataset.v === "1" : filter.dataset.v;
+      filter.parentElement.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b === filter)));
+      render();
+      return;
+    }
+    const tab = event.target.closest("[data-tab]");
+    if (tab) { S.tab = tab.dataset.tab; notes(rows()); return; }
+    const th = event.target.closest("th[data-sort]");
+    if (th) { const key = th.dataset.sort; S.sort = [key, S.sort[0] === key ? -S.sort[1] : key === "name" ? 1 : -1]; table(rows()); return; }
+    const open = event.target.closest("[data-open]");
+    if (open && open.dataset.open !== "") { openDrawer(+open.dataset.open); return; }
+    if (event.target.closest("[data-close]") || event.target.classList.contains("ptd-scrim")) closeDrawer();
+  });
+  root.addEventListener("input", event => {
+    if (!event.target.matches(".ptd-search")) return;
+    S.q = event.target.value;
+    render();
+  });
+  document.addEventListener("keydown", event => {
+    if (!root.isConnected) return;
+    const drawer = $(".ptd-drawer");
+    if (!drawer || drawer.hidden) return;
+    if (event.key === "Escape") closeDrawer();
+    const rs = rows();
+    const pos = rs.findIndex(x => x.i === S.open);
+    if (event.key === "ArrowRight" && rs[pos + 1]) openDrawer(rs[pos + 1].i);
+    if (event.key === "ArrowLeft" && rs[pos - 1]) openDrawer(rs[pos - 1].i);
+  });
+  root.addEventListener("pointermove", event => {
+    const tip = $(".ptd-tip");
+    if (!tip) return;
+    const target = event.target.closest("[data-tip]");
+    if (!target || event.pointerType === "touch") { tip.hidden = true; return; }
+    tip.innerHTML = target.dataset.tip;
+    tip.hidden = false;
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    tip.style.left = `${Math.min(event.clientX + 14, innerWidth - w - 8)}px`;
+    tip.style.top = `${event.clientY + 16 + h > innerHeight ? event.clientY - h - 10 : event.clientY + 16}px`;
+  });
+
+  load();
+}
+
+return { initPlaytestDashboard };
 })();
 
 // ---- round-pictures.js
@@ -46218,6 +46799,7 @@ const { getAccountUnits, getDuelHistory, saveUnits } = __modules["auth.js"];
 const { DUEL_ROUNDS, PARTY_MIN_START, rematchHost, rematchIn, rematchReady, rematchSeats, seatsOf, standings } = __modules["duel-rules.js"];
 const { getAccountLanguage, getProfile, getUser, initAuth, isConfigured: isAuthConfigured, pullDays, pushDay, saveLanguage, sendEmailLink, sendPlaytestFeedback, signIn, signOut, takeAuthRedirectError, verifyEmailCode } = __modules["auth.js"];
 const { initPlaytest } = __modules["playtest.js"];
+const { initPlaytestDashboard } = __modules["playtest-dashboard.js"];
 const { ROUND_PICTURES } = __modules["round-pictures.js"];
 const { CLUES } = __modules["clues.js"];
 const { sounds } = __modules["audio.js"];
@@ -51660,14 +52242,12 @@ const archive = initializeHistoryScreens({
   onPlayDay: (...args) => { if (!lobbyBlocks()) enterGameView(...args); },
 });
 
-// The playtest: ?playtest in the address (playtest.js). Testers play Daily: today, or the
-// latest Daily day before it once the calendar runs out.
+// The playtest: ?playtest in the address (playtest.js). Testers play a random Daily day up to
+// today (playtest.js picks it); the team's dashboard is ?dashboard (playtest-dashboard.js).
 {
   const dailyDates = () => getAllPuzzleDays().filter(date => date <= today && hasDailyDay(date));
   playtest = initPlaytest({
     getDays: () => dailyDates().map(date => getDayRecord(date, "daily")),
-    firstDay: () => hasDailyDay(today) ? today : dailyDates().at(-1) || today,
-    dayState: date => (record => record.completed ? "done" : record.started ? "started" : "new")(getDayRecord(date, "daily")),
     play: date => { if (!lobbyBlocks()) mainMenu.showGame("daily", date); },
     openArchive: () => {
       endSkip();
@@ -51678,6 +52258,8 @@ const archive = initializeHistoryScreens({
   });
   if (!playtest.active) playtest = null;
 }
+// The team's dashboard of the playtest answers: ?dashboard (playtest-dashboard.js).
+initPlaytestDashboard();
 duel = createDuel({
   globe,
   onExit: () => {
