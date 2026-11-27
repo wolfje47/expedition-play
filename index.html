@@ -5434,10 +5434,16 @@ h1, h2, h3 { font-weight: normal; }
 .playtest-link { justify-self: center; padding: 6px 4px; border: 0; background: none; color: var(--muted); font: 14px var(--font-body); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .playtest-link:hover { color: var(--text); }
 @media (max-width: 760px) {
+  /* One row, as low as HOME and ARCHIVE: the standing journey above takes what's left. */
   .playtest-end { width: auto; justify-self: stretch; padding: 0 16px; }
-  .playtest-end-buttons { grid-template-columns: 1fr; gap: 8px; }
+  .playtest-end-buttons { gap: 10px; }
+  .playtest-end .btn { min-height: 46px; padding: 0 8px; font-size: 9px; }
   .playtest-end p { display: none; }
 }
+/* The end screen's standing journey keeps its shape (27 November 2026, found in the
+   playtest): on a short phone screen its box can be lower than the 240 art pixels the scene
+   needs, and "fill" squashed the mountain; now it scales down and stays in the middle. */
+#victoryModal .end-climb-chart .journey.is-tall { object-fit: contain; }
 
 /* the form */
 .pt-top {
@@ -11646,6 +11652,15 @@ const NL_TEXT = {
   "Quito is the highest official capital on this list; Amsterdam lies around sea level.": "Quito is de hoogste officiële hoofdstad in dit rijtje; Amsterdam ligt rond zeeniveau.",
   "Addis Ababa": "Addis Abeba",
   "Lost and Found": "Verloren en gevonden",
+  "Name one of the Twelve Caesars: Julius Caesar and the first eleven Roman emperors after him.": "Noem een van de twaalf keizers: Julius Caesar en de eerste elf Romeinse keizers na hem.",
+  "The Twelve Caesars": "De twaalf keizers",
+  "The Roman historian Suetonius wrote the lives of Julius Caesar and the first eleven emperors after him around AD 121. Four of them ruled in AD 69 alone, the Year of the Four Emperors: Galba, Otho, Vitellius and Vespasian.": "De Romeinse geschiedschrijver Suetonius beschreef rond 121 n.Chr. het leven van Julius Caesar en de eerste elf keizers na hem. Vier van hen regeerden alleen al in 69 n.Chr., het Vierkeizerjaar: Galba, Otho, Vitellius en Vespasianus.",
+  "Caesars": "Keizers",
+  "Written": "Geschreven",
+  "c. AD 121": "ca. 121 n.Chr.",
+  "Emperors in AD 69": "Keizers in 69 n.Chr.",
+  "Vespasian": "Vespasianus",
+  "Domitian": "Domitianus",
   "The oldest known written story, the Epic of Gilgamesh, comes from here.": "Het oudst bekende geschreven verhaal, het Gilgamesj-epos, komt hiervandaan.",
   "The ruins of ancient Babylon are here.": "De ruïnes van het oude Babylon liggen hier.",
   "It lies in the land between two rivers, the Tigris and the Euphrates.": "Het ligt in het land tussen twee rivieren, de Tigris en de Eufraat.",
@@ -24991,7 +25006,7 @@ const DAILY_DAYS = {
       question: "Click every country the Andes run through.",
       answers: ["VE", "CO", "EC", "PE", "BO", "CL", "AR"],
       view: [-15, -68],
-      picture: "Aconcagua"
+      picture: "Andes"
     },
     mystery: "KG",
     iceberg: {
@@ -25043,29 +25058,30 @@ const DAILY_DAYS = {
       picture: "Seven Wonders of the Ancient World"
     },
     mystery: "PE",
+    // Replaced 27 November 2026 (playtest: Paint the Map's card named every Wonder two
+    // rounds earlier); the team picked the Twelve Caesars of Suetonius.
     iceberg: {
-      countries: ["EG"],
-      question: "Name one of the Seven Wonders of the Ancient World.",
+      countries: ["IT"],
+      question: "Name one of the Twelve Caesars: Julius Caesar and the first eleven Roman emperors after him.",
       answers: {
-        "200": ["Great Pyramid of Giza"],
-        "400": ["Hanging Gardens of Babylon", "Colossus of Rhodes"],
-        "600": ["Lighthouse of Alexandria"],
-        "800": ["Temple of Artemis", "Statue of Zeus"],
-        "1000": ["Mausoleum at Halicarnassus"]
+        "200": ["Julius Caesar", "Nero"],
+        "400": ["Augustus", "Caligula"],
+        "600": ["Tiberius", "Claudius"],
+        "800": ["Vespasian", "Titus", "Domitian"],
+        "1000": ["Galba", "Otho", "Vitellius"]
       },
       aliases: {
-        "Mausoleum at Halicarnassus": ["Mausoleum of Halicarnassus"],
-        "Temple of Artemis": ["Temple of Artemis at Ephesus"],
-        "Statue of Zeus": ["Statue of Zeus at Olympia"],
-        "Lighthouse of Alexandria": ["Pharos of Alexandria"],
-        "Hanging Gardens of Babylon": ["Hanging Gardens"],
-        "Great Pyramid of Giza": ["Great Pyramid", "Pyramids of Giza"]
+        "Julius Caesar": ["Caesar", "Gaius Julius Caesar"],
+        Augustus: ["Octavian", "Octavianus", "Caesar Augustus"],
+        Caligula: ["Gaius"],
+        Vespasian: ["Vespasianus"],
+        Domitian: ["Domitianus"]
       },
       info: {
-        title: "The Seven Wonders",
-        text: "Only one of the Seven Wonders of the Ancient World still stands: the Great Pyramid of Giza, built around 2560 BC. It was the tallest building on Earth for almost 4,000 years.",
-        facts: [["Wonders", "7"], ["Still standing", "1"], ["Pyramid built", "c. 2560 BC"]],
-        picture: "Great Pyramid of Giza"
+        title: "The Twelve Caesars",
+        text: "The Roman historian Suetonius wrote the lives of Julius Caesar and the first eleven emperors after him around AD 121. Four of them ruled in AD 69 alone, the Year of the Four Emperors: Galba, Otho, Vitellius and Vespasian.",
+        facts: [["Caesars", "12"], ["Written", "c. AD 121"], ["Emperors in AD 69", "4"]],
+        picture: "The Twelve Caesars"
       }
     }
   },
@@ -37535,7 +37551,7 @@ const ROUND_PICTURES = {
   },
   "daily:2026-11-09": {
     pin: {"src":"pictures/daily-2026-11-09-pin.webp","width":640,"height":425,"credit":"Pavel Špindler","license":"CC BY 3.0","link":"https://commons.wikimedia.org/wiki/File:Lhasa_-_Pot%C3%A1la_-_panoramio.jpg","article":"Lhasa","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Lhasa_-_Pot%C3%A1la_-_panoramio.jpg/960px-Lhasa_-_Pot%C3%A1la_-_panoramio.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    paint: {"src":"pictures/2026-11-17-rank.webp","width":640,"height":353,"credit":"Bjørn Christian Tørrissen","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Aconcagua2016.jpg","article":"Aconcagua","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/Aconcagua2016.jpg/960px-Aconcagua2016.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
+    paint: {"src":"pictures/2026-11-09-paint.webp","width":640,"height":341,"credit":"Diego Delso","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Panoramic_view_Andes-Chile.jpg","article":"Andes","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Panoramic_view_Andes-Chile.jpg/960px-Panoramic_view_Andes-Chile.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     mystery: {"src":"pictures/2026-11-17-mystery.webp","width":640,"height":427,"credit":"Aitenir","license":"CC0","link":"https://commons.wikimedia.org/wiki/File:Bishkek_City%27s_business_center.jpg","article":"Bishkek","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Bishkek_City%27s_business_center.jpg/960px-Bishkek_City%27s_business_center.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     iceberg: {"src":"pictures/2026-11-17-deepcut.webp","width":640,"height":427,"credit":"Rdevany","license":"CC BY-SA 3.0","link":"https://commons.wikimedia.org/wiki/File:Mt._Everest_from_Gokyo_Ri_November_5,_2012.jpg","article":"Mount Everest","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/Mt._Everest_from_Gokyo_Ri_November_5%2C_2012.jpg/960px-Mt._Everest_from_Gokyo_Ri_November_5%2C_2012.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
@@ -37543,7 +37559,7 @@ const ROUND_PICTURES = {
     pin: {"src":"pictures/2026-11-18-rank.webp","width":640,"height":394,"credit":"Carsten Steger","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Aerial_image_of_Pompeii_and_Mount_Vesuvius_(view_from_the_southeast).jpg","article":"Pompeii","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Aerial_image_of_Pompeii_and_Mount_Vesuvius_%28view_from_the_southeast%29.jpg/960px-Aerial_image_of_Pompeii_and_Mount_Vesuvius_%28view_from_the_southeast%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     paint: {"src":"pictures/2026-11-18-paint.webp","width":640,"height":1056,"credit":"The original uploader was Mark22 at English Wikipedia.","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:SevenWondersOfTheWorld.png","article":"Seven Wonders of the Ancient World","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/SevenWondersOfTheWorld.png/960px-SevenWondersOfTheWorld.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
     mystery: {"src":"pictures/2026-11-18-mystery.webp","width":640,"height":432,"credit":"David Felipe Ruiz Hoyos","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Bas%C3%ADlica_Catedral_Metropolitana_de_Lima_(cropped).jpg","article":"Lima","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/69/Bas%C3%ADlica_Catedral_Metropolitana_de_Lima_%28cropped%29.jpg/960px-Bas%C3%ADlica_Catedral_Metropolitana_de_Lima_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
-    iceberg: {"src":"pictures/2026-11-18-deepcut.webp","width":640,"height":360,"credit":"Douwe C. van der Zee","license":"CC BY-SA 4.0","link":"https://commons.wikimedia.org/wiki/File:Great_Pyramid_of_Giza_-_Pyramid_of_Khufu.jpg","article":"Great Pyramid of Giza","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Great_Pyramid_of_Giza_-_Pyramid_of_Khufu.jpg/960px-Great_Pyramid_of_Giza_-_Pyramid_of_Khufu.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
+    iceberg: {"src":"pictures/daily-2026-11-10-iceberg.webp","width":640,"height":1086,"credit":"Suetonius","license":"Public domain","link":"https://commons.wikimedia.org/wiki/File:Suetonius,_De_vita_Caesarum,_Berlin,_Ms._lat._fol._28.jpg","article":"The Twelve Caesars","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Suetonius%2C_De_vita_Caesarum%2C_Berlin%2C_Ms._lat._fol._28.jpg/960px-Suetonius%2C_De_vita_Caesarum%2C_Berlin%2C_Ms._lat._fol._28.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"}
   },
   "daily:2026-11-11": {
     pin: {"src":"pictures/daily-2026-11-11-pin.webp","width":640,"height":429,"credit":"Pavel Kazachkov from Moscow, Russia","license":"CC BY 2.0","link":"https://commons.wikimedia.org/wiki/File:Moscow_Kremlin_(8281675670).jpg","article":"Moscow Kremlin","remote":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/Moscow_Kremlin_%288281675670%29.jpg/960px-Moscow_Kremlin_%288281675670%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"},
@@ -49918,11 +49934,10 @@ function showFinalModal() {
   document.getElementById("victoryModal").dataset.mode = activeMode;
   document.getElementById("victoryModal").classList.remove("hidden");
   document.getElementById("endPages").scrollLeft = 0;
+  // Playtest: PLAY ANOTHER DAY or GIVE FEEDBACK under the pages. Before the journey, which
+  // takes its size from the room left (added after it, they squashed the standing journey).
+  playtest?.renderEnd(activeMode);
   const onPhone = window.matchMedia("(max-width: 760px)").matches;
-  // The day's journey, round by round in each round's colour.
-  endClimb = journeyIn(endClimb, "endClimb", { tall: onPhone ? { top: 0.05, bottom: 0.96 } : null });
-  const stretches = getStretches(dayScore);
-  // Played once, then it stays at the day's total.
   // Where the world's top 50, 20, 5 and 1 % started today, as signs on the route, and
   // your own top % over the explorer (sample numbers for now, and the sign says so).
   const worldStats = getDayStats(activeDate, activeMode);
@@ -49933,6 +49948,15 @@ function showFinalModal() {
   const crewBox = document.getElementById("endCrew");
   if (onPhone) document.querySelector("#victoryModal .end-more").prepend(crewBox);
   else document.getElementById("endVersus").after(crewBox);
+  // A challenge you took for this day, and CHALLENGE A FRIEND (challenge.js).
+  challenges?.renderEnd(activeDate, activeMode, dayScore.total, dayScore.completed);
+  crewCard?.renderEnd(document.getElementById("endCrew"), { show: activeMode === MAIN_MODE && dayScore.completed });
+  // The day's journey, round by round in each round's colour. Made last of page 1: it takes
+  // its size from the room that's left, so everything else on the page comes first (27
+  // November 2026: the ruler, CHALLENGE A FRIEND and the playtest buttons came after it, and
+  // the standing journey on a phone was squashed into the smaller box).
+  endClimb = journeyIn(endClimb, "endClimb", { tall: onPhone ? { top: 0.05, bottom: 0.96 } : null });
+  const stretches = getStretches(dayScore);
   if (onPhone) endClimb.setRanks?.(null);
   else endClimb.setRanks?.({
     marks: [50, 20, 5, 1].map(n => ({ value: scoreAtTopPercent(worldStats, n), label: t("end.rankMark", { n }), short: `${n}%` })),
@@ -49952,11 +49976,6 @@ function showFinalModal() {
   const hideSkip = endSkip;
   const skipTimer = setTimeout(hideSkip, Math.max(1800, replayMs || 0));
 
-  // A challenge you took for this day, and CHALLENGE A FRIEND (challenge.js).
-  challenges?.renderEnd(activeDate, activeMode, dayScore.total, dayScore.completed);
-  crewCard?.renderEnd(document.getElementById("endCrew"), { show: activeMode === MAIN_MODE && dayScore.completed });
-  // Playtest: PLAY ANOTHER DAY or GIVE FEEDBACK under the pages.
-  playtest?.renderEnd(activeMode);
 
   // You against everyone who played today (sample numbers for now).
   const stats = getDayStats(activeDate, activeMode);
